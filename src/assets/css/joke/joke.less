@@ -1,0 +1,354 @@
+// 列表页
+// =======================
+.m-joke-types {
+    position: sticky;
+    top: 112px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    z-index: 100;
+    .u-icon {
+        .size(24px);
+        .y(-6px);
+    }
+}
+@media screen and (max-width: @phone) {
+    .wechat-miniprogram {
+        .m-joke-types {
+            position: relative;
+            top: 0;
+        }
+    }
+}
+.m-joke-search {
+    .el-switch__label {
+        color: @color;
+    }
+}
+.m-joke-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .mt(40px);
+}
+.m-joke-main {
+    .m-joke-content {
+        .w(100%);
+    }
+}
+@media screen and (min-width: 900px) {
+    .m-joke-main {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-joke-search {
+        .el-input-group__append {
+            .none;
+        }
+    }
+    .m-joke-footer{
+        flex-direction: column;
+    }
+    .m-joke-reward{
+        .mt(20px);
+    }
+    .m-joke-pagination{
+        .w(100%);
+    }
+}
+.m-joke-reward {
+    display: flex;
+    align-items: flex-end;
+    .m-joke-all{
+        margin-right: 10px;
+    }
+}
+.m-joke-publish {
+    background-color: @bg-light;
+    padding: 10px;
+    border: 1px solid #eee;
+    .r(4px);
+    .mb(20px);
+    .u-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+    .u-type {
+        margin-left: 10px;
+        position: relative;
+        top: -1px;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-joke-publish {
+        .u-type {
+            .none;
+        }
+    }
+}
+
+.m-joke-item {
+    .mb(30px);
+}
+@media screen and (max-width: @phone) {
+    .m-joke-pagination {
+        .x;
+        overflow-x: auto;
+    }
+}
+
+// 详情页
+// =======================
+.m-joke-goback {
+    .mb(10px);
+
+    .flex;
+    justify-content: space-between;
+    align-items: center;
+    .u-doc {
+        .fr;
+        .fz(12px);
+        i {
+            .mr(5px);
+        }
+        color: #555;
+        &:hover {
+            color: @pink;
+        }
+    }
+}
+.m-joke-tags {
+    .mt(10px);
+    color: #666;
+    .mb(30px);
+    padding: 5px 10px;
+    i {
+        .y;
+        .mr(5px);
+    }
+    .u-tag {
+        .fz(12px);
+
+        &:after {
+            content: "、";
+        }
+
+        &:last-child {
+            &::after {
+                .none;
+            }
+        }
+    }
+}
+
+// 骚话单项
+// =======================
+.m-joke-item {
+    position: relative;
+    @width: 30;
+
+    .arrows(b,@width,@color,@bo-width,@bo-color,@x:50%) {
+        &:before,
+        &:after {
+            top: 100%;
+            left: @x;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            border-style: solid;
+            border-color: transparent;
+            // margin-top:-1px;
+        }
+        &:after {
+            border-top-color: @color;
+            border-width: unit(@width, px);
+            @margin: -@width;
+            margin-left: unit(@margin, px);
+        }
+        &:before {
+            border-top-color: @bo-color;
+            @arrbo: @width+ @bo-width;
+            border-width: unit(@arrbo, px);
+            @margin-bo: -@arrbo;
+            margin-left: unit(@margin-bo, px);
+        }
+    }
+
+    .u-content {
+        // margin-bottom: 8px;
+        .fz(15px);
+
+        background: #fafbfc;
+        padding: 20px 14px;
+        border-radius: 4px;
+        border: 1px solid @border-hr;
+        .pr;
+
+        .arrows(b, 10px, #fafbfc, 1px, @border-hr, @x:20px);
+        .pointer;
+
+        transition: 0.1s ease-in-out;
+        &:hover,
+        &.on {
+            background-color: #f3f9ff;
+            border-color: #3585de;
+            .arrows(b, 10px, #f3f9ff, 1px, #3585de, @x:20px);
+        }
+
+        &.on {
+            cursor: default;
+        }
+    }
+    .u-sentence {
+        line-height: 24px;
+
+        div {
+            .di;
+        }
+        img {
+            .y(-3px);
+        }
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+
+    .u-star {
+        font-style: normal;
+        .fz(12px, 18px);
+        .size(20px);
+        .x;
+        border-radius: 2px;
+        background-color: #6f42c1;
+        color: #fff;
+        .fl;
+        .mr(5px);
+        transition: 0.1s ease-in-out;
+        .pr;
+        top: 2px;
+    }
+
+    .u-misc {
+        .clearfix;
+        .fz(12px, 20px);
+        .mt(15px);
+    }
+    .u-op {
+        .fl;
+        display: flex;
+        i {
+            .mr(5px);
+        }
+    }
+    .u-user {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 20px;
+        img {
+            margin-right: 8px;
+            .size(20px);
+            .y;
+            .r(2px);
+            .mr(5px);
+        }
+        a {
+            .underline(@color-link);
+        }
+
+        .ml(10px);
+    }
+    .el-link,
+    .u-like {
+        .mr(20px);
+        .fz(12px);
+    }
+    .u-like {
+        .pr;
+        cursor: pointer;
+        user-select: none;
+        .flex;
+        align-items: center;
+        &.disabled {
+            // .tm(0.5);
+            cursor: default;
+        }
+
+        &:hover {
+            .like-icon {
+                color: #f00;
+            }
+        }
+
+        &.on {
+            .like-icon {
+                color: #f00;
+            }
+        }
+
+        .like-icon {
+            .fz(15px);
+        }
+
+        .like-count {
+            color: #888;
+            .ml(6px);
+        }
+    }
+
+    .u-other {
+        .fr;
+        display: flex;
+        font-size: 12px;
+        color: #999;
+        align-items: center;
+        justify-content: space-between;
+
+
+        a:hover {
+            color: @pink;
+        }
+
+        .u-op-item {
+            .mr(15px);
+            i{
+                .mr(3px);
+            }
+        }
+
+        .u-op-gift{
+            .el-checkbox__label{
+                .fz(12px);
+                padding-left:5px;
+            }
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-joke-item {
+        .u-other {
+            .none;
+        }
+        .pr;
+        .u-copy,
+        .u-star {
+            .none !important;
+        }
+    }
+}
+
+// 其它
+// =======================
+.m-thx {
+    .mt(20px);
+}
+
+@media screen and (max-width:@phone){
+    .v-joke{
+        padding-top:10px;
+    }
+}

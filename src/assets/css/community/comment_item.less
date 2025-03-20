@@ -1,0 +1,148 @@
+// 回复 外包装
+.m-comment-wrapper {
+    background: #fafafa;
+    border-left: 1px solid #e8e8e8;
+    margin-bottom: 4px;
+    .u-reply-box {
+        .u-reply-list {
+            padding: 12px;
+            margin: 0;
+            border: 1px solid rgba(232, 232, 232, 1);
+            .u-reply-item {
+                .u-reply-list {
+                    padding-left: 20px;
+                }
+            }
+        }
+    }
+}
+.m-comment-right {
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    gap: 16px;
+    padding: 10px;
+    .u-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+    }
+}
+// 包含回复内容 、时间、操作按钮 的主要展示区域
+.m-comment-content {
+    flex: 1;
+    .u-content-top {
+        display: flex;
+        justify-content: space-between;
+        // 这条回复的作者名字
+        .u-name {
+            .flex;
+            .fz(14px, 20px);
+            color: #4080ff;
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 4px;
+            gap: 4px;
+            a:hover {
+                color: #f39;
+            }
+            .m-comment-time {
+                margin: 0;
+                font-size: 12px;
+                font-weight: normal;
+            }
+        }
+        // 会在移动端显示 更多操作
+        .u-more {
+            color: #0366d6;
+        }
+    }
+
+    // 回复的用户
+    .u-answer-user {
+        .fz(14px, 28px);
+        margin: 0;
+        color: #888;
+    }
+    // 回复的内容
+    .u-content {
+        margin-bottom: 4px;
+        padding-right: 0;
+        font-size: 14px;
+        margin: 0 0 4px 0;
+        white-space: pre-line;
+        line-height: 1.8;
+    }
+    // 操作 工具栏
+    .u-comment-toolbar {
+        .flex;
+        justify-content: space-between;
+        align-items: center;
+        column-gap: 15px;
+        flex-wrap: wrap;
+        // like 按钮 爱心
+        .u-btn-content {
+            .u-like-icon {
+                font-weight: 500;
+                font-size: 16px;
+                font-family: BlinkMacSystemFont, Helvetica;
+            }
+            .is-like {
+                color: red;
+            }
+            &:hover {
+                .u-like-icon {
+                    color: red;
+                }
+            }
+        }
+        .m-comment-time {
+            margin: 0 12px;
+        }
+        .el-button {
+            padding: 0;
+            height: 32px;
+        }
+        // 文本按钮
+        .el-button--text {
+            font-size: 12px;
+            opacity: 0.7;
+            &:not(.is-disabled):hover {
+                color: #0366d6;
+                opacity: 1;
+            }
+        }
+        // 按钮之间的间距
+        .el-button + .el-button {
+            margin-left: 12px;
+        }
+    }
+}
+
+.m-comment-time {
+    font-size: 14px;
+    color: #949494;
+}
+
+.u-mobile-show {
+    display: none;
+}
+
+@media screen and (max-width: @phone) {
+    .m-comment-right {
+        .u-avatar {
+            display: none;
+        }
+    }
+    .u-mobile-show {
+        display: block;
+    }
+    .m-comment-wrapper {
+        .u-mobile-hidden {
+            display: none;
+        }
+    }
+}
+.m-comment-time{
+    .fz(12px);
+}

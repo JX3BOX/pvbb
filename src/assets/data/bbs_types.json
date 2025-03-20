@@ -1,0 +1,18 @@
+{
+    "1":{
+        "label":"攻略心得",
+        "icon":"el-icon-collection"
+    },
+    "2":{
+        "label":"江湖回忆",
+        "icon":"el-icon-headset"
+    },
+    "3":{
+        "label":"同人创作",
+        "icon":"el-icon-film"
+    },
+    "4":{
+        "label":"交流讨论",
+        "icon":"el-icon-chat-line-square"
+    }
+}

@@ -1,0 +1,339 @@
+// reply-item 外包装
+.m-reply-wrapper {
+    display: flex;
+    margin-bottom: 12px;
+    background: white;
+    padding: 16px 0;
+    border-radius: 0 0 10px 10px;
+}
+
+// 包含回帖内容 、时间、操作按钮 的主要展示区域
+.m-reply-content {
+    border-radius: 0 6px 6px 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+    // 操作 工具栏
+    .u-reply-toolbar {
+        .flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        align-items: center;
+        column-gap: 15px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        .u-more {
+            padding: 5px 10px;
+            color: #0366d6;
+        }
+        .u-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .el-button {
+            height: 32px;
+        }
+        .u-reply-btn {
+            background: rgba(64, 128, 255, 1);
+            border-color: rgba(64, 128, 255, 1);
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+        .u-praise-btn {
+            background: rgba(255, 112, 146, 1);
+            border-color: rgba(255, 112, 146, 1);
+            &.is-disabled {
+                opacity: 0.5;
+            }
+            &:not(.is-disabled):hover {
+                opacity: 0.8;
+            }
+        }
+        // 文本按钮
+        .el-button--text {
+            padding: 0;
+            opacity: 0.7;
+            &:not(.is-disabled):hover {
+                color: #0366d6;
+                opacity: 1;
+            }
+        }
+        // 按钮之间的间距
+        .el-button + .el-button {
+            margin-left: 18px;
+        }
+    }
+    // 楼层
+    .u-reply-floor {
+        .pr;
+        .bold;
+        .flex;
+        align-items: center;
+        color: @color-link;
+        line-height: 32px;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+    .u-thx {
+        .flex;
+        align-items: center;
+        img {
+            .size(18px);
+        }
+    }
+    .u-comment-time {
+        color: #999;
+        font-weight: normal;
+        margin-left: 5px;
+    }
+    .u-reply-op {
+        margin-left: 5px;
+    }
+    .u-boxcoin {
+        .pa;
+        right: 0;
+        top: 0;
+        .fz(12px);
+        .flex;
+        align-items: center;
+        gap: 5px;
+        .pointer;
+        padding: 5px 10px 5px 15px;
+        border: 1px solid #eee;
+        border-right: none;
+        border-top-left-radius: 32px;
+        border-bottom-left-radius: 32px;
+        background-color: @bg-light;
+    }
+
+    .u-boxcoin-img {
+        .size(14px);
+    }
+
+    .u-boxcoin-num {
+        color: #f0b400;
+        .bold;
+        padding: 0 2px;
+    }
+    // 回帖内容
+    .u-reply-content {
+        .fz(16px, 28px);
+        margin-bottom: 24px;
+        // white-space: pre-line;  //主楼不要加这个啊
+        p {
+            margin: 0;
+        }
+        img {
+            vertical-align: middle;
+            position: relative;
+            &.attachment {
+                height: auto;
+                padding: 5px;
+                border: 1px solid #eee;
+                margin: 5px 0;
+            }
+        }
+    }
+
+    .m-image-box {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 10px;
+        margin-top: 24px;
+        width: 100%;
+        flex-wrap: wrap;
+        .u-item {
+            min-width: 48px;
+            height: 48px;
+            min-height: 48px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            img {
+                vertical-align: top;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .el-image {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: @pc) {
+    .m-reply-content {
+        .u-reply-content {
+            img {
+                max-width: 40vw;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-reply-content .u-boxcoin {
+        .none;
+    }
+    .m-reply-content {
+        .u-reply-content {
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+}
+
+// 回帖时间
+.m-reply-time {
+    text-align: right;
+    color: rgba(148, 148, 148, 1);
+    font-size: 12px;
+    margin-bottom: 24px;
+    margin-left: 12px;
+}
+
+// 左侧-用户信息
+.m-reply-left {
+    padding: 0 24px;
+    width: 220px;
+    .pr;
+    .u-top-right {
+        text-align: right;
+        justify-content: space-between;
+        .u-floor {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0366d6;
+            // margin-bottom: 8px;
+            .pointer;
+        }
+        .m-reply-time {
+            margin-bottom: 0;
+        }
+    }
+
+    .m-theme {
+        background-repeat: no-repeat;
+        background-size: 100% auto;
+        background-position: top right;
+        margin: 0 -24px 0 -24px;
+        padding: 24px 24px 0 24px;
+    }
+
+    @media screen and (max-width: @phone) {
+        & {
+            height: 82px;
+        }
+        .m-theme {
+            width: 100vw;
+            box-sizing: border-box;
+            margin: 0;
+            position: absolute;
+            left: -12px;
+            top: -16px;
+        }
+        .u-top-right {
+            .pa;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 0;
+        }
+    }
+}
+// 右侧-主要内容
+.m-reply-right {
+    .pr;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(232, 232, 232, 1);
+    padding: 0 24px;
+}
+// 折叠评论
+.m-comment-collapse {
+    font-size: 14px;
+    color: rgba(166, 166, 166, 1);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(232, 232, 232, 1);
+    margin-bottom: 4px;
+    & > div {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        cursor: pointer;
+    }
+}
+// 打赏组件上下加一下边距
+.m-single-thx {
+    padding: 40px 0;
+}
+// 评论列表 外包装
+.m-comment-list {
+    margin-top: 8px;
+}
+
+.u-mobile-show {
+    display: none;
+}
+
+@media screen and (max-width: @ipad) {
+    .m-reply-wrapper {
+        display: block;
+        padding: 16px 12px;
+        margin-bottom: 8px;
+    }
+    .m-reply-left {
+        padding: 0;
+    }
+    .m-reply-right {
+        border-left: 0;
+        padding: 0;
+    }
+    .m-reply-content {
+        .u-reply-content {
+            .fz(14px, 28px);
+            margin-bottom: 12px;
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-reply-left {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    .m-reply-content {
+        .u-reply-toolbar {
+            flex-direction: row;
+            .el-button + .el-button {
+                margin-left: 0;
+                margin-right: 12px;
+            }
+        }
+    }
+
+    .m-reply-wrapper {
+        .u-mobile-hidden {
+            display: none;
+        }
+        .u-mobile-show {
+            display: block;
+            &.u-top-right {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+}

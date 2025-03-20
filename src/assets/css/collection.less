@@ -1,0 +1,121 @@
+.m-collection-header {
+    background-color: #fafbfc;
+    padding: 10px;
+    .r(3px);
+    border: 1px solid @border-hr;
+    .fz(14px, 2);
+    white-space: pre-wrap;
+    a:hover {
+        box-shadow: 0 1px 0 @color-link;
+    }
+}
+.v-collection {
+    .u-tab-icon {
+        color: @color;
+    }
+    .is-active .u-tab-icon {
+        color: @color-link !important;
+    }
+    .u-tab-icon i {
+        .mr(5px);
+    }
+
+    .el-empty {
+        .flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .el-empty__description {
+            font-size: 13px;
+            color: #909399;
+        }
+    }
+}
+.m-collection-list {
+    padding: 0;
+    margin: 0;
+    .u-item {
+        .db;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        .pr;
+        min-height: 48px;
+        padding-left: 60px;
+        &:hover {
+            background-color: @bg-gray;
+        }
+
+        a {
+            .db;
+        }
+        border-bottom: 1px solid #eee;
+    }
+
+    .u-icon {
+        .pa;
+        .lt(0, 10px);
+        // .mr(10px);
+    }
+
+    .u-name {
+        .fz(14px);
+        .bold;
+        // .db;
+        .mr(5px);
+    }
+
+    .u-xf {
+        // .db;
+        .fz(12px, 2);
+        color: #555;
+        img {
+            .size(16px);
+            .y(-3px);
+        }
+    }
+
+    .u-desc {
+        .db;
+        color: @pink;
+        .fz(13px);
+        .bold;
+    }
+
+    .u-remark {
+        .db;
+        color: #999;
+        .fz(12px, 2);
+    }
+}
+
+.m-ladder-contributor {
+    .fz(14px);
+    border-top: 1px dashed #ddd;
+    padding: 20px 0;
+    .mt(40px);
+
+    .u-list {
+        .mt(10px);
+        .clearfix;
+    }
+    .u-author {
+        img {
+            .size(24px);
+            .r(2px);
+            .mr(5px);
+            .y;
+        }
+        .fz(14px, 24px);
+        .mr(20px);
+        .mb(5px);
+        padding: 5px 10px 5px 10px;
+        .db;
+        .fl;
+        &:hover {
+            color: @pink;
+            .bold;
+            background-color: @bg-gray;
+        }
+    }
+}

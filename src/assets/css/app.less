@@ -1,0 +1,43 @@
+.m-main{
+    padding:20px 30px;
+}
+@media screen and (max-width:@ipad){
+    .m-main{
+        padding:10px 20px;
+    }
+}
+@media screen and (max-width:@phone){
+    .m-main{
+        padding:5px 15px;
+    }
+    .c-breadcrumb .u-op{.none;}
+
+    .wechat-miniprogram {
+        .c-breadcrumb {
+            position: sticky;
+            top: 0;
+        }
+
+        .c-main {
+            margin-top: 0;
+        }
+
+        .u-editor {
+            .none;
+        }
+
+        .c-sidebar-left,.c-sidebar-right {
+            top: 48px;
+        }
+    }
+}
+
+.m-extend{
+    padding:10px 15px;
+}
+
+.m-archive-search{
+    display: flex;
+    gap:10px;
+    .mb(10px);
+}

@@ -1,0 +1,36 @@
+@import '../../../node_modules/@jx3box/jx3box-common/css/preset.css';
+
+.el-tabs--card {
+    .el-tabs__item{
+        background-color:@bg-light;
+        border-bottom:1px solid @border !important;
+
+        &.is-active{
+            border-bottom:none !important;
+            background-color:#fff;
+            .bold;
+        }
+    }
+}
+
+@url:"https://img.jx3box.com/";
+
+.scrollbar() {
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-track-piece {
+        background-color: #fafafa;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #eee;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-corner,
+    &::-webkit-resizer {
+        display: none;
+    }
+}

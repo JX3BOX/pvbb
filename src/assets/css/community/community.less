@@ -1,0 +1,461 @@
+.m-community-content {
+    padding: 0 6px 30px;
+
+    .m-archive-list {
+        margin: 0 24px;
+    }
+}
+
+// 帖子列表
+.m-topic-list {
+    .u-title {
+        &:hover {
+            text-decoration: underline;
+            // box-shadow: 0 1px 0 @color-link;
+        }
+    }
+    .u-banner {
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+    // 帖子item 外包装
+    .m-topic-box {
+        margin: 20px;
+        border-radius: 10px;
+        // 帖子item 左侧
+        .u-content-aside {
+            width: 168px;
+            padding-right: 24px;
+            // padding: 10px 30px 10px 15px;
+            border-right: 1px dotted rgba(229, 229, 229, 1);
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            // gap: 15px;
+            .m-topic-title {
+                display: none;
+            }
+            .u-cover {
+                // width: 168px;
+                width: 100%;
+                height: 88px;
+                overflow: hidden;
+                border-radius: 4px;
+                background-size: 300% 100%;
+                background-repeat: no-repeat;
+                background-position: center;
+                cursor: pointer;
+                box-shadow: 4px 4px 0 #eee;
+                margin-bottom: 15px;
+                .el-image {
+                    width: 100%;
+                    height: 100%;
+                }
+                img {
+                    object-fit: cover;
+                }
+            }
+        }
+        // 帖子item 右侧
+        .u-box-content {
+            .flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+            overflow: hidden;
+            .u-introduction {
+                display: -webkit-box; /* 使用弹性盒子模型 */
+                -webkit-box-orient: vertical; /* 设置盒子的排列方向为垂直方向 */
+                -webkit-line-clamp: 3; /* 限制显示的行数为3行 */
+                overflow: hidden; /* 隐藏超出的内容 */
+            }
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+        }
+    }
+    .m-topic-box .withSkin {
+        background-color: rgba(255, 255, 255, 0.6);
+        .u-box-content {
+            padding: 10px 15px;
+        }
+        .u-content-aside {
+            .u-cover {
+                box-shadow: 4px 4px 0 rgba(255, 255, 255, 0.6);
+            }
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+    }
+    .m-topic-box .withSkin.dark {
+        .u-box-content {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            .m-topic-title,
+            a {
+                color: #fff;
+            }
+        }
+
+        .u-content-aside {
+            .m-topic-title {
+                color: #fff;
+            }
+            .u-cover {
+                box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.8);
+            }
+            border-color: rgba(0, 0, 0, 0.6);
+        }
+        .m-topic-collection {
+            > a {
+                .u-value {
+                    color: #fff;
+                }
+                border: 1px solid #fff;
+            }
+        }
+        .m-topic-userInfo .m-topic-userInfo__name {
+            color: #fff;
+        }
+    }
+}
+
+.m-search-right {
+    .flex;
+    align-items: center;
+    gap: 10px;
+
+    .el-checkbox {
+        padding-top: 4px !important;
+    }
+}
+
+// 顶部左侧时间与右侧分类展示
+.m-topic-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .m-topic-top__time {
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: rgba(122, 122, 122, 1);
+        .u-timeload-icon {
+            width: 12px;
+            height: 12px;
+        }
+    }
+    .m-topic-top_right {
+        padding: 4px 4px 4px 90px;
+        position: relative;
+        display: flex;
+        gap: 24px;
+        .u-item {
+            .flex;
+            gap: 5px;
+            align-items: center;
+            font-size: 12px;
+            color: rgba(122, 122, 122, 1);
+        }
+        .m-topic-category {
+            .fz(12px, 12px);
+            padding: 2px 12px;
+            border-radius: 12px 12px 12px 0px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 700;
+            align-items: center;
+            user-select: none;
+            cursor: pointer;
+            color: @color;
+            & > div {
+                display: flex;
+                align-items: center;
+            }
+        }
+        .u-mocha {
+            width: 260px;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            bottom: -1px;
+            z-index: -1;
+
+            // path:nth-of-type(2) {
+            // fill: var(--border-hover-color);
+            // }
+        }
+    }
+}
+
+// 帖子item 外包装
+.m-topic-box {
+    .m-topic-box__content {
+        .flex;
+        background: white;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: right top;
+        padding: 20px;
+        border-radius: 6px;
+        border-top-right-radius: 0;
+        border: 1px solid rgba(232, 232, 232, 1);
+
+        &:hover {
+            border-color: var(--border-hover-color);
+            // .m-topic-title {
+            //     color: var(--title-hover-color) !important;
+            // }
+            // // 置顶贴的标题
+            // .m-topic-hot__right {
+            //     .u-title {
+            //         color: var(--title-hover-color) !important;
+            //     }
+            // }
+        }
+    }
+}
+// 标题
+.m-topic-title {
+    .bold;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 28px;
+    color: @color-link;
+    color: var(--title-color);
+    margin: 0;
+    text-decoration: none;
+    > svg {
+        position: relative;
+        top: -1px;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+    &:hover {
+        // color: rgba(255, 64, 128, 1);
+        color: @color-link;
+        text-decoration: underline;
+    }
+}
+
+// 帖子图片列表
+.m-topic-imgs {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 10px;
+    margin-top: 24px;
+    .u-item {
+        min-width: 48px;
+        height: 48px;
+        min-height: 48px;
+        cursor: pointer;
+        border-radius: 4px;
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        img {
+            vertical-align: top;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .el-image {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+// 小册
+.m-topic-collection {
+    margin-bottom: 5px;
+    & > a {
+        max-width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        cursor: pointer;
+        display: inline-block;
+        width: auto;
+        font-size: 12px;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid rgba(199, 199, 199, 1);
+        // .db;
+        .u-label {
+            display: inline-block;
+            padding: 2px 4px;
+            background: rgba(199, 199, 199, 1);
+            color: white;
+        }
+        .u-value {
+            padding: 2px 6px;
+            color: rgba(173, 173, 173, 1);
+        }
+    }
+}
+
+// 标签展示
+.m-topic-tag {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    color: rgba(64, 128, 255, 1);
+    margin-bottom: 10px;
+    span {
+        font-size: 12px;
+        cursor: pointer;
+        padding: 1px 8px;
+        background-color: #4080ff;
+        color: #fff;
+        border-radius: 3px;
+        line-height: 20px;
+    }
+}
+
+// 左侧用户信息
+.m-topic-userInfo {
+    & > a {
+        color: @color;
+        &:hover {
+            color: @color-link;
+            text-decoration: underline;
+        }
+    }
+    .m-topic-userInfo__avatar {
+        width: 18px;
+        height: 18px;
+        border-radius: 100%;
+        margin-right: 6px;
+        vertical-align: middle;
+    }
+    .m-topic-userInfo__name {
+        vertical-align: middle;
+        font-size: 13px;
+    }
+}
+
+// 帖子简介
+.m-topic-content,
+.m-topic-content > a {
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 24px;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+// 分页
+.m-topic-pagination {
+    margin: 0 24px;
+    .m-topic-pages {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    .m-community-pages {
+        overflow: auto;
+    }
+}
+.scrollbar {
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 12px;
+    }
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-track-piece {
+        background-color: #fafafa;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #eee;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-corner,
+    &::-webkit-resizer {
+        display: none;
+    }
+}
+
+@media screen and (max-width: @ipad) {
+    .m-topic-list {
+        column-count: unset;
+        margin-bottom: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+
+        .u-item {
+            padding-right: 5px;
+        }
+
+        .m-topic-box {
+            margin: 0;
+            .mb(40px);
+            .m-topic-box__content {
+                flex-direction: column;
+            }
+            .u-content-aside {
+                padding-right: 0;
+                margin-right: 0;
+                border: 0;
+                width: 100%;
+                .u-cover {
+                    display: none;
+                }
+                .m-topic-title {
+                    display: block;
+                }
+            }
+        }
+        .m-topic-userInfo {
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(229, 229, 229, 1);
+        }
+        .m-topic-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 4; /* 控制显示的行数 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            .m-topic-title {
+                display: none;
+            }
+        }
+    }
+    .m-topic-hot {
+        display: none;
+    }
+    .m-topic-hot__mini {
+        display: block;
+    }
+    .m-community-header {
+        .m-community-header__special-box {
+            justify-content: space-between;
+            gap: 0;
+        }
+        .m-community-header__special-list > a {
+            padding-left: 8px;
+        }
+    }
+}
+@media screen and (max-width: @ipad) {
+    .m-community-content {
+        padding: 15px;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-community-header {
+        padding: 15px;
+        margin-bottom: 0;
+    }
+    .m-community-header__special-list {
+        .none !important;
+    }
+    .m-community-header__special-box {
+        margin-left: 10px;
+    }
+}

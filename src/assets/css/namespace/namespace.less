@@ -1,0 +1,140 @@
+.m-namespace-item {
+    background-color: #f5f7fa;
+    padding: 15px 15px 10px 15px;
+    .pointer;
+    .r(4px);
+    &:hover{
+        .u-title{
+            a{
+                    color: @pink;
+            }
+        }
+    }
+    .u-title {
+        .db;
+        .fz(15px);
+        font-style: normal;
+        font-weight: normal;
+        margin: 0 0 5px 0;
+        .u-icon {
+            .mr(5px);
+            .fz(20px);
+            color: @color;
+            .y(-2px);
+        }
+        a {
+            .db;
+            font-weight: 500;
+            .mr(80px);
+            .nobreak;
+        }
+
+        .pr;
+        .u-preview {
+            background-color: #222;
+            color: #fff;
+            .ml(5px);
+            .fz(12px);
+            padding: 2px 5px;
+            .r(3px);
+        }
+        .u-my {
+            .fz(12px, 20px);
+            background-color: #e1f2fd;
+            color: #637a9c;
+            font-style: normal;
+            // .fr;
+            .pa;
+            .rt(0);
+            .r(2px);
+            padding: 0 5px;
+        }
+    }
+    .u-desc {
+        @h: 13px;
+        .nobreak;
+        .fz(@h, 2);
+        margin: 0;
+        .color(#666);
+    }
+    .u-misc {
+        .fz(12px, 2);
+        .color(#999);
+    }
+    .u-author {
+        .mr(10px);
+        a {
+            .underline(@color-link);
+            color: #999;
+            &:hover {
+                color: @color-link;
+            }
+        }
+    }
+}
+.m-namespace-list {
+    .flex;
+    .pt(20px);
+    flex-wrap: wrap;
+
+    .u-namespace {
+        .w(50%);
+        box-sizing: border-box;
+        padding: 0 20px 20px 0;
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-namespace-list {
+        .u-namespace {
+            .w(100%);
+            padding-right:0;
+        }
+    }
+}
+.m-namespace-pages {
+    overflow-x: auto;
+    .x;
+}
+.m-namespace-null {
+    margin-top: 20px;
+}
+.m-namespace-null {
+    margin-top: 20px;
+}
+.m-namespace-tab {
+    margin-top: 10px;
+    padding: 0 5px;
+}
+
+.m-namespace-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.m-namespace-add {
+    display: flex;
+    align-items: center;
+}
+.m-namespace-total {
+    .fz(12px, 2);
+    .ml(10px);
+    .color(#999);
+    b {
+        .color(#fba524);
+        margin: 0 2px;
+    }
+}
+
+.m-namespace-warning {
+    .mb(10px);
+}
+.m-namespace-search {
+    padding-left: 0 !important;
+}
+
+@media screen and (max-width:@phone){
+    .v-namespace{
+        padding-top:10px;
+    }
+}
