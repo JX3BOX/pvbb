@@ -21,7 +21,7 @@
             <!-- 过滤 -->
             <div class="m-namespace-filter">
                 <div class="m-namespace-add">
-                    <a :href="publish_link" class="u-publish el-button el-button--primary el-button--small">+ 注册铭牌</a>
+                    <a :href="publish_link" class="u-publish u-namespace-add el-button el-button--primary el-button--small">+ 注册铭牌</a>
                     <a href="/publish/#/bucket/namespace" class="u-publish el-button el-button--primary el-button--small">
                         <span class="el-icon-receiving"></span> 我的铭牌
                     </a>

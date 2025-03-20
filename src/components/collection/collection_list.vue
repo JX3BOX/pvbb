@@ -11,10 +11,8 @@
                 @clear="onSearch"
                 @keydown.native.enter="onSearch"
             >
-                <template #prepend> <i class="el-icon-search"></i> 关键词 </template>
-                <template #append>
-                    <el-button icon="el-icon-position" class="u-btn" @click="onSearch"></el-button>
-                </template>
+            <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
+            <el-button slot="append" icon="el-icon-position" class="u-btn" @click="onSearch"></el-button>
             </el-input>
         </div>
         <Banner :subtype="'collection'"></Banner>
