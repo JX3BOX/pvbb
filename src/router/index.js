@@ -19,12 +19,14 @@ const Emotion = () => import("../views/Emotion.vue");
 const Collection = () => import("../views/Collection.vue");
 const Community = () => import("../views/Community.vue");
 const CommunitySingle = () => import("../views/CommunitySingle.vue");
+const Single = () => import("../views/Single.vue");
 
 Vue.use(VueRouter);
 
 const routes = [
     { name: "index", path: "/", redirect: { name: "community" },},
     { name: "bbs", path: "/bbs", redirect: { name: "community" }, },
+    { name: "single", path: "/bbs/:id", component: Single },
     { name: "community", path: "/community", component: Community },
     { path: "/community_topic/:id", redirect: "/community/:id"},
     { path: "/community/topic/:id", redirect: "/community/:id" },
