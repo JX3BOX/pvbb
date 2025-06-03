@@ -6,35 +6,37 @@
             :rows="4"
             placeholder="快速发布一条骚话"
             id="textarea"
-            :maxlength="128"
             :minlength="1"
             show-word-limit
         ></el-input>
         <div class="u-actions">
             <div>
                 <joke-emotion @emotion="insertVariable"></joke-emotion>
-                <el-select
-                    class="u-type"
-                    v-model="type"
-                    size="small"
-                    placeholder="选择门派"
-                >
-                    <el-option v-for="(school,i) in schoolmap" :key="i" :value="i" :label="school">
-                        <div style="display: flex;align-items: center;">
+                <el-select class="u-type" v-model="type" size="small" placeholder="选择门派">
+                    <el-option v-for="(school, i) in schoolmap" :key="i" :value="i" :label="school">
+                        <div style="display: flex; align-items: center">
                             <img
                                 class="u-icon"
-                                style="margin-right:5px"
+                                style="margin-right: 5px"
                                 width="24"
                                 height="24"
                                 :src="i | showSchoolIcon"
                                 :alt="school"
                             />
-                            {{school}}
+                            {{ school }}
                         </div>
                     </el-option>
                 </el-select>
             </div>
-            <el-button type="primary" size="small" @click="publish" icon="el-icon-position" :loading="processing" :disabled="processing">提交</el-button>
+            <el-button
+                type="primary"
+                size="small"
+                @click="publish"
+                icon="el-icon-position"
+                :loading="processing"
+                :disabled="processing"
+                >提交</el-button
+            >
         </div>
     </div>
 </template>
@@ -83,10 +85,7 @@ export default {
                 await this.$nextTick();
 
                 myField.focus();
-                myField.setSelectionRange(
-                    endPos + value.length,
-                    endPos + value.length
-                );
+                myField.setSelectionRange(endPos + value.length, endPos + value.length);
             } else {
                 this.content = value;
             }
@@ -142,31 +141,31 @@ export default {
              * 依次判定表情字符为1，2，3个的情况
              */
             const emotion_1 = str.match(regex_1)
-                ? str
-                      .match(regex_1)
-                      .filter((emotion) => emotionKeys.includes(emotion))
+                ? str.match(regex_1).filter((emotion) => emotionKeys.includes(emotion))
                 : [];
 
-            emotion_1.forEach((emotion) => str.replace(emotion, ""));
+            // 替换表情，注意需要将结果赋值回str
+            emotion_1.forEach((emotion) => {
+                str = str.replace(emotion, "");
+            });
 
             const emotion_2 = str.match(regex_2)
-                ? str
-                      .match(regex_2)
-                      .filter((emotion) => emotionKeys.includes(emotion))
+                ? str.match(regex_2).filter((emotion) => emotionKeys.includes(emotion))
                 : [];
 
-            emotion_2.forEach((emotion) => str.replace(emotion, ""));
+            emotion_2.forEach((emotion) => {
+                str = str.replace(emotion, "");
+            });
 
             const emotion_3 = str.match(regex_3)
-                ? str
-                      .match(regex_3)
-                      .filter((emotion) => emotionKeys.includes(emotion))
+                ? str.match(regex_3).filter((emotion) => emotionKeys.includes(emotion))
                 : [];
 
-            emotion_3.forEach((emotion) => str.replace(emotion, ""));
+            emotion_3.forEach((emotion) => {
+                str = str.replace(emotion, "");
+            });
 
-            const emotionLength =
-                emotion_1.length + emotion_2.length + emotion_3.length;
+            const emotionLength = emotion_1.length + emotion_2.length + emotion_3.length;
 
             this.contentLength = emotionLength;
 
@@ -179,17 +178,41 @@ export default {
                 return false;
             }
 
-            // 纯数字 128 纯文字 64
-            const textLength = str.match(/[^\x00-\xff]/g)?.length || 0;
+            // 计算中文字符数量
+            const chineseLength = str.match(/[\u4e00-\u9fa5]/g)?.length || 0;
 
-            if (textLength * 2 + (str.length - textLength) > 128) {
+            // 计算总长度：中文字符算2个长度，其他字符算1个长度
+            const totalLength = chineseLength * 2 + (str.length - chineseLength);
+
+            // 判断是否是纯数字或纯字母
+            const isPureDigit = /^\d+$/.test(str);
+            const isPureAlpha = /^[a-zA-Z]+$/.test(str);
+
+            // 如果是纯数字或纯字母，长度限制为128
+            // 否则，中文字符不能超过64个（相当于总长度不超过128）
+            if ((isPureDigit || isPureAlpha) && str.length > 128) {
                 this.$notify({
-                    title: "错误",
+                    title: "提示",
+                    message: "纯数字或纯字母内容长度不能超过128个字符",
+                    type: "warning",
+                });
+                return false;
+            } else if (!isPureDigit && !isPureAlpha && chineseLength > 64) {
+                this.$notify({
+                    title: "提示",
+                    message: "中文字符不能超过64个",
+                    type: "warning",
+                });
+                return false;
+            } else if (!isPureDigit && !isPureAlpha && totalLength > 128) {
+                this.$notify({
+                    title: "提示",
                     message: "内容长度不能超过128个字符",
-                    type: "error",
+                    type: "warning",
                 });
                 return false;
             }
+
             return true;
         },
     },
