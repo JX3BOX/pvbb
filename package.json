@@ -29,12 +29,12 @@
         "root": true
     },
     "dependencies": {
-        "@jx3box/jx3box-comment-ui": "^2.0.4",
+        "@jx3box/jx3box-comment-ui": "^2.0.5",
         "@jx3box/jx3box-common": "^8.7.1",
-        "@jx3box/jx3box-common-ui": "^9.3.8",
-        "@jx3box/jx3box-data": "^3.8.2",
-        "@jx3box/jx3box-editor": "^2.2.27",
-        "@jx3box/jx3box-emotion": "^1.2.8",
+        "@jx3box/jx3box-common-ui": "^9.4.4",
+        "@jx3box/jx3box-data": "^3.8.3",
+        "@jx3box/jx3box-editor": "^2.2.29",
+        "@jx3box/jx3box-emotion": "^1.2.13",
         "axios": "^0.21.1",
         "core-js": "^3.16.2",
         "dayjs": "^1.10.6",
