@@ -82,7 +82,8 @@ export default {
                 post_title: this.post.title,
                 ID: this.post.id,
                 post_type: 'community',
-                _subtype: this.subtype
+                _subtype: this.subtype,
+                author: this.post?.ext_user_info?.display_name
             };
         },
         subtype() {
