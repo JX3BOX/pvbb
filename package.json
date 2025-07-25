@@ -33,7 +33,7 @@
         "@jx3box/jx3box-common": "^8.7.1",
         "@jx3box/jx3box-common-ui": "^9.4.5",
         "@jx3box/jx3box-data": "^3.8.3",
-        "@jx3box/jx3box-editor": "^2.2.30",
+        "@jx3box/jx3box-editor": "^2.2.36",
         "@jx3box/jx3box-emotion": "^1.2.14",
         "@jx3box/jx3box-fe-proxy": "^1.0.1",
         "axios": "^0.21.1",
