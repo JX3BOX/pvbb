@@ -6,6 +6,7 @@
  */
 import Vue from "vue";
 import VueRouter from "vue-router";
+import { isMiniProgram } from "@jx3box/jx3box-common/js/utils";
 
 // 解决重复点击路由报错的BUG
 const originalPush = VueRouter.prototype.push;
@@ -14,7 +15,9 @@ VueRouter.prototype.push = function push(location) {
 };
 
 const Namespace = () => import("../views/Namespace.vue");
-const Joke = () => import("../views/Joke.vue");
+const Joke = () => import("../views/Joke/Joke.vue");
+const JokeMobile = () => import("../views/Joke/Joke-mobile.vue");
+
 const Emotion = () => import("../views/Emotion.vue");
 const Collection = () => import("../views/Collection.vue");
 const Community = () => import("../views/Community.vue");
@@ -24,11 +27,11 @@ const Single = () => import("../views/Single.vue");
 Vue.use(VueRouter);
 
 const routes = [
-    { name: "index", path: "/", redirect: { name: "community" },},
-    { name: "bbs", path: "/bbs", redirect: { name: "community" }, },
+    { name: "index", path: "/", redirect: { name: "community" } },
+    { name: "bbs", path: "/bbs", redirect: { name: "community" } },
     { name: "single", path: "/bbs/:id", component: Single },
     { name: "community", path: "/community", component: Community },
-    { path: "/community_topic/:id", redirect: "/community/:id"},
+    { path: "/community_topic/:id", redirect: "/community/:id" },
     { path: "/community/topic/:id", redirect: "/community/:id" },
     { name: "community-single", path: "/community/:id", component: CommunitySingle },
     { name: "namespace", path: "/namespace", component: Namespace },
@@ -37,7 +40,8 @@ const routes = [
         path: "/namespace/:id",
         component: () => import("@/components/namespace/namespace_single.vue"),
     },
-    { name: "joke", path: "/joke/:id?", component: Joke },
+    { name: "joke", path: "/joke/:id?", component: isMiniProgram() ? JokeMobile : Joke },
+
     { name: "emotion", path: "/emotion/:id?", component: Emotion },
     { name: "collection", path: "/collection", component: Collection },
     {

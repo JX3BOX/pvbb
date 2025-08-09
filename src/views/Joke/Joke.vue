@@ -388,5 +388,5 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/app.less";
-@import "../assets/css/joke/joke.less";
+@import "~@/assets/css/joke/joke.less";
 </style>

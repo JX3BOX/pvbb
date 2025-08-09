@@ -5,6 +5,7 @@
         "build": "vue-cli-service build",
         "debug": "env DEV_SERVER=true vue-cli-service serve --mode staging",
         "dev": "env DEV_SERVER=true vue-cli-service serve --mode development",
+        "dev_win": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
         "inspect": "vue inspect > output.js",
         "lint": "vue-cli-service lint",
         "preview": "env BUILD_MODE=preview vue-cli-service build",
