@@ -10,6 +10,7 @@
                 placeholder="参与讨论..."
                 :id="inputId"
                 ref="textarea"
+                class="u-comment-editor"
                 @paste.native="handlePaste"
                 @keydown.delete.native="handleDel"
             ></el-input>
@@ -299,6 +300,13 @@ export default {
             opacity: 0.9;
         }
         .size(180px,42px);
+    }
+}
+@media screen and (max-width: @phone) {
+    .u-comment-editor.el-textarea {
+        .el-input__count {
+            bottom: auto;
+        }
     }
 }
 </style>
