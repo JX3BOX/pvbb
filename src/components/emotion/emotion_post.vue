@@ -80,7 +80,7 @@
 import joke_emotion from "@/components/joke/joke_emotion.vue";
 import { uploadEmotion, postEmotion } from "@/service/emotion";
 import schoolmap from "@jx3box/jx3box-data/data/xf/schoolid.json";
-import { __imgPath, __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath, __cdn } from "@/utils/config";
 import User from "@jx3box/jx3box-common/js/user";
 import cloneDeep from "lodash/cloneDeep";
 const imgTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];

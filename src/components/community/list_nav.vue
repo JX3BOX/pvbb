@@ -52,7 +52,7 @@
 
 <script>
 import { getMenu } from "@jx3box/jx3box-common/js/api_misc.js";
-import { feedback } from "@jx3box/jx3box-common/data/jx3box.json";
+import { feedback } from "@/utils/config";
 import { getAppType, getAppIcon } from "@jx3box/jx3box-common/js/utils";
 import { getConfigBanner } from "@/service/cms";
 import Banner from "@/components/bbs/banner.vue";

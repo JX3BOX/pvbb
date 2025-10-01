@@ -87,7 +87,7 @@ import ArticleMarkdown from "@jx3box/jx3box-editor/src/ArticleMarkdown.vue";
 import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
 import PostGuide from "@jx3box/jx3box-common-ui/src/single/PostGuide.vue";
 
-import { __visibleMap } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __visibleMap } from "@/utils/config";
 import { getAppType } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 export default {

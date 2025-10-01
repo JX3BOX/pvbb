@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { __imgPath } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath } from "@/utils/config";
 import { getLink } from "@jx3box/jx3box-common/js/utils";
 import { getRecommendedJokes } from "@/service/joke";
 import JX3_EMOTION from "@jx3box/jx3box-emotion";

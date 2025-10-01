@@ -132,7 +132,7 @@ import { atAuthors } from "@/service/pay";
 import Collection from "@jx3box/jx3box-common-ui/src/single/Collection.vue";
 import renderJx3Element from "@jx3box/jx3box-editor/assets/js/jx3_element";
 import Author from "@jx3box/jx3box-editor/src/components/Author.vue";
-import { __visibleMap } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __visibleMap } from "@/utils/config";
 import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
 
 const appKey = "community";

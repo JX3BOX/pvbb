@@ -1,5 +1,5 @@
 import { $cms } from "@jx3box/jx3box-common/js/https";
-import { __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __cdn } from "@/utils/config";
 
 function getMenu(key) {
     return $cms().get(`/api/cms/config/menu/${key}`);

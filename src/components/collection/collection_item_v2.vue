@@ -28,7 +28,7 @@
 <script>
 import { showAvatar, resolveImagePath, authorLink } from "@jx3box/jx3box-common/js/utils";
 import { showDate } from "@jx3box/jx3box-common/js/moment";
-import { __imgPath } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath } from "@/utils/config";
 export default {
     name: "CollectionItemV2",
     props: {

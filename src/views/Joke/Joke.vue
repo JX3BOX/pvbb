@@ -140,7 +140,7 @@ import LeftTab from "@/components/left-tab.vue";
 
 // 分类
 import schoolmap from "@jx3box/jx3box-data/data/xf/schoolid.json";
-import { __imgPath } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath } from "@/utils/config";
 
 // 数据
 import { getJokes, getJoke } from "@/service/joke";

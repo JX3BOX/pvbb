@@ -174,7 +174,7 @@ import {
 } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user.js";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
-import { __imgPath } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath } from "@/utils/config";
 
 import CollectionLayout from "@/layouts/CollectionLayout.vue";
 export default {

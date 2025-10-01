@@ -73,7 +73,7 @@
 <script>
 import { appKey } from "@/../setting.json";
 import { showAvatar, authorLink, showBanner, buildTarget, getLink } from "@jx3box/jx3box-common/js/utils";
-import { __ossMirror, __imgPath } from "@jx3box/jx3box-common/data/jx3box";
+import { __ossMirror, __imgPath } from "@/utils/config";
 import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
 import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";

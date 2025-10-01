@@ -49,7 +49,7 @@ import publishGate from "@/components/publish_gate.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-common-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
-import { __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __cdn } from "@/utils/config";
 export default {
     name: "SingleLayout",
     props: [],

@@ -37,7 +37,7 @@ import Nav from "@/components/nav/Nav.vue";
 import Side from "@/components/bbs/list_side.vue";
 import publishGate from "@/components/publish_gate.vue";
 import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
-import { __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __cdn } from "@/utils/config";
 export default {
     name: "ListLayout",
     props: [],

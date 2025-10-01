@@ -50,7 +50,7 @@
 
 <script>
 import { showAvatar, getLink, resolveImagePath, authorLink } from "@jx3box/jx3box-common/js/utils";
-import { __imgPath } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __imgPath } from "@/utils/config";
 import {dateFormat} from "@/utils/dateFormat.js";
 export default {
     name: "CollectionItem",

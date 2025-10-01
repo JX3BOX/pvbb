@@ -25,7 +25,7 @@
 
 <script>
 import { postLink } from "@jx3box/jx3box-common/js/utils";
-import { __Root, __OriginRoot } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __Root, __OriginRoot } from "@/utils/config";
 import { getMenu } from "@jx3box/jx3box-common/js/api_misc";
 export default {
     name: "rank",

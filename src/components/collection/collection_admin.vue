@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { __postType, __cms } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __postType, __cms } from "@/utils/config";
 import { updateCollection, getCollection } from "@/service/collection";
 import Bus from "@/store/bus";
 export default {

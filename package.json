@@ -2,14 +2,12 @@
     "name": "pvbb",
     "private": true,
     "scripts": {
-        "build": "vue-cli-service build",
-        "debug": "env DEV_SERVER=true vue-cli-service serve --mode staging",
-        "dev": "env DEV_SERVER=true vue-cli-service serve --mode development",
-        "dev_win": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
+        "dev": "cross-env DEV_SERVER=true vue-cli-service serve --mode development",
+        "serve": "cross-env NODE_ENV=development vue-cli-service serve --mode production",
+        "build": "cross-env NODE_ENV=production vue-cli-service build --mode production",
+        "preview": "cross-env BUILD_MODE=preview NODE_ENV=production vue-cli-service build --mode preview",
         "inspect": "vue inspect > output.js",
         "lint": "vue-cli-service lint",
-        "preview": "env BUILD_MODE=preview vue-cli-service build",
-        "serve": "vue-cli-service serve --mode serve",
         "update": "npm --registry https://registry.npmjs.org install @jx3box/jx3box-common-ui@latest @jx3box/jx3box-common@latest @jx3box/jx3box-data@latest @jx3box/jx3box-emotion@latest @jx3box/jx3box-comment-ui@latest @jx3box/jx3box-editor@latest"
     },
     "browserslist": [

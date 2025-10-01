@@ -23,7 +23,7 @@ import AuthorRss from "@jx3box/jx3box-common-ui/src/author/AuthorRss.vue";
 import AuthorCommunity from "./author_community.vue";
 
 import { getDecoration } from "@/service/cms";
-import { __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __cdn } from "@/utils/config";
 const DECORATION_SIDEBAR = "decoration_sidebar";
 export default {
     props: ["uid", "isMaster"],

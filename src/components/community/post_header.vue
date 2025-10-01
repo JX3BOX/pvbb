@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { __Root, __clients } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __Root, __clients } from "@/utils/config";
 import { showDate, showTime } from "@jx3box/jx3box-common/js/moment";
 import { editLink } from "@jx3box/jx3box-common/js/utils.js";
 import User from "@jx3box/jx3box-common/js/user.js";

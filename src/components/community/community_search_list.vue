@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { __clients, __Root } from "@jx3box/jx3box-common/data/jx3box.json";
+import { __clients, __Root } from "@/utils/config";
 
 export default {
     name: "CommunitySearchList",
