@@ -7,6 +7,8 @@
 @black80: rgba(28, 28, 28, 0.8);
 @black80-dark: rgba(255, 255, 255, 0.8);
 
+@brand2: #24292e;
+@brand3: #fedaa3;
 @brand4: #fff;
 @brand4-dark: #282828;
 
@@ -113,6 +115,37 @@
                 font-weight: bold;
             }
         }
+        .m-input-container {
+            display: flex;
+            align-items: center;
+
+            .c-comment-emotion {
+                line-height: 1;
+                padding: 0 0.75rem;
+            }
+            .u-btn {
+                flex-shrink: 0;
+                background-color: @brand3;
+                border-radius: 0.75rem;
+                text-align: center;
+                padding: 0.25rem 0.75rem;
+                color: @brand2;
+                font-size: 0.75rem;
+                transition: 0.2s all;
+
+                &.disabled {
+                    opacity: 0.7;
+                }
+            }
+        }
+        .m-emotion-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: 0.2s all;
+            &.show {
+                max-height: 300px;
+            }
+        }
     }
     .m-joke-copy-drawer {
         background-color: #24292e;
@@ -200,6 +233,16 @@
                 }
                 .u-tip {
                     color: @black40-dark;
+                }
+            }
+
+            .m-input-container {
+                .u-input {
+                    .el-textarea__inner {
+                        background-color: @black5-dark;
+                        border: none;
+                        color: white;
+                    }
                 }
             }
         }
