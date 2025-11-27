@@ -18,7 +18,8 @@ const Namespace = () => import("../views/Namespace.vue");
 const Joke = () => import("../views/Joke/Joke.vue");
 const JokeMobile = () => import("../views/Joke/Joke-mobile.vue");
 
-const Emotion = () => import("../views/Emotion.vue");
+const Emotion = () => import("../views/emotion/Emotion.vue");
+const EmotionMobile = () => import("../views/emotion/Emotion-mobile.vue");
 const Collection = () => import("../views/Collection.vue");
 const Community = () => import("../views/Community.vue");
 const CommunitySingle = () => import("../views/CommunitySingle.vue");
@@ -42,7 +43,7 @@ const routes = [
     },
     { name: "joke", path: "/joke/:id?", component: isMiniProgram() ? JokeMobile : Joke },
 
-    { name: "emotion", path: "/emotion/:id?", component: Emotion },
+    { name: "emotion", path: "/emotion/:id?", component: isMiniProgram() ? EmotionMobile : Emotion },
     { name: "collection", path: "/collection", component: Collection },
     {
         name: "collection-single",
