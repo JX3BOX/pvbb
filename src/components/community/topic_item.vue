@@ -47,7 +47,7 @@
                 <a class="m-topic-title" :href="getPostUrl(data.id)" target="_blank" :style="hightStyle">
                     <img svg-inline v-if="isTop" src="@/assets/img/community/is_top.svg" alt="" srcset="" />
                     <img svg-inline v-if="data.is_star" src="@/assets/img/community/is_star.svg" alt="" srcset="" />
-                    <span>{{ data.title }}</span>
+                    {{ data.title }}
                 </a>
                 <a class="u-cover" :href="getPostUrl(data.id)" target="_blank">
                     <el-image :src="getBanner(data)" alt="banner" srcset="" />
@@ -81,7 +81,7 @@
                     <span class="m-topic-title" target="_blank" :style="hightStyle">
                         <img svg-inline v-if="isTop" src="@/assets/img/community/is_top.svg" alt="" srcset="" />
                         <img svg-inline v-if="data.is_star" src="@/assets/img/community/is_star.svg" alt="" srcset="" />
-                        <span>{{ data.title }}</span>
+                        {{ data.title }}
                     </span>
                     <div class="u-introduction" v-html="introduction"></div>
                 </a>
