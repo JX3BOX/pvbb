@@ -121,6 +121,7 @@ export default {
         }
         .m-community-single__left {
             flex: 1;
+            min-width: 0;
         }
         .m-community-single__right {
             width: 280px;
