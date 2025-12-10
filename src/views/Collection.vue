@@ -1,26 +1,39 @@
 <template>
-    <ListLayout>
-        <div class="v-collection">
-            <List v-if="mode == 'list'" />
-            <Single v-else />
+    <div>
+        <div v-if="isMiniProgram">
+            <MiniList v-if="mode == 'list'" />
+            <MiniSingle v-else />
         </div>
-    </ListLayout>
+        <ListLayout v-else>
+            <div class="v-collection">
+                <List v-if="mode == 'list'" />
+                <Single v-else />
+            </div>
+        </ListLayout>
+    </div>
 </template>
 
 <script>
 import ListLayout from "@/layouts/ListLayout.vue";
 import List from "@/components/collection/collection_list.vue";
+import MiniList from "@/components/collection/collection_mini_list.vue";
 import Single from "@/components/collection/collection_single.vue";
+import MiniSingle from "@/components/collection/collection_mini_single.vue";
+import { isMiniProgram } from "@jx3box/jx3box-common/js/utils";
 export default {
     name: "Collection",
     props: [],
     components: {
         List,
+        MiniList,
         Single,
+        MiniSingle,
         ListLayout,
     },
     data: function () {
-        return {};
+        return {
+            isMiniProgram: isMiniProgram(),
+        };
     },
     computed: {
         mode: function () {

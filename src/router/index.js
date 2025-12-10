@@ -25,6 +25,9 @@ const Community = () => import("../views/Community.vue");
 const CommunitySingle = () => import("../views/CommunitySingle.vue");
 const Single = () => import("../views/Single.vue");
 
+const CollectionSingle = () => import("@/components/collection/collection_single.vue");
+const CollectionMiniSingle = () => import("@/components/collection/collection_mini_single.vue");
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -48,7 +51,7 @@ const routes = [
     {
         name: "collection-single",
         path: "/collection/:id",
-        component: () => import("@/components/collection/collection_single.vue"),
+        component: isMiniProgram() ? CollectionMiniSingle : CollectionSingle,
     },
 ];
 

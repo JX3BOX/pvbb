@@ -7,8 +7,12 @@ function getLikes(params) {
 
 function getBirthdayList(params) {
     return $next().get(`/api/next2/users/birthday/today`, {
-        params
-    })
+        params,
+    });
 }
 
-export { getLikes, getBirthdayList }
+function getFans(uid) {
+    return $next().get(`/api/next2/rss/overview/author/${uid}`);
+}
+
+export { getLikes, getBirthdayList, getFans };
