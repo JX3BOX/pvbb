@@ -1,6 +1,6 @@
 <template>
     <div class="m-comment-user c-author m-theme" :style="{ backgroundImage: `url(${bg})` }">
-        <AuthorInfo :uid="uid" @ready="installModules" />
+        <AuthorInfo :uid="uid" @ready="installModules" :isAnonymous="isAnonymous" />
         <template v-if="data">
             <div class="u-interact">
                 <AuthorFollow v-if="!isMaster" style="margin-right: 8px" :uid="uid" />
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AuthorInfo from "@jx3box/jx3box-common-ui/src/author/AuthorInfo.vue";
+import AuthorInfo from "./comment_user_info.vue";
 import AuthorFollow from "@jx3box/jx3box-common-ui/src/author/AuthorFollow.vue";
 import AuthorMedals from "@jx3box/jx3box-common-ui/src/author/AuthorMedals.vue";
 import AuthorRss from "@jx3box/jx3box-common-ui/src/author/AuthorRss.vue";
@@ -26,7 +26,7 @@ import { getDecoration } from "@/service/cms";
 import { __cdn } from "@/utils/config";
 const DECORATION_SIDEBAR = "decoration_sidebar";
 export default {
-    props: ["uid", "isMaster"],
+    props: ["uid", "isMaster", "isAnonymous"],
     data: function () {
         return {
             data: "",

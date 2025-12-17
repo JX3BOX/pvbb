@@ -1,7 +1,7 @@
 <template>
     <div class="m-reply-wrapper" :id="`floor-${post.floor}`">
         <div class="m-reply-left">
-            <CommentUser :uid="userInfo.id" :isMaster="isMaster" />
+            <CommentUser :uid="userInfo.id" :isMaster="isMaster" :isAnonymous="isAnonymous" />
             <div class="u-top-right u-mobile-show">
                 <div class="u-floor">{{ isMaster ? "楼主" : "#" + post.floor }}</div>
                 <div class="m-reply-time">{{ showTime }}</div>
@@ -343,6 +343,10 @@ export default {
         },
         visible: function () {
             return !!this.post?.visible_validate;
+        },
+        // 是否匿名
+        isAnonymous: function () {
+            return !!this.post?.anonymous;
         },
     },
     watch: {
