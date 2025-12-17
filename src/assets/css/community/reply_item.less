@@ -42,6 +42,10 @@
             &:hover {
                 opacity: 0.8;
             }
+
+            &.is-disabled {
+                opacity: 0.5;
+            }
         }
         .u-praise-btn {
             background: rgba(255, 112, 146, 1);
@@ -278,6 +282,12 @@
 // 打赏组件上下加一下边距
 .m-single-thx {
     padding: 40px 0;
+
+    &.is-disabled-boxcoin {
+        .w-like2 {
+            .none !important;
+        }
+    }
 }
 // 评论列表 外包装
 .m-comment-list {

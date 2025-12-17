@@ -81,7 +81,8 @@
                 </div>
                 <div class="u-editor">
                     <el-divider content-position="left">回帖</el-divider>
-                    <CommentEditor @submit="onReplyTopic" />
+                    <CommentEditor @submit="onReplyTopic" v-if="!isDisabledComment" />
+                    <el-alert :show-close="false" center v-else class="m-disabled-comment-tip">作者已关闭回帖功能</el-alert>
                 </div>
             </div>
         </div>
@@ -244,6 +245,9 @@ export default {
         },
         visible: function() {
             return !!this.post?.visible_validate;
+        },
+        isDisabledComment: function() {
+            return !!this.post?.disable_comment;
         },
     },
     created() {

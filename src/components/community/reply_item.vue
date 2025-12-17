@@ -87,6 +87,7 @@
                 <Thx
                     v-if="isMaster"
                     class="m-single-thx"
+                    :class="{'is-disabled-boxcoin': isDisableBoxcoin}"
                     :postId="~~id"
                     postType="community_topic"
                     :postTitle="post.title"
@@ -108,7 +109,7 @@
                         <DeleteButton class="u-mobile-hidden" :post="post" type="reply" :isMaster="isMaster" />
                         <AddBlockButton class="u-mobile-hidden" :post="post" />
                         <ComplaintButton class="u-mobile-hidden" :post="post" />
-                        <el-button type="primary" size="small" class="u-reply-btn" :style="styles" @click="onShowReply">
+                        <el-button type="primary" size="small" class="u-reply-btn" :class="{'is-disabled': isDisabledComment && isMaster}" :style="styles" @click="onShowReply" :disabled="isDisabledComment && isMaster">
                             <div class="u-btn">
                                 <img src="@/assets/img/community/reply.svg" alt="" />
                                 <span>{{ isMaster ? "跟帖" : "回复" }}</span>
@@ -347,6 +348,13 @@ export default {
         // 是否匿名
         isAnonymous: function () {
             return !!this.post?.anonymous;
+        },
+        // 是否禁止投币
+        isDisableBoxcoin: function () {
+            return !!this.post?.disable_inspire_boxcoin;
+        },
+        isDisabledComment: function() {
+            return !!this.post?.disable_comment;
         },
     },
     watch: {
