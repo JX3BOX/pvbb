@@ -349,6 +349,7 @@ export default {
             };
             if (this.onlyAuthor && (this.onlyAuthor == true || this.onlyAuthor == "true")) {
                 _query.user_id = this.post.user_id;
+                _query.only_author = 1;
             }
             this.replaceRoute({ page: this.page, onlyAuthor: this.onlyAuthor });
             return _query;
