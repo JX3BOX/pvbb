@@ -329,7 +329,7 @@ export default {
             return User.isSuperAdmin();
         },
         isFollower() {
-            return this.post?.user_id == User.getInfo()?.uid;
+            return this.post?.user_id && this.post?.user_id == User.getInfo()?.uid;
         },
         isLogin() {
             return User.isLogin();
