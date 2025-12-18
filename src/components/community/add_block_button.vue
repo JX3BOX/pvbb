@@ -1,5 +1,5 @@
 <template>
-    <el-button type="text" :disabled="!allowBlock" @click="addBlock()">
+    <el-button type="text" :disabled="!allowBlock" @click="addBlock">
         <i class="el-icon-circle-close"></i>
         拉黑
     </el-button>

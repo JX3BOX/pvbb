@@ -69,10 +69,14 @@
                 </div>
 
                 <div class="m-topic-userInfo">
-                    <a :href="authorLink(data.ext_user_info.id)" target="_blank">
+                    <a :href="authorLink(data.ext_user_info.id)" target="_blank" v-if="!data.anonymous">
                         <img class="m-topic-userInfo__avatar" :src="showAvatar()" alt="" srcset="" />
                         <span class="m-topic-userInfo__name">{{ data.ext_user_info.display_name }}</span>
                     </a>
+                    <span v-else>
+                        <img class="m-topic-userInfo__avatar" :src="showAvatar(true)" alt="" srcset="" />
+                        <span class="m-topic-userInfo__name">神秘侠士</span>
+                    </span>
                 </div>
             </div>
 
@@ -211,8 +215,9 @@ export default {
             }
             return val;
         },
-        showAvatar: function () {
-            return showAvatar(this.data?.ext_user_info?.avatar);
+        showAvatar: function (isDefault = false) {
+            // return showAvatar(this.data?.ext_user_info?.avatar);
+            return isDefault ? showAvatar(`${__cdn}/design/avatar/xisai/0-1.png`) : showAvatar(this.data?.ext_user_info?.avatar);
         },
         getPostUrl(id) {
             return `/community/${id}`;

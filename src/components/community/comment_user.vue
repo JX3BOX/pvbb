@@ -11,7 +11,7 @@
             <slot></slot>
         </template>
 
-        <AuthorCommunity v-if="isMaster" :uid="uid"></AuthorCommunity>
+        <AuthorCommunity v-if="isMaster && !isAnonymous" :uid="uid"></AuthorCommunity>
     </div>
 </template>
 
@@ -53,6 +53,9 @@ export default {
     },
     methods: {
         installModules: function (data) {
+            if (this.isMaster && this.isAnonymous) {
+                return;
+            }
             this.data = data;
         },
         onMessage: function () {
@@ -63,6 +66,10 @@ export default {
         },
         getDecoration() {
             if (!this.user_id) {
+                return;
+            }
+            // 如果是主楼并且是匿名帖子
+            if (this.isMaster && this.isAnonymous) {
                 return;
             }
             let decoration_sidebar = sessionStorage.getItem(DECORATION_SIDEBAR + this.user_id) || "";
