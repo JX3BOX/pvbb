@@ -91,9 +91,10 @@
                 :src="item.ext_user_info | showAvatar"
                 :alt="item.ext_user_info | showNickname"
             />
-            <a class="u-author-name" :href="item.user_id | authorLink" target="_blank">{{
+            <a class="u-author-name" :href="item.user_id | authorLink" target="_blank" v-if="!item.anonymous">{{
                 item.ext_user_info | showNickname
             }}</a>
+            <span v-else>神秘侠士</span>
             <span class="u-date">
                 Updated on
                 <time v-if="order == 'update'">{{ item.post_modified | dateFormat }}</time>
