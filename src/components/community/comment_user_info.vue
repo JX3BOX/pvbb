@@ -1,8 +1,7 @@
 <template>
     <div class="c-author-info">
         <div class="u-author">
-            <Avatar v-if="!isAnonymous" class="u-avatar" :uid="uid" :url="data.user_avatar" size="s" :frame="data.user_avatar_frame" />
-            <Avatar v-else class="u-avatar" :url="defaultUrl" size="s"></Avatar>
+            <Avatar class="u-avatar" :uid="uid" :url="data.user_avatar" size="s" :frame="data.user_avatar_frame" />
             <div class="u-info">
                 <div class="u-name">
                     <el-tooltip class="item" effect="dark" content="签约作者" placement="top" v-if="isSuperAuthor">
@@ -92,9 +91,6 @@ export default {
         // sign
         isSuperAuthor: function () {
             return this.data?.sign;
-        },
-        defaultUrl: function () {
-            return `${__cdn}/design/avatar/xisai/0-1.png`
         },
     },
     watch: {

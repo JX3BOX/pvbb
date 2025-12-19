@@ -70,11 +70,11 @@
 
                 <div class="m-topic-userInfo">
                     <a :href="authorLink(data.ext_user_info.id)" target="_blank" v-if="!data.anonymous">
-                        <img class="m-topic-userInfo__avatar" :src="showAvatar()" alt="" srcset="" />
+                        <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
                         <span class="m-topic-userInfo__name">{{ data.ext_user_info.display_name }}</span>
                     </a>
                     <span v-else>
-                        <img class="m-topic-userInfo__avatar" :src="showAvatar(true)" alt="" srcset="" />
+                        <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
                         <span class="m-topic-userInfo__name">神秘侠士</span>
                     </span>
                 </div>
@@ -171,6 +171,9 @@ export default {
         isTop: function () {
             return this.data.is_top || this.data.is_category_top;
         },
+        avatarUrl: function () {
+            return showAvatar(this.data?.ext_user_info?.avatar);
+        }
     },
     mounted() {
         this.getSkinJson();
@@ -214,10 +217,6 @@ export default {
                 return getThumbnail(val, 48 * 2);
             }
             return val;
-        },
-        showAvatar: function (isDefault = false) {
-            // return showAvatar(this.data?.ext_user_info?.avatar);
-            return isDefault ? showAvatar(`${__cdn}/design/avatar/xisai/0-1.png`) : showAvatar(this.data?.ext_user_info?.avatar);
         },
         getPostUrl(id) {
             return `/community/${id}`;

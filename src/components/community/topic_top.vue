@@ -82,10 +82,14 @@
                     </div>
 
                     <div class="m-topic-userInfo">
-                        <a :href="authorLink(data.ext_user_info.id)" target="_blank">
-                            <img class="m-topic-userInfo__avatar" :src="showAvatar()" alt="" srcset="" />
+                        <a :href="authorLink(data.ext_user_info.id)" target="_blank" v-if="!data.anonymous">
+                            <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
                             <span class="m-topic-userInfo__name">{{ data.ext_user_info.display_name }}</span>
                         </a>
+                        <span v-else>
+                            <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
+                            <span class="m-topic-userInfo__name">神秘侠士</span>
+                        </span>
                     </div>
                     <a :href="getPostUrl(data.id)" class="m-topic-content" target="_blank">
                         <div v-html="introduction"></div>
@@ -171,6 +175,9 @@ export default {
         isTop: function () {
             return this.data.is_top || this.data.is_category_top;
         },
+        avatarUrl: function () {
+            return showAvatar(this.data?.ext_user_info?.avatar);
+        },
     },
     mounted() {
         this.getSkinJson();
@@ -189,9 +196,6 @@ export default {
         },
         getTimeAgo,
         authorLink,
-        showAvatar: function () {
-            return showAvatar(this.data?.ext_user_info?.avatar);
-        },
         getBanner: function (val) {
             if (val) {
                 if (val.indexOf("jx3box.com") >= 0) {
@@ -320,7 +324,7 @@ export default {
             color: #fff;
             padding: 10px;
             border-radius: 8px;
-            box-sizing:border-box;
+            box-sizing: border-box;
             background-color: rgba(0, 0, 0, 0.6);
             .u-title {
                 .color(#fff,#fff);
