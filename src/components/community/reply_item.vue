@@ -89,7 +89,7 @@
                     class="m-single-thx"
                     :class="{'is-disabled-boxcoin': isDisableBoxcoin}"
                     :postId="~~id"
-                    postType="community_topic"
+                    postType="bbs"
                     :postTitle="post.title"
                     :userId="post.user_id"
                     :adminBoxcoinEnable="true"
