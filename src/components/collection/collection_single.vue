@@ -137,10 +137,10 @@
                 <Thx
                     class="m-thx"
                     :postId="id"
-                    postType="collection"
+                    postType="bbs"
                     :postTitle="title"
                     :userId="author_id"
-                    :adminBoxcoinEnable="true"
+                    :adminBoxcoinEnable="false"
                     :userBoxcoinEnable="true"
                     client="all"
                 />

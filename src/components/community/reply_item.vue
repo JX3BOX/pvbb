@@ -516,20 +516,20 @@ export default {
         },
         onThx() {
             bus.emit("onThx", {
-                postType: "community_topic_reply",
+                postType: "bbs",
                 postId: this.post.id,
                 postUserId: this.userId,
                 client: "std",
             });
         },
         loadHomeworkBoxcoin() {
-            getHistorySummary("community_topic_reply", this.post.id).then((res) => {
+            getHistorySummary("bbs", this.post.id).then((res) => {
                 this.summary = res.data.data;
             });
         },
         onBoxcoinClick() {
             bus.emit("boxcoin-click", {
-                postType: "community_topic_reply",
+                postType: "bbs",
                 postId: this.post.id,
                 postUserId: this.userId,
             });

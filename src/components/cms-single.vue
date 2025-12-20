@@ -43,7 +43,7 @@
             <Thx
                 class="m-single-thx"
                 :postId="id"
-                :postType="post_type"
+                postType="bbs"
                 :postTitle="post_title"
                 :userId="author_id"
                 :adminBoxcoinEnable="true"
