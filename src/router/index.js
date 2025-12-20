@@ -21,7 +21,7 @@ const JokeMobile = () => import("../views/Joke/Joke-mobile.vue");
 const Emotion = () => import("../views/emotion/Emotion.vue");
 const EmotionMobile = () => import("../views/emotion/Emotion-mobile.vue");
 const Collection = () => import("../views/Collection.vue");
-const Community = () => import("../views/Community.vue");
+const Community = () => import("../views/Community_v2.vue");
 const CommunitySingle = () => import("../views/CommunitySingle.vue");
 const Single = () => import("../views/Single.vue");
 

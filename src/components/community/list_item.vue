@@ -26,9 +26,7 @@
             />
 
             <!-- 标题文字 -->
-            <a class="u-title" :style="hightStyle" :href="postLink(item.id)" :target="target">
-                <!-- 图标 -->
-                {{ item.title || "无标题" }}
+            <a class="u-title" :style="hightStyle" :href="postLink(item.id)" :target="target" v-html="highlightText(item.title)">
             </a>
 
             <!-- 角标 -->
@@ -36,10 +34,10 @@
                 <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark | showMark }}</i>
             </span> -->
 
-            <!-- <span class="u-push" v-if="hasPermission">
+            <span class="u-push" v-if="hasPermission">
                 <time v-if="showPushDate" class="u-push__time" :class="{'is-recent': isRecent()}">{{ pushDate }} 已推送</time>
                 <el-button class="u-push__btn" size="mini" type="warning" @click="onPush" icon="el-icon-s-promotion">推送</el-button>
-            </span> -->
+            </span>
         </h2>
 
         <!-- 字段 -->
@@ -61,7 +59,7 @@
                 </em> -->
                 <strong>摘要</strong>
                 <em>
-                    <span v-html="item.introduction"></span>
+                    <span v-html="highlightText(item.introduction)"></span>
                 </em>
             </div>
             <div class="u-metalist u-topics">
@@ -71,16 +69,19 @@
                         >《{{ item.collection && item.collection.title }}》</a
                     >
                 </template>
-                <span v-if="item.color_tag && item.color_tag.length" class="m-topic-tag">
-                    <span
-                        v-for="(_item, index) in item.color_tag"
-                        :key="index"
-                        :style="{ backgroundColor: _item.color }"
-                    >
-                        {{ _item.label }}
-                    </span>
+                <span class="m-topic-tag">
+                    <span>{{ item.category }}</span>
+                    <template v-if="item.color_tag">
+                        <span
+                            v-for="(_item, index) in item.color_tag"
+                            :key="index"
+                            :style="{ backgroundColor: _item.color }"
+                        >
+                            {{ _item.label }}
+                        </span>
+                    </template>
+                    <span class="u-star-tag" v-if="item.is_star">精选</span>
                 </span>
-                <template v-else>-</template>
             </div>
         </div>
 
@@ -120,7 +121,7 @@ const skinKey = "community_topic_skin";
 
 export default {
     name: "ListItem",
-    props: ["item", "order"],
+    props: ["item", "order", "keyword"],
     components: {},
     data: function () {
         return {
@@ -205,7 +206,13 @@ export default {
             return dayjs().diff(dayjs(date), "day") < 30;
         },
         onPush() {
-            bus.emit("design-task", this.item);
+            const data = {
+                post_type: "community",
+                post_title: this.item.title,
+                ID: this.item.id,
+                author: this.item?.ext_user_info?.display_name || "匿名",
+            }
+            bus.emit("design-task", data);
         },
         postLink: function (val) {
             return location.origin + `/${appKey}/` + val;
@@ -220,6 +227,13 @@ export default {
                     sessionStorage.setItem(skinKey, JSON.stringify(res.data));
                 });
             }
+        },
+        // 高亮搜索关键字
+        highlightText(text) {
+            if (!this.keyword) return text;
+            const regex = new RegExp(`(${this.keyword})`, "gi");
+            text = text.replace(regex, '<span style="background-color: #ffff00; color: #ff0000;">$1</span>');
+            return text;
         },
     },
     filters: {
