@@ -2,7 +2,7 @@
     <CommunitySingleLayout :post="post">
         <div class="m-community-single" v-loading="loading">
             <!-- 头部 -->
-            <div class="m-community-header">
+            <!-- <div class="m-community-header">
                 <PostHeader :post="post" :stat="stat">
                     <template #append>
                         <el-pagination
@@ -16,16 +16,16 @@
                             class="m-pageheader-pagination"
                         ></el-pagination>
                     </template>
-                </PostHeader>
+                </PostHeader> -->
                 <!-- 文集小册 -->
-                <Collection
+                <!-- <Collection
                     class="m-single-collection"
                     :id="collection_id"
                     :defaultVisible="collection_collapse"
                     @collectionUpdate="updateCollection"
                 />
-                <el-divider content-position="left">JX3BOX</el-divider>
-            </div>
+                <el-divider content-position="left">JX3BOX</el-divider> -->
+            <!-- </div> -->
 
             <div class="m-list-box">
                 <!--  楼主 -->
@@ -37,7 +37,35 @@
                         :post="post"
                         @onReplyTopic="handleReplyTopic"
                         @enterPwd="enterPwd"
-                    />
+                    >
+                        <template #header>
+                            <!-- 头部 -->
+                            <div class="m-community-header">
+                                <PostHeader :post="post" :stat="stat">
+                                    <template #append>
+                                        <el-pagination
+                                            layout="prev, pager, next"
+                                            :hide-on-single-page="true"
+                                            :page-size="per"
+                                            :total="total"
+                                            :current-page.sync="page"
+                                            @current-change="changePage"
+                                            size="small"
+                                            class="m-pageheader-pagination"
+                                        ></el-pagination>
+                                    </template>
+                                </PostHeader>
+                                <!-- 文集小册 -->
+                                <Collection
+                                    class="m-single-collection"
+                                    :id="collection_id"
+                                    :defaultVisible="collection_collapse"
+                                    @collectionUpdate="updateCollection"
+                                />
+                                <el-divider content-position="left">JX3BOX</el-divider>
+                            </div>
+                        </template>
+                    </ReplyItem>
                 </div>
 
                 <!-- 帖子回复 -->
@@ -82,7 +110,9 @@
                 <div class="u-editor">
                     <el-divider content-position="left">回帖</el-divider>
                     <CommentEditor @submit="onReplyTopic" v-if="!isDisabledComment" />
-                    <el-alert :show-close="false" center v-else class="m-disabled-comment-tip">作者已关闭回帖功能</el-alert>
+                    <el-alert :show-close="false" center v-else class="m-disabled-comment-tip"
+                        >作者已关闭回帖功能</el-alert
+                    >
                 </div>
             </div>
         </div>
@@ -206,7 +236,7 @@ export default {
         };
     },
     computed: {
-        styles: function() {
+        styles: function () {
             let item = this.categoryList.find((item) => item.value === this.post.category);
             if (item) {
                 return item;
@@ -218,7 +248,7 @@ export default {
                 };
             }
         },
-        id: function() {
+        id: function () {
             return this.$route.params.id;
         },
         isAuthor() {
@@ -228,25 +258,25 @@ export default {
             return window.innerWidth < 768;
         },
         // 是否显示加载更多
-        hasNextPage: function() {
+        hasNextPage: function () {
             return this.pageTotal >= 1 && this.per * this.page < this.total;
         },
         collection_id() {
             return this.post.collection_id;
         },
-        collection_collapse: function() {
+        collection_collapse: function () {
             return this.post?.collection_collapse;
         },
-        null_tip: function() {
+        null_tip: function () {
             let str = "作者设置了【";
             str += __visibleMap[this.post?.visible];
             str += "】";
             return str;
         },
-        visible: function() {
+        visible: function () {
             return !!this.post?.visible_validate;
         },
-        isDisabledComment: function() {
+        isDisabledComment: function () {
             return !!this.post?.disable_comment;
         },
     },
@@ -281,7 +311,7 @@ export default {
         "$route.query": {
             deep: true,
             immediate: true,
-            handler: function(query) {
+            handler: function (query) {
                 if (Object.keys(query).length) {
                     for (let key in query) {
                         // for:element分页组件兼容性问题
@@ -299,7 +329,7 @@ export default {
         /**
          * 获取url楼诚参数
          */
-        getJumpFloor: function() {
+        getJumpFloor: function () {
             const hash = window.location.hash;
             const floor = hash.substring(1).split("?")[0];
             if (floor) {
@@ -322,7 +352,7 @@ export default {
             });
         },
         // 翻页按钮
-        nextPage: function() {
+        nextPage: function () {
             this.getReplyList(true);
         },
         onSearch() {
@@ -341,7 +371,7 @@ export default {
             this.getReplyList();
         },
 
-        buildQuery: function() {
+        buildQuery: function () {
             let _query = {
                 index: this.page,
                 pageSize: this.per,
@@ -354,10 +384,10 @@ export default {
             this.replaceRoute({ page: this.page, onlyAuthor: this.onlyAuthor });
             return _query;
         },
-        getTopicData: function() {
+        getTopicData: function () {
             return this.post;
         },
-        getDetails: function() {
+        getDetails: function () {
             let fun = getTopicDetails;
             if (this.mode == "admin") {
                 fun = getTopicDetailsFromAdmin;
@@ -400,7 +430,7 @@ export default {
                 }
             });
         },
-        getReplyList: function(appendMode) {
+        getReplyList: function (appendMode) {
             if (this.mode == "admin") return;
             this.loading = true;
             if (appendMode) {
@@ -516,7 +546,7 @@ export default {
             this.getReplyList();
         },
         // 路由绑定
-        replaceRoute: function(extend) {
+        replaceRoute: function (extend) {
             return this.$router
                 .push({ name: this.$route.name, query: Object.assign({}, this.$route.query, extend) })
                 .then(() => {
@@ -528,7 +558,7 @@ export default {
             // 展示快捷回复弹窗
             this.showComment = true;
         },
-        updateCollection: function(val) {
+        updateCollection: function (val) {
             this.collection_data = val;
         },
 

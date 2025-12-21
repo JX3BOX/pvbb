@@ -1,5 +1,5 @@
 <template>
-    <div class="m-reply-wrapper" :id="`floor-${post.floor}`">
+    <div class="m-reply-wrapper" :class="{'is-master': isMaster}" :id="`floor-${post.floor || 0}`">
         <div class="m-reply-left">
             <CommentUser :uid="userInfo.id" :isMaster="isMaster" :isAnonymous="isAnonymous" />
             <div class="u-top-right u-mobile-show">
@@ -8,9 +8,10 @@
             </div>
         </div>
         <div class="m-reply-right">
+            <slot name="header"></slot>
             <div class="m-reply-content">
                 <div class="u-reply-floor u-mobile-hidden">
-                    <a :href="`#floor-${post.floor}`" @click="onFloorClick">{{
+                    <a :href="`#floor-${post.floor || 0}`" @click="onFloorClick">{{
                         isMaster ? "楼主" : post.floor + "楼"
                     }}</a>
                     <span class="u-comment-time u-mobile-hidden">{{ post.updated_at }}</span>
@@ -100,7 +101,7 @@
                     :author-id="post.user_id"
                     :banner="post.banner_img"
                     :contentMetaId="post.link_content_meta_id"
-                    :allowGift="!isDisableBoxcoin"
+                    :allowGift="Number(!isDisableBoxcoin)"
                 />
                 <!-- 操作按钮 -->
                 <!-- <div class="m-reply-time u-mobile-hidden">{{ showTime }}</div> -->

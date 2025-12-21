@@ -57,6 +57,10 @@
                 <img svg-inline src="@/assets/img/community/is_star_inline.svg" alt="" />
                 精选
             </span>
+            <div class="u-meta u-sub-block">
+                <em class="u-label">适用客户端</em>
+                <span class="u-value u-client" :class="'i-client-' + client">{{ showClientLabel(client) }}</span>
+            </div>
 
             <!-- 帖子分类 -->
             <!-- <span class="u-status u-sub-block" :style="`background-color: ${styles.color};`">
@@ -85,6 +89,13 @@
                     <img svg-inline src="@jx3box/jx3box-common-ui/assets/img/single/podate.svg" />
                 </i>
                 <time>{{ post_date }}</time>
+            </span>
+
+            <span class="u-sub-block" :title="'发布日期:' + post_time">
+                <i class="u-icon-modate">
+                    <img svg-inline src="@jx3box/jx3box-common-ui/assets/img/single/modate.svg" />
+                </i>
+                <time>{{ update_date }}</time>
             </span>
 
             <!-- 查看次数 -->
@@ -208,6 +219,9 @@ export default {
                 return item;
             }
             return null;
+        },
+        client: function () {
+            return this.post?.client || "std";
         },
     },
     watch: {
