@@ -70,17 +70,19 @@
                     >
                 </template>
                 <span class="m-topic-tag">
-                    <span>{{ showCategory(item.category) }}</span>
+                    <span class="u-tag">{{ showCategory(item.category) }}</span>
                     <template v-if="item.color_tag">
-                        <span
+                        <a
+                            class="u-tag"
                             v-for="(_item, index) in item.color_tag"
                             :key="index"
                             :style="{ backgroundColor: _item.color }"
+                            :href="getLink(_item)"
                         >
                             {{ _item.label }}
-                        </span>
+                        </a>
                     </template>
-                    <span class="u-star-tag" v-if="item.is_star">精选</span>
+                    <span class="u-tag u-star-tag" v-if="item.is_star">精选</span>
                 </span>
             </div>
         </div>
@@ -239,6 +241,12 @@ export default {
             text = text.replace(regex, '<span style="background-color: #ffff00; color: #ff0000;">$1</span>');
             return text;
         },
+        getLink(item) {
+            // 往当前url上加上tag查询参数
+            const url = new URL(window.location.href);
+            url.searchParams.set("tag", item.label);
+            return url.toString();
+        }
     },
     filters: {
         authorLink,

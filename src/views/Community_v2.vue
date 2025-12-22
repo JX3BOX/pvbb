@@ -130,6 +130,7 @@ export default {
             isSearch: false,
             client: "all", // 版本过滤，默认不过滤
             is_star: 0, // 只看精选，0否1是
+            tag: "",
 
             view: 2, // 列表视图，1卡片，2列表
             page: 1, // 当前页码
@@ -169,7 +170,6 @@ export default {
         window.addEventListener("scroll", this.handleScroll);
         // 初始化的时候执行一次
         this.handleResize();
-        this.loadData();
         this.getCategoryList();
 
         const view = localStorage.getItem("community_view");
@@ -204,6 +204,8 @@ export default {
                         }
                     }
                 }
+                // 路由参数更新后加载数据
+                this.loadData();
             },
         },
         list: {
@@ -349,6 +351,9 @@ export default {
             }
             if (this.client && this.client !== "all") {
                 _query.client = this.client;
+            }
+            if (this.tag) {
+                _query.tag = this.tag;
             }
             this.replaceRoute({ category: this.category, page: this.page });
 
