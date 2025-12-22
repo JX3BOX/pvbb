@@ -1,31 +1,39 @@
 <template>
     <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
-        <el-tab-pane label="心得" name="insights">
+        <el-tab-pane label="全部" name="">
             <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/labor.svg" alt="">
-                <b>心得</b>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/all.png" alt="">
+                <b>全部内容</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </span>
         </el-tab-pane>
 
-        <el-tab-pane label="故事" name="stories">
+        <el-tab-pane label="攻略心得" name="guide">
             <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/write.svg" alt="">
-                <b>故事</b>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/guide.png" alt="">
+                <b>攻略心得</b>
+                <!-- <em class="u-secret">权威白皮书</em> -->
             </span>
         </el-tab-pane>
 
-        <el-tab-pane label="讨论" name="discussions">
+        <el-tab-pane label="江湖故事" name="story">
             <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/sns.svg" alt="">
-                <b>讨论</b>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="">
+                <b>江湖故事</b>
             </span>
         </el-tab-pane>
 
-        <el-tab-pane label="求助" name="help">
+        <el-tab-pane label="交流分享" name="discuz">
             <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/love.svg" alt="">
-                <b>求助</b>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="">
+                <b>交流分享</b>
+            </span>
+        </el-tab-pane>
+
+        <el-tab-pane label="求助寻觅" name="help">
+            <span slot="label">
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="">
+                <b>求助寻觅</b>
             </span>
         </el-tab-pane>
     </el-tabs>

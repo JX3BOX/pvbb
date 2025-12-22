@@ -163,8 +163,10 @@
     }
 
     .u-item {
+        background-color:@bg-light;
         border-bottom: 1px solid @border-hr;
-        padding-bottom: 20px;
+        padding: 16px;
+        .r(6px);
         .mb(20px);
         .clearfix;
         .pr;
@@ -242,7 +244,7 @@
         .u-push {
             .pa;
             top: 0;
-            right: 8px;
+            right: 0;
             .flex;
             align-items: center;
             gap: 2px;
@@ -367,7 +369,7 @@
     .u-misc {
         .db;
         .pa;
-        .rb(10px, 24px);
+        .rb(16px, 24px) !important;
         .x(right);
         .fz(12px, 20px);
         color: #777;
