@@ -1,6 +1,6 @@
 <template>
     <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
-        <el-tab-pane label="全部" name="">
+        <el-tab-pane label="全部内容" name="all">
             <span slot="label">
                 <img class="u-icon-img" svg-inline src="@/assets/img/community/category/all.png" alt="">
                 <b>全部内容</b>
@@ -40,26 +40,14 @@
 </template>
 
 <script>
-import User from "@jx3box/jx3box-common/js/user";
-const tabsMap = {
-    insights: "心得",
-    stories: "故事",
-    discussions: "讨论",
-    help: "求助",
-}
-// 反向映射：中文 -> 英文
-const reversedTabsMap = {
-    "心得": "insights",
-    "故事": "stories",
-    "讨论": "discussions",
-    "求助": "help",
-}
+import {tabsMap, reversedTabsMap} from "@/assets/data/community_category.js";
+
 export default {
     name: "tabs",
     props: {
         value: {
             type: String,
-            default: "心得",
+            default: "all",
         },
     },
     data: function () {
@@ -70,11 +58,11 @@ export default {
         view: {
             get() {
                 // 将接收的中文转换为英文key用于内部绑定
-                return reversedTabsMap[this.value] || "insights";
+                return this.value;
             },
             set(val) {
                 // 将英文key转换为中文后传出
-                this.$emit('input', tabsMap[val]);
+                this.$emit('input', val);
             }
         },
         client: function () {

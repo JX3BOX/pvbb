@@ -70,7 +70,7 @@
                     >
                 </template>
                 <span class="m-topic-tag">
-                    <span>{{ item.category }}</span>
+                    <span>{{ showCategory(item.category) }}</span>
                     <template v-if="item.color_tag">
                         <span
                             v-for="(_item, index) in item.color_tag"
@@ -118,6 +118,7 @@ import bus from "@/utils/bus";
 import { getSkinJson } from "@/service/community";
 const appKey = "community";
 const skinKey = "community_topic_skin";
+import {tabsMap} from "@/assets/data/community_category.js";
 
 export default {
     name: "ListItem",
@@ -183,6 +184,9 @@ export default {
     },
     watch: {},
     methods: {
+        showCategory: function (val) {
+            return tabsMap[val] || val || "未分类";
+        },
         getBanner: function (val, subtype) {
             if (val) {
                 return showBanner(val);

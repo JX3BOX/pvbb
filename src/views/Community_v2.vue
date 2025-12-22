@@ -2,6 +2,7 @@
     <CommunityLayout>
         <div class="p-community-v2">
             <ListTabs v-model="category" />
+            <list-top></list-top>
             <div class="m-archive-search" slot="search-before">
                 <a :href="publish_link" class="u-publish el-button el-button--primary">+ 发布作品</a>
                 <el-input
@@ -30,6 +31,7 @@
                         border
                         size="mini"
                         @change="onIsStarChange"
+                        class="u-star-checkbox"
                         >只看精选</el-checkbox
                     >
                 </div>
@@ -105,6 +107,7 @@ import TopicItem from "@/components/community/topic_item.vue";
 import ListItem from "@/components/community/list_item.vue";
 import TopicTop from "@/components/community/topic_top.vue";
 import DesignTask from "@jx3box/jx3box-common-ui/src/bread/DesignTask.vue";
+import ListTop from "@/components/community/list_top.vue";
 
 export default {
     name: "Community_v2",
@@ -117,17 +120,18 @@ export default {
         TopicTop,
         Waterfall,
         DesignTask,
+        ListTop,
     },
     data: function () {
         return {
             // 筛选条件
             title: "",
-            category: "心得",
+            category: "all",
             isSearch: false,
             client: "all", // 版本过滤，默认不过滤
             is_star: 0, // 只看精选，0否1是
 
-            view: 1, // 列表视图，1卡片，2列表
+            view: 2, // 列表视图，1卡片，2列表
             page: 1, // 当前页码
             per: 20, // 每页数量
             total: 0, // 总数
@@ -234,6 +238,10 @@ export default {
             this.page = 1;
             this.loadData();
         },
+        client: function () {
+            this.page = 1;
+            this.loadData();
+        },
     },
     methods: {
         getLikes() {
@@ -327,10 +335,12 @@ export default {
                 this.page += 1;
             }
             let _query = {
-                category: this.category,
                 pageSize: this.per,
                 index: this.page,
             };
+            if (this.category && this.category !== "all") {
+                _query.category = this.category;
+            }
             if (this.is_star) {
                 _query.is_star = this.is_star;
             }
@@ -425,5 +435,12 @@ export default {
         margin: 0 30px 10px 30px;
     }
     background-color: #fff;
+
+    .m-community-top {
+        margin: 0 30px 20px 30px;
+    }
+    .u-star-checkbox {
+        padding-top: 4px !important;
+    }
 }
 </style>
