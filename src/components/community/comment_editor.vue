@@ -1,5 +1,8 @@
 <template>
     <el-form ref="form" :model="newComment" class="c-comment-box m-comment-reply">
+        <div class="u-mask">
+            参与评论，需先进行<a href="/dashboard/auth" class="u-link">账号认证</a>。
+        </div>
         <el-form-item>
             <el-input
                 rows="6"
@@ -300,6 +303,25 @@ export default {
             opacity: 0.9;
         }
         .size(180px,42px);
+    }
+
+    .pr;
+
+    .u-mask {
+        .pa;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 10;
+        display: none;
+        text-align: center;
+        align-content: center;
+    }
+
+    .u-link {
+        color: @primary;
     }
 }
 @media screen and (max-width: @phone) {

@@ -180,6 +180,7 @@
                     :user-href="authorLink(userId)"
                     @hideForm="showReplyForReplyFrom = false"
                     @doReply="doReply"
+                    :commentStrict="commentStrict"
                 />
             </div>
 
@@ -196,7 +197,7 @@
             </div>
             <!-- 评论列表 -->
             <div v-if="!isMaster && commentList.length" class="m-comment-list">
-                <CommentItem v-for="item in commentList" :key="item.id" :post="item" />
+                <CommentItem v-for="item in commentList" :key="item.id" :post="item" :commonStrict="commentStrict" />
             </div>
 
             <!-- 分页 -->
@@ -238,7 +239,7 @@ import { getHistorySummary } from "@/service/pay";
 export default {
     name: "ReplyItem",
     inject: ["getTopicData", "getReplyList", "onReplyTopic"],
-    props: ["isMaster", "post", "isAuthor", "nullTip"],
+    props: ["isMaster", "post", "isAuthor", "nullTip", "commentStrict"],
     components: {
         DeleteButton,
         ForwardButton,

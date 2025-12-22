@@ -76,6 +76,7 @@
                         :post="item"
                         :is-master="false"
                         :is-author="isAuthor"
+                        :comment-strict="comment_strict"
                     />
                 </div>
             </div>
@@ -109,7 +110,7 @@
                 </div>
                 <div class="u-editor">
                     <el-divider content-position="left">回帖</el-divider>
-                    <CommentEditor @submit="onReplyTopic" v-if="!isDisabledComment" />
+                    <CommentEditor @submit="onReplyTopic" v-if="!isDisabledComment" :class="{ 'c-comment-mask': comment_strict }" />
                     <el-alert :show-close="false" center v-else class="m-disabled-comment-tip"
                         >作者已关闭回帖功能</el-alert
                     >
@@ -135,7 +136,7 @@
         ></boxCoinRecords>
 
         <el-dialog :visible.sync="showComment" title="快捷回复" :width="isPhone ? '95%' : ''">
-            <CommentEditor @submit="onReplyTopic"></CommentEditor>
+            <CommentEditor @submit="onReplyTopic" :class="{ 'c-comment-mask': comment_strict }"></CommentEditor>
         </el-dialog>
 
         <go-to-top-or-bottom />
@@ -165,6 +166,7 @@ import renderJx3Element from "@jx3box/jx3box-editor/assets/js/jx3_element";
 import Author from "@jx3box/jx3box-editor/src/components/Author.vue";
 import { __visibleMap } from "@/utils/config";
 import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
+import {getConfig} from "@jx3box/jx3box-common/js/api_misc";
 
 const appKey = "community";
 
@@ -215,6 +217,7 @@ export default {
             // 打赏相关 end
 
             showComment: false,
+            comment_strict: false,
 
             collection_data: "",
 
@@ -290,6 +293,12 @@ export default {
             this.$nextTick(() => {
                 renderJx3Element(this);
             });
+        });
+
+        getConfig({
+            key: "comment_strict"
+        }).then((res) => {
+            this.comment_strict = res.data.data.val == 1;
         });
 
         // 打赏
@@ -578,6 +587,13 @@ export default {
 .w-jx3-element-pop {
     position: fixed;
     .z(2000);
+}
+
+.c-comment-mask {
+    .pr;
+    .u-mask {
+        display: block;
+    }
 }
 
 @media screen and (max-width: @phone) {

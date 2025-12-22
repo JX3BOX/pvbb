@@ -1,5 +1,8 @@
 <template>
-    <el-form ref="form" class="c-comment-subbox m-comment-editor">
+    <el-form ref="form" class="c-comment-subbox m-comment-editor" :class="{'m-comment-mask': commentStrict}">
+        <div class="u-mask">
+            参与评论，需先进行<a href="/dashboard/auth" class="u-link">账号认证</a>。
+        </div>
         <div class="u-subbox-label">
             回复
             <el-link type="primary" target="_blank" :href="userHref">＠{{ username }}</el-link>
@@ -29,7 +32,7 @@
 // import Uploader from "./upload.vue";
 import Emotion from "@jx3box/jx3box-emotion/src/Emotion.vue";
 export default {
-    props: ["username", "userHref", "currentId"],
+    props: ["username", "userHref", "currentId", "commentStrict"],
     data: function () {
         return {
             content: "",
@@ -119,6 +122,30 @@ export default {
         height: 24px;
         margin: 0 10px 0 0;
         vertical-align: middle;
+    }
+    .pr;
+
+    .u-mask {
+        .pa;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 10;
+        display: none;
+        text-align: center;
+        align-content: center;
+    }
+
+    .u-link {
+        color: @primary;
+    }
+}
+.m-comment-mask {
+    .pr;
+    .u-mask {
+        .db;
     }
 }
 </style>

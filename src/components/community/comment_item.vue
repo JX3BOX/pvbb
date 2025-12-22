@@ -57,6 +57,7 @@
                     :user-href="authorLink(userInfo.id)"
                     @hideForm="showReplyForReplyFrom = false"
                     @doReply="doReply"
+                    :commentStrict="commentStrict"
                 />
             </div>
         </div>
@@ -79,7 +80,7 @@ const DECORATION_KEY = "decoration_comment_";
 
 export default {
     name: "CommentItem",
-    props: ["post"],
+    props: ["post", "commentStrict"],
     inject: ["getTopicData", "getReplyData", "getCommentList"],
     components: {
         ReplyForReply,
