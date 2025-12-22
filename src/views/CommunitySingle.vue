@@ -62,7 +62,7 @@
                                     :defaultVisible="collection_collapse"
                                     @collectionUpdate="updateCollection"
                                 />
-                                <el-divider content-position="left">JX3BOX</el-divider>
+                                <el-divider class="m-community-header__divider" content-position="left">JX3BOX</el-divider>
                             </div>
                         </template>
                     </ReplyItem>
@@ -572,7 +572,9 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/community/community-single.less";
-
+.m-community-header__divider{
+    margin: 10px 0 20px 0;
+}
 .w-jx3-element-pop {
     position: fixed;
     .z(2000);

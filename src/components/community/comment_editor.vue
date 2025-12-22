@@ -294,8 +294,8 @@ export default {
     }
     .u-publish {
         margin-bottom: 4px;
-        background: #4080ff;
-        border: 1px solid #4080ff;
+        // background: #4080ff;
+        // border: 1px solid #4080ff;
         &:hover {
             opacity: 0.9;
         }

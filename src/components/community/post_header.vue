@@ -29,9 +29,9 @@
                 </i>
                 <span :style="hightStyle" class="u-title-text">{{ title }}</span>
                 <div class="u-title-toolbar">
-                    <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
+                    <!-- <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
                         >编辑</el-button
-                    >
+                    > -->
                     <el-button
                         size="small"
                         :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
@@ -363,8 +363,8 @@ export default {
     .fr;
     .u-only-btn {
         position: relative;
-        background: rgba(64, 128, 255, 1);
-        border: 1px solid rgba(64, 128, 255, 1);
+        // background: @color-link;
+        // border: 1px solid rgba(64, 128, 255, 1);
         display: inline-block;
         height: 32px;
         &.u-unset {
@@ -416,7 +416,7 @@ export default {
     .u-client {
         // .fl;
         font-style: normal;
-        .fz(12px);
+        .fz(12px,20px);
         padding: 0px 5px;
         .r(3px);
         // .mr(10px);
