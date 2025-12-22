@@ -437,7 +437,7 @@ export default {
     background-color: #fff;
 
     .m-community-top {
-        margin: 0 30px 20px 30px;
+        margin: 0 30px 10px 30px;
     }
     .u-star-checkbox {
         padding-top: 4px !important;
