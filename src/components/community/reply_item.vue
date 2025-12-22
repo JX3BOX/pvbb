@@ -90,7 +90,7 @@
                     class="m-single-thx"
                     :class="{'is-disabled-boxcoin': isDisableBoxcoin}"
                     :postId="~~id"
-                    postType="bbs"
+                    postType="community_topic"
                     :postTitle="post.title"
                     :userId="post.user_id"
                     :adminBoxcoinEnable="true"
@@ -517,20 +517,20 @@ export default {
         },
         onThx() {
             bus.emit("onThx", {
-                postType: "bbs",
+                postType: "community_topic_reply",
                 postId: this.post.id,
                 postUserId: this.userId,
                 client: "std",
             });
         },
         loadHomeworkBoxcoin() {
-            getHistorySummary("bbs", this.post.id).then((res) => {
+            getHistorySummary("community_topic_reply", this.post.id).then((res) => {
                 this.summary = res.data.data;
             });
         },
         onBoxcoinClick() {
             bus.emit("boxcoin-click", {
-                postType: "bbs",
+                postType: "community_topic_reply",
                 postId: this.post.id,
                 postUserId: this.userId,
             });

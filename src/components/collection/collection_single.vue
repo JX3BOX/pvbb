@@ -137,7 +137,7 @@
                 <Thx
                     class="m-thx"
                     :postId="id"
-                    postType="bbs"
+                    postType="collection"
                     :postTitle="title"
                     :userId="author_id"
                     :adminBoxcoinEnable="false"

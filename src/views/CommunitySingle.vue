@@ -207,7 +207,7 @@ export default {
 
             // 打赏相关 start
             showHomeWork: false,
-            postType: "bbs",
+            postType: "community",
             postId: "",
             postUserId: 0,
             postClient: "std",
