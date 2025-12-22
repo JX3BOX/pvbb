@@ -2,7 +2,7 @@
     <div id="app" class="m-community-layout">
         <Header></Header>
         <Breadcrumb
-            name="魔盒论坛"
+            name="竹林茶馆"
             slug="community"
             :publishEnable="false"
             :topicEnable="false"

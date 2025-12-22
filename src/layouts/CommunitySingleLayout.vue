@@ -3,7 +3,7 @@
         <Header></Header>
         <Breadcrumb
             v-if="post"
-            name="魔盒论坛"
+            name="竹林茶馆"
             slug="community"
             :publishEnable="false"
             :adminEnable="true"
