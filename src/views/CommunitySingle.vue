@@ -298,7 +298,11 @@ export default {
         getConfig({
             key: "comment_strict"
         }).then((res) => {
-            this.comment_strict = res.data.data.val == 1;
+            if (res.data.data?.val == 1) {
+                if (User.isLogin()) {
+                    this.comment_strict = User.getInfo().group < 16;
+                }
+            }
         });
 
         // 打赏
