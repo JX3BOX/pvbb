@@ -26,7 +26,13 @@
             />
 
             <!-- 标题文字 -->
-            <a class="u-title" :style="hightStyle" :href="postLink(item.id)" :target="target" v-html="highlightText(item.title)">
+            <a
+                class="u-title"
+                :style="hightStyle"
+                :href="postLink(item.id)"
+                :target="target"
+                v-html="highlightText(item.title)"
+            >
             </a>
 
             <!-- 角标 -->
@@ -35,8 +41,12 @@
             </span> -->
 
             <span class="u-push" v-if="hasPermission">
-                <time v-if="showPushDate" class="u-push__time" :class="{'is-recent': isRecent()}">{{ pushDate }} 已推送</time>
-                <el-button class="u-push__btn" size="mini" type="warning" @click="onPush" icon="el-icon-s-promotion">推送</el-button>
+                <time v-if="showPushDate" class="u-push__time" :class="{ 'is-recent': isRecent() }"
+                    >{{ pushDate }} 已推送</time
+                >
+                <el-button class="u-push__btn" size="mini" type="warning" @click="onPush" icon="el-icon-s-promotion"
+                    >推送</el-button
+                >
             </span>
         </h2>
 
@@ -64,13 +74,10 @@
             </div>
             <div class="u-metalist u-topics">
                 <strong>标签</strong>
-                <template v-if="~~item.collection_id">
-                    <a :href="`/collection/${item.collection_id}`" target="_blank"
-                        >《{{ item.collection && item.collection.title }}》</a
-                    >
-                </template>
                 <span class="m-topic-tag">
-                    <span class="u-tag">{{ showCategory(item.category) }}</span>
+                    <a class="u-tag" :href="`/community?category=${item.category}&page=1`" target="_blank">{{
+                        showCategory(item.category)
+                    }}</a>
                     <template v-if="item.color_tag">
                         <a
                             class="u-tag"
@@ -78,11 +85,17 @@
                             :key="index"
                             :style="{ backgroundColor: _item.color }"
                             :href="getLink(_item)"
+                            target="_blank"
                         >
                             {{ _item.label }}
                         </a>
                     </template>
-                    <span class="u-tag u-star-tag" v-if="item.is_star">精选</span>
+                    <!-- <span class="u-tag u-star-tag" v-if="item.is_star">精选</span> -->
+                    <template v-if="~~item.collection_id">
+                        <a class="u-tag u-tag--collection" :href="`/collection/${item.collection_id}`" target="_blank">{{
+                            item.collection && item.collection.title.replace(/(^《|》$)/g, "")
+                        }}</a>
+                    </template>
                 </span>
             </div>
         </div>
@@ -120,7 +133,7 @@ import bus from "@/utils/bus";
 import { getSkinJson } from "@/service/community";
 const appKey = "community";
 const skinKey = "community_topic_skin";
-import {tabsMap} from "@/assets/data/community_category.js";
+import { tabsMap } from "@/assets/data/community_category.js";
 
 export default {
     name: "ListItem",
@@ -217,7 +230,7 @@ export default {
                 post_title: this.item.title,
                 ID: this.item.id,
                 author: this.item?.ext_user_info?.display_name || "匿名",
-            }
+            };
             bus.emit("design-task", data);
         },
         postLink: function (val) {
@@ -246,7 +259,7 @@ export default {
             const url = new URL(window.location.href);
             url.searchParams.set("tag", item.label);
             return url.toString();
-        }
+        },
     },
     filters: {
         authorLink,
@@ -283,8 +296,8 @@ export default {
     border: 1px solid #fff !important;
     background-color: #fff;
 
-    &:hover{
-        border:1px solid @color-link !important;
+    &:hover {
+        border: 1px solid @color-link !important;
     }
 
     .u-post {
@@ -303,15 +316,15 @@ export default {
         align-items: center;
     }
 }
-@media screen and (max-width:@phone){
-    .m-topic-list .u-community-item{
-        .u-post{
+@media screen and (max-width: @phone) {
+    .m-topic-list .u-community-item {
+        .u-post {
             .flex;
             align-items: flex-start;
         }
-        .u-title{
+        .u-title {
             .pr;
-            top:-3px;
+            top: -3px;
         }
     }
 }
