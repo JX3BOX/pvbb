@@ -1,7 +1,7 @@
 <template>
     <el-form ref="form" class="c-comment-subbox m-comment-editor" :class="{'m-comment-mask': commentStrict}">
         <div class="u-mask">
-            参与评论，需先进行<a href="/dashboard/auth" class="u-link">账号认证</a>。
+            参与评论，需先进行<a href="/dashboard/auth" target="_blank" class="u-link">账号认证</a>。
         </div>
         <div class="u-subbox-label">
             回复
