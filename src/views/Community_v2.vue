@@ -414,6 +414,7 @@ export default {
             this.col = 1;
         },
         handleScroll() {
+            if (this.view != 1) return;
             const paginationRef = this.$refs.paginationRef;
             if (paginationRef && this.hasNextPage) {
                 const y = paginationRef.$el.offsetTop;

@@ -328,7 +328,7 @@ export default {
             return "";
         },
         isSuper() {
-            return User.isSuperAdmin();
+            return User.getInfo()?.group >= 64;
         },
         isFollower() {
             return this.post?.user_id && this.post?.user_id == User.getInfo()?.uid;
@@ -509,7 +509,7 @@ export default {
         },
         onEdit() {
             if (this.isMaster) {
-                const path = editLink("community", this.post.id);
+                const path = editLink("community", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
                 window.open(path, "_blank");
             } else {
                 const path = editLink("community/reply", this.post.id);
