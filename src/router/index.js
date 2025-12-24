@@ -15,6 +15,7 @@ VueRouter.prototype.push = function push(location) {
 };
 
 const Namespace = () => import("../views/Namespace.vue");
+const NamespaceMobile = () => import("../views/Namespace-mobile.vue");
 const Joke = () => import("../views/Joke/Joke.vue");
 const JokeMobile = () => import("../views/Joke/Joke-mobile.vue");
 
@@ -38,7 +39,7 @@ const routes = [
     { path: "/community_topic/:id", redirect: "/community/:id" },
     { path: "/community/topic/:id", redirect: "/community/:id" },
     { name: "community-single", path: "/community/:id", component: CommunitySingle },
-    { name: "namespace", path: "/namespace", component: Namespace },
+    { name: "namespace", path: "/namespace", component: isMiniProgram() ? NamespaceMobile : Namespace },
     {
         name: "namespace-single",
         path: "/namespace/:id",
