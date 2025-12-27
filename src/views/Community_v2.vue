@@ -166,8 +166,8 @@ export default {
         };
     },
     mounted() {
-        window.addEventListener("resize", this.handleResize);
-        window.addEventListener("scroll", this.handleScroll);
+        // window.addEventListener("resize", this.handleResize);
+        // window.addEventListener("scroll", this.handleScroll);
         // 初始化的时候执行一次
         this.handleResize();
         this.getCategoryList();
@@ -185,8 +185,8 @@ export default {
         });
     },
     beforeDestroy() {
-        window.removeEventListener("resize", this.handleResize);
-        window.removeEventListener("scroll", this.handleScroll);
+        // window.removeEventListener("resize", this.handleResize);
+        // window.removeEventListener("scroll", this.handleScroll);
     },
     watch: {
         // 加载路由参数
