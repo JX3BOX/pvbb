@@ -1,5 +1,5 @@
 <template>
-    <div class="m-community-top">
+    <div class="m-community-top" v-if="data.length">
         <div class="m-community-top__header">
             <h3 class="u-title"><i class="el-icon-news"></i>公告</h3>
             <!-- <a href="/notice" class="u-more" target="_blank">全部 &raquo;</a> -->
@@ -34,7 +34,7 @@ export default {
                     this.data = JSON.parse(data);
                 } else {
                     getBreadcrumb('bbs_ac').then(res => {
-                        this.data = res.split('\n');
+                        this.data = res && res.split('\n') || [];
 
                         sessionStorage.setItem("bbs_ac", JSON.stringify(this.data));
                     })
