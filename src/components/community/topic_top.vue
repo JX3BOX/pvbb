@@ -67,7 +67,7 @@
                         </span>
                     </a>
                     <div v-if="data.color_tag && data.color_tag.length" class="m-topic-tag">
-                        <span v-for="(item, index) in data.color_tag" :key="index" :style="{ background: item.color }">
+                        <span class="u-tag" v-for="(item, index) in data.color_tag" :key="index" :style="{ background: item.color }">
                             {{ item.label }}
                         </span>
                     </div>
