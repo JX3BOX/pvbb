@@ -592,6 +592,9 @@ export default {
     position: fixed;
     .z(2000);
 }
+.m-single-collection{
+    margin-bottom: 20px;
+}
 
 .c-comment-mask {
     .pr;

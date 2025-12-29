@@ -4,7 +4,7 @@
         <div class="m-single-title">
             <span class="u-title u-sub-block">
                 <slot name="title_before"></slot>
-                <div class="m-topic-category-box" v-if="styles">
+                <!-- <div class="m-topic-category-box" v-if="styles">
                     <a
                         :href="`/community?category=${post.category}`"
                         :class="`m-topic-category`"
@@ -17,71 +17,57 @@
                         />
                         <div>{{ post.category }}</div>
                     </a>
-                </div>
+                </div> -->
 
-                <i class="u-private" v-if="post.post_status != 'publish' || !!~~post.visible">
-                    <i
-                        class="el-icon-lock"
-                        v-if="post.post_status == 'draft' || post.post_status == 'pending' || !!~~post.visible"
-                        style="color: #fb9b24"
-                    ></i>
-                    <i class="el-icon-delete" v-if="post.post_status == 'dustbin'" style="color: #c00"></i>
+                <!-- 可视状态 -->
+                <i class="u-status u-status-private" v-if="post.status != 1 || post.visible != 0">
+                    <i class="el-icon-lock" style="color: #fb9b24"></i>
                 </i>
+
+                <i class="u-status u-status-deleted" v-if="post.is_deleted">
+                    <i class="el-icon-delete" style="color: #c00"></i>
+                </i>
+
+                <!-- 标题与高亮 -->
+                <i v-if="isTop" class="u-status u-status-top">
+                    <img svg-inline src="@/assets/img/community/is_top.svg" alt="" />
+                </i>
+
+                <i v-if="isStar" class="u-status u-status-star">
+                    <img svg-inline src="@/assets/img/community/is_star.svg" alt="" />
+                </i>
+
                 <span :style="hightStyle" class="u-title-text">{{ title }}</span>
-                <div class="u-title-toolbar">
-                    <!-- <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
-                        >编辑</el-button
-                    > -->
-                    <el-button
-                        size="small"
-                        :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
-                        type="primary"
-                        @click="setOnlyAuthor(!onlyAuthor)"
-                    >
-                        <img svg-inline v-show="!onlyAuthor" src="@/assets/img/community/only-author.svg" />
-                        {{ onlyAuthor ? "取消只看楼主" : "只看楼主" }}
-                    </el-button>
-                </div>
             </span>
         </div>
 
         <!-- 信息 -->
         <div class="m-single-info">
             <slot></slot>
-            <span v-if="isTop" class="u-status u-sub-block top">
-                <img svg-inline src="@/assets/img/community/is_top.svg" alt="" />
-                置顶
-            </span>
 
-            <span v-if="isStar" class="u-status u-sub-block star">
-                <img svg-inline src="@/assets/img/community/is_star_inline.svg" alt="" />
-                精选
-            </span>
+            <div class="u-meta u-sub-block">
+                <em class="u-label">分类</em>
+                <span class="u-value">{{ showPostTypeLabel(post.category) }}</span>
+            </div>
+
             <div class="u-meta u-sub-block">
                 <em class="u-label">适用客户端</em>
                 <span class="u-value u-client" :class="'i-client-' + client">{{ showClientLabel(client) }}</span>
             </div>
 
-            <!-- 帖子分类 -->
-            <!-- <span class="u-status u-sub-block" :style="`background-color: ${styles.color};`">
-                <img v-svg-inline :src="require(`@/assets/img/community/category/${styles.icon}.svg`)" />
-                {{ post.category }}
-            </span> -->
-
-            <!-- 标签 -->
-            <span
-                v-for="(item, index) in tags"
-                :key="index"
-                class="u-tag u-sub-block"
-                :style="{ backgroundColor: item.color }"
-            >
-                {{ item.label }}
-            </span>
-            <!-- 小册 -->
-            <!-- <a v-if="collection" class="u-book u-sub-block" :href="collection.url" target="_blank">
-                <img svg-inline src="@/assets/img/community/bookmark.svg" alt="小册" />
-                {{ collection.name }}
-            </a> -->
+            <div class="u-meta u-sub-block">
+                <em class="u-label">标签</em>
+                <span class="u-value">
+                    <span
+                        v-for="(item, index) in tags"
+                        :key="index"
+                        class="u-tag"
+                        :style="{ backgroundColor: item.color }"
+                    >
+                        {{ item.label }}
+                    </span>
+                </span>
+            </div>
 
             <!-- 发布日期 -->
             <span class="u-sub-block" :title="'发布日期:' + post_time">
@@ -118,10 +104,25 @@
             <slot name="append"></slot>
         </div>
 
-        <div class="u-title-toolbar u-phone-show">
-            <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
-                >编辑</el-button
-            >
+        <!-- <div class="u-title-toolbar u-phone-show">
+        <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
+            >编辑</el-button
+        >
+        <el-button
+            size="small"
+            :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
+            type="primary"
+            @click="setOnlyAuthor(!onlyAuthor)"
+        >
+            <img svg-inline v-show="!onlyAuthor" src="@/assets/img/community/only-author.svg" />
+            {{ onlyAuthor ? "取消只看楼主" : "只看楼主" }}
+        </el-button>
+    </div> -->
+
+        <div class="m-single-toolbar">
+            <!-- <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
+                        >编辑</el-button
+                    > -->
             <el-button
                 size="small"
                 :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
@@ -143,6 +144,7 @@ import User from "@jx3box/jx3box-common/js/user.js";
 import $ from "jquery";
 import { formatCategoryList } from "@/utils/community";
 import { getTopicBucket } from "@/service/cms";
+import { tabsMap } from "@/assets/data/community_category";
 export default {
     name: "single-header",
     props: ["post", "stat"],
@@ -151,6 +153,7 @@ export default {
         return {
             categoryList: [],
             wordCount: 0,
+            postTypes: tabsMap,
         };
     },
     computed: {
@@ -233,6 +236,9 @@ export default {
         },
     },
     methods: {
+        showPostTypeLabel(type) {
+            return tabsMap[type] || type;
+        },
         showClientLabel: function (val) {
             return __clients[val];
         },
@@ -322,6 +328,14 @@ export default {
         .pr;
     }
 
+    .u-status {
+        .size(20px);
+        margin-right: 5px;
+        svg,i{
+            .size(20px);
+        }
+    }
+
     .u-original {
         background-color: #6f42c1;
         color: #fff;
@@ -343,25 +357,27 @@ export default {
 .expanding-right {
     .m-single-title {
         // .u-title {
-            max-width: calc(100vw - 80px);
+        max-width: calc(100vw - 80px);
         // }
     }
 }
 
-.u-title-toolbar.u-phone-show {
-    display: none;
-    align-items: center;
-    .el-button--small,
-    .el-button--small.is-round {
-        padding: 0 10px;
-        height: 25px;
-        box-sizing: border-box;
-        overflow: hidden;
-    }
-}
-.u-title-toolbar {
-    .fr;
+// .u-title-toolbar.u-phone-show {
+//     display: none;
+//     align-items: center;
+//     .el-button--small,
+//     .el-button--small.is-round {
+//         padding: 0 10px;
+//         height: 25px;
+//         box-sizing: border-box;
+//         overflow: hidden;
+//     }
+// }
+.m-single-toolbar {
+    .pa;.rt(0,20px);
+    // .fr;
     .u-only-btn {
+        top:10px;
         position: relative;
         // background: @color-link;
         // border: 1px solid rgba(64, 128, 255, 1);
@@ -392,13 +408,25 @@ export default {
             white-space: normal;
             font-weight: normal;
         }
+        .u-status {
+            .size(16px);
+            svg,i{
+                .size(16px);
+            }
+        }
+    }
+    .m-single-header{
+        padding-top:0;
+    }
+    .m-single-toolbar{
+        .ps;
     }
 
     .expanding-right {
-    .m-single-title {
+        .m-single-title {
             max-width: unset;
+        }
     }
-}
 }
 @media print {
     .m-single-title {
