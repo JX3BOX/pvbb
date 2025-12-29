@@ -66,7 +66,12 @@
                     <!-- 列表 -->
                     <div class="m-archive-list m-topic-list">
                         <ul class="u-list">
-                            <ListItem :key="topTopicData.id" :keyword="title" v-if="topTopicData" :item="topTopicData" />
+                            <ListItem
+                                :key="topTopicData.id"
+                                :keyword="title"
+                                v-if="topTopicData"
+                                :item="topTopicData"
+                            />
                             <ListItem v-for="item in list" :keyword="title" :key="item.id" :item="item" />
                         </ul>
                     </div>
@@ -94,10 +99,12 @@
 const appKey = "community";
 
 import { getTopicList, getTopicBucket } from "@/service/community";
+import { getDesignLog } from "@/service/design";
 import { publishLink } from "@jx3box/jx3box-common/js/utils";
 import { getLikes } from "@/service/next";
 import { formatCategoryList } from "@/utils/community";
 import bus from "@/utils/bus";
+import User from "@jx3box/jx3box-common/js/user";
 
 import Waterfall from "vue-waterfall-rapid";
 import CommunityLayout from "@/layouts/CommunityLayout.vue";
@@ -143,7 +150,7 @@ export default {
 
             loading: false, // 加载状态
             list: [], // 文章列表
-            topTopicData: null,    // 置顶文章数据
+            topTopicData: null, // 置顶文章数据
 
             currentPost: null,
             showDesignTask: false,
@@ -285,8 +292,8 @@ export default {
             this.isSearch = false;
             let query = this.buildQuery(appendMode);
             this.loading = true;
-            getTopicList(query)
-                .then((res) => {
+            return getTopicList(query)
+                .then(async (res) => {
                     let list = res.data.data.list || [];
                     list = list.map((item) => {
                         return {
@@ -312,8 +319,23 @@ export default {
                         });
                     }
 
+                    if (User.hasPermission("push_banner") && !this.isPhone) {
+                        const ids = this.list.map((item) => item.id);
+                        const logs = await getDesignLog({ source_type: "community", ids: ids.join(",") }).then(
+                            (res) => res.data.data
+                        );
+
+                        this.list = this.list.map((item) => {
+                            const log = logs.find((log) => log.source_id == item.id) || null;
+                            this.$set(item, "log", log);
+                            return item;
+                        });
+                    }
+
                     this.total = res.data.data.page.total;
                     this.pages = res.data.data.page.pageTotal;
+
+                    this.$forceUpdate();
                 })
                 .finally(() => {
                     this.loading = false;
@@ -437,7 +459,8 @@ export default {
     .m-tabs {
         padding: 20px 30px 0 30px;
     }
-    .m-archive-search, .m-archive-filter {
+    .m-archive-search,
+    .m-archive-filter {
         margin: 0 30px 10px 30px;
     }
     background-color: #fff;
