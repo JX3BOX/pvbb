@@ -114,7 +114,7 @@ export default {
     },
     methods: {
         getAppIcon(key) {
-            return __cdn + "logo-light/" + key + ".svg";
+            return __cdn + "logo/logo-light/" + key + ".svg";
         },
         isActive: function (slug) {
             return slug == this.$route.name;
