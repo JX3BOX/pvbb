@@ -54,9 +54,26 @@
                 </a>
 
                 <div v-if="data.color_tag && data.color_tag.length" class="m-topic-tag">
-                    <span class="u-tag" v-for="(item, index) in data.color_tag" :key="index" :style="{ backgroundColor: item.color }">
-                        {{ item.label }}
-                    </span>
+                    <template v-for="(_item, index) in data.color_tag">
+                        <a
+                            class="u-tag" :key="index"
+                            :style="{ backgroundColor: _item.color }"
+                            :href="getLink(_item)"
+                            target="_blank"
+                            v-if="!getBg(_item.label)"
+                        >
+                            {{ _item.label }}
+                        </a>
+                        <a
+                            v-else
+                            class="u-tag" :key="index"
+                            :href="getLink(_item)"
+                            target="_blank"
+                        >
+                            <img class="u-tag-bg" :src="getBg(_item.label)" alt="">
+                            <span class="u-tag-text">{{ _item.label }}</span>
+                        </a>
+                    </template>
                 </div>
                 <div
                     class="m-topic-collection"
@@ -173,7 +190,10 @@ export default {
         },
         avatarUrl: function () {
             return showAvatar(this.data?.ext_user_info?.avatar);
-        }
+        },
+        tags: function () {
+            return this.$store.state.tags;
+        },
     },
     mounted() {
         this.getSkinJson();
@@ -220,6 +240,22 @@ export default {
         },
         getPostUrl(id) {
             return `/community/${id}`;
+        },
+        getBg(label) {
+            const item = this.tags.find((tag) => tag.label === label);
+            return (item?.icon && `${__cdn}${item.icon}`) || "";
+        },
+        getBgStyle(item) {
+            return {
+                backgroundColor: item.color,
+                backgroundImage: this.getBg(item.label) ? `url(${this.getBg(item.label)})` : "none",
+            };
+        },
+        getLink(item) {
+            // 往当前url上加上tag查询参数
+            const url = new URL(window.location.href);
+            url.searchParams.set("tag", item.label);
+            return url.toString();
         },
     },
 };

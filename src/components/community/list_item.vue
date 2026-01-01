@@ -79,22 +79,35 @@
                         showCategory(item.category)
                     }}</a>
                     <template v-if="item.color_tag">
-                        <a
-                            class="u-tag"
-                            v-for="(_item, index) in item.color_tag"
-                            :key="index"
-                            :style="{ backgroundColor: _item.color }"
-                            :href="getLink(_item)"
-                            target="_blank"
-                        >
-                            {{ _item.label }}
-                        </a>
+                        <template v-for="(_item, index) in item.color_tag">
+                            <a
+                                class="u-tag" :key="index"
+                                :style="{ backgroundColor: _item.color }"
+                                :href="getLink(_item)"
+                                target="_blank"
+                                v-if="!getBg(_item.label)"
+                            >
+                                {{ _item.label }}
+                            </a>
+                            <a
+                                v-else
+                                class="u-tag" :key="index"
+                                :href="getLink(_item)"
+                                target="_blank"
+                            >
+                                <img class="u-tag-bg" :src="getBg(_item.label)" alt="">
+                                <span class="u-tag-text">{{ _item.label }}</span>
+                            </a>
+                        </template>
                     </template>
                     <!-- <span class="u-tag u-star-tag" v-if="item.is_star">精选</span> -->
                     <template v-if="~~item.collection_id">
-                        <a class="u-tag u-tag--collection" :href="`/collection/${item.collection_id}`" target="_blank">{{
-                            item.collection && item.collection.title.replace(/(^《|》$)/g, "")
-                        }}</a>
+                        <a
+                            class="u-tag u-tag--collection"
+                            :href="`/collection/${item.collection_id}`"
+                            target="_blank"
+                            >{{ item.collection && item.collection.title.replace(/(^《|》$)/g, "") }}</a
+                        >
                     </template>
                 </span>
             </div>
@@ -196,6 +209,9 @@ export default {
                 borderHoverColor: "#0366d6",
             };
         },
+        tags: function () {
+            return this.$store.state.tags;
+        },
     },
     watch: {},
     methods: {
@@ -259,6 +275,16 @@ export default {
             const url = new URL(window.location.href);
             url.searchParams.set("tag", item.label);
             return url.toString();
+        },
+        getBg(label) {
+            const item = this.tags.find((tag) => tag.label === label);
+            return (item?.icon && `${__cdn}${item.icon}`) || "";
+        },
+        getBgStyle(item) {
+            return {
+                backgroundColor: item.color,
+                backgroundImage: this.getBg(item.label) ? `url(${this.getBg(item.label)})` : "none",
+            };
         },
     },
     filters: {

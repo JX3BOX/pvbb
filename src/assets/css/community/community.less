@@ -317,10 +317,37 @@
         border-radius: 3px;
         line-height: 20px;
         text-decoration: none;
+        .pr;
+        .dbi;
         &:hover {
             text-decoration: none;
             box-shadow: none !important;
         }
+
+        // 当有背景图时
+        &:has(.u-tag-bg) {
+            background-color: transparent !important;
+            overflow: visible;
+            width: 120px;
+            padding: 0;
+            .flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    .u-tag-bg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        // width: 120px;
+        height: 24px;
+    }
+
+    .u-tag-text {
+        position: relative;
+        z-index: 1;
     }
 
     .u-star-tag {

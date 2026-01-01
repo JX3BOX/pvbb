@@ -105,6 +105,7 @@ import { getLikes } from "@/service/next";
 import { formatCategoryList } from "@/utils/community";
 import bus from "@/utils/bus";
 import User from "@jx3box/jx3box-common/js/user";
+import {getMenu} from "@jx3box/jx3box-common/js/api_misc";
 
 import Waterfall from "vue-waterfall-rapid";
 import CommunityLayout from "@/layouts/CommunityLayout.vue";
@@ -178,6 +179,8 @@ export default {
         // 初始化的时候执行一次
         this.handleResize();
         this.getCategoryList();
+
+        this.loadCommunityTagList();
 
         const view = localStorage.getItem("community_view");
         if (view) {
@@ -445,6 +448,17 @@ export default {
                     this.appendPage();
                 }
             }
+        },
+        loadCommunityTagList() {
+            const tags = sessionStorage.getItem("community_tags");
+            if (tags) {
+                this.$store.commit("setTags", JSON.parse(tags));
+                return;
+            }
+            getMenu("community_tags").then((res) => {
+                this.$store.commit("setTags", res);
+                sessionStorage.setItem("community_tags", JSON.stringify(res));
+            });
         },
     },
 };

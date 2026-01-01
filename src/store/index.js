@@ -17,10 +17,14 @@ let store = {
             collection_data: "",
             directory: false,
         },
+        tags: [], // 论坛tags
     },
     mutations: {
         switchClient: function (state, val) {
             state.client = val || "std";
+        },
+        setTags: function (state, val) {
+            state.tags = val;
         },
     },
     getters: {},
