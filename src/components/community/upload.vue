@@ -4,6 +4,7 @@
             :action="url"
             ref="upload"
             list-type="picture-card"
+            :headers="headers"
             :on-preview="handlePictureCardPreview"
             :auto-upload="false"
             :file-list="fileList"
@@ -30,7 +31,7 @@
 
 <script>
 import { __cms } from "@/utils/config";
-const API_Root = process.env.NODE_ENV === "production" ? __cms : "/";
+const API_Root = process.env.NODE_ENV === "production" ? __cms : __cms;
 const API = API_Root + "api/cms/upload";
 export default {
     data() {
@@ -44,6 +45,15 @@ export default {
             maxCount: 5,
             maxSize: 10 * 1024 * 1024,
         };
+    },
+    computed: {
+        headers() {
+            const token = localStorage.getItem("token") || "";
+            const credentials = btoa(`${token}:cms common request`);
+            return {
+                Authorization: `Basic ${credentials}`,
+            };
+        },
     },
     methods: {
         handlePictureCardPreview(file) {

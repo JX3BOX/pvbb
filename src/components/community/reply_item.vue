@@ -27,7 +27,7 @@
                         >
                     </div>
                 </div>
-                <span class="u-boxcoin" v-if="!isMaster">
+                <span class="u-boxcoin" v-if="!isMaster && (isLogin || boxCoinTotal)">
                     <el-button
                         v-if="isLogin && !isMaster"
                         class="u-mobile-hidden"

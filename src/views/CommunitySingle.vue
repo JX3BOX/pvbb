@@ -48,8 +48,7 @@
                                             :hide-on-single-page="true"
                                             :page-size="per"
                                             :total="total"
-                                            :current-page.sync="page"
-                                            @current-change="changePage"
+                                            @current-change="changeTopPage"
                                             size="small"
                                             class="m-pageheader-pagination"
                                         ></el-pagination>
@@ -578,6 +577,10 @@ export default {
         enterPwd(value) {
             this.password = value;
             this.getDetails();
+        },
+        changeTopPage(page) {
+            this.page = page;
+            this.getReplyList();
         },
     },
 };
