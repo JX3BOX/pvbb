@@ -512,7 +512,7 @@ export default {
                 const path = editLink("community", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
                 window.open(path, "_blank");
             } else {
-                const path = editLink("community/reply", this.post.id);
+                const path = editLink("community/reply", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
                 window.open(path, "_blank");
             }
         },
