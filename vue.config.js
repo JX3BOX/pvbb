@@ -63,6 +63,20 @@ module.exports = {
         //for lost
         "/",
 
+        //❤️ 配置需要被 Babel 转译的 node_modules 依赖 ~
+    transpileDependencies: [
+        'htmlparser2',
+        'cheerio',
+        'dom-serializer',
+        'domelementtype',
+        'domhandler',
+        'domutils',
+        'entities',
+        'parse5',
+        'parse5-htmlparser2-tree-adapter',
+        '@jx3box/jx3box-editor'
+    ],
+
     // 奇怪的打包错误 ThreadLoader 会和 WorkerLoader 冲突
     // 禁用并行打包
     parallel: false,
