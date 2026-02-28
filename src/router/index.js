@@ -6,7 +6,7 @@
  */
 import Vue from "vue";
 import VueRouter from "vue-router";
-import { isMiniProgram } from "@jx3box/jx3box-common/js/utils";
+import { isMiniProgram, isApp } from "@jx3box/jx3box-common/js/utils";
 
 // 解决重复点击路由报错的BUG
 const originalPush = VueRouter.prototype.push;
@@ -39,20 +39,20 @@ const routes = [
     { path: "/community_topic/:id", redirect: "/community/:id" },
     { path: "/community/topic/:id", redirect: "/community/:id" },
     { name: "community-single", path: "/community/:id", component: CommunitySingle },
-    { name: "namespace", path: "/namespace", component: isMiniProgram() ? NamespaceMobile : Namespace },
+    { name: "namespace", path: "/namespace", component: isMiniProgram() || isApp() ? NamespaceMobile : Namespace },
     {
         name: "namespace-single",
         path: "/namespace/:id",
         component: () => import("@/components/namespace/namespace_single.vue"),
     },
-    { name: "joke", path: "/joke/:id?", component: isMiniProgram() ? JokeMobile : Joke },
+    { name: "joke", path: "/joke/:id?", component: isMiniProgram() || isApp() ? JokeMobile : Joke },
 
-    { name: "emotion", path: "/emotion/:id?", component: isMiniProgram() ? EmotionMobile : Emotion },
+    { name: "emotion", path: "/emotion/:id?", component: isMiniProgram() || isApp() ? EmotionMobile : Emotion },
     { name: "collection", path: "/collection", component: Collection },
     {
         name: "collection-single",
         path: "/collection/:id",
-        component: isMiniProgram() ? CollectionMiniSingle : CollectionSingle,
+        component: isMiniProgram() || isApp() ? CollectionMiniSingle : CollectionSingle,
     },
 ];
 

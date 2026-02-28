@@ -19,7 +19,7 @@ import List from "@/components/collection/collection_list.vue";
 import MiniList from "@/components/collection/collection_mini_list.vue";
 import Single from "@/components/collection/collection_single.vue";
 import MiniSingle from "@/components/collection/collection_mini_single.vue";
-import { isMiniProgram } from "@jx3box/jx3box-common/js/utils";
+import { isMiniProgram, isApp } from "@jx3box/jx3box-common/js/utils";
 export default {
     name: "Collection",
     props: [],
@@ -32,7 +32,7 @@ export default {
     },
     data: function () {
         return {
-            isMiniProgram: isMiniProgram(),
+            isMiniProgram: isMiniProgram() || isApp(),
         };
     },
     computed: {
