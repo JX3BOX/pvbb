@@ -18,10 +18,13 @@
             :on-error="onError"
         >
             <i class="el-icon-plus"></i>
-            <div slot="tip" class="el-upload__tip">
-                最多上传 {{ maxCount }} 张 {{ acceptedExtensions.join(" / ").toUpperCase() }} 格式图片，单张图片不能超过
-                {{ maxSize / 1024 / 1024 }} MB
-            </div>
+            <template #tip>
+                <div class="el-upload__tip">
+                    最多上传 {{ maxCount }} 张
+                    {{ acceptedExtensions.join(" / ").toUpperCase() }} 格式图片，单张图片不能超过
+                    {{ maxSize / 1024 / 1024 }} MB
+                </div>
+            </template>
         </el-upload>
         <el-dialog :visible.sync="dialogVisible">
             <img width="60%" :src="dialogImageUrl" alt />

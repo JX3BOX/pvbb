@@ -1,4 +1,5 @@
-import { $cms } from "@jx3box/jx3box-common/js/https";
+import axios from "axios";
+import { $cms } from "@jx3box/jx3box-common/js/api";
 import { __cdn } from "@/utils/config";
 
 function getMenu(key) {

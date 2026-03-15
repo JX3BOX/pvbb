@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import CollectionPublish from "@jx3box/jx3box-editor/service/enum/CollectionPublic";
+import CollectionPublish from "@jx3box/jx3box-editor/src/service/enum/CollectionPublic";
 import { getCollection, removeCollection } from "@/service/collection";
 import { dateFormat } from "@/utils/dateFormat";
 import dayjs from "dayjs";

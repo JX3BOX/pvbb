@@ -4,17 +4,18 @@
             <ListTabs v-model="category" />
             <list-top></list-top>
             <div class="m-archive-search" slot="search-before">
-                <a :href="publish_link" class="u-publish el-button el-button--primary">+ 发布作品</a>
+                <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">+ 发布作品</a>
                 <el-input
                     placeholder="请输入搜索内容"
                     v-model.trim.lazy="title"
                     clearable
                     @clear="onSearch"
+                    size="large"
                     @keydown.native.enter="onSearch"
                 >
-                    <span slot="prepend"><i class="el-icon-search"></i> 关键词</span>
+                    <template #prepend><i class="el-icon-search"></i> 关键词</template>
                     <template #append>
-                        <el-button icon="el-icon-position" @click="onSearch"></el-button>
+                        <el-button icon="Position" @click="onSearch"></el-button>
                     </template>
                 </el-input>
             </div>
@@ -26,18 +27,17 @@
                     <clientBy @filter="filterImperceptibly" :type="client"></clientBy>
                     <el-checkbox
                         v-model="is_star"
-                        :true-label="1"
-                        :false-label="0"
+                        :true-value="1"
+                        :false-value="0"
                         border
-                        size="mini"
                         @change="onIsStarChange"
                         class="u-star-checkbox"
                         >只看精选</el-checkbox
                     >
                 </div>
-                <el-radio-group class="m-list-view" v-model="view" size="mini" @input="onViewChange">
-                    <el-radio-button :label="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
-                    <el-radio-button :label="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
+                <el-radio-group class="m-list-view" v-model="view" size="small" @change="onViewChange">
+                    <el-radio-button :value="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
+                    <el-radio-button :value="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
                 </el-radio-group>
             </div>
 
@@ -56,9 +56,11 @@
                             :gutter="20"
                             ref="waterfall"
                         >
-                            <div slot-scope="item" :class="{ fadeIn: item.state == 'show' }">
-                                <TopicItem :key="item.data.id" :data="item.data" />
-                            </div>
+                            <template #default="item">
+                                <div :class="{ fadeIn: item.state == 'show' }">
+                                    <TopicItem :key="item.data.id" :data="item.data" />
+                                </div>
+                            </template>
                         </Waterfall>
                     </div>
                 </template>
@@ -105,16 +107,16 @@ import { getLikes } from "@/service/next";
 import { formatCategoryList } from "@/utils/community";
 import bus from "@/utils/bus";
 import User from "@jx3box/jx3box-common/js/user";
-import {getMenu} from "@jx3box/jx3box-common/js/api_misc";
+import { getMenu } from "@jx3box/jx3box-common/js/system";
 
-import Waterfall from "vue-waterfall-rapid";
+import Waterfall from "@/components/WaterfallRapid.vue";
 import CommunityLayout from "@/layouts/CommunityLayout.vue";
 import ListTabs from "@/components/community/list_tabs.vue";
 import CommunityPagination from "@/components/community/community_pagination.vue";
 import TopicItem from "@/components/community/topic_item.vue";
 import ListItem from "@/components/community/list_item.vue";
 import TopicTop from "@/components/community/topic_top.vue";
-import DesignTask from "@jx3box/jx3box-common-ui/src/bread/DesignTask.vue";
+import DesignTask from "@jx3box/jx3box-ui/src/bread/DesignTask.vue";
 import ListTop from "@/components/community/list_top.vue";
 
 export default {
@@ -191,6 +193,14 @@ export default {
 
         bus.on("design-task", (post) => {
             this.currentPost = post;
+            // DesignTask 仅监听 modelValue，弹窗已打开时切换文章需要重新触发打开流程
+            if (this.showDesignTask) {
+                this.showDesignTask = false;
+                this.$nextTick(() => {
+                    this.showDesignTask = true;
+                });
+                return;
+            }
             this.showDesignTask = true;
         });
     },
@@ -240,7 +250,7 @@ export default {
                         id,
                     }).then((res) => {
                         if (res.data.data[id] && res.data.data[id].likes) {
-                            this.$set(topTopicData, "agree_count", res.data.data[id].likes);
+                            this.topTopicData.agree_count = res.data.data[id].likes;
                         }
                     });
                 }
@@ -263,7 +273,7 @@ export default {
             for (let index = 0; index < this.list.length; index++) {
                 const item = this.list[index];
                 if (item.agree_count == null) {
-                    this.$set(this.list[index], "agree_count", 0);
+                    this.list[index].agree_count = 0;
                 }
             }
             if (!ids.length) return;
@@ -279,7 +289,7 @@ export default {
                         const id = key.split("-")[1];
                         const index = this.list.findIndex((item) => item.id == id);
                         if (index > -1) {
-                            this.$set(this.list[index], "agree_count", res.data.data[key].likes);
+                            this.list[index].agree_count = res.data.data[key].likes;
                         }
                     });
                 }
@@ -330,7 +340,7 @@ export default {
 
                         this.list = this.list.map((item) => {
                             const log = logs.find((log) => log.source_id == item.id) || null;
-                            this.$set(item, "log", log);
+                            item.log = log;
                             return item;
                         });
                     }
@@ -390,6 +400,7 @@ export default {
         },
         // 视图切换
         onViewChange(view) {
+            console.log(view);
             this.view = view;
             localStorage.setItem("community_view", view);
         },
@@ -483,7 +494,12 @@ export default {
         margin: 0 30px 10px 30px;
     }
     .u-star-checkbox {
-        padding-top: 4px !important;
+        height: 28px;
+    }
+    .m-list-view {
+        .el-radio-button__inner {
+            padding: 8px 11px;
+        }
     }
 }
 </style>

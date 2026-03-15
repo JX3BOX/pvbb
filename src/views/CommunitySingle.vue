@@ -17,8 +17,8 @@
                         ></el-pagination>
                     </template>
                 </PostHeader> -->
-                <!-- 文集小册 -->
-                <!-- <Collection
+            <!-- 文集小册 -->
+            <!-- <Collection
                     class="m-single-collection"
                     :id="collection_id"
                     :defaultVisible="collection_collapse"
@@ -61,7 +61,9 @@
                                     :defaultVisible="collection_collapse"
                                     @collectionUpdate="updateCollection"
                                 />
-                                <el-divider class="m-community-header__divider" content-position="left">JX3BOX</el-divider>
+                                <el-divider class="m-community-header__divider" content-position="left"
+                                    >JX3BOX</el-divider
+                                >
                             </div>
                         </template>
                     </ReplyItem>
@@ -87,11 +89,12 @@
                 <el-button
                     class="u-more-buttom"
                     :style="{ fontSize: hasNextPage ? '14px' : '12px' }"
-                    :type="hasNextPage ? 'primary' : 'text'"
+                    :type="hasNextPage ? 'primary' : 'info'"
+                    :link="!hasNextPage"
                     @click="nextPage"
                     :loading="loading"
                     :disabled="!hasNextPage"
-                    :icon="hasNextPage ? 'el-icon-arrow-down' : ''"
+                    :icon="hasNextPage ? 'ArrowDown' : ''"
                 >
                     {{ hasNextPage ? "下一页" : "没有更多了" }}
                 </el-button>
@@ -109,7 +112,11 @@
                 </div>
                 <div class="u-editor">
                     <el-divider content-position="left">回帖</el-divider>
-                    <CommentEditor @submit="onReplyTopic" v-if="!isDisabledComment" :class="{ 'c-comment-mask': comment_strict }" />
+                    <CommentEditor
+                        @submit="onReplyTopic"
+                        v-if="!isDisabledComment"
+                        :class="{ 'c-comment-mask': comment_strict }"
+                    />
                     <el-alert :show-close="false" center v-else class="m-disabled-comment-tip"
                         >作者已关闭回帖功能</el-alert
                     >
@@ -156,16 +163,16 @@ import { getTopicDetails, getTopicDetailsFromAdmin, getTopicReplyList, replyTopi
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { getLikes } from "@/service/next";
 import User from "@jx3box/jx3box-common/js/user";
-import Homework from "@jx3box/jx3box-common-ui/src/interact/Homework.vue";
-import boxCoinRecords from "@jx3box/jx3box-comment-ui/src/components/boxcoin-records.vue";
+import Homework from "@jx3box/jx3box-ui/src/interact/Homework.vue";
+import boxCoinRecords from "@jx3box/jx3box-ui/src/interact/BoxcoinRecords.vue";
 import bus from "@/utils/bus";
 import { atAuthors } from "@/service/pay";
-import Collection from "@jx3box/jx3box-common-ui/src/single/Collection.vue";
-import renderJx3Element from "@jx3box/jx3box-editor/assets/js/jx3_element";
+import Collection from "@jx3box/jx3box-ui/src/single/Collection.vue";
+import renderJx3Element from "@jx3box/jx3box-editor/src/assets/js/jx3_element";
 import Author from "@jx3box/jx3box-editor/src/components/Author.vue";
 import { __visibleMap } from "@/utils/config";
 import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
-import {getConfig} from "@jx3box/jx3box-common/js/api_misc";
+import { getConfig } from "@jx3box/jx3box-common/js/system";
 
 const appKey = "community";
 
@@ -295,7 +302,7 @@ export default {
         });
 
         getConfig({
-            key: "comment_strict"
+            key: "comment_strict",
         }).then((res) => {
             if (res.data.data?.val == 1) {
                 if (User.isLogin()) {
@@ -413,7 +420,7 @@ export default {
 
                 getStat(appKey, this.id).then((res) => {
                     this.stat = res.data;
-                    this.$set(this.post, "likes", this.stat.likes || 0);
+                    this.post.likes = this.stat.likes || 0;
                 });
                 postStat(appKey, this.id);
 
@@ -588,14 +595,14 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/community/community-single.less";
-.m-community-header__divider{
+.m-community-header__divider {
     margin: 10px 0 20px 0;
 }
 .w-jx3-element-pop {
     position: fixed;
     .z(2000);
 }
-.m-single-collection{
+.m-single-collection {
     margin-bottom: 20px;
 }
 

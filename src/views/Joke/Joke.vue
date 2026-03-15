@@ -4,7 +4,7 @@
             <!-- 单页 -->
             <div class="m-joke-single-container" v-if="id">
                 <div class="m-joke-goback">
-                    <el-button class="u-back" size="mini" icon="el-icon-arrow-left" @click="goBack">返回列表</el-button>
+                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
                     <a class="u-doc" href="/tool/23239" target="_blank">
                         <i class="el-icon-info"></i>游戏内获取或发布骚话
                     </a>
@@ -16,10 +16,6 @@
                         </div>
                     </el-col>
                 </el-row>
-                <!-- <div class="m-joke-tags" v-if="joke.tags && joke.tags.length">
-                    <i class="el-icon-price-tag"></i>
-                    <span class="u-tag" v-for="(tag,i) in joke.tags" :key="i">{{tag}}</span>
-                </div>-->
                 <Thx
                     class="m-thx"
                     :postId="~~id"
@@ -44,18 +40,21 @@
                     <el-input
                         placeholder="请输入搜索内容"
                         v-model.trim.lazy="search"
-                        @keydown.native.enter="onSearch"
+                        @keydown.enter="onSearch"
                         clearable
                         @clear="onSearch"
                     >
-                        <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
-                        <el-switch
-                            slot="append"
-                            v-model="star"
-                            :inactive-value="0"
-                            :active-value="1"
-                            inactive-text="只看精选"
-                        ></el-switch>
+                        <template #prepend
+                            ><i class="el-icon-search"></i> <span class="u-search">关键词</span></template
+                        >
+                        <template #append>
+                            <el-switch
+                                v-model="star"
+                                :inactive-value="0"
+                                :active-value="1"
+                                inactive-text="只看精选"
+                            ></el-switch>
+                        </template>
                     </el-input>
                 </div>
                 <div class="m-joke-main">
@@ -70,7 +69,7 @@
                             </el-tab-pane>
                             <el-tab-pane v-for="(item, i) in schoolmap" :key="i" :name="i">
                                 <div slot="label" style="min-width: 57px">
-                                    <img class="u-icon" :src="i | showSchoolIcon" :alt="item" />
+showSchoolIcon(<img class="u-icon" :src="i)" :alt="item" />
                                     {{ item }}
                                 </div>
                             </el-tab-pane>
@@ -109,7 +108,7 @@
                             ></el-pagination>
                             <!--  -->
                             <div class="m-joke-reward" v-if="isEditor">
-                                <el-button class="m-joke-all" type="primary" size="mini" @click="rewardAll"
+                                <el-button class="m-joke-all" type="primary" size="small" @click="rewardAll"
                                     >{{ this.rewardAllType ? "取消" : "" }} 全选</el-button
                                 >
                                 <Thx
@@ -134,7 +133,6 @@
 // 模块
 import joke_item from "@/components/joke/joke_item";
 import joke_post from "@/components/joke/joke_post.vue";
-import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
 import ListLayout from "@/layouts/ListLayout.vue";
 import LeftTab from "@/components/left-tab.vue";
 
@@ -155,7 +153,6 @@ export default {
     name: "Joke",
     components: {
         "joke-item": joke_item,
-        Comment,
         "joke-post": joke_post,
         ListLayout,
         LeftTab,
@@ -306,7 +303,7 @@ export default {
                     const likes = res.data.data;
                     if (Object.keys(likes).length) {
                         this.jokes.forEach((d) => {
-                            this.$set(d, "count", likes?.["joke-" + d.id]?.likes);
+                            d.count = likes?.["joke-" + d.id]?.likes;
                         });
                     }
                 });
@@ -372,7 +369,7 @@ export default {
             handler: function (val) {
                 val && this.init();
             },
-        }
+        },
     },
     mounted: function () {
         const that = this;

@@ -1,5 +1,5 @@
 <template>
-    <el-form ref="form" class="c-comment-subbox m-comment-editor" :class="{'m-comment-mask': commentStrict}">
+    <el-form ref="form" class="c-comment-subbox m-comment-editor" :class="{ 'm-comment-mask': commentStrict }">
         <div class="u-mask">
             参与评论，需先进行<a href="/dashboard/auth" target="_blank" class="u-link">账号认证</a>。
         </div>
@@ -16,13 +16,13 @@
                 <Emotion class="c-comment-emotion" @selected="handleEmotionSelected" type="pop" :max="6"></Emotion>
                 <el-button
                     class="u-publish"
-                    size="mini"
+                    size="small"
                     type="primary"
                     @click="submintReply()"
                     :disabled="disableSubmitBtn"
                     >提交</el-button
                 >
-                <el-button size="mini" type="text" @click="hideForm()">收起</el-button>
+                <el-button size="small" link @click="hideForm()">收起</el-button>
             </div>
         </el-form-item>
     </el-form>
@@ -30,7 +30,7 @@
 
 <script>
 // import Uploader from "./upload.vue";
-import Emotion from "@jx3box/jx3box-emotion/src/Emotion.vue";
+import Emotion from "@jx3box/jx3box-emotion/src/Emotion2.vue";
 export default {
     props: ["username", "userHref", "currentId", "commentStrict"],
     data: function () {
@@ -110,12 +110,12 @@ export default {
     }
 
     // .u-publish {
-        // margin-bottom: 4px;
-        // background: #4080ff;
-        // border:none;
-        // &:hover {
-        //     background-color:lighten(#4080ff, 2%);
-        // }
+    // margin-bottom: 4px;
+    // background: #4080ff;
+    // border:none;
+    // &:hover {
+    //     background-color:lighten(#4080ff, 2%);
+    // }
     // }
     .c-comment-emotion {
         display: inline-block;

@@ -18,8 +18,8 @@
                 </a>
             </div>
             <div class="u-time">
-                <el-button type="text" icon="el-icon-date">{{ showDate(data.created * 1000) }}</el-button>
-                <el-button type="text" icon="el-icon-refresh">{{ showDate(data.updated * 1000) }}</el-button>
+                <el-button link icon="el-icon-date">{{ showDate(data.created * 1000) }}</el-button>
+                <el-button link icon="el-icon-refresh">{{ showDate(data.updated * 1000) }}</el-button>
             </div>
         </div>
     </a>
@@ -135,7 +135,7 @@ export default {
         .size(18px);
         .r(100%);
     }
-    .u-time{
+    .u-time {
         .none;
     }
 

@@ -16,7 +16,6 @@ import minirank from "./minirank.vue";
 import birthday from "./birthday.vue";
 export default {
     name: "list_side",
-    props: [],
     data: function () {
         return {
             activeDocGroup: [],
@@ -37,6 +36,7 @@ export default {
                     title: "复制成功",
                     message: "内容：" + this.qq,
                     type: "success",
+                    zIndex: 999999,
                 });
             });
         },
@@ -63,6 +63,7 @@ export default {
 .m-extend-list {
     .u-link {
         .pointer;
+        color: var(--el-color-primary);
     }
 
     .c-sidebar-right-msg {

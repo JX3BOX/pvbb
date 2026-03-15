@@ -1,4 +1,4 @@
-import { $pay } from "@jx3box/jx3box-common/js/https";
+import { $pay } from "@jx3box/jx3box-common/js/api";
 
 export const getHistorySummary = (postType, postId) => {
     return $pay().get(`/api/inspire/article/${postType}/${postId}/history/summary`);

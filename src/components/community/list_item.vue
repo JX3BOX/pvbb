@@ -37,14 +37,20 @@
 
             <!-- 角标 -->
             <!-- <span class="u-marks" v-if="item.mark && item.mark.length">
-                <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark | showMark }}</i>
+showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
             </span> -->
 
             <span class="u-push" v-if="hasPermission">
                 <time v-if="showPushDate" class="u-push__time" :class="{ 'is-recent': isRecent() }"
                     >{{ pushDate }} 已推送</time
                 >
-                <el-button class="u-push__btn" size="mini" type="warning" @click="onPush" icon="el-icon-s-promotion"
+                <el-button
+                    class="u-push__btn"
+                    size="small"
+                    type="warning"
+                    :disabled="pushing"
+                    @click="onPush"
+                    icon="Promotion"
                     >推送</el-button
                 >
             </span>
@@ -79,23 +85,18 @@
                         showCategory(item.category)
                     }}</a>
                     <template v-if="item.color_tag">
-                        <template v-for="(_item, index) in item.color_tag">
+                        <template v-for="(_item, index) in item.color_tag" :key="index">
                             <a
-                                class="u-tag" :key="index"
+                                v-if="!getBg(_item.label)"
+                                class="u-tag"
                                 :style="{ backgroundColor: _item.color }"
                                 :href="getLink(_item)"
                                 target="_blank"
-                                v-if="!getBg(_item.label)"
                             >
                                 {{ _item.label }}
                             </a>
-                            <a
-                                v-else
-                                class="u-tag" :key="index"
-                                :href="getLink(_item)"
-                                target="_blank"
-                            >
-                                <img class="u-tag-bg" :src="getBg(_item.label)" alt="">
+                            <a v-else class="u-tag" :href="getLink(_item)" target="_blank">
+                                <img class="u-tag-bg" :src="getBg(_item.label)" alt="" />
                                 <span class="u-tag-text">{{ _item.label }}</span>
                             </a>
                         </template>
@@ -117,17 +118,17 @@
         <div class="u-misc">
             <img
                 class="u-author-avatar"
-                :src="item.ext_user_info | showAvatar"
-                :alt="item.ext_user_info | showNickname"
+                :src="showAvatar(item.ext_user_info)"
+                :alt="showNickname(item.ext_user_info)"
             />
-            <a class="u-author-name" :href="item.user_id | authorLink" target="_blank" v-if="!item.anonymous">{{
-                item.ext_user_info | showNickname
+            <a class="u-author-name" :href="authorLink(item.user_id)" target="_blank" v-if="!item.anonymous">{{
+                showNickname(item.ext_user_info)
             }}</a>
             <span v-else>神秘侠士</span>
             <span class="u-date">
                 Updated on
-                <time v-if="order == 'update'">{{ item.post_modified | dateFormat }}</time>
-                <time v-else>{{ item.updated_at | dateFormat }}</time>
+                <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>
+                <time v-else>{{ dateFormat(item.updated_at) }}</time>
             </span>
         </div>
     </li>
@@ -135,8 +136,9 @@
 
 <script>
 import { showAvatar, authorLink, showBanner, buildTarget, postLink } from "@jx3box/jx3box-common/js/utils";
-import { __ossMirror, __cdn } from "@jx3box/jx3box-common/data/jx3box";
-import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
+import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
+const { __ossMirror, __cdn } = jx3box;
+import markMap from "@jx3box/jx3box-common/data/mark.json";
 import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
 import { random } from "lodash";
@@ -158,6 +160,7 @@ export default {
 
             start: 1,
             end: 39,
+            pushing: false,
 
             skinJson: {},
         };
@@ -169,12 +172,12 @@ export default {
         hasPermission() {
             return User.hasPermission("push_banner");
         },
-        pushDate({ item }) {
-            const date = item?.log?.push_at;
-            return showDate(new Date(date));
+        pushDate() {
+            const date = this.item?.log?.push_at;
+            return date ? showDate(new Date(date)) : "";
         },
         showPushDate() {
-            return Boolean(this.item?.log);
+            return Boolean(this.item?.log?.push_at);
         },
         isTop: function () {
             return this.item.is_top || this.item.is_category_top;
@@ -241,6 +244,8 @@ export default {
             return dayjs().diff(dayjs(date), "day") < 30;
         },
         onPush() {
+            if (this.pushing) return;
+            this.pushing = true;
             const data = {
                 post_type: "community",
                 post_title: this.item.title,
@@ -248,6 +253,9 @@ export default {
                 author: this.item?.ext_user_info?.display_name || "匿名",
             };
             bus.emit("design-task", data);
+            setTimeout(() => {
+                this.pushing = false;
+            }, 300);
         },
         postLink: function (val) {
             return location.origin + `/${appKey}/` + val;
@@ -293,7 +301,7 @@ export default {
             return val ? `color:${val};font-weight:600;` : "";
         },
         showMark: function (val) {
-            return mark_map[val] || val;
+            return (markMap.cms && markMap.cms[val]) || val;
         },
         showAvatar: function (userinfo) {
             return showAvatar(userinfo?.avatar);

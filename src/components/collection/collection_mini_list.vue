@@ -12,7 +12,7 @@
                     <div class="u-content">
                         <div class="u-title">{{ item.title }}</div>
                         <div class="m-user">
-                            <img class="u-avatar" :src="item.collection_user_info.user_avatar | showAvatar" />
+                            <img class="u-avatar" :src="showAvatar(item.collection_user_info.user_avatar)" />
                             <span class="u-nickname" v-text="item.collection_user_info.display_name"></span>
                         </div>
                     </div>
@@ -54,7 +54,7 @@ import { showAvatar, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __imgPath } from "@/utils/config";
 import { dateFormat } from "@/utils/dateFormat.js";
 import { getCollections } from "@/service/collection.js";
-import SuspendCommon from "@jx3box/jx3box-common-ui/src/SuspendCommon.vue";
+import SuspendCommon from "@jx3box/jx3box-ui/src/SuspendCommon.vue";
 import "wc-waterfall";
 export default {
     name: "CollectionList",

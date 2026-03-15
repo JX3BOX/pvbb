@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { getBreadcrumb, getMenus } from "@jx3box/jx3box-common/js/api_misc.js";
+import { getBreadcrumb, getMenus } from "@jx3box/jx3box-common/js/system.js";
 import { __imgPath } from "@/utils/config";
 const empty_item = {
     color: "",

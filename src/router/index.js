@@ -4,15 +4,8 @@
  * @LastEditTime: 2022-07-17 20:06:34
  * @Description:
  */
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import { isMiniProgram, isApp } from "@jx3box/jx3box-common/js/utils";
-
-// 解决重复点击路由报错的BUG
-const originalPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
-    return originalPush.call(this, location).catch((err) => err);
-};
 
 const Namespace = () => import("../views/Namespace.vue");
 const NamespaceMobile = () => import("../views/Namespace-mobile.vue");
@@ -28,8 +21,6 @@ const Single = () => import("../views/Single.vue");
 
 const CollectionSingle = () => import("@/components/collection/collection_single.vue");
 const CollectionMiniSingle = () => import("@/components/collection/collection_mini_single.vue");
-
-Vue.use(VueRouter);
 
 const routes = [
     { name: "index", path: "/", redirect: { name: "community" } },
@@ -56,9 +47,9 @@ const routes = [
     },
 ];
 
-const router = new VueRouter({
+const router = createRouter({
+    history: createWebHistory(),
     routes,
-    mode: "history",
 });
 
 export default router;

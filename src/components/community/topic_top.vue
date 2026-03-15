@@ -67,7 +67,12 @@
                         </span>
                     </a>
                     <div v-if="data.color_tag && data.color_tag.length" class="m-topic-tag">
-                        <span class="u-tag" v-for="(item, index) in data.color_tag" :key="index" :style="{ background: item.color }">
+                        <span
+                            class="u-tag"
+                            v-for="(item, index) in data.color_tag"
+                            :key="index"
+                            :style="{ background: item.color }"
+                        >
                             {{ item.label }}
                         </span>
                     </div>
@@ -108,7 +113,8 @@
 import { getTimeAgo } from "@/utils/dateFormat";
 import TopicItem from "@/components/community/topic_item.vue";
 import { random } from "lodash";
-import { __ossMirror, __cdn } from "@jx3box/jx3box-common/data/jx3box";
+import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
+const { __ossMirror, __cdn } = jx3box;
 import { showAvatar, authorLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { getSkinJson } from "@/service/community";
 const skinKey = "community_topic_skin";

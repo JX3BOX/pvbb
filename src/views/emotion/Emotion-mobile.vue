@@ -8,7 +8,7 @@
                         <div :key="item.id || index" class="m-chat-item">
                             <div class="m-message">
                                 <div class="m-avatar">
-                                    <img class="u-avatar" :src="item.user_info?.user_avatar | showAvatar" />
+                                    <img class="u-avatar" :src="showAvatar(item.user_info?.user_avatar)" />
                                 </div>
                                 <div class="m-content">
                                     <div class="m-header">

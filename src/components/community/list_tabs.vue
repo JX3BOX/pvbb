@@ -1,46 +1,46 @@
 <template>
     <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
         <el-tab-pane label="全部内容" name="all">
-            <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/all.png" alt="">
+            <template #label>
+                <img class="u-icon-img" src="@/assets/img/community/category/all.png" alt="" />
                 <b>全部内容</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
-            </span>
+            </template>
         </el-tab-pane>
 
         <el-tab-pane label="攻略心得" name="guide">
-            <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/guide.png" alt="">
+            <template #label>
+                <img class="u-icon-img" src="@/assets/img/community/category/guide.png" alt="" />
                 <b>攻略心得</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
-            </span>
+            </template>
         </el-tab-pane>
 
         <el-tab-pane label="江湖故事" name="story">
-            <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="">
+            <template #label>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="" />
                 <b>江湖故事</b>
-            </span>
+            </template>
         </el-tab-pane>
 
         <el-tab-pane label="交流分享" name="discuz">
-            <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="">
+            <template #label>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="" />
                 <b>交流分享</b>
-            </span>
+            </template>
         </el-tab-pane>
 
         <el-tab-pane label="求助寻觅" name="help">
-            <span slot="label">
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="">
+            <template #label>
+                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="" />
                 <b>求助寻觅</b>
-            </span>
+            </template>
         </el-tab-pane>
     </el-tabs>
 </template>
 
 <script>
-import {tabsMap, reversedTabsMap} from "@/assets/data/community_category.js";
+import { tabsMap, reversedTabsMap } from "@/assets/data/community_category.js";
 
 export default {
     name: "tabs",
@@ -51,8 +51,7 @@ export default {
         },
     },
     data: function () {
-        return {
-        };
+        return {};
     },
     computed: {
         view: {
@@ -62,8 +61,8 @@ export default {
             },
             set(val) {
                 // 将英文key转换为中文后传出
-                this.$emit('input', val);
-            }
+                this.$emit("input", val);
+            },
         },
         client: function () {
             return this.$store.state.client || "std";
@@ -73,10 +72,9 @@ export default {
         changeView(tab) {
             // el-tabs 的 tab-click 事件会传入 tab 对象
             this.view = tab.name;
-        }
+        },
     },
-    mounted: function () {
-    },
+    mounted: function () {},
 };
 </script>
 

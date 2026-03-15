@@ -54,23 +54,18 @@
                 </a>
 
                 <div v-if="data.color_tag && data.color_tag.length" class="m-topic-tag">
-                    <template v-for="(_item, index) in data.color_tag">
+                    <template v-for="(_item, index) in data.color_tag" :key="index">
                         <a
-                            class="u-tag" :key="index"
+                            v-if="!getBg(_item.label)"
+                            class="u-tag"
                             :style="{ backgroundColor: _item.color }"
                             :href="getLink(_item)"
                             target="_blank"
-                            v-if="!getBg(_item.label)"
                         >
                             {{ _item.label }}
                         </a>
-                        <a
-                            v-else
-                            class="u-tag" :key="index"
-                            :href="getLink(_item)"
-                            target="_blank"
-                        >
-                            <img class="u-tag-bg" :src="getBg(_item.label)" alt="">
+                        <a v-else class="u-tag" :href="getLink(_item)" target="_blank">
+                            <img class="u-tag-bg" :src="getBg(_item.label)" alt="" />
                             <span class="u-tag-text">{{ _item.label }}</span>
                         </a>
                     </template>
@@ -98,14 +93,14 @@
             </div>
 
             <a class="u-box-content" :href="getPostUrl(data.id)" target="_blank">
-                <a :href="getPostUrl(data.id)" class="m-topic-content" target="_blank">
+                <div class="m-topic-content">
                     <span class="m-topic-title" target="_blank" :style="hightStyle">
                         <img svg-inline v-if="isTop" src="@/assets/img/community/is_top.svg" alt="" srcset="" />
                         <img svg-inline v-if="data.is_star" src="@/assets/img/community/is_star.svg" alt="" srcset="" />
                         {{ data.title }}
                     </span>
                     <div class="u-introduction" v-html="introduction"></div>
-                </a>
+                </div>
                 <div v-if="data.extra_images && data.extra_images.length" class="m-topic-imgs scrollbar">
                     <a class="u-item" v-for="(item, index) in data.extra_images" :key="index">
                         <el-image :src="getSquareBanner(item)" fit="fill" />
@@ -118,7 +113,8 @@
 
 <script>
 import { showAvatar, authorLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
-import { __ossMirror, __cdn } from "@jx3box/jx3box-common/data/jx3box";
+import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
+const { __ossMirror, __cdn } = jx3box;
 import { random } from "lodash";
 import { getTimeAgo } from "@/utils/dateFormat";
 import { getSkinJson } from "@/service/community";

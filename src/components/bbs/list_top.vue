@@ -16,13 +16,13 @@
                     <span class="u-label u-zlp">置顶</span>
 
                     <!-- 标题文字 -->
-                    <a class="u-title" :style="item.color | showHighlight" :href="getLink(item)" :target="target">{{
+showHighlight(<a class="u-title" :style="item.color)" :href="getLink(item)" :target="target">{{
                         item.post_title || "无标题"
                     }}</a>
 
                     <!-- 角标 -->
                     <span class="u-marks" v-if="item.mark && item.mark.length">
-                        <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark | showMark }}</i>
+showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                     </span>
                 </h2>
 
@@ -77,7 +77,7 @@ import { __ossMirror, __imgPath } from "@/utils/config";
 import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
 import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
-import { getBreadcrumb } from "@jx3box/jx3box-common/js/api_misc";
+import { getBreadcrumb } from "@jx3box/jx3box-common/js/system";
 import { getPosts } from "@/service/post"
 export default {
     name: "list_top",

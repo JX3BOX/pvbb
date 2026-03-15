@@ -1,6 +1,6 @@
 <template>
     <div class="m-collection-layout">
-        <Header></Header>
+        <CommonHeader></CommonHeader>
         <Breadcrumb
             name="剑三小册"
             slug="collection"
@@ -11,13 +11,6 @@
             :crumbEnable="true"
         >
             <template #op-prepend>
-                <!-- <el-button
-                    class="c-admin-button u-admin"
-                    type="primary"
-                    icon="el-icon-setting"
-                    @click="onAdminClick"
-                    v-if="isEditor"
-                >管理</el-button> -->
                 <AdminDrop v-if="isTeammate" :post="finalPost" :user-id="user_id" />
             </template>
         </Breadcrumb>
@@ -29,7 +22,7 @@
             <RightSidebar>
                 <Side :id="id" class="m-extend" />
             </RightSidebar>
-            <Footer></Footer>
+            <CommonFooter></CommonFooter>
         </Main>
     </div>
 </template>
@@ -77,7 +70,7 @@ export default {
                 ...this.post,
                 post_title: this.post.title,
                 ID: this.post.id,
-                post_type: "collection"
+                post_type: "collection",
             };
         },
         isTeammate() {

@@ -5,7 +5,7 @@
         </div>
         <el-form-item>
             <el-input
-                rows="6"
+                :rows="6"
                 type="textarea"
                 :maxlength="maxLength"
                 show-word-limit
@@ -42,7 +42,7 @@
 
 <script>
 import Uploader from "./upload.vue";
-import Emotion from "@jx3box/jx3box-emotion/src/Emotion.vue";
+import Emotion from "@jx3box/jx3box-emotion/src/Emotion2.vue";
 import quickReply from "./quick-reply.vue";
 import Tribute from "tributejs";
 import { getUserList } from "@/service/cms";
@@ -296,7 +296,7 @@ export default {
         top: 7px;
     }
     .u-publish {
-        margin-bottom: 4px;
+        // margin-bottom: 4px;
         // background: #4080ff;
         // border: 1px solid #4080ff;
         &:hover {

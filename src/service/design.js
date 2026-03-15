@@ -1,4 +1,4 @@
-import { $cms } from "@jx3box/jx3box-common/js/https";
+import { $cms } from "@jx3box/jx3box-common/js/api";
 
 export const getDesignLog = (params) => {
     return $cms().get(`/api/cms/design/task/log`, { params });

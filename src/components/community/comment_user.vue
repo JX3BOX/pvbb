@@ -3,9 +3,9 @@
         <AuthorInfo :uid="uid" @ready="installModules" :isAnonymous="isAnonymous" />
         <template v-if="data">
             <div class="u-interact">
-                <AuthorFollow v-if="!isMaster" style="margin-right: 8px" :uid="uid" />
-                <AuthorRss v-else style="margin-right: 8px" :uid="uid" />
-                <el-button icon="el-icon-message" class="u-btn" size="mini" @click="onMessage">私信</el-button>
+                <AuthorFollow v-if="!isMaster" :uid="uid" />
+                <AuthorRss v-else :uid="uid" />
+                <el-button icon="Message" class="u-btn" size="small" @click="onMessage">私信</el-button>
             </div>
             <AuthorMedals class="u-block u-trophy" :uid="uid" />
             <slot></slot>
@@ -17,10 +17,11 @@
 
 <script>
 import AuthorInfo from "./comment_user_info.vue";
-import AuthorFollow from "@jx3box/jx3box-common-ui/src/author/AuthorFollow.vue";
-import AuthorMedals from "@jx3box/jx3box-common-ui/src/author/AuthorMedals.vue";
-import AuthorRss from "@jx3box/jx3box-common-ui/src/author/AuthorRss.vue";
+import AuthorFollow from "@jx3box/jx3box-ui/src/author/AuthorFollow.vue";
+import AuthorMedals from "@jx3box/jx3box-ui/src/author/AuthorMedals.vue";
+import AuthorRss from "@jx3box/jx3box-ui/src/author/AuthorRss.vue";
 import AuthorCommunity from "./author_community.vue";
+import "@jx3box/jx3box-ui/assets/css/single/author.less";
 
 import { getDecoration } from "@/service/cms";
 import { __cdn } from "@/utils/config";
@@ -49,7 +50,7 @@ export default {
                 this.getDecoration();
             },
             immediate: true,
-        }
+        },
     },
     methods: {
         installModules: function (data) {

@@ -20,7 +20,7 @@
                                 style="margin-right: 5px"
                                 width="24"
                                 height="24"
-                                :src="i | showSchoolIcon"
+                                showSchoolIcon(:src="i)"
                                 :alt="school"
                             />
                             {{ school }}
@@ -32,7 +32,7 @@
                 type="primary"
                 size="small"
                 @click="publish"
-                icon="el-icon-position"
+                icon="Position"
                 :loading="processing"
                 :disabled="processing"
                 >提交</el-button

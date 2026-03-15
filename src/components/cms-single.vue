@@ -24,8 +24,7 @@
             <el-divider content-position="left">JX3BOX</el-divider>
             <div class="m-single-content">
                 <slot></slot>
-                <ArticleMarkdown v-if="isMarkdown" :content="post_content" @directoryRendered="updateDirectory" />
-                <Article v-else :content="post_content" @directoryRendered="updateDirectory" />
+                <Article :content="post_content" :post_mode="post_mode" @directoryRendered="updateDirectory" />
             </div>
         </div>
         <div class="m-single-null" v-else>
@@ -77,15 +76,13 @@
 </template>
 
 <script>
-import PostHeader from "@jx3box/jx3box-common-ui/src/single/PostHeader.vue";
-import Creators from "@jx3box/jx3box-common-ui/src/single/Creators.vue";
-import Collection from "@jx3box/jx3box-common-ui/src/single/Collection.vue";
-import Thx from "@jx3box/jx3box-common-ui/src/single/Thx.vue";
-import RightAffix from "@jx3box/jx3box-common-ui/src/single/right-affix.vue";
+import PostHeader from "@jx3box/jx3box-ui/src/single/PostHeader.vue";
+import Creators from "@jx3box/jx3box-ui/src/single/Creators.vue";
+import Collection from "@jx3box/jx3box-ui/src/single/Collection.vue";
+import Thx from "@jx3box/jx3box-ui/src/single/Thx.vue";
+import RightAffix from "@jx3box/jx3box-ui/src/single/RightAffix.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
-import ArticleMarkdown from "@jx3box/jx3box-editor/src/ArticleMarkdown.vue";
-import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
-import PostGuide from "@jx3box/jx3box-common-ui/src/single/PostGuide.vue";
+import PostGuide from "@jx3box/jx3box-ui/src/single/PostGuide.vue";
 
 import { __visibleMap } from "@/utils/config";
 import { getAppType } from "@jx3box/jx3box-common/js/utils";
@@ -98,8 +95,6 @@ export default {
         Collection,
         Thx,
         Article,
-        ArticleMarkdown,
-        Comment,
         RightAffix,
         PostGuide,
     },
@@ -150,9 +145,6 @@ export default {
         },
         post_mode: function () {
             return this.post?.post_mode || "tinymce";
-        },
-        isMarkdown: function () {
-            return this.post_mode == "markdown";
         },
         allow_comment: function () {
             return !this.post?.comment;
@@ -237,8 +229,8 @@ export default {
                     }
                     location.href = `/community/${val}`;
                 }
-            }
-        }
+            },
+        },
     },
 };
 </script>

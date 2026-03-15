@@ -3,11 +3,13 @@
         <el-button
             class="m-topic-pages"
             :style="{ fontSize: hasNextPage ? '14px' : '12px' }"
-            :type="hasNextPage ? 'primary' : 'text'"
+            :type="hasNextPage ? 'primary' : 'info'"
+            :link="!hasNextPage"
             @click="appendPage"
             :loading="loading"
             :disabled="!hasNextPage"
-            :icon="hasNextPage ? 'el-icon-arrow-down' : ''"
+            :icon="hasNextPage ? 'ArrowDown' : ''"
+            size="large"
         >
             {{ hasNextPage ? "加载更多" : "没有更多了" }}
         </el-button>

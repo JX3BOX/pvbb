@@ -34,15 +34,6 @@
                         :active-value="1"
                         :inactive-value="0"
                     ></el-switch>
-                    <!-- <el-input
-                        class="u-author"
-                        v-model="data.author"
-                        placeholder="（非必填）"
-                        v-if="!data.original"
-                        size="mini"
-                    >
-                        <span slot="prepend">原作者</span>
-                    </el-input> -->
                     <el-select v-model="type" size="small" placeholder="选择门派">
                         <el-option v-for="(school, i) in schoolmap" :key="i" :value="i" :label="school">
                             <div style="display: flex; align-items: center">
@@ -51,7 +42,7 @@
                                     style="margin-right: 5px"
                                     width="24"
                                     height="24"
-                                    :src="i | showSchoolIcon"
+                                    showSchoolIcon(:src="i)"
                                     :alt="school"
                                 />
                                 {{ school }}
@@ -67,7 +58,7 @@
                     @click="post"
                     :disabled="loading"
                     :loading="loading"
-                    icon="el-icon-position"
+                    icon="Position"
                     size="small"
                     >提交</el-button
                 >
@@ -108,10 +99,10 @@ export default {
         };
     },
     computed: {
-        fileInput: function() {
+        fileInput: function () {
             return this.$refs.uploadInput;
         },
-        isLogin: function() {
+        isLogin: function () {
             return User.isLogin();
         },
     },
@@ -156,7 +147,7 @@ export default {
                 return item;
             });
         },
-        select: function() {
+        select: function () {
             this.fileInput.dispatchEvent(new MouseEvent("click"));
         },
         async upload() {
@@ -184,7 +175,7 @@ export default {
             // this.data.url = "";
             // this.data.desc = "";
         },
-        post: function() {
+        post: function () {
             if (!this.isLogin) {
                 User.toLogin();
             } else {
@@ -214,7 +205,7 @@ export default {
         },
     },
     filters: {
-        showSchoolIcon: function(val) {
+        showSchoolIcon: function (val) {
             return __imgPath + "image/school/" + val + ".png";
         },
     },

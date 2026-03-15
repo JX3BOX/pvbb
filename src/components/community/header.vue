@@ -18,41 +18,28 @@
                 :content="item.remark"
                 :disabled="!item.remark"
             >
-                <a
-                    slot="reference"
-                    :href="item.href || 'javascript:;'"
-                    :class="`
-                    ${selectedCategory === item.value && 'u-active'}
-                    ${item.mark && 'has-mark'}
-                    u-item`"
-                    @click="handleChange(item)"
-                    :style="{
-                        '--hover-bg-color': item.hoverColor,
-                        '--hover-color': item.color,
-                    }"
-                >
-                    <span>{{ item.name }}</span>
-                    <!-- <img -->
-                        <!-- v-svg-inline -->
-                        <!-- class="u-icon" -->
-                        <!-- :src="require(`@/assets/img/community/category/${item.icon}.svg`)" -->
-                    <!-- /> -->
+                <template #reference>
+                    <a
+                        :href="item.href || 'javascript:;'"
+                        :class="`
+                        ${selectedCategory === item.value && 'u-active'}
+                        ${item.mark && 'has-mark'}
+                        u-item`"
+                        @click="handleChange(item)"
+                        :style="{
+                            '--hover-bg-color': item.hoverColor,
+                            '--hover-color': item.color,
+                        }"
+                    >
+                        <span>{{ item.name }}</span>
 
-                    <CategoryLottieMark class="u-mark" v-if="item.mark && item.mark_enable" :mark="item.mark"></CategoryLottieMark>
-
-                    <!-- <img
-                        v-if="item.mark && item.mark.indexOf('.svg') >= 0"
-                        v-svg-inline
-                        class="u-mark"
-                        :style="{ color: item.color }"
-                        :src="require(`@/assets/img/community/category/${item.mark}`)"
-                    />
-                    <img
-                        v-else-if="item.mark"
-                        class="u-mark"
-                        :src="require(`@/assets/img/community/category/${item.mark}`)"
-                    /> -->
-                </a>
+                        <CategoryLottieMark
+                            class="u-mark"
+                            v-if="item.mark && item.mark_enable"
+                            :mark="item.mark"
+                        ></CategoryLottieMark>
+                    </a>
+                </template>
             </el-popover>
 
             <el-dropdown size="small" :disabled="moreNavList.length === 0">
@@ -60,31 +47,28 @@
                     <span>更多</span>
                     <i class="el-icon-arrow-down"></i>
                 </a>
-                <el-dropdown-menu slot="dropdown" class="m-community-dropdown">
-                    <el-dropdown-item
-                        v-for="(item, index) in moreNavList"
-                        :key="index"
-                        :style="{
-                            '--hover-bg-color': item.hoverColor,
-                            '--hover-color': item.color,
-                            '--active-color': item.activeColor || '#fff',
-                        }"
-                        class="m-community-dropdown__item"
-                    >
-                        <a
-                            :href="item.href || 'javascript:;'"
-                            :class="`${selectedCategory === item.value && 'active'} u-item`"
-                            @click="handleChange(item)"
+                <template #dropdown>
+                    <el-dropdown-menu class="m-community-dropdown">
+                        <el-dropdown-item
+                            v-for="(item, index) in moreNavList"
+                            :key="index"
+                            :style="{
+                                '--hover-bg-color': item.hoverColor,
+                                '--hover-color': item.color,
+                                '--active-color': item.activeColor || '#fff',
+                            }"
+                            class="m-community-dropdown__item"
                         >
-                            <span> {{ item.name }}</span>
-                            <!-- <img
-                                v-svg-inline
-                                class="u-icon"
-                                :src="require(`@/assets/img/community/category/${item.icon}.svg`)"
-                            /> -->
-                        </a>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
+                            <a
+                                :href="item.href || 'javascript:;'"
+                                :class="`${selectedCategory === item.value && 'active'} u-item`"
+                                @click="handleChange(item)"
+                            >
+                                <span> {{ item.name }}</span>
+                            </a>
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
             </el-dropdown>
         </div>
         <div class="m-community-header__special-box">

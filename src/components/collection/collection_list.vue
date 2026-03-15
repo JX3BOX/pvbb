@@ -18,8 +18,8 @@
         <Banner :subtype="'collection'"></Banner>
         <!-- 列表 -->
         <div class="m-collection-list" v-if="data && data.length">
-            <template v-for="(item, i) in data">
-                <collection-item :data="item" :key="i" :style="!isPhone ? `width: calc(100% / ${count})` : ''" />
+            <template v-for="(item, i) in data" :key="i">
+                <collection-item :data="item" :style="!isPhone ? `width: calc(100% / ${count})` : ''" />
             </template>
         </div>
         <!-- 空 -->

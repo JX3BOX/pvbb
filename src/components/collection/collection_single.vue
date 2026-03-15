@@ -29,7 +29,7 @@
                                     <i class="u-author-icon">
                                         <img svg-inline src="@/assets/img/author.svg" />
                                     </i>
-                                    <a class="u-name" :href="collection.user_id | authorLink">{{
+                                    <a class="u-name" :href="authorLink(collection.user_id)">{{
                                         collection.collection_user_info && collection.collection_user_info.display_name
                                     }}</a>
                                 </div>
@@ -98,7 +98,7 @@
                                     class="u-item-author"
                                     v-if="post.type !== 'custom' && post.user_id"
                                     target="_blank"
-                                    :href="post.user_id | authorLink"
+                                    :href="authorLink(post.user_id)"
                                 >
                                     <img class="u-avatar" :src="showAvatar(post.user_avatar)" />
                                     <span class="u-nickname" v-text="post.user_nickname"></span>
@@ -149,7 +149,7 @@
                     <el-divider content-position="left">
                         <span style="color: #999999"> <i class="el-icon-chat-line-square"></i> 讨论 </span>
                     </el-divider>
-                    <jx3-comment :id="id" category="collection" />
+                    <Comment :id="id" category="collection" />
                 </div>
             </template>
         </div>
@@ -157,8 +157,7 @@
 </template>
 
 <script>
-import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
-import CollectionPublish from "@jx3box/jx3box-editor/service/enum/CollectionPublic";
+import CollectionPublish from "@jx3box/jx3box-editor/src/service/enum/CollectionPublic";
 import { getCollection, removeCollection } from "@/service/collection";
 import { dateFormat } from "@/utils/dateFormat";
 import dayjs from "dayjs";
@@ -181,7 +180,6 @@ export default {
     name: "CollectionSingle",
     props: [],
     components: {
-        "jx3-comment": Comment,
         CollectionLayout,
     },
     data: function () {
@@ -274,7 +272,7 @@ export default {
             return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
         },
         iconUrl: function (icon) {
-            const key = icon.replace("_", '/')
+            const key = icon.replace("_", "/");
             return `${__imgPath}image/${key}.png`;
         },
     },

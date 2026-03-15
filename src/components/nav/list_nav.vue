@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { getMenu } from "@jx3box/jx3box-common/js/api_misc.js";
+import { getMenu } from "@jx3box/jx3box-common/js/system.js";
 import { feedback } from "@/utils/config";
 import { getAppType, getAppIcon } from "@jx3box/jx3box-common/js/utils";
 import { getConfigBanner } from "@/service/cms";

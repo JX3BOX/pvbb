@@ -19,7 +19,7 @@ import singlebox from "@/components/cms-single";
 import { getPost } from "../../service/post.js";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
-import { appKey } from "../../../setting.json";
+import settings from "../../../setting.json";
 import bbsSubtypes from "@/assets/data/bbs_subtypes.json";
 export default {
     name: "single",
@@ -56,7 +56,7 @@ export default {
                     document.title = this.post.post_title;
 
                     User.isLogin() && postHistory({
-                        source_type: appKey,
+                        source_type: settings.appKey,
                         source_id: ~~this.id,
                         link: location.href,
                         title: this.post.post_title,
@@ -69,10 +69,10 @@ export default {
                     this.loading = false;
                 });
 
-            getStat(appKey, this.id).then((res) => {
+            getStat(settings.appKey, this.id).then((res) => {
                 this.stat = this.$store.state.stat = res.data;
             });
-            postStat(appKey, this.id);
+            postStat(settings.appKey, this.id);
         }
     },
     components: {

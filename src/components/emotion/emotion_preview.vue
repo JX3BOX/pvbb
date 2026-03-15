@@ -17,18 +17,14 @@
         <div class="m-emotion-info">
             <div class="u-info-op">
                 <div class="u-info-user">
-                    <img class="u-user-avatar waterfall-img" :src="user_avatar | showAvatar" :key="user_avatar" />
-                    <a
-                        class="u-user-name"
-                        :href="emotion.user_id | authorLink"
-                        target="_blank"
-                        v-if="emotion.user_id"
-                        >{{ emotion | showUserName }}</a
-                    >
+                    <img class="u-user-avatar waterfall-img" :src="showAvatar(user_avatar)" :key="user_avatar" />
+                    <a class="u-user-name" :href="authorLink(emotion.user_id)" target="_blank" v-if="emotion.user_id">{{
+                        showUserName(emotion)
+                    }}</a>
                     <span class="u-user-name" v-else>
                         {{ emotion.author || "匿名" }}
                     </span>
-                    <time class="u-time">{{ emotion.updated_at | showTime }}</time>
+                    <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
                 </div>
                 <div class="u-comment-editor">
                     <div class="u-op">
@@ -74,12 +70,18 @@
     </el-dialog>
 </template>
 <script>
-import { showAvatar, authorLink, editLink,getLink, getThumbnail, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
+import {
+    showAvatar,
+    authorLink,
+    editLink,
+    getLink,
+    getThumbnail,
+    resolveImagePath,
+} from "@jx3box/jx3box-common/js/utils";
 import { getRelativeTime } from "@/utils/dateFormat.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { starEmotion, unstarEmotion, removeEmotion } from "@/service/emotion";
-import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
 export default {
     name: "EmotionPreview",
     emits: ["close"],
@@ -241,7 +243,7 @@ export default {
         box-shadow: none !important;
         .flex;
         justify-content: center;
-        .el-dialog__header{
+        .el-dialog__header {
             .none;
         }
         .el-dialog__body {
@@ -260,13 +262,13 @@ export default {
                 align-items: center;
                 justify-content: center;
                 font-size: 24px;
-                background-color: rgba(0,0,0,.5);
-                color:#fff;
+                background-color: rgba(0, 0, 0, 0.5);
+                color: #fff;
 
-                i{
+                i {
                     transition: all 0.3s ease;
                 }
-                &:hover i{
+                &:hover i {
                     transform: rotate(180deg);
                 }
             }
@@ -340,11 +342,11 @@ export default {
     }
     .m-emotion-info {
         padding: 0 10px 10px;
-        .m-thx{
+        .m-thx {
             padding-bottom: 20px;
             max-width: 700px;
             .auto(x);
-            .w-thx-copyright{
+            .w-thx-copyright {
                 .none;
             }
         }

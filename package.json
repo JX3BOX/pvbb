@@ -8,70 +8,76 @@
         "preview": "cross-env BUILD_MODE=preview NODE_ENV=production vue-cli-service build --mode preview",
         "inspect": "vue inspect > output.js",
         "lint": "vue-cli-service lint",
-        "update": "npm --registry https://registry.npmjs.org install @jx3box/jx3box-common-ui@latest @jx3box/jx3box-common@latest @jx3box/jx3box-data@latest @jx3box/jx3box-emotion@latest @jx3box/jx3box-comment-ui@latest @jx3box/jx3box-editor@latest"
+        "update": "npm --registry https://registry.npmjs.org install @jx3box/jx3box-ui@latest @jx3box/jx3box-common@latest @jx3box/jx3box-data@latest @jx3box/jx3box-emotion@latest @jx3box/jx3box-editor@latest"
     },
     "browserslist": [
         "> 1%",
-        "last 2 versions"
+        "last 2 versions",
+        "not dead",
+        "not ie 11"
     ],
     "eslintConfig": {
+        "root": true,
         "env": {
             "node": true
         },
-        "parserOptions": {
-            "parser": "babel-eslint"
-        },
         "extends": [
-            "plugin:vue/essential"
+            "plugin:vue/vue3-essential"
         ],
-        "rules": {},
-        "root": true
+        "rules": {
+            "vue/multi-word-component-names": "off"
+        },
+        "parserOptions": {
+            "parser": "@babel/eslint-parser"
+        }
     },
     "dependencies": {
-        "@jx3box/jx3box-comment-ui": "^2.0.9",
-        "@jx3box/jx3box-common": "^8.7.5",
-        "@jx3box/jx3box-common-ui": "^9.5.23",
+        "@element-plus/icons-vue": "^2.3.2",
+        "@jx3box/jx3box-common": "^9.1.3",
         "@jx3box/jx3box-data": "^3.9.2",
-        "@jx3box/jx3box-editor": "^2.2.47",
+        "@jx3box/jx3box-editor": "^3.0.7",
         "@jx3box/jx3box-emotion": "^1.2.14",
         "@jx3box/jx3box-fe-proxy": "^1.0.1",
-        "axios": "^0.21.1",
-        "core-js": "^3.16.2",
-        "dayjs": "^1.10.6",
-        "element-ui": "^2.15.5",
-        "hevue-img-preview": "^5.0.0",
+        "@jx3box/jx3box-ui": "^2.0.12",
+        "axios": "^1.3.4",
+        "core-js": "^3.8.3",
+        "dayjs": "^1.11.7",
+        "element-plus": "^2.13.5",
         "jquery": "^3.7.1",
         "localforage": "^1.7.3",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "lottie-web": "^5.12.2",
         "mitt": "^3.0.1",
         "tributejs": "^5.1.3",
-        "vue": "^2.6.14",
-        "vue-router": "^3.5.2",
+        "vue": "^3.5.13",
+        "vue-router": "^4.0.16",
         "vue-svg-inline-plugin": "^2.2.3",
         "vue-waterfall-rapid": "^1.0.25",
-        "vuex": "^3.1.2",
+        "vuedraggable": "^4.1.0",
+        "vuex": "^4.1.0",
         "wc-waterfall": "^0.1.3"
     },
     "devDependencies": {
-        "@babel/compat-data": "^7.15.0",
+        "@babel/core": "^7.12.16",
+        "@babel/eslint-parser": "^7.28.6",
         "@babel/plugin-proposal-optional-chaining": "^7.14.5",
-        "@vue/cli-plugin-babel": "^4.0.0",
-        "@vue/cli-plugin-eslint": "^4.0.0",
-        "@vue/cli-plugin-router": "^4.0.0",
-        "@vue/cli-plugin-vuex": "^4.0.0",
-        "@vue/cli-service": "^4.1.2",
-        "babel-eslint": "^10.0.3",
+        "@tailwindcss/postcss": "^4.2.1",
+        "@vue/cli-plugin-babel": "~5.0.0",
+        "@vue/cli-plugin-eslint": "~5.0.0",
+        "@vue/cli-service": "~5.0.0",
+        "autoprefixer": "^10.4.27",
         "cross-env": "^7.0.3",
-        "csslab": "^4.0.3",
-        "eslint": "^5.16.0",
-        "eslint-plugin-vue": "^5.0.0",
+        "csslab": "^6.0.1",
+        "eslint": "^7.32.0",
+        "eslint-plugin-vue": "^8.0.3",
         "glob": "^7.1.6",
-        "less": "^3.0.4",
-        "less-loader": "^5.0.0",
-        "style-resources-loader": "^1.3.3",
-        "vue-cli-plugin-element": "^1.0.1",
-        "vue-svg-inline-loader": "^1.4.6",
-        "vue-template-compiler": "^2.6.14"
+        "less": "^4.1.3",
+        "less-loader": "^11.0.0",
+        "postcss": "^8.5.8",
+        "sass": "^1.97.3",
+        "sass-loader": "^16.0.7",
+        "style-resources-loader": "^1.5.0",
+        "tailwindcss": "^4.2.1",
+        "vue-svg-inline-loader": "^2.1.3"
     }
 }

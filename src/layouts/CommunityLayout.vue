@@ -1,6 +1,6 @@
 <template>
-    <div id="app" class="m-community-layout">
-        <Header></Header>
+    <div id="app" class="l-community-layout">
+        <CommonHeader></CommonHeader>
         <Breadcrumb
             name="竹林茶馆"
             slug="community"
@@ -11,7 +11,9 @@
             :crumbEnable="true"
         >
             <Info />
-            <publish-gate slot="op-append" />
+            <template #op-append>
+                <publish-gate />
+            </template>
         </Breadcrumb>
         <LeftSidebar>
             <Nav />
@@ -23,7 +25,7 @@
             <RightSidebar class="m-bbs-right-side" :show-toggle="true">
                 <Side class="m-extend" />
             </RightSidebar>
-            <Footer></Footer>
+            <CommonFooter></CommonFooter>
         </Main>
     </div>
 </template>
@@ -58,12 +60,15 @@ export default {
 </script>
 
 <style lang="less">
-.m-community-layout {
+.l-community-layout {
     .c-header {
         z-index: 9999;
     }
     background: #fafbfc;
     .m-main {
+        padding: 0;
+    }
+    .c-main {
         padding: 0;
     }
 }

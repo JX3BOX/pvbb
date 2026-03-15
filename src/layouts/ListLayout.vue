@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <Header></Header>
+        <CommonHeader></CommonHeader>
         <Breadcrumb
             name="竹林茶馆"
             slug="bbs"
@@ -10,11 +10,13 @@
             :feedbackEnable="true"
             :crumbEnable="true"
         >
-        <template #logo>
+            <template #logo>
                 <img svg-inline :src="logo" />
             </template>
             <Info />
-            <publish-gate slot="op-append" />
+            <template #op-append>
+                <publish-gate />
+            </template>
         </Breadcrumb>
         <LeftSidebar>
             <Nav />
@@ -26,7 +28,7 @@
             <RightSidebar class="m-bbs-right-side" :show-toggle="true">
                 <Side class="m-extend" />
             </RightSidebar>
-            <Footer></Footer>
+            <CommonFooter></CommonFooter>
         </Main>
     </div>
 </template>

@@ -1,4 +1,4 @@
-import { $cms, $next } from "@jx3box/jx3box-common/js/https";
+import { $cms, $next } from "@jx3box/jx3box-common/js/api";
 
 function getMyPost(params) {
     return $cms().get("/api/cms/posts/my", {

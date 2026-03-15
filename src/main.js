@@ -8,52 +8,95 @@ try {
     console.log("旧地址匹配异常", e);
 }
 
-Vue.config.productionTip = false;
+// 1.Create APP
+import { createApp } from "vue";
+import App from "./App.vue";
+const app = createApp(App);
 
-// import Vue plugin
+// 将 filters 合并到 methods，兼容 Vue3 模板中直接调用
+app.mixin({
+    beforeCreate() {
+        const filters = this.$options.filters;
+        if (filters) {
+            this.$options.methods = {
+                ...(this.$options.methods || {}),
+                ...filters,
+            };
+        }
+    },
+});
+
+// 2.Router & Store
+import router from "./router";
+import store from "./store";
+app.use(router);
+app.use(store);
+
+// 3.i18n (JX3BOX UI)
+import { Jx3boxUiI18n, getJx3boxUiAvailableLocales } from "@jx3box/jx3box-ui";
+const __langKey = (localStorage.getItem("lang") || "zh-cn").toLowerCase();
+const __langMap = {
+    "zh-cn": "zh-CN",
+    "en-us": "en-US",
+    "zh-tw": "zh-TW",
+    vi: "vi",
+};
+const __preferredI18nLocale = __langMap[__langKey] || "zh-CN";
+const __supportedI18nLocales = getJx3boxUiAvailableLocales();
+const __i18nLocale = __supportedI18nLocales.includes(__preferredI18nLocale) ? __preferredI18nLocale : "zh-CN";
+app.use(Jx3boxUiI18n, {
+    locale: __i18nLocale,
+});
+
+// 4.UI
+import "@jx3box/jx3box-common/css/normalize.css";
+import "@jx3box/jx3box-common/css/font.css";
+import "@/assets/css/tailwind.css";
+
+import ElementPlus from "element-plus";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+import en from "element-plus/es/locale/lang/en";
+import zhTw from "element-plus/es/locale/lang/zh-tw";
+import vi from "element-plus/es/locale/lang/vi";
+import "element-plus/dist/index.css";
+import "@/assets/css/element-plus-theme.scss";
+import "@jx3box/jx3box-common/css/element-fonticon.css";
+
 import VueSvgInlinePlugin from "vue-svg-inline-plugin";
 
-// import polyfills for IE if you want to support it
-import "vue-svg-inline-plugin/src/polyfills";
-
 // use Vue plugin without options
-Vue.use(VueSvgInlinePlugin);
+app.use(VueSvgInlinePlugin);
 
 // use Vue plugin with options
-VueSvgInlinePlugin.install(Vue, {
+app.use(VueSvgInlinePlugin, {
     attributes: {
         data: ["src"],
         remove: ["alt"],
     },
 });
-// 第三方UI组件
-import Vue from "vue";
-import ElementUI from "element-ui";
-Vue.use(ElementUI);
 
-import hevueImgPreview from "hevue-img-preview";
-Vue.use(hevueImgPreview);
+const __elementLocaleMap = {
+    "zh-CN": zhCn,
+    "en-US": en,
+    "zh-TW": zhTw,
+    vi,
+};
+const __elementLocale = __elementLocaleMap[__i18nLocale] || zhCn;
+app.use(ElementPlus, {
+    locale: __elementLocale,
+});
 
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component);
+}
+
+import { install } from "@jx3box/jx3box-ui";
+install(app);
+
+// reporter
 import reporter from "@jx3box/jx3box-common/js/reporter";
-reporter.install(Vue);
+reporter.installVue3(app);
 
-// import waterfall from "vue-waterfall2";
-// Vue.use(waterfall)
-
-// 通用UI模块
-import JX3BOX_UI from "@jx3box/jx3box-common-ui";
-import "@jx3box/jx3box-common/css/element.css";
-import "@jx3box/jx3box-common/css/normalize.css";
-Vue.use(JX3BOX_UI);
-
-// 数据与路由
-import router from "./router";
-import store from "./store";
-
-import App from "./App.vue";
-
-new Vue({
-    router,
-    store,
-    render: (h) => h(App),
-}).$mount("#app");
+// 5.Mount DOM
+app.mount("#app");

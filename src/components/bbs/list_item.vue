@@ -1,12 +1,9 @@
 <template>
     <li class="u-item">
         <!-- Banner -->
-        <a class="u-banner" :href="item.ID | postLink" :target="target" v-reporter="{
-                data: {
-                    href: reporterLink(item.ID),
-                },
-                caller,
-            }"><img :src="getBanner(item.post_banner, item.post_subtype)" :key="item.ID"/></a>
+        <a class="u-banner" :href="item.ID | postLink" :target="target">
+            <img :src="getBanner(item.post_banner, item.post_subtype)" :key="item.ID"
+        /></a>
 
         <!-- 标题 -->
         <h2 class="u-post" :class="{ isSticky: item.sticky }">
@@ -14,15 +11,14 @@
             <img class="u-icon" svg-inline src="../../assets/img/list/post.svg" />
 
             <!-- 资料片 -->
-            <span class="u-label u-zlp" v-if="item.post_subtype && showSubtype(item.post_subtype)">{{ showSubtype(item.post_subtype) }}</span>
+            <span class="u-label u-zlp" v-if="item.post_subtype && showSubtype(item.post_subtype)">{{
+                showSubtype(item.post_subtype)
+            }}</span>
 
             <!-- 标题文字 -->
-            <a class="u-title" :style="item.color | showHighlight" :href="item.ID | postLink" :target="target" v-reporter="{
-                data: {
-                    href: reporterLink(item.ID),
-                },
-                caller,
-            }">{{ item.post_title || "无标题" }}</a>
+            <a class="u-title" :style="item.color | showHighlight" :href="item.ID | postLink" :target="target">{{
+                item.post_title || "无标题"
+            }}</a>
 
             <!-- 角标 -->
             <span class="u-marks" v-if="item.mark && item.mark.length">
@@ -30,18 +26,21 @@
             </span>
 
             <span class="u-push" v-if="hasPermission">
-                <time v-if="showPushDate" class="u-push__time" :class="{'is-recent': isRecent()}">{{ pushDate }} 已推送</time>
-                <el-button class="u-push__btn" size="mini" type="warning" @click="onPush" icon="el-icon-s-promotion">推送</el-button>
+                <time v-if="showPushDate" class="u-push__time" :class="{ 'is-recent': isRecent() }"
+                    >{{ pushDate }} 已推送</time
+                >
+                <el-button
+                    class="u-push__btn"
+                    size="mini"
+                    type="warning"
+                    :disabled="pushing"
+                    @click="onPush"
+                    icon="Promotion"
+                    >推送</el-button
+                >
             </span>
         </h2>
-
-        <!-- 字段 -->
-        <!-- <div class="u-content u-desc">
-            {{ item.post_excerpt || item.post_title || "这个作者很懒,什么都没有留下" }}
-        </div> -->
-        <!-- 字段 -->
         <div class="u-content u-desc">
-            <!-- {{ item.post_excerpt || item.post_title || "这个作者很懒,什么都没有留下" }} -->
             <div class="u-metalist u-collection">
                 <strong>小册</strong>
                 <em>
@@ -69,7 +68,9 @@
         <!-- 作者 -->
         <div class="u-misc">
             <img class="u-author-avatar" :src="item.author_info | showAvatar" :alt="item.author_info | showNickname" />
-            <a class="u-author-name" :href="item.post_author | authorLink" target="_blank">{{ item.author_info | showNickname }}</a>
+            <a class="u-author-name" :href="item.post_author | authorLink" target="_blank">{{
+                item.author_info | showNickname
+            }}</a>
             <span class="u-date">
                 Updated on
                 <time v-if="order == 'update'">{{ item.post_modified | dateFormat }}</time>
@@ -84,22 +85,23 @@ import { appKey } from "@/../setting.json";
 import { showAvatar, authorLink, showBanner, buildTarget } from "@jx3box/jx3box-common/js/utils";
 import { __ossMirror, __imgPath, __cdn } from "@/utils/config";
 import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
-import {showDate} from '@jx3box/jx3box-common/js/moment.js'
+import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
-import { random} from "lodash"
+import { random } from "lodash";
 import User from "@jx3box/jx3box-common/js/user";
 import dayjs from "dayjs";
 import bus from "@/utils/bus";
 export default {
     name: "ListItem",
-    props: ['item','order', 'caller'],
+    props: ["item", "order", "caller"],
     components: {},
-    data: function() {
+    data: function () {
         return {
-            target : buildTarget(),
+            target: buildTarget(),
 
             start: 1,
             end: 39,
+            pushing: false,
         };
     },
     computed: {
@@ -107,67 +109,79 @@ export default {
             return this.item?.client;
         },
         hasPermission() {
-            return User.hasPermission('push_banner');
+            return User.hasPermission("push_banner");
         },
-        pushDate({item}) {
-            const date = item?.log?.push_at
-            return showDate(new Date(date));
+        pushDate() {
+            const date = this.item?.log?.push_at;
+            return date ? showDate(new Date(date)) : "";
         },
         showPushDate() {
-            return Boolean(this.item?.log);
+            return Boolean(this.item?.log?.push_at);
         },
     },
     watch: {},
     methods: {
-        getBanner: function(val, subtype) {
+        getBanner: function (val, subtype) {
             if (val) {
                 return showBanner(val);
             } else {
                 // 从1-39中随机选一个
-                const randomNum = random(this.start, this.end)
+                const randomNum = random(this.start, this.end);
                 // return __imgPath + `image/banner/${appKey}${subtype}` + ".png";
-                return __cdn + `design/random_cover/${randomNum}.jpg`
+                return __cdn + `design/random_cover/${randomNum}.jpg`;
             }
         },
         reporterLink: function (val) {
-            const prefix = this.client === 'std' ? 'www' : 'origin'
-            return`${prefix}:/${appKey}/` + val;
+            const prefix = this.client === "std" ? "www" : "origin";
+            return `${prefix}:/${appKey}/` + val;
         },
-        showSubtype: function (val){
-            return _bbsSubtypes[val]?.label || ""
+        showSubtype: function (val) {
+            return _bbsSubtypes[val]?.label || "";
         },
         showDate,
         // 是否为30天内
         isRecent: function () {
-            const date = this.item?.log?.push_at
+            const date = this.item?.log?.push_at;
             return dayjs().diff(dayjs(date), "day") < 30;
         },
         onPush() {
-            bus.emit("design-task", this.item);
+            if (this.pushing) return;
+            this.pushing = true;
+            const data = {
+                post_type: this.item?.post_type || "bbs",
+                post_title: this.item?.post_title || "",
+                ID: this.item?.ID,
+                client: this.item?.client,
+                author: this.item?.author_info?.display_name || "匿名",
+            };
+            bus.emit("design-task", data);
+            setTimeout(() => {
+                this.pushing = false;
+            }, 300);
         },
     },
     filters: {
         authorLink,
-        postLink: function(val) {
+        postLink: function (val) {
             return location.origin + `/${appKey}/` + val;
         },
-        showHighlight: function(val) {
+        showHighlight: function (val) {
             return val ? `color:${val};font-weight:600;` : "";
         },
-        showMark: function(val) {
+        showMark: function (val) {
             return mark_map[val] || val;
         },
-        showAvatar: function(userinfo) {
+        showAvatar: function (userinfo) {
             return showAvatar(userinfo?.user_avatar);
         },
-        showNickname : function (userinfo){
-            return userinfo?.display_name || '匿名'
+        showNickname: function (userinfo) {
+            return userinfo?.display_name || "匿名";
         },
-        dateFormat : function (gmt){
-            return showDate(new Date(gmt))
-        }
+        dateFormat: function (gmt) {
+            return showDate(new Date(gmt));
+        },
     },
-    created: function() {},
-    mounted: function() {},
+    created: function () {},
+    mounted: function () {},
 };
 </script>

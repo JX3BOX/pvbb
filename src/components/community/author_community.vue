@@ -1,10 +1,9 @@
 <template>
     <div class="c-community-posts" v-if="ready">
         <div class="u-label">
-            <!-- <i class="el-icon-notebook-2"></i> -->
             <img svg-inline src="@/assets/img/leftsidebar/post.svg" />
             <span>最新帖子</span>
-            <a :href="uid | authorLink" class="u-more" target="_blank"
+            <a :href="authorLink(uid)" class="u-more" target="_blank"
                 ><img svg-inline src="@/assets/img/leftsidebar/more.svg"
             /></a>
         </div>
@@ -12,8 +11,8 @@
         <ul class="u-list" v-if="data && data.length">
             <li v-for="(item, i) in data" :key="i">
                 <a class="u-item" :href="url(item.id, 'community')" target="_blank">
-                    <span>
-                        <img svg-inline src="@/assets/img/leftsidebar/arrow.svg" class="u-icon" />
+                    <span class="u-title">
+                        <!-- <img svg-inline src="@/assets/img/leftsidebar/arrow.svg" class="u-icon" /> -->
                         {{ item.title || item.category + "/无标题" }}
                     </span>
                 </a>
@@ -51,10 +50,9 @@ export default {
             return getLink(type, pid);
         },
         init: function () {
-            getTopicList({ user_id: this.uid, pageSize: 5 })
-                .then((res) => {
-                    this.data = res.data.data.list || [];
-                })
+            getTopicList({ user_id: this.uid, pageSize: 5 }).then((res) => {
+                this.data = res.data.data.list || [];
+            });
         },
     },
     filters: {
@@ -70,10 +68,16 @@ export default {
     ul {
         list-style: none;
         margin: 0;
-        padding: 0;
+        padding: 0 0 0 10px;
     }
     li {
-        .db;
+        // .db;
+        &::marker {
+            content: "+";
+            font-size: 10px;
+            color: #999;
+        }
+        list-style-position: outside;
     }
     .u-item {
         .db;
@@ -86,7 +90,7 @@ export default {
             color: @pink;
             // background-color:#fff;
             // border-bottom: 1px solid @border;
-            .u-icon{
+            .u-icon {
                 transform: translateX(5px);
             }
         }

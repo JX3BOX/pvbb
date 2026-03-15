@@ -1,6 +1,6 @@
 <template>
     <div id="app" class="p-community-single">
-        <Header></Header>
+        <CommonHeader></CommonHeader>
         <Breadcrumb
             v-if="post"
             name="竹林茶馆"
@@ -13,15 +13,17 @@
         >
             <TopStickyInfo :post="post" />
             <!-- <Info /> -->
-            <publish-gate slot="op-append" />
+            <template #op-append>
+                <publish-gate />
+            </template>
             <template #op-prepend>
                 <AdminDrop v-if="isTeammate" :is-community="true" :post="finalPost" :user-id="user_id" />
             </template>
-            <template #title>
+            <!-- <template #title>
                 <span>
                     {{ title }}
                 </span>
-            </template>
+            </template> -->
         </Breadcrumb>
 
         <Main :withoutRight="false">
@@ -31,7 +33,7 @@
                     <RightSidebar :show-toggle="true">
                         <Side :id="id" type="community" class="m-extend" />
                     </RightSidebar>
-                    <Footer></Footer>
+                    <CommonFooter></CommonFooter>
                 </div>
             </div>
         </Main>
@@ -42,22 +44,22 @@
 import TopStickyInfo from "@/components/community/top_sticky_info.vue";
 import publishGate from "@/components/publish_gate.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
-import AdminDrop from "@jx3box/jx3box-common-ui/src/bread/AdminDrop.vue";
+import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import Side from "@/components/bbs/single_side.vue";
 const postTypeMaps = {
-    "求助": "newbie",
-    "萌新": "newbie",
-    "讨论": "discussion",
-    "警示": "discussion",
-    "墨香": "poem",
-    "日记": "poem",
-    "三次元": "poem",
-    "美图": "pvx",
-    "同人": "pvx",
-    "心得": "wiki",
-    "剧情": "wiki"
-}
+    求助: "newbie",
+    萌新: "newbie",
+    讨论: "discussion",
+    警示: "discussion",
+    墨香: "poem",
+    日记: "poem",
+    三次元: "poem",
+    美图: "pvx",
+    同人: "pvx",
+    心得: "wiki",
+    剧情: "wiki",
+};
 export default {
     name: "CommunitySingleLayout",
     props: ["post"],
@@ -81,14 +83,14 @@ export default {
                 ...this.post,
                 post_title: this.post.title,
                 ID: this.post.id,
-                post_type: 'community',
+                post_type: "community",
                 _subtype: this.subtype,
-                author: this.post?.ext_user_info?.display_name
+                author: this.post?.ext_user_info?.display_name,
             };
         },
         subtype() {
-            return postTypeMaps[this.post.category]
-        }
+            return postTypeMaps[this.post.category];
+        },
     },
     mounted() {},
     methods: { getAppIcon },
@@ -116,6 +118,7 @@ export default {
         flex: 1;
         margin-left: 0;
         // margin-right: 0;
+        padding: 0;
         .m-community-single {
             flex: 1;
         }

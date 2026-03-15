@@ -1,16 +1,18 @@
-.m-main{
-    padding:20px 30px;
+.m-main {
+    padding: 20px 30px;
 }
-@media screen and (max-width:@ipad){
-    .m-main{
-        padding:10px 20px;
+@media screen and (max-width: @ipad) {
+    .m-main {
+        padding: 10px 20px;
     }
 }
-@media screen and (max-width:@phone){
-    .m-main{
-        padding:5px 15px;
+@media screen and (max-width: @phone) {
+    .m-main {
+        padding: 5px 15px;
     }
-    .c-breadcrumb .u-op{.none;}
+    .c-breadcrumb .u-op {
+        .none;
+    }
 
     .m-archive-search {
         .u-publish {
@@ -41,17 +43,60 @@
         .none;
     }
 
-    .c-sidebar-left,.c-sidebar-right {
+    .c-sidebar-left,
+    .c-sidebar-right {
         top: 48px;
     }
 }
 
-.m-extend{
-    padding:10px 15px;
+.m-extend {
+    padding: 10px 15px;
 }
 
-.m-archive-search{
+.m-archive-search {
     display: flex;
-    gap:10px;
+    gap: 10px;
     .mb(10px);
+}
+
+// Align header layout with pvx (fix inner height / search vertical centering)
+.c-header-inner {
+    height: 100%;
+    .c-header-search {
+        height: 100%;
+        margin: 0;
+        .c-search {
+            height: 100%;
+        }
+        .u-form {
+            .flex;
+            align-items: center;
+            height: 100%;
+        }
+        .u-btn {
+            top: calc(50% - 10px);
+            .flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+// jx3box-ui header client switch relies on reset-like button styles
+// that are not guaranteed inside pvx. Keep the override local to pvx.
+.c-header-client {
+    .u-trigger {
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        margin: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        line-height: 1;
+        white-space: nowrap;
+    }
 }

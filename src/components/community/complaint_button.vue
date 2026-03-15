@@ -1,5 +1,5 @@
 <template>
-    <el-button type="text" :disabled="!allowReport" @click="onMiscfeedback">
+    <el-button link :disabled="!allowReport" type="primary" @click="onMiscfeedback">
         <i class="el-icon-warning-outline"></i>
         举报
     </el-button>

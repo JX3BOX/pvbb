@@ -1,5 +1,5 @@
 <template>
-    <div class="m-reply-wrapper" :class="{'is-master': isMaster}" :id="`floor-${post.floor || 0}`">
+    <div class="m-reply-wrapper" :class="{ 'is-master': isMaster }" :id="`floor-${post.floor || 0}`">
         <div class="m-reply-left">
             <CommentUser :uid="userInfo.id" :isMaster="isMaster" :isAnonymous="isAnonymous" />
             <div class="u-top-right u-mobile-show">
@@ -20,21 +20,16 @@
                             v-if="isSuper || isFollower"
                             class="u-mobile-hidden"
                             @click="onEdit"
-                            type="text"
-                            icon="el-icon-edit-outline"
-                            size="mini"
+                            link
+                            icon="Edit"
+                            size="small"
+                            type="primary"
                             >编辑</el-button
                         >
                     </div>
                 </div>
                 <span class="u-boxcoin" v-if="!isMaster && (isLogin || boxCoinTotal)">
-                    <el-button
-                        v-if="isLogin && !isMaster"
-                        class="u-mobile-hidden"
-                        type="text"
-                        @click="onThx"
-                        size="mini"
-                    >
+                    <el-button v-if="isLogin && !isMaster" class="u-mobile-hidden" link @click="onThx" size="small">
                         <span class="u-thx">
                             <img src="@/assets/img/community/thx.webp" alt="答谢" />
                             答谢
@@ -53,7 +48,7 @@
                     <div class="m-single-null" v-else-if="isMaster">
                         <el-alert type="warning" show-icon v-if="post.visible > 1 && post.visible != 3">
                             <template #title>
-                                <span>{{nullTip}}</span>
+                                <span>{{ nullTip }}</span>
                                 <a class="u-pwd-text" v-if="isLogin" @click="enterPwd">输入密码</a>
                             </template>
                         </el-alert>
@@ -88,7 +83,7 @@
                 <Thx
                     v-if="isMaster"
                     class="m-single-thx"
-                    :class="{'is-disabled-boxcoin': isDisableBoxcoin}"
+                    :class="{ 'is-disabled-boxcoin': isDisableBoxcoin }"
                     :postId="~~id"
                     postType="community_topic"
                     :postTitle="post.title"
@@ -111,7 +106,15 @@
                         <DeleteButton class="u-mobile-hidden" :post="post" type="reply" :isMaster="isMaster" />
                         <AddBlockButton class="u-mobile-hidden" :post="post" />
                         <ComplaintButton class="u-mobile-hidden" :post="post" />
-                        <el-button type="primary" size="small" class="u-reply-btn" :class="{'is-disabled': isDisabledComment && isMaster}" :style="styles" @click="onShowReply" :disabled="isDisabledComment && isMaster">
+                        <el-button
+                            type="primary"
+                            size="small"
+                            class="u-reply-btn"
+                            :class="{ 'is-disabled': isDisabledComment && isMaster }"
+                            :style="styles"
+                            @click="onShowReply"
+                            :disabled="isDisabledComment && isMaster"
+                        >
                             <div class="u-btn">
                                 <img src="@/assets/img/community/reply.svg" alt="" />
                                 <span>{{ isMaster ? "跟帖" : "回复" }}</span>
@@ -137,39 +140,37 @@
                             <span class="el-dropdown-link">
                                 <i class="el-icon-more"></i>
                             </span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>
-                                    <ForwardButton class="u-mobile-hidden" :post="post" :isMaster="isMaster" />
-                                </el-dropdown-item>
-                                <el-dropdown-item v-if="!isMaster && (isSuper || isFollower)">
-                                    <el-button
-                                        class="u-mobile-hidden"
-                                        @click="onEdit"
-                                        type="text"
-                                        icon="el-icon-edit-outline"
-                                        >编辑</el-button
-                                    >
-                                </el-dropdown-item>
-                                <el-dropdown-item v-if="isLogin && !isMaster">
-                                    <el-button class="u-mobile-hidden" type="text" icon="el-icon-present" @click="onThx"
-                                        >答谢</el-button
-                                    >
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <DeleteButton
-                                        class="u-mobile-hidden"
-                                        :post="post"
-                                        type="reply"
-                                        :isMaster="isMaster"
-                                    />
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <AddBlockButton class="u-mobile-hidden" :post="post" />
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <ComplaintButton class="u-mobile-hidden" :post="post" />
-                                </el-dropdown-item>
-                            </el-dropdown-menu>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item>
+                                        <ForwardButton class="u-mobile-hidden" :post="post" :isMaster="isMaster" />
+                                    </el-dropdown-item>
+                                    <el-dropdown-item v-if="!isMaster && (isSuper || isFollower)">
+                                        <el-button class="u-mobile-hidden" @click="onEdit" link icon="Edit"
+                                            >编辑</el-button
+                                        >
+                                    </el-dropdown-item>
+                                    <el-dropdown-item v-if="isLogin && !isMaster">
+                                        <el-button class="u-mobile-hidden" link icon="Present" @click="onThx"
+                                            >答谢</el-button
+                                        >
+                                    </el-dropdown-item>
+                                    <el-dropdown-item>
+                                        <DeleteButton
+                                            class="u-mobile-hidden"
+                                            :post="post"
+                                            type="reply"
+                                            :isMaster="isMaster"
+                                        />
+                                    </el-dropdown-item>
+                                    <el-dropdown-item>
+                                        <AddBlockButton class="u-mobile-hidden" :post="post" />
+                                    </el-dropdown-item>
+                                    <el-dropdown-item>
+                                        <ComplaintButton class="u-mobile-hidden" :post="post" />
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
                         </el-dropdown>
                     </div>
                 </div>
@@ -232,7 +233,7 @@ import ForwardButton from "@/components/community/forward_button.vue";
 import ComplaintButton from "./complaint_button.vue";
 import DeleteButton from "./delete_button.vue";
 import { getLikes } from "@/service/next";
-import Thx from "@jx3box/jx3box-common-ui/src/single/Thx.vue";
+import Thx from "@jx3box/jx3box-ui/src/single/Thx.vue";
 import dayjs from "dayjs";
 import bus from "@/utils/bus";
 import { getHistorySummary } from "@/service/pay";
@@ -356,7 +357,7 @@ export default {
         isDisableBoxcoin: function () {
             return !!this.post?.disable_inspire_boxcoin;
         },
-        isDisabledComment: function() {
+        isDisabledComment: function () {
             return !!this.post?.disable_comment;
         },
     },
@@ -509,10 +510,12 @@ export default {
         },
         onEdit() {
             if (this.isMaster) {
-                const path = editLink("community", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
+                const path =
+                    editLink("community", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
                 window.open(path, "_blank");
             } else {
-                const path = editLink("community/reply", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
+                const path =
+                    editLink("community/reply", this.post.id) + (!this.isFollower && this.isSuper ? "?from=admin" : "");
                 window.open(path, "_blank");
             }
         },

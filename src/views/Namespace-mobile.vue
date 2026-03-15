@@ -14,7 +14,7 @@
                     <div class="m-item-user-name">
                         {{ (namespace.creator && namespace.creator.display_name) || "匿名" }}
                     </div>
-                    <div class="m-item-user-time">{{ namespace.created | dataFormat }}</div>
+                    <div class="m-item-user-time">{{ dataFormat(namespace.created) }}</div>
                 </div>
                 <div class="m-item-info">
                     <div class="m-item-info-key">{{ namespace.key || "未知" }}</div>

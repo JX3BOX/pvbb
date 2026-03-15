@@ -8,7 +8,7 @@
 <script>
 import list_nav from "@/components/nav/list_nav.vue";
 import single_nav from "@/components/nav/single_nav.vue";
-import { single_types } from "../../../setting.json";
+import settings from "../../../setting.json";
 import { getAppID } from "@/utils/common.js";
 export default {
     name: "Nav",
@@ -29,7 +29,7 @@ export default {
     created: function () {
         let id = location.pathname.split("/")[2];
         let type = location.pathname.split("/")[1];
-        if (single_types.includes(type) && id) {
+        if (settings.single_types.includes(type) && id) {
             this.mode = "single";
         } else {
             this.mode = "list";

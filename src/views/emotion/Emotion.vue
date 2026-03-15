@@ -4,7 +4,7 @@
             <!--单页-->
             <div class="m-emotion-single-container" v-if="id">
                 <div class="m-emotion-goback">
-                    <el-button class="u-back" size="mini" icon="el-icon-arrow-left" @click="goBack">返回列表</el-button>
+                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
                 </div>
                 <emotion-item :emotion="emotion" mode="single"></emotion-item>
             </div>
@@ -16,12 +16,15 @@
                     <el-input
                         placeholder="请输入搜索内容"
                         v-model.trim.lazy="search"
-                        @keydown.native.enter="onSearch"
+                        @keydown.enter="onSearch"
                         @clear="onSearch"
                         clearable
                     >
-                        <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
-                        <template slot="append">
+                        <template #prepend>
+                            <i class="el-icon-search"></i>
+                            <span class="u-search">关键词</span>
+                        </template>
+                        <template #append>
                             <el-switch
                                 class="u-star"
                                 v-model="star"
@@ -42,21 +45,6 @@
                 <div class="m-emotion-main">
                     <!-- 门派分类 -->
                     <left-tab class="m-emotion-types" @setType="setType"></left-tab>
-                    <!-- <div class="m-emotion-types">
-                        <el-tabs v-model="type" :tabPosition="windowWidth < 900 ? 'top' : 'left'">
-                            <el-tab-pane name="all" label="全部">
-                                <span slot="label">
-                                    <i class="u-icon el-icon-menu" style="vertical-align: 0"></i>全部
-                                </span>
-                            </el-tab-pane>
-                            <el-tab-pane v-for="(item, i) in schoolmap" :key="i" :name="i">
-                                <div slot="label" style="min-width: 57px">
-                                    <img class="u-icon" :src="showSchoolIcon(i)" :alt="item" />
-                                    {{ item }}
-                                </div>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </div> -->
                     <div class="m-emotion-content">
                         <!--快速发布-->
                         <emotion-post></emotion-post>
@@ -71,69 +59,70 @@
                                 :col-width="waterfall_options.colWidth"
                                 :col="waterfall_options.col"
                             >
-                                <div
-                                    class="u-item waterfall-item m-emotion-item"
-                                    :class="{ fadeIn: item.state == 'show' }"
-                                    slot-scope="item"
-                                >
-                                    <div class="u-emotion">
-                                        <img
-                                            class="u-pic u-emotion-pic waterfall-img"
-                                            :src="showEmotion(item.data.url)"
-                                            :alt="item.data.desc"
-                                            :key="item.data.url"
-                                            @click="handlePreview(item.data)"
-                                        />
-                                        <i class="u-star" v-if="item.data.star"
-                                            ><i class="el-icon-star-off"></i
-                                            ><i class="u-original" v-if="item.data.original">原创</i></i
-                                        >
-                                    </div>
-                                    <div class="u-item-bottom">
-                                        <div class="u-info-user">
-                                            <a
-                                                class="u-user-name"
-                                                :href="doEmotionUser(item.data).userLink"
-                                                target="_blank"
-                                                ><img
-                                                    class="u-user-avatar waterfall-img"
-                                                    :src="doEmotionUser(item.data).userAvatar"
-                                                    :key="doEmotionUser(item.data).userAvatar"
-                                                />{{ doEmotionUser(item.data).username }}</a
+                                <template #default="item">
+                                    <div
+                                        class="u-item waterfall-item m-emotion-item"
+                                        :class="{ fadeIn: item.state == 'show' }"
+                                    >
+                                        <div class="u-emotion">
+                                            <img
+                                                class="u-pic u-emotion-pic waterfall-img"
+                                                :src="showEmotion(item.data.url)"
+                                                :alt="item.data.desc"
+                                                :key="item.data.url"
+                                                @click="handlePreview(item.data)"
+                                            />
+                                            <i class="u-star" v-if="item.data.star"
+                                                ><i class="el-icon-star-off"></i
+                                                ><i class="u-original" v-if="item.data.original">原创</i></i
                                             >
                                         </div>
-                                        <div class="u-info-misc">
-                                            <time class="u-time">{{ doEmotionUser(item.data).time }}</time>
-                                            <el-checkbox
-                                                v-if="isEditor"
-                                                :disabled="!item.data.user_id || isSelf(item.data)"
-                                                v-model="rewardObj[item.data.id]"
-                                                @change="doReward($event, item.data)"
-                                                class="u-op-item u-op-gift"
-                                                >打赏</el-checkbox
-                                            >
-                                            <a
-                                                v-else
-                                                class="u-like"
-                                                :class="{ on: item.data.isLike }"
-                                                title="赞"
-                                                @click="addLike(item.data)"
-                                            >
-                                                <i class="like-icon">{{ item.data.isLike ? "♥" : "♡" }}</i>
-                                                <span class="like-text">Like</span>
-                                                <span class="like-count" v-if="item.data.count">{{
-                                                    item.data.count
-                                                }}</span>
-                                            </a>
+                                        <div class="u-item-bottom">
+                                            <div class="u-info-user">
+                                                <a
+                                                    class="u-user-name"
+                                                    :href="doEmotionUser(item.data).userLink"
+                                                    target="_blank"
+                                                    ><img
+                                                        class="u-user-avatar waterfall-img"
+                                                        :src="doEmotionUser(item.data).userAvatar"
+                                                        :key="doEmotionUser(item.data).userAvatar"
+                                                    />{{ doEmotionUser(item.data).username }}</a
+                                                >
+                                            </div>
+                                            <div class="u-info-misc">
+                                                <time class="u-time">{{ doEmotionUser(item.data).time }}</time>
+                                                <el-checkbox
+                                                    v-if="isEditor"
+                                                    :disabled="!item.data.user_id || isSelf(item.data)"
+                                                    v-model="rewardObj[item.data.id]"
+                                                    @change="doReward($event, item.data)"
+                                                    class="u-op-item u-op-gift"
+                                                    >打赏</el-checkbox
+                                                >
+                                                <a
+                                                    v-else
+                                                    class="u-like"
+                                                    :class="{ on: item.data.isLike }"
+                                                    title="赞"
+                                                    @click="addLike(item.data)"
+                                                >
+                                                    <i class="like-icon">{{ item.data.isLike ? "♥" : "♡" }}</i>
+                                                    <span class="like-text">Like</span>
+                                                    <span class="like-count" v-if="item.data.count">{{
+                                                        item.data.count
+                                                    }}</span>
+                                                </a>
+                                            </div>
                                         </div>
+                                        <!-- <emotion-item
+                                            :emotion="item.data"
+                                            :index="item.index"
+                                            @preview="handlePreview"
+                                            :key="'emotion-' + item.data.type + '-' + item.data.id + new Date().getTime()"
+                                        ></emotion-item> -->
                                     </div>
-                                    <!-- <emotion-item
-                                        :emotion="item.data"
-                                        :index="item.index"
-                                        @preview="handlePreview"
-                                        :key="'emotion-' + item.data.type + '-' + item.data.id + new Date().getTime()"
-                                    ></emotion-item> -->
-                                </div>
+                                </template>
                             </waterfall>
                         </ul>
 
@@ -155,7 +144,7 @@
                                 @size-change="handleSizeChange"
                             ></el-pagination>
                             <div class="m-emotion-reward" v-if="isEditor">
-                                <el-button class="m-emotion-all" type="primary" size="mini" @click="rewardAll"
+                                <el-button class="m-emotion-all" type="primary" size="small" @click="rewardAll"
                                     >{{ this.rewardAllType ? "取消" : "" }} 全选</el-button
                                 >
                                 <Thx
@@ -173,7 +162,7 @@
                                     type="primary"
                                     @click="loadMore"
                                     v-show="page < pages"
-                                    icon="el-icon-arrow-down"
+                                    icon="ArrowDown"
                                     size="small"
                                     :disabled="loading"
                                     >加载更多</el-button
@@ -198,7 +187,7 @@
 <script>
 import cloneDeep from "lodash/cloneDeep";
 import debounce from "lodash/debounce";
-import waterfall from "vue-waterfall-rapid";
+import WaterfallRapid from "@/components/WaterfallRapid.vue";
 import ListLayout from "@/layouts/ListLayout.vue";
 import LeftTab from "@/components/left-tab.vue";
 
@@ -226,8 +215,7 @@ export default {
     components: {
         "emotion-post": emotion_post,
         "emotion-item": emotion_item,
-        // Comment,
-        waterfall,
+        waterfall: WaterfallRapid,
         ListLayout,
         EmotionPreview,
         LeftTab,
@@ -339,7 +327,7 @@ export default {
                         article_type: "emotion",
                     });
                 }
-                this.$set(this.rewardObj, item.id, !this.rewardAllType);
+                this.rewardObj[item.id] = !this.rewardAllType;
             });
             this.rewardArr = this.rewardAllType ? [] : arr;
         },
@@ -443,7 +431,7 @@ export default {
                     const likes = res.data.data;
                     if (Object.keys(likes).length) {
                         this.emotions.forEach((d) => {
-                            this.$set(d, "count", likes?.["emotion-" + d.id]?.likes);
+                            d.count = likes?.["emotion-" + d.id]?.likes;
                         });
                     }
                 });

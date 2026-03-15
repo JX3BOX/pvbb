@@ -8,8 +8,8 @@
             <div class="u-op">
                 <!-- 作者 -->
                 <span class="u-user">
-                    <img width="24" height="24" :src="user_avatar | showAvatar" />
-                    <a :href="joke.user_id | authorLink" target="_blank" v-if="joke.user_id">{{ user_name }}</a>
+                    <img width="24" height="24" :src="showAvatar(user_avatar)" />
+                    <a :href="authorLink(joke.user_id)" target="_blank" v-if="joke.user_id">{{ user_name }}</a>
                     <span v-else>{{ joke.author || "匿名" }}</span>
                 </span>
                 <!-- 复制 -->
@@ -56,7 +56,7 @@
                 <!-- 时间 -->
                 <span class="u-date">
                     <i class="el-icon-date"></i>&nbsp;
-                    <time>{{ joke.created_at | dateFormat }}</time>
+                    <time>{{ dateFormat(joke.created_at) }}</time>
                 </span>
             </div>
         </div>

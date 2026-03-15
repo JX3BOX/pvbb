@@ -4,10 +4,12 @@
         <CommunitySearch @search="onSearch" ref="searchInput">
             <template #right>
                 <div class="m-search-right">
-                    <el-checkbox v-model="is_star" :true-label="1" :false-label="0" border size="mini" @change="onIsStarChange">只看精选</el-checkbox>
-                    <el-radio-group class="m-list-view" v-model="view" size="mini" @input="onViewChange">
-                        <el-radio-button :label="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
-                        <el-radio-button :label="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
+                    <el-checkbox v-model="is_star" :true-value="1" :false-value="0" border @change="onIsStarChange"
+                        >只看精选</el-checkbox
+                    >
+                    <el-radio-group class="m-list-view" v-model="view" @input="onViewChange">
+                        <el-radio-button :value="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
+                        <el-radio-button :value="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
                     </el-radio-group>
                 </div>
             </template>
@@ -49,9 +51,11 @@
                             :gutter="20"
                             ref="waterfall"
                         >
-                            <div slot-scope="item" :class="{ fadeIn: item.state == 'show' }">
-                                <TopicItem :key="item.data.id" :data="item.data" />
-                            </div>
+                            <template #default="item">
+                                <div :class="{ fadeIn: item.state == 'show' }">
+                                    <TopicItem :key="item.data.id" :data="item.data" />
+                                </div>
+                            </template>
                         </Waterfall>
                     </div>
                 </template>
@@ -85,7 +89,7 @@
 import CommunityLayout from "@/layouts/CommunityLayout.vue";
 import CommunityHeader from "@/components/community/header.vue";
 import CommunitySearch from "@/components/community/search.vue";
-import Waterfall from "vue-waterfall-rapid";
+import Waterfall from "@/components/WaterfallRapid.vue";
 import TopicItem from "@/components/community/topic_item.vue";
 import ListItem from "@/components/community/list_item.vue";
 import { getTopicList, globalSearch } from "@/service/community";
@@ -205,7 +209,7 @@ export default {
                         id,
                     }).then((res) => {
                         if (res.data.data[id] && res.data.data[id].likes) {
-                            this.$set(topTopicData, "agree_count", res.data.data[id].likes);
+                            this.topTopicData.agree_count = res.data.data[id].likes;
                         }
                     });
                 }
@@ -220,7 +224,7 @@ export default {
             for (let index = 0; index < this.list.length; index++) {
                 const item = this.list[index];
                 if (item.agree_count == null) {
-                    this.$set(this.list[index], "agree_count", 0);
+                    this.list[index].agree_count = 0;
                 }
             }
             if (!ids.length) return;
@@ -236,7 +240,7 @@ export default {
                         const id = key.split("-")[1];
                         const index = this.list.findIndex((item) => item.id == id);
                         if (index > -1) {
-                            this.$set(this.list[index], "agree_count", res.data.data[key].likes);
+                            this.list[index].agree_count = res.data.data[key].likes;
                         }
                     });
                 }

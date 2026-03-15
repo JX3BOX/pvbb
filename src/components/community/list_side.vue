@@ -3,24 +3,9 @@
         <!-- 其他链接 -->
         <div class="m-jx3dat-links m-side-links">
             <h3 class="m-side-title" style="border-bottom: none">
-                <div class="u-title">
-                    <!-- svg 图标 -->
-                    <!-- <img class="u-icon" v-svg-inline src="" /> -->
-                    魔盒文档
-                </div>
+                <div class="u-title">魔盒文档</div>
             </h3>
             <el-collapse class="u-groups" v-model="activeDocGroup">
-                <!-- <el-collapse-item title="发布指南" name="senior">
-                    <div class="u-docs">
-                        <a v-for="(item, i) in jx3dat_senior" :key="i" class="u-doc" :href="item.link" target="_blank">
-                            <i class="el-icon-collection"></i>
-                            {{ item.label }}
-                        </a>
-                    </div>
-                </el-collapse-item> -->
-                <!-- <el-collapse-item title="版规与要求" name="rule" class="m-tool-rule">
-                    <div class="u-content" v-html="rules"></div>
-                </el-collapse-item> -->
                 <el-collapse-item title="入门指南" name="newbie">
                     <div class="u-docs">
                         <a v-for="(item, i) in jx3dat_newbie" :key="i" class="u-doc" :href="item.link" target="_blank">
@@ -45,7 +30,6 @@
                 </el-collapse-item>
                 <el-collapse-item title="热门搜索" name="tags" class="m-tool-rule">
                     <div class="m-nav-tags" v-if="tags && tags.length">
-                        <!-- <h5 class="u-title"><i class="el-icon-collection-tag"></i> 热门搜索</h5> -->
                         <div class="u-list">
                             <a :href="item.link" target="_blank" v-for="(item, i) in tags" :key="i">{{ item.label }}</a>
                         </div>
@@ -53,7 +37,6 @@
                 </el-collapse-item>
             </el-collapse>
         </div>
-        <!-- <Github_REPO REPO="fb" coder="8"></Github_REPO> -->
     </div>
 </template>
 

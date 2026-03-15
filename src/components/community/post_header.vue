@@ -4,20 +4,6 @@
         <div class="m-single-title">
             <span class="u-title u-sub-block">
                 <slot name="title_before"></slot>
-                <!-- <div class="m-topic-category-box" v-if="styles">
-                    <a
-                        :href="`/community?category=${post.category}`"
-                        :class="`m-topic-category`"
-                        :style="`background-color: ${styles.hoverColor};color:${styles.color};`"
-                    >
-                        <img
-                            v-svg-inline
-                            class="u-icon"
-                            :src="require(`@/assets/img/community/category/${styles.icon}.svg`)"
-                        />
-                        <div>{{ post.category }}</div>
-                    </a>
-                </div> -->
 
                 <!-- 可视状态 -->
                 <i class="u-status u-status-private" v-if="post.status != 1 || post.visible != 0">
@@ -72,14 +58,14 @@
             <!-- 发布日期 -->
             <span class="u-sub-block" :title="'发布日期:' + post_time">
                 <i class="u-icon-podate">
-                    <img svg-inline src="@jx3box/jx3box-common-ui/assets/img/single/podate.svg" />
+                    <img svg-inline src="@jx3box/jx3box-ui/assets/img/single/podate.svg" />
                 </i>
                 <time>{{ post_date }}</time>
             </span>
 
             <span class="u-sub-block" :title="'发布日期:' + post_time">
                 <i class="u-icon-modate">
-                    <img svg-inline src="@jx3box/jx3box-common-ui/assets/img/single/modate.svg" />
+                    <img svg-inline src="@jx3box/jx3box-ui/assets/img/single/modate.svg" />
                 </i>
                 <time>{{ update_date }}</time>
             </span>
@@ -95,34 +81,10 @@
                 {{ wordCount }}
             </span>
 
-            <!-- 编辑 -->
-            <!-- <a class="u-edit u-sub-block" :href="edit_link" v-if="canEdit">
-                <i class="u-icon-edit el-icon-edit-outline"></i>
-                <span>编辑</span>
-            </a> -->
-
             <slot name="append"></slot>
         </div>
 
-        <!-- <div class="u-title-toolbar u-phone-show">
-        <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
-            >编辑</el-button
-        >
-        <el-button
-            size="small"
-            :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
-            type="primary"
-            @click="setOnlyAuthor(!onlyAuthor)"
-        >
-            <img svg-inline v-show="!onlyAuthor" src="@/assets/img/community/only-author.svg" />
-            {{ onlyAuthor ? "取消只看楼主" : "只看楼主" }}
-        </el-button>
-    </div> -->
-
         <div class="m-single-toolbar">
-            <!-- <el-button size="small" @click="onEditClick" v-if="isPostOwner" type="warning" icon="el-icon-edit"
-                        >编辑</el-button
-                    > -->
             <el-button
                 size="small"
                 :class="`u-only-btn ${onlyAuthor && 'u-unset'}`"
@@ -331,7 +293,8 @@ export default {
     .u-status {
         .size(20px);
         margin-right: 5px;
-        svg,i{
+        svg,
+        i {
             .size(20px);
         }
     }
@@ -374,10 +337,11 @@ export default {
 //     }
 // }
 .m-single-toolbar {
-    .pa;.rt(0,20px);
+    .pa;
+    .rt(0,20px);
     // .fr;
     .u-only-btn {
-        top:10px;
+        top: 10px;
         position: relative;
         // background: @color-link;
         // border: 1px solid rgba(64, 128, 255, 1);
@@ -410,15 +374,16 @@ export default {
         }
         .u-status {
             .size(16px);
-            svg,i{
+            svg,
+            i {
                 .size(16px);
             }
         }
     }
-    .m-single-header{
-        padding-top:0;
+    .m-single-header {
+        padding-top: 0;
     }
-    .m-single-toolbar{
+    .m-single-toolbar {
         .ps;
     }
 
@@ -448,10 +413,6 @@ export default {
         padding: 0px 5px;
         .r(3px);
         // .mr(10px);
-    }
-
-    * {
-        .dbi;
     }
 
     svg {

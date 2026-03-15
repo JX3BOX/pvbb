@@ -10,7 +10,7 @@
                 <li v-for="(item, k) in list" :key="k">
                     <a class="u-link" :href="authorLink(item.uid)" target="_blank">
                         <!-- <span class="u-order" :class="highlight(k)">{{ k + 1 }}</span> -->
-                        <Avatar class="u-avatar" :url="item.avatar" :size="14"> </Avatar>
+                        <img class="u-avatar" :src="showAvatar(item.avatar)" :size="14" />
                         <!-- <span class="u-tag" :class="item.client">{{ item.client === "std" ? "重制" : "缘起" }}</span> -->
                         <span class="u-name"> {{ item.username }} </span>
                     </a>
@@ -23,7 +23,7 @@
 
 <script>
 import { getBirthdayList } from "@/service/next";
-import { authorLink } from "@jx3box/jx3box-common/js/utils";
+import { authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getStarSign } from "@/utils/common";
 import starSign from "@/assets/data/star_sign.json";
 import dayjs from "dayjs";
@@ -64,6 +64,7 @@ export default {
                 });
         },
         authorLink,
+        showAvatar,
     },
 };
 </script>
@@ -76,6 +77,11 @@ export default {
         .u-date {
             color: #8d29ae;
         }
+    }
+    .u-avatar {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
     }
 }
 </style>

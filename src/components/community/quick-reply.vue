@@ -21,14 +21,9 @@
                     </div>
                 </div>
             </div>
-            <img
-                slot="reference"
-                class="u-reference"
-                width="24"
-                height="24"
-                src="@/assets/img/comment.svg"
-                alt="comment"
-            />
+            <template #reference>
+                <img class="u-reference" width="24" height="24" src="@/assets/img/comment.svg" alt="comment" />
+            </template>
         </el-popover>
     </div>
 </template>

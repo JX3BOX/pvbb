@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import PostDirectory from '@jx3box/jx3box-common-ui/src/single/PostDirectory.vue'
-// import PostCollection from '@jx3box/jx3box-common-ui/src/single/PostCollection.vue'
-import PostTopic from '@jx3box/jx3box-common-ui/src/single/PostTopic.vue'
+import PostDirectory from '@jx3box/jx3box-ui/src/single/PostDirectory.vue'
+// import PostCollection from '@jx3box/jx3box-ui/src/single/PostCollection.vue'
+import PostTopic from '@jx3box/jx3box-ui/src/single/PostTopic.vue'
 export default {
     name: "single_side",
     props: ['id'],

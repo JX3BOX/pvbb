@@ -1,4 +1,4 @@
-import { $cms, $next } from "@jx3box/jx3box-common/js/https";
+import { $cms, $next } from "@jx3box/jx3box-common/js/api";
 
 // 发布
 const postEmotion = (data) => {

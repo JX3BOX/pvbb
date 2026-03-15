@@ -1,6 +1,6 @@
 <template>
     <div id="app" class="p-bbs p-bbs-single">
-        <Header></Header>
+        <CommonHeader></CommonHeader>
         <Breadcrumb
             name="竹林茶馆"
             slug="bbs"
@@ -14,7 +14,9 @@
             <template #logo>
                 <img svg-inline :src="logo" />
             </template>
-            <publish-gate slot="op-append" />
+            <template #op-append>
+                <publish-gate />
+            </template>
             <template #op-prepend>
                 <!-- <AdminDirectMessage
                     :user-id="user_id"
@@ -37,7 +39,7 @@
             <RightSidebar :show-toggle="true">
                 <Side :id="id" class="m-extend" />
             </RightSidebar>
-            <Footer></Footer>
+            <CommonFooter></CommonFooter>
         </Main>
     </div>
 </template>
@@ -47,7 +49,7 @@ import Nav from "@/components/nav/single_nav.vue";
 import Side from "@/components/bbs/single_side.vue";
 import publishGate from "@/components/publish_gate.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
-import AdminDrop from "@jx3box/jx3box-common-ui/src/bread/AdminDrop.vue";
+import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import { __cdn } from "@/utils/config";
 export default {

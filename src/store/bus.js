@@ -1,7 +1,8 @@
-import Vue from "vue";
-const Bus = new Vue();
-export default Bus
+import bus from "@/utils/bus";
 
-// Use like
-// Bus.$emit(事件名,数据);
-// Bus.$on(事件名,data => {});
+// 兼容旧的 $on/$emit 调用
+bus.$on = bus.on;
+bus.$emit = bus.emit;
+bus.$off = bus.off;
+
+export default bus;

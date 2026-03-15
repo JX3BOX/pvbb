@@ -9,24 +9,24 @@
         <div class="m-index-posts" v-loading="loading">
             <ul class="u-list" v-if="posts && posts.length">
                 <li class="u-item" v-for="(item, i) in posts" :key="i">
-                    <a class="u-post" :href="item.ID | postLink" :target="target">
+                    <a class="u-post" :href="postLink(item.ID)" :target="target">
                         <!-- <i class="u-icon">{{showIcon(item.post_subtype)}}</i> -->
                         <span class="u-prefix" :class="'isType-' + item.post_subtype">
-                            <i class="u-icon" :class="item.post_subtype | showTypeIcon"></i>
-                            <span class="u-type">[{{ item.post_subtype | showTypeLabel }}]</span>
+                            <i class="u-icon" :class="showTypeIcon(item.post_subtype)"></i>
+                            <span class="u-type">[{{ showTypeLabel(item.post_subtype) }}]</span>
                         </span>
-                        <span class="u-title" :style="item.color | isHighlight">{{ item.post_title || "无标题" }}</span>
+                        <span class="u-title" :style="isHighlight(item.color)">{{ item.post_title || "无标题" }}</span>
                         <span class="u-marks" v-if="item.mark && item.mark.length">
-                            <i v-for="mark in item.mark" class="u-mark" :class="mark | markcls" :key="mark">{{ mark | showMark }}</i>
+                            <i v-for="mark in item.mark" class="u-mark" :class="markcls(mark)" :key="mark">{{ showMark(mark) }}</i>
                         </span>
                     </a>
                     <span class="u-misc">
                         <span class="u-author">
-                            <a class="u-author-name" :href="item.post_author | authorLink" target="_blank">{{ item.author_info.display_name }}</a>
-                            <img class="u-author-avatar" :src="item.author_info.user_avatar | showAvatar" :alt="item.author_info.display_name" />
+                            <a class="u-author-name" :href="authorLink(item.post_author)" target="_blank">{{ item.author_info.display_name }}</a>
+                            <img class="u-author-avatar" :src="showAvatar(item.author_info.user_avatar)" :alt="item.author_info.display_name" />
                         </span>
                         <span class="u-date">
-                            <time>{{ item.post_modified | dateFormat }}</time>
+                            <time>{{ dateFormat(item.post_modified) }}</time>
                         </span>
                     </span>
                 </li>

@@ -9,7 +9,7 @@
                 <el-radio-button label="community_discussion_topic">帖子</el-radio-button>
                 <el-radio-button label="community_discussion_topic_reply">回帖</el-radio-button>
             </el-radio-group>
-            <el-button size="small" class="u-close-btn" type="info" @click="closeSearch" icon="el-icon-close"
+            <el-button size="small" class="u-close-btn" type="info" @click="closeSearch" icon="Close"
                 >关闭搜索</el-button
             >
         </div>

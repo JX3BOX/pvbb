@@ -1,7 +1,7 @@
 <template>
     <div class="m-collection-item">
         <a class="u-image" :href="`/collection/${data.id}`" target="_blank">
-            <img :src="data.image | getCover" />
+            <img :src="getCover(data.image)" />
         </a>
         <div class="u-content">
             <a class="u-title" :href="`/collection/${data.id}`" target="_blank">
@@ -9,8 +9,8 @@
                 {{ data.title }}
             </a>
             <div class="u-info" v-if="data.collection_user_info">
-                <a :href="data.collection_user_info.user_id | authorLink" class="u-user" target="_blank">
-                    <img class="u-avatar" :src="data.collection_user_info.user_avatar | showAvatar" />
+                <a :href="authorLink(data.collection_user_info.user_id)" class="u-user" target="_blank">
+                    <img class="u-avatar" :src="showAvatar(data.collection_user_info.user_avatar)" />
                     <span class="u-nickname" v-text="data.collection_user_info.display_name"></span>
                 </a>
                 <!-- <ul class="u-tags" v-if="data.tags && data.tags.length">

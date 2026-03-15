@@ -1,8 +1,5 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 import { getAppID } from "@jx3box/jx3box-common/js/utils";
-
-Vue.use(Vuex);
 
 let store = {
     state: {
@@ -32,4 +29,4 @@ let store = {
     modules: {},
 };
 
-export default new Vuex.Store(store);
+export default createStore(store);

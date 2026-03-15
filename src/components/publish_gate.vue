@@ -12,25 +12,25 @@ export default {
     props: [],
     data: function () {
         return {
-            redirect_types : ['index','forum','notice','feedback', 'single']
+            redirect_types: ["index", "forum", "notice", "feedback", "single"],
         };
     },
     computed: {
         channel: function () {
-            if(this.$route){
-                let routename = this.$route.name
-                if(this.redirect_types.includes(routename)){
-                    routename = 'bbs'
-                } else if (routename.includes('community')) {
-                    routename = 'community'
+            if (this.$route) {
+                let routename = this.$route.name;
+                if (this.redirect_types.includes(routename)) {
+                    routename = "bbs";
+                } else if (routename.includes("community")) {
+                    routename = "community";
                 }
                 return routename;
-            }else{
-                return 'bbs'
+            } else {
+                return "bbs";
             }
         },
         publish_link: function () {
-            return publishLink(this.channel)
+            return publishLink(this.channel);
         },
     },
     methods: {},

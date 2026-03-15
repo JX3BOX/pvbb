@@ -1,5 +1,5 @@
 <template>
-    <el-button type="text" v-if="allowForward" @click="onForward()">
+    <el-button link v-if="allowForward" type="primary" @click="onForward()">
         <i class="el-icon-document-copy"></i>
         <span class="u-copy-text__pc"> 复制党+1 </span>
         <span class="u-copy-text__phone">&nbsp; <strong>+1</strong> </span>

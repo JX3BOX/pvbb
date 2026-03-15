@@ -11,13 +11,13 @@
         <div class="u-misc">
             <span class="u-author">
                 <i class="el-icon-user"></i
-                ><a :href="namespace.uid | authorLink" target="_blank" @click.stop>
-                    {{ namespace.creator && namespace.creator.display_name || "匿名" }}</a
+                ><a :href="authorLink(namespace.uid)" target="_blank" @click.stop>
+                    {{ (namespace.creator && namespace.creator.display_name) || "匿名" }}</a
                 >
             </span>
             <time class="u-time"
                 ><i class="el-icon-date"></i>
-                {{ namespace.created | dataFormat }}</time
+                >{{ dataFormat(namespace.created) }}</time
             >
         </div>
     </div>

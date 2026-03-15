@@ -1,24 +1,13 @@
 <template>
-    <el-popover
-        popper-class="m-joke-popover"
-        placement="top"
-        width="500"
-        :offset="-200"
-        v-model="showPop"
-    >
+    <el-popover popper-class="m-joke-popover" placement="top" width="500" :offset="-200" v-model="showPop">
         <Emotion class="m-publish-joke-emotion" @selected="handleEmotionSelect" />
 
-        <span
-            slot="reference"
-            class="m-publish-joke-button"
-            style="cursor: pointer"
-            title="选择表情"
-        >😀插入表情</span>
+        <span slot="reference" class="m-publish-joke-button" style="cursor: pointer" title="选择表情">😀插入表情</span>
     </el-popover>
 </template>
 
 <script>
-import Emotion from "@jx3box/jx3box-emotion/src/Emotion.vue";
+import Emotion from "@jx3box/jx3box-emotion/src/Emotion2.vue";
 export default {
     name: "joke_post",
     components: {
@@ -54,4 +43,3 @@ export default {
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
 }
 </style>
-

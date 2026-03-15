@@ -16,9 +16,9 @@
                 </div>
                 <div class="u-extend">
                     <el-tooltip class="item" effect="dark" placement="top" v-if="!isAnonymous">
-                        <div slot="content">
+                        <template #content>
                             <span class="u-tips">经验值：{{ data.experience }}</span>
-                        </div>
+                        </template>
                         <a
                             class="u-level"
                             :class="'lv-' + level"
@@ -37,7 +37,13 @@
                         target="_blank"
                         >Lv.{{ level }}</a
                     >
-                    <el-tooltip class="item" effect="dark" :content="vipTypeTitle" placement="top" v-if="isVip && !isAnonymous">
+                    <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="vipTypeTitle"
+                        placement="top"
+                        v-if="isVip && !isAnonymous"
+                    >
                         <a class="u-vip" href="/vip/premium?from=sidebar_author" target="_blank">
                             <i class="i-icon-vip on">{{ vipType }}</i>
                         </a>
@@ -51,12 +57,13 @@
 </template>
 
 <script>
-import { __server, __imgPath, __userLevel, __userLevelColor, __cdn } from "@jx3box/jx3box-common/data/jx3box.json";
+import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
+const { __server, __imgPath, __userLevel, __userLevelColor, __cdn } = jx3box;
 import { authorLink } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
-import { getUserInfo } from "@jx3box/jx3box-common-ui/service/author";
-import Avatar from "@jx3box/jx3box-common-ui/src/author/Avatar.vue";
-import Honor from "@jx3box/jx3box-common-ui/src/author/AuthorHonor.vue";
+import { getUserInfo } from "@jx3box/jx3box-ui/service/author";
+import Avatar from "@jx3box/jx3box-ui/src/author/Avatar.vue";
+import Honor from "@jx3box/jx3box-ui/src/author/AuthorHonor.vue";
 export default {
     name: "AuthorInfo",
     props: ["uid", "isAnonymous"],

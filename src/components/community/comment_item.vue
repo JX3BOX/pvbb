@@ -13,32 +13,34 @@
                             <span class="el-dropdown-link">
                                 <i class="el-icon-more"></i>
                             </span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>
-                                    <DeleteButton :post="post" type="comment" />
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <AddBlockButton :post="post" />
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <ComplaintButton :post="post" />
-                                </el-dropdown-item>
-                            </el-dropdown-menu>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item>
+                                        <DeleteButton :post="post" type="comment" />
+                                    </el-dropdown-item>
+                                    <el-dropdown-item>
+                                        <AddBlockButton :post="post" />
+                                    </el-dropdown-item>
+                                    <el-dropdown-item>
+                                        <ComplaintButton :post="post" />
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
                         </el-dropdown>
                     </div>
                 </div>
                 <p class="u-answer-user">回复 {{ replyUserInfo.display_name }}：</p>
                 <p class="u-content" v-html="renderContent"></p>
                 <div class="u-comment-toolbar">
-                    <div>
-                        <el-button type="text" size="small" @click="addLike" class="">
-                            <div class="u-btn-content">
+                    <div class="flex items-center">
+                        <el-button link size="small" type="primary" @click="addLike" class="">
+                            <div class="u-btn-content flex items-center">
                                 <i :class="`u-like-icon ${isLike && 'is-like'}`">{{ isLike ? "♥" : "♡" }}</i>
                                 {{ isLike ? "已赞" : "赞" }}
                                 <span class="u-count" v-if="likeCount"> ({{ likeCountRender }})</span>
                             </div>
                         </el-button>
-                        <el-button type="text" size="small" @click="onShowReply">
+                        <el-button link size="small" type="primary" @click="onShowReply">
                             <i class="el-icon-chat-round"></i>
                             <span>回复</span>
                         </el-button>

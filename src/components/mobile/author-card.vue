@@ -24,7 +24,7 @@
 import { showAvatar } from "@jx3box/jx3box-common/js/utils.js";
 import { subscribeAuthor, unsubscribeAuthor } from "@jx3box/jx3box-common/js/rss";
 import { getFans } from "@/service/next";
-import { getUserInfo } from "@jx3box/jx3box-common-ui/service/author";
+import { getUserInfo } from "@jx3box/jx3box-ui/service/author";
 import User from "@jx3box/jx3box-common/js/user";
 
 export default {

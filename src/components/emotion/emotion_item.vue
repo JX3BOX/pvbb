@@ -45,21 +45,17 @@
         </div>
         <div class="u-info">
             <div class="u-info-meta" v-if="mode">
-                <!-- <router-link v-if="mode !== 'single'" class="u-desc" :to="{ name: 'emotion', params: { id: emotion.id } }">
-                <i class="el-icon-link"></i>
-                {{ emotion.desc | showListDesc }}
-            </router-link> -->
                 <span class="u-desc">{{ emotion.desc }}</span>
             </div>
             <div class="u-info-user">
-                <img class="u-user-avatar waterfall-img" :src="user_avatar | showAvatar" :key="user_avatar" />
-                <a class="u-user-name" :href="emotion.user_id | authorLink" target="_blank" v-if="emotion.user_id">{{
-                    emotion | showUserName
+                <img class="u-user-avatar waterfall-img" :src="showAvatar(user_avatar)" :key="user_avatar" />
+                <a class="u-user-name" :href="authorLink(emotion.user_id)" target="_blank" v-if="emotion.user_id">{{
+                    showUserName(emotion)
                 }}</a>
                 <span class="u-user-name" v-else>
                     {{ emotion.author || "匿名" }}
                 </span>
-                <time class="u-time">{{ emotion.updated_at | showTime }}</time>
+                <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
                 <!-- <a class="u-like" :class="{ on: isLike }" title="赞" @click="addLike" v-if="isListPage">
                 <i class="like-icon">{{ isLike ? "♥" : "♡" }}</i>
                 <span class="like-text">Like</span>
@@ -102,7 +98,6 @@ import { getRelativeTime } from "@/utils/dateFormat.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { starEmotion, unstarEmotion, removeEmotion } from "@/service/emotion";
-import Comment from "@jx3box/jx3box-comment-ui/src/Comment.vue";
 
 export default {
     props: ["emotion", "mode", "index"],
@@ -116,9 +111,6 @@ export default {
             ext: "gif",
             types: [],
         };
-    },
-    components: {
-        Comment,
     },
     computed: {
         user_avatar: function () {
