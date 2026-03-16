@@ -16,13 +16,13 @@
                     <span class="u-label u-zlp">置顶</span>
 
                     <!-- 标题文字 -->
-showHighlight(<a class="u-title" :style="item.color)" :href="getLink(item)" :target="target">{{
+                    <a class="u-title" :style="showHighlight(item.color)" :href="getLink(item)" :target="target">{{
                         item.post_title || "无标题"
                     }}</a>
 
                     <!-- 角标 -->
                     <span class="u-marks" v-if="item.mark && item.mark.length">
-showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
+                        <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ showMark(mark) }}</i>
                     </span>
                 </h2>
 
@@ -60,8 +60,14 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                 <!-- 作者 -->
                 <div class="u-misc">
                     <div class="u-ids">
-                        <div class="u-id" @click.stop="onTopIdClick(_id)" v-for="(_id, index) in ids" :key="_id" :class="{ 'active': current == _id }">
-                            {{ index+1 }}
+                        <div
+                            class="u-id"
+                            @click.stop="onTopIdClick(_id)"
+                            v-for="(_id, index) in ids"
+                            :key="_id"
+                            :class="{ active: current == _id }"
+                        >
+                            {{ index + 1 }}
                         </div>
                     </div>
                 </div>
@@ -71,14 +77,14 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
 </template>
 
 <script>
-import { appKey } from "@/../setting.json";
+import { appKey } from "@/settings.js";
 import { showAvatar, authorLink, showBanner, buildTarget, getLink } from "@jx3box/jx3box-common/js/utils";
 import { __ossMirror, __imgPath } from "@/utils/config";
 import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
 import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
 import { getBreadcrumb } from "@jx3box/jx3box-common/js/system";
-import { getPosts } from "@/service/post"
+import { getPosts } from "@/service/post";
 export default {
     name: "list_top",
     data() {
@@ -107,20 +113,20 @@ export default {
                 }
             });
         },
-        getBanner: function(val, subtype) {
+        getBanner: function (val, subtype) {
             if (val) {
                 return showBanner(val);
             } else {
                 return __imgPath + `image/banner/${appKey}${subtype}` + ".png";
             }
         },
-        showSubtype: function(val) {
+        showSubtype: function (val) {
             return _bbsSubtypes[val]?.label || "";
         },
         loadPost() {
             const params = {
                 list: this.current,
-            }
+            };
             getPosts(params).then((res) => {
                 this.item = res.data.data.list[0];
             });
@@ -130,27 +136,25 @@ export default {
             this.loadPost();
         },
         getLink(item) {
-            return getLink(item.post_type, item.ID)
-        }
-    },
-    filters: {
+            return getLink(item.post_type, item.ID);
+        },
         authorLink,
-        postLink: function(val) {
+        postLink: function (val) {
             return location.origin + `/${appKey}/` + val;
         },
-        showHighlight: function(val) {
+        showHighlight: function (val) {
             return val ? `color:${val};font-weight:600;` : "";
         },
-        showMark: function(val) {
+        showMark: function (val) {
             return mark_map[val] || val;
         },
-        showAvatar: function(userinfo) {
+        showAvatar: function (userinfo) {
             return showAvatar(userinfo?.user_avatar);
         },
-        showNickname: function(userinfo) {
+        showNickname: function (userinfo) {
             return userinfo?.display_name || "匿名";
         },
-        dateFormat: function(gmt) {
+        dateFormat: function (gmt) {
             return showDate(new Date(gmt));
         },
     },

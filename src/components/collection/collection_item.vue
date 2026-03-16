@@ -66,8 +66,6 @@ export default {
         dateFormat: function (timestamp) {
             return dateFormat(new Date(timestamp * 1000));
         },
-    },
-    filters: {
         getCover: function (val) {
             return val ? resolveImagePath(val) : `${__imgPath}image/collection/default_cover.png`;
         },

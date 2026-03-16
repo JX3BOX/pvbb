@@ -1,21 +1,20 @@
 <template>
     <div>
-        <list_nav v-if="mode == 'list'" class="m-nav" />
-        <single_nav v-if="mode == 'single'" />
+        <list-nav v-if="mode == 'list'" class="m-nav" />
+        <single-nav v-if="mode == 'single'" />
     </div>
 </template>
 
 <script>
-import list_nav from "@/components/nav/list_nav.vue";
-import single_nav from "@/components/nav/single_nav.vue";
-import settings from "../../../setting.json";
-import { getAppID } from "@/utils/common.js";
+import ListNav from "@/components/nav/ListNav.vue";
+import SingleNav from "@/components/nav/SingleNav.vue";
+import settings from "@/settings.js";
 export default {
     name: "Nav",
     props: [],
     components: {
-        list_nav,
-        single_nav,
+        ListNav,
+        SingleNav,
     },
     data: function () {
         return {
@@ -25,7 +24,6 @@ export default {
     computed: {},
     watch: {},
     methods: {},
-    filters: {},
     created: function () {
         let id = location.pathname.split("/")[2];
         let type = location.pathname.split("/")[1];

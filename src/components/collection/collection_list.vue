@@ -5,14 +5,14 @@
             <a :href="publish_link" class="u-publish el-button el-button--primary">+ 创建小册</a>
             <el-input
                 placeholder="请输入搜索内容"
-                v-model.trim.lazy="search"
+                v-model.trim="search"
                 class="input-with-select"
                 clearable
                 @clear="onSearch"
-                @keydown.native.enter="onSearch"
+                @keydown.enter="onSearch"
             >
-            <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
-            <el-button slot="append" icon="el-icon-position" class="u-btn" @click="onSearch"></el-button>
+                <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
+                <el-button slot="append" icon="el-icon-position" class="u-btn" @click="onSearch"></el-button>
             </el-input>
         </div>
         <Banner :subtype="'collection'"></Banner>
@@ -53,7 +53,7 @@ export default {
         "collection-item": collection_item_v2,
         Banner,
     },
-    data: function() {
+    data: function () {
         return {
             loading: false, //加载状态
 
@@ -69,10 +69,10 @@ export default {
     },
     computed: {
         // 发布按钮链接
-        publish_link: function() {
+        publish_link: function () {
             return publishLink("collection");
         },
-        params: function() {
+        params: function () {
             return {
                 page: this.page,
                 per: this.per,
@@ -83,10 +83,10 @@ export default {
         },
     },
     methods: {
-        skipTop: function() {
+        skipTop: function () {
             window.scrollTo(0, 0);
         },
-        loadData: function() {
+        loadData: function () {
             this.loading = true;
             const params = {
                 ...this.params,
@@ -118,7 +118,7 @@ export default {
         params: {
             immediate: true,
             deep: true,
-            handler: function() {
+            handler: function () {
                 this.loadData();
             },
         },

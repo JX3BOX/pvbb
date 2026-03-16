@@ -1,3 +1,4 @@
+@import "../../../node_modules/@jx3box/jx3box-common/css/preset.css";
 .m-main {
     padding: 20px 30px;
 }
@@ -98,5 +99,18 @@
         padding: 0 16px;
         line-height: 1;
         white-space: nowrap;
+    }
+}
+
+.el-tabs--card {
+    .el-tabs__item {
+        background-color: @bg-light;
+        border-bottom: 1px solid @border !important;
+
+        &.is-active {
+            border-bottom: none !important;
+            background-color: #fff;
+            .bold;
+        }
     }
 }

@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <el-drawer :visible.sync="filterVisible" direction="btt" custom-class="m-filter-drawer">
+        <el-drawer v-model="filterVisible" direction="btt" custom-class="m-filter-drawer">
             <div class="m-filter-all" @click="drawerType = 'all'" :class="{ active: drawerType == 'all' }">全部</div>
             <div class="m-filter-group">
                 <div
@@ -133,12 +133,10 @@ export default {
             return [this.id, this.type, this.star, this.original];
         },
     },
-    filters: {
+    methods: {
         showAvatar: function (val) {
             return showAvatar(val);
         },
-    },
-    methods: {
         loadList: function (appendMode = false) {
             this.loading = true;
             if (appendMode) {

@@ -74,11 +74,6 @@ export default {
             showSearchForm: false,
         };
     },
-    filters: {
-        showAvatar: function (url) {
-            return showAvatar(url);
-        },
-    },
     computed: {
         imgPath() {
             return `${__imgPath}topic/bbs/`;
@@ -91,6 +86,9 @@ export default {
         },
     },
     methods: {
+        showAvatar: function (url) {
+            return showAvatar(url);
+        },
         resolveImagePath,
         randomNumber() {
             return Math.floor(Math.random() * 4) + 1;

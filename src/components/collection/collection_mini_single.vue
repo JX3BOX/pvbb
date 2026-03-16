@@ -188,8 +188,6 @@ export default {
             const key = icon.replace("_", "/");
             return `${__imgPath}image/${key}.png`;
         },
-    },
-    filters: {
         authorLink,
     },
     created: function () {},

@@ -128,7 +128,10 @@ export default {
             },
         },
     },
-    filters: {
+    mounted() {
+        // console.log(document.documentElement.clientWidth);
+    },
+    methods: {
         showAvatar: function (val) {
             return showAvatar(val);
         },
@@ -145,11 +148,6 @@ export default {
         showUserName: function (emotion) {
             return emotion?.user_info?.display_name.slice(0, 12) || "匿名";
         },
-    },
-    mounted() {
-        // console.log(document.documentElement.clientWidth);
-    },
-    methods: {
         close() {
             this.show = false;
             this.$emit("close");

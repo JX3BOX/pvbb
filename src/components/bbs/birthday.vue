@@ -1,7 +1,7 @@
 <template>
     <div class="m-birthday m-jx3dat-rank-mini m-jx3dat-rank">
         <h3 class="c-sidebar-right-title">
-            <span class="u-title"><img class="u-icon" svg-inline src="@/assets/img/cake.svg" />今日之星</span>
+            <span class="u-title"><img class="u-icon" svg-inline src="@/assets/img/common/cake.svg" />今日之星</span>
             <span class="u-date">{{ `${icon} ${today}` }}</span>
             <!-- <span class="u-more" @click="viewRank">查看更多 &raquo;</span> -->
         </h3>

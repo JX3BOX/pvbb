@@ -5,7 +5,7 @@
             <div class="m-archive-search m-namespace-search" key="namespace-search">
                 <el-input
                     placeholder="请输入搜索内容"
-                    v-model.trim.lazy="search"
+                    v-model.trim="search"
                     clearable
                     @clear="onSearch"
                     @keydown.enter="onSearch"

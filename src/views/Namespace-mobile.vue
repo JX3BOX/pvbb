@@ -53,12 +53,10 @@ export default {
             };
         },
     },
-    filters: {
+    methods: {
         dataFormat: function (val) {
             return (val && showDate(~~val * 1000)) || "-";
         },
-    },
-    methods: {
         handleScroll(event) {
             const { target } = event;
             if (this.loading) return;

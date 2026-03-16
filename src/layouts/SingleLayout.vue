@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="p-bbs p-bbs-single">
+    <div class="p-bbs p-bbs-single">
         <CommonHeader></CommonHeader>
         <Breadcrumb
             name="竹林茶馆"
@@ -45,9 +45,9 @@
 </template>
 
 <script>
-import Nav from "@/components/nav/single_nav.vue";
+import Nav from "@/components/nav/SingleNav.vue";
 import Side from "@/components/bbs/single_side.vue";
-import publishGate from "@/components/publish_gate.vue";
+import publishGate from "@/components/common/PublishGate.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";

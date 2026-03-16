@@ -120,6 +120,9 @@ export default {
         },
     },
     methods: {
+        showSchoolIcon: function (val) {
+            return __imgPath + "image/school/" + val + ".png";
+        },
         async insertVariable(emotion) {
             const value = emotion.key;
             const myField = document.querySelector("#textarea");
@@ -202,11 +205,6 @@ export default {
                         this.loading = false;
                     });
             }
-        },
-    },
-    filters: {
-        showSchoolIcon: function (val) {
-            return __imgPath + "image/school/" + val + ".png";
         },
     },
 };

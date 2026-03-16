@@ -88,15 +88,6 @@ export default {
             content: "",
         };
     },
-    filters: {
-        dateFormat: function (val) {
-            return dateFormat(new Date(val));
-        },
-        showAvatar: function (val) {
-            return showAvatar(val);
-        },
-        authorLink,
-    },
     computed: {
         isSelf: function () {
             return this.joke.user_id == User.getInfo().uid;
@@ -137,6 +128,13 @@ export default {
         },
     },
     methods: {
+        dateFormat: function (val) {
+            return dateFormat(new Date(val));
+        },
+        showAvatar: function (val) {
+            return showAvatar(val);
+        },
+        authorLink,
         async parse(str) {
             const ins = new JX3_EMOTION(str);
             const result = await ins._renderHTML();

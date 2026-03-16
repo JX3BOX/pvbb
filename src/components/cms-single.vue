@@ -76,7 +76,6 @@
 </template>
 
 <script>
-import PostHeader from "@jx3box/jx3box-ui/src/single/PostHeader.vue";
 import Creators from "@jx3box/jx3box-ui/src/single/Creators.vue";
 import Collection from "@jx3box/jx3box-ui/src/single/Collection.vue";
 import Thx from "@jx3box/jx3box-ui/src/single/Thx.vue";
@@ -90,7 +89,6 @@ import User from "@jx3box/jx3box-common/js/user";
 export default {
     name: "cms-single",
     components: {
-        PostHeader,
         Creators,
         Collection,
         Thx,

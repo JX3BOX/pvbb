@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="p-community-single">
+    <div class="p-community-single">
         <CommonHeader></CommonHeader>
         <Breadcrumb
             v-if="post"
@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import TopStickyInfo from "@/components/community/top_sticky_info.vue";
-import publishGate from "@/components/publish_gate.vue";
+import TopStickyInfo from "@/views/community/components/TopStickyInfo.vue";
+import publishGate from "@/components/common/PublishGate.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";

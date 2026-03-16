@@ -1,14 +1,17 @@
 {
     "name": "pvbb",
     "private": true,
+    "description": "论坛等业务项目",
     "scripts": {
-        "dev": "cross-env DEV_SERVER=true vue-cli-service serve --mode development",
-        "serve": "cross-env NODE_ENV=development vue-cli-service serve --mode production",
-        "build": "cross-env NODE_ENV=production vue-cli-service build --mode production",
-        "preview": "cross-env BUILD_MODE=preview NODE_ENV=production vue-cli-service build --mode preview",
-        "inspect": "vue inspect > output.js",
+        "dev": "vue-cli-service serve --mode development",
+        "serve": "vue-cli-service serve --mode production",
+        "debug": "vue-cli-service serve --mode debug",
+        "build": "npm run build:prod",
+        "build:dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vue-cli-service build --mode development",
+        "build:prod": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vue-cli-service build --mode production",
         "lint": "vue-cli-service lint",
-        "update": "npm --registry https://registry.npmjs.org install @jx3box/jx3box-ui@latest @jx3box/jx3box-common@latest @jx3box/jx3box-data@latest @jx3box/jx3box-emotion@latest @jx3box/jx3box-editor@latest"
+        "header": "vue-cli-service build --target lib --name newheader src/Header.vue && cp public/index.html dist/newheader.html",
+        "update": "npm --registry https://registry.npmjs.org install @jx3box/jx3box-common@latest @jx3box/jx3box-data@latest @jx3box/jx3box-ui@latest @jx3box/jx3box-editor@latest"
     },
     "browserslist": [
         "> 1%",

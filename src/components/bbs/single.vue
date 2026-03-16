@@ -1,13 +1,15 @@
 <template>
     <singlebox :post="post" :stat="stat" v-loading="loading" @extendUpdate="updateExtend">
         <!-- 头部子类型 -->
-        <div class="u-meta u-sub-block" slot="single-header">
-            <em class="u-label">类型</em>
-            <span class="u-value">
-                {{ post_subtype }}
-            </span>
+        <template #single-header>
+            <div class="u-meta u-sub-block">
+                <em class="u-label">类型</em>
+                <span class="u-value">
+                    {{ post_subtype }}
+                </span>
+            </div>
             <!-- <span v-for="item in topics" :key="item" class="u-label u-topic">{{ item }}</span> -->
-        </div>
+        </template>
     </singlebox>
 </template>
 
@@ -19,12 +21,12 @@ import singlebox from "@/components/cms-single";
 import { getPost } from "../../service/post.js";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
-import settings from "../../../setting.json";
+import settings from "@/settings.js";
 import bbsSubtypes from "@/assets/data/bbs_subtypes.json";
 export default {
     name: "single",
     props: ["id"],
-    data: function() {
+    data: function () {
         return {
             loading: false,
             post: {},
@@ -32,20 +34,20 @@ export default {
         };
     },
     computed: {
-        post_subtype: function() {
+        post_subtype: function () {
             let subtype = this.post?.post_subtype;
-            return subtype ? bbsSubtypes[subtype]?.['label'] : "-";
+            return subtype ? bbsSubtypes[subtype]?.["label"] : "-";
         },
-        topics: function (){
-            return (this.post?.topics || []).map(item => item.topic)
-        }
+        topics: function () {
+            return (this.post?.topics || []).map((item) => item.topic);
+        },
     },
-    methods : {
-        updateExtend : function (val){
-            this.$store.state.extend = val
-        }
+    methods: {
+        updateExtend: function (val) {
+            this.$store.state.extend = val;
+        },
     },
-    mounted: function() {
+    mounted: function () {
         if (this.id) {
             this.loading = true;
             getPost(this.id)
@@ -55,15 +57,16 @@ export default {
                     this.$store.state.user_id = this.post?.post_author;
                     document.title = this.post.post_title;
 
-                    User.isLogin() && postHistory({
-                        source_type: settings.appKey,
-                        source_id: ~~this.id,
-                        link: location.href,
-                        title: this.post.post_title,
-                        author: this.post.post_author,
-                        banner: this.post.post_banner,
-                        content_meta_id: this.post.link_content_meta_id,
-                    });
+                    User.isLogin() &&
+                        postHistory({
+                            source_type: settings.appKey,
+                            source_id: ~~this.id,
+                            link: location.href,
+                            title: this.post.post_title,
+                            author: this.post.post_author,
+                            banner: this.post.post_banner,
+                            content_meta_id: this.post.link_content_meta_id,
+                        });
                 })
                 .finally(() => {
                     this.loading = false;

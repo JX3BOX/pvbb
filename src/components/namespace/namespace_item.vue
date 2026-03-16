@@ -40,13 +40,11 @@ export default {
             return this.data;
         },
     },
-    filters: {
+    methods: {
         authorLink,
         dataFormat: function(val) {
             return (val && showDate(~~val * 1000)) || "-";
         },
-    },
-    methods: {
         isMyNamespace: function(val) {
             return this.uid && val == this.uid;
         },

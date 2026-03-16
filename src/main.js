@@ -1,39 +1,25 @@
-try {
-    let [subtype, id] = location.hash.slice(2)?.split("/");
-    const oldSubtypes = ["collection", "emotion", "joke"];
-    if (oldSubtypes.includes(subtype)) {
-        location.href = location.origin + "/" + subtype + "/" + id;
-    }
-} catch (e) {
-    console.log("旧地址匹配异常", e);
-}
-
 // 1.Create APP
 import { createApp } from "vue";
 import App from "./App.vue";
 const app = createApp(App);
 
-// 将 filters 合并到 methods，兼容 Vue3 模板中直接调用
-app.mixin({
-    beforeCreate() {
-        const filters = this.$options.filters;
-        if (filters) {
-            this.$options.methods = {
-                ...(this.$options.methods || {}),
-                ...filters,
-            };
-        }
-    },
-});
-
-// 2.Router & Store
+// 2.Router
 import router from "./router";
-import store from "./store";
 app.use(router);
+
+// 3.Store
+import store from "./store";
 app.use(store);
 
-// 3.i18n (JX3BOX UI)
-import { Jx3boxUiI18n, getJx3boxUiAvailableLocales } from "@jx3box/jx3box-ui";
+// 4.Components
+import { createHead } from "@vueuse/head";
+const head = createHead();
+app.use(head);
+
+// 5.i18n
+import { createJx3boxUiI18n, getJx3boxUiAvailableLocales } from "@jx3box/jx3box-ui";
+import { mergeAppLocaleMessages } from "@/locale";
+import { initRouterI18nHead } from "@/router/i18n-head";
 const __langKey = (localStorage.getItem("lang") || "zh-cn").toLowerCase();
 const __langMap = {
     "zh-cn": "zh-CN",
@@ -44,24 +30,55 @@ const __langMap = {
 const __preferredI18nLocale = __langMap[__langKey] || "zh-CN";
 const __supportedI18nLocales = getJx3boxUiAvailableLocales();
 const __i18nLocale = __supportedI18nLocales.includes(__preferredI18nLocale) ? __preferredI18nLocale : "zh-CN";
-app.use(Jx3boxUiI18n, {
-    locale: __i18nLocale,
-});
 
-// 4.UI
+// 安装 JX3BOX-UI 的 i18n（提供 $t，避免 $jx3boxT 渲染期访问未定义的 $t 产生大量 warning）
+const __i18n = createJx3boxUiI18n({ locale: __i18nLocale });
+mergeAppLocaleMessages(__i18n);
+// UI 包内部存在大量缺失 key 的情况（不影响功能），关闭 warning 避免刷屏
+__i18n.global.missingWarn = false;
+__i18n.global.fallbackWarn = false;
+app.use(__i18n);
+
+// 根据路由 meta 自动更新 title/keywords/description（同时支持语言切换）
+initRouterI18nHead(router, __i18n, head);
+
+// 6.UI
+
+// 6.1 JX3BOX UI
 import "@jx3box/jx3box-common/css/normalize.css";
 import "@jx3box/jx3box-common/css/font.css";
-import "@/assets/css/tailwind.css";
+import { install as JX3BOX_UI } from "@jx3box/jx3box-ui";
+app.use(JX3BOX_UI);
 
+// 6.2 Element Plus
 import ElementPlus from "element-plus";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import en from "element-plus/es/locale/lang/en";
 import zhTw from "element-plus/es/locale/lang/zh-tw";
 import vi from "element-plus/es/locale/lang/vi";
 import "element-plus/dist/index.css";
-import "@/assets/css/element-plus-theme.scss";
+import "@jx3box/jx3box-common/css/element-plus-theme.scss";
 import "@jx3box/jx3box-common/css/element-fonticon.css";
 
+const __elementLocaleMap = {
+    "zh-CN": zhCn,
+    "en-US": en,
+    "zh-TW": zhTw,
+    vi,
+};
+const __elementLocale = __elementLocaleMap[__i18nLocale] || zhCn;
+app.use(ElementPlus, {
+    locale: __elementLocale,
+});
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component);
+}
+
+// 6.3 Tailwind
+import "@/assets/css/tailwind.css";
+
+// 7. 其它扩展
 import VueSvgInlinePlugin from "vue-svg-inline-plugin";
 
 // use Vue plugin without options
@@ -75,28 +92,5 @@ app.use(VueSvgInlinePlugin, {
     },
 });
 
-const __elementLocaleMap = {
-    "zh-CN": zhCn,
-    "en-US": en,
-    "zh-TW": zhTw,
-    vi,
-};
-const __elementLocale = __elementLocaleMap[__i18nLocale] || zhCn;
-app.use(ElementPlus, {
-    locale: __elementLocale,
-});
-
-import * as ElementPlusIconsVue from "@element-plus/icons-vue";
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component);
-}
-
-import { install } from "@jx3box/jx3box-ui";
-install(app);
-
-// reporter
-import reporter from "@jx3box/jx3box-common/js/reporter";
-reporter.installVue3(app);
-
-// 5.Mount DOM
+// Final.Mount DOM
 app.mount("#app");

@@ -1,43 +1,41 @@
 <template>
-    <div id="app">
-        <CommonHeader></CommonHeader>
-        <Breadcrumb
-            name="竹林茶馆"
-            slug="bbs"
-            :publishEnable="false"
-            :topicEnable="false"
-            :adminEnable="false"
-            :feedbackEnable="true"
-            :crumbEnable="true"
-        >
-            <template #logo>
-                <img svg-inline :src="logo" />
-            </template>
-            <Info />
-            <template #op-append>
-                <publish-gate />
-            </template>
-        </Breadcrumb>
-        <LeftSidebar>
-            <Nav />
-        </LeftSidebar>
-        <Main :withoutRight="false">
-            <div class="m-main">
-                <slot></slot>
-            </div>
-            <RightSidebar class="m-bbs-right-side" :show-toggle="true">
-                <Side class="m-extend" />
-            </RightSidebar>
-            <CommonFooter></CommonFooter>
-        </Main>
-    </div>
+    <CommonHeader></CommonHeader>
+    <Breadcrumb
+        name="竹林茶馆"
+        slug="bbs"
+        :publishEnable="false"
+        :topicEnable="false"
+        :adminEnable="false"
+        :feedbackEnable="true"
+        :crumbEnable="true"
+    >
+        <template #logo>
+            <img svg-inline :src="logo" />
+        </template>
+        <Info />
+        <template #op-append>
+            <publish-gate />
+        </template>
+    </Breadcrumb>
+    <LeftSidebar>
+        <Nav />
+    </LeftSidebar>
+    <Main :withoutRight="false">
+        <div class="m-main">
+            <slot></slot>
+        </div>
+        <RightSidebar class="m-bbs-right-side" :show-toggle="true">
+            <Side class="m-extend" />
+        </RightSidebar>
+        <CommonFooter></CommonFooter>
+    </Main>
 </template>
 
 <script>
 import Info from "@/components/Info.vue";
 import Nav from "@/components/nav/Nav.vue";
 import Side from "@/components/bbs/list_side.vue";
-import publishGate from "@/components/publish_gate.vue";
+import publishGate from "@/components/common/PublishGate.vue";
 import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
 import { __cdn } from "@/utils/config";
 export default {

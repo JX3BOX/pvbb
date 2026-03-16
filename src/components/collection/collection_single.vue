@@ -27,7 +27,7 @@
                                 <!-- 用户名 -->
                                 <div class="u-author u-sub-block">
                                     <i class="u-author-icon">
-                                        <img svg-inline src="@/assets/img/author.svg" />
+                                        <img svg-inline src="@/assets/img/common/author.svg" />
                                     </i>
                                     <a class="u-name" :href="authorLink(collection.user_id)">{{
                                         collection.collection_user_info && collection.collection_user_info.display_name
@@ -275,8 +275,6 @@ export default {
             const key = icon.replace("_", "/");
             return `${__imgPath}image/${key}.png`;
         },
-    },
-    filters: {
         authorLink,
     },
     created: function () {},

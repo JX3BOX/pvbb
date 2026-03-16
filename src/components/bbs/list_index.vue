@@ -17,13 +17,21 @@
                         </span>
                         <span class="u-title" :style="isHighlight(item.color)">{{ item.post_title || "无标题" }}</span>
                         <span class="u-marks" v-if="item.mark && item.mark.length">
-                            <i v-for="mark in item.mark" class="u-mark" :class="markcls(mark)" :key="mark">{{ showMark(mark) }}</i>
+                            <i v-for="mark in item.mark" class="u-mark" :class="markcls(mark)" :key="mark">{{
+                                showMark(mark)
+                            }}</i>
                         </span>
                     </a>
                     <span class="u-misc">
                         <span class="u-author">
-                            <a class="u-author-name" :href="authorLink(item.post_author)" target="_blank">{{ item.author_info.display_name }}</a>
-                            <img class="u-author-avatar" :src="showAvatar(item.author_info.user_avatar)" :alt="item.author_info.display_name" />
+                            <a class="u-author-name" :href="authorLink(item.post_author)" target="_blank">{{
+                                item.author_info.display_name
+                            }}</a>
+                            <img
+                                class="u-author-avatar"
+                                :src="showAvatar(item.author_info.user_avatar)"
+                                :alt="item.author_info.display_name"
+                            />
                         </span>
                         <span class="u-date">
                             <time>{{ dateFormat(item.post_modified) }}</time>
@@ -58,7 +66,7 @@ import { getPosts } from "@/service/post";
 export default {
     name: "Index",
     props: [],
-    data: function() {
+    data: function () {
         return {
             loading: false,
             search: "",
@@ -67,43 +75,43 @@ export default {
             page: 1,
             total: 1,
             icon_map: {
-                "1": "🔮",
-                "2": "❤️",
-                "3": "🎬",
-                "4": "📄",
+                1: "🔮",
+                2: "❤️",
+                3: "🎬",
+                4: "📄",
             },
             types,
         };
     },
     computed: {
-        client: function() {
+        client: function () {
             return this.$store.state.client;
         },
-        params: function() {
+        params: function () {
             let _ = {
                 per: this.per,
                 page: ~~this.page || 1,
                 sticky: 1,
                 client: this.client,
-                type: "bbs"
+                type: "bbs",
             };
             if (this.search) {
                 _.search = this.search;
             }
             return _;
         },
-        target: function() {
+        target: function () {
             return buildTarget();
         },
     },
     methods: {
-        showIcon: function(subtype) {
+        showIcon: function (subtype) {
             return this.icon_map[subtype];
         },
-        skipTop: function() {
+        skipTop: function () {
             window.scrollTo(0, 0);
         },
-        loadPosts: function() {
+        loadPosts: function () {
             this.loading = true;
             getPosts(this.params, this)
                 .then((res) => {
@@ -114,43 +122,41 @@ export default {
                     this.loading = false;
                 });
         },
-        getIconClass: function(subtype) {
+        getIconClass: function (subtype) {
             return types[subtype]["icon"] + " " + `u-icon-${subtype}`;
         },
-    },
-    filters: {
-        dateFormat: function(val) {
+        dateFormat: function (val) {
             return dateFormat(new Date(val));
         },
         showAvatar,
         authorLink,
-        postLink: function(val) {
+        postLink: function (val) {
             return location.origin + "/bbs/" + val;
         },
-        isHighlight: function(val) {
+        isHighlight: function (val) {
             return val ? `color:${val};font-weight:600;` : "";
         },
-        showMark: function(val) {
+        showMark: function (val) {
             return mark_map[val];
         },
-        markcls: function(val) {
+        markcls: function (val) {
             return "u-mark-" + val;
         },
-        showTypeLabel: function(val) {
+        showTypeLabel: function (val) {
             return types?.[val]?.["label"];
         },
-        showTypeIcon: function(val) {
+        showTypeIcon: function (val) {
             return types?.[val]?.["icon"];
         },
     },
     watch: {
-        search : function (){
-            this.page = 1
+        search: function () {
+            this.page = 1;
         },
         params: {
             immediate: true,
             deep: true,
-            handler: function() {
+            handler: function () {
                 this.loadPosts();
             },
         },

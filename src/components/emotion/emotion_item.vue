@@ -138,7 +138,7 @@ export default {
             },
         },
     },
-    filters: {
+    methods: {
         showAvatar: function (val) {
             return showAvatar(val);
         },
@@ -155,8 +155,6 @@ export default {
         showUserName: function (emotion) {
             return emotion?.user_info?.display_name.slice(0, 12) || "匿名";
         },
-    },
-    methods: {
         editLink,
         preview() {
             if (!this.mode) this.$emit("preview", this.emotion); //列表可预览

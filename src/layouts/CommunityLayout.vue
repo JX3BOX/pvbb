@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="l-community-layout">
+    <div class="l-community-layout">
         <CommonHeader></CommonHeader>
         <Breadcrumb
             name="竹林茶馆"
@@ -23,7 +23,7 @@
                 <slot></slot>
             </div>
             <RightSidebar class="m-bbs-right-side" :show-toggle="true">
-                <Side class="m-extend" />
+                <ListSide class="m-extend" />
             </RightSidebar>
             <CommonFooter></CommonFooter>
         </Main>
@@ -33,8 +33,8 @@
 <script>
 import Info from "@/components/Info.vue";
 import Nav from "@/components/nav/Nav.vue";
-import Side from "@/components/bbs/list_side.vue";
-import publishGate from "@/components/publish_gate.vue";
+import ListSide from "@/components/bbs/list_side.vue";
+import publishGate from "@/components/common/PublishGate.vue";
 import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
 export default {
     name: "CommunityLayout",
@@ -54,7 +54,7 @@ export default {
         Nav,
         "publish-gate": publishGate,
         Info,
-        Side,
+        ListSide,
     },
 };
 </script>

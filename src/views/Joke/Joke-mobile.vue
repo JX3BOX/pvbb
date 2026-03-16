@@ -112,14 +112,6 @@ export default {
             return User.isLogin();
         },
     },
-    filters: {
-        dateFormat: function (val) {
-            return dateFormat(new Date(val));
-        },
-        showAvatar: function (val) {
-            return showAvatar(val);
-        },
-    },
     mounted: function () {
         this.fetchJokes();
         // 获取当前时分秒
@@ -129,6 +121,12 @@ export default {
         this.userEntTime = `${hours}:${minutes < 10 ? "0" + minutes : minutes}`;
     },
     methods: {
+        dateFormat: function (val) {
+            return dateFormat(new Date(val));
+        },
+        showAvatar: function (val) {
+            return showAvatar(val);
+        },
         async parse(str) {
             const ins = new JX3_EMOTION(str);
             const result = await ins._renderHTML();

@@ -1,7 +1,6 @@
 import { $next, $cms } from "@jx3box/jx3box-common/js/api";
 import axios from "axios";
-import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
-const { __cdn } = jx3box;
+import { __cdn } from "@/utils/config";
 
 const API_PREFIX = `/api/next2`;
 const gs_url = process.env.NODE_ENV === "development" ? "" : "https://gs.jx3box.com";

@@ -66,6 +66,9 @@ export default {
         },
     },
     methods: {
+        showSchoolIcon: function (val) {
+            return __imgPath + "image/school/" + val + ".png";
+        },
         /**
          * add emotion to textarea
          * @parma {string} value emotion key
@@ -214,11 +217,6 @@ export default {
             }
 
             return true;
-        },
-    },
-    filters: {
-        showSchoolIcon: function (val) {
-            return __imgPath + "image/school/" + val + ".png";
         },
     },
 };

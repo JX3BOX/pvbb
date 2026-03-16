@@ -11,11 +11,11 @@
             <!--列表-->
             <div class="m-emotion-list-container" v-else>
                 <!-- 搜索 -->
-                <div class="m-archive-search m-emotion-search" slot="search-before">
+                <div class="m-archive-search m-emotion-search">
                     <!-- <a :href="publish_link" class="u-publish el-button el-button--primary">+ 发布作品</a> -->
                     <el-input
                         placeholder="请输入搜索内容"
-                        v-model.trim.lazy="search"
+                        v-model.trim="search"
                         @keydown.enter="onSearch"
                         @clear="onSearch"
                         clearable
@@ -33,12 +33,12 @@
                                 inactive-text="只看精选"
                             ></el-switch>
                             <!-- <el-switch
-                                class="u-original"
-                                v-model="original"
-                                :inactive-value="0"
-                                :active-value="1"
-                                inactive-text="只看原创"
-                            ></el-switch> -->
+                            class="u-original"
+                            v-model="original"
+                            :inactive-value="0"
+                            :active-value="1"
+                            inactive-text="只看原创"
+                        ></el-switch> -->
                         </template>
                     </el-input>
                 </div>

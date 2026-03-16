@@ -64,8 +64,8 @@ export default {
             colW: 0, // 列宽
             maxH: 1, // 最高的列
             mainW: 0, // 容器宽度
-            _col: 0, // 列缓存
-            __col: 0, // 内部维护列数
+            colCache: 0, // 列缓存
+            internalCol: 0, // 内部维护列数
             batchCB: null, // 批处理Promise
             onRender: null, // 渲染完毕回调函数
         };
@@ -130,7 +130,7 @@ export default {
             this.mainW = width;
             this.calcCol();
             if (this.autoResize) {
-                if (this.fillBox || this.col || this.__col != this._col) {
+                if (this.fillBox || this.col || this.internalCol != this.colCache) {
                     this.calcXY(start, "resize");
                 }
             }
@@ -150,7 +150,7 @@ export default {
             } else {
                 this.colW = this.mainW / col;
             }
-            this.__col = col;
+            this.internalCol = col;
             return col;
         },
         polling() {
@@ -207,7 +207,7 @@ export default {
         async calcXY(index = 0, cause = "data", duration) {
             const moveDuration = isNaN(duration) ? this.moveTransitionDuration : duration;
             let idx = index;
-            this._col = this.__col;
+            this.colCache = this.internalCol;
             for (let i = index; i < this.styleArr.length; i++) {
                 if (!this.styleArr[i] || !this.styleArr[i].complete) continue;
                 this.styleArr[i].width = this.colW + "px";
@@ -263,12 +263,12 @@ export default {
                 if (item && !set[item.col]) {
                     set[item.col] = item;
                 }
-                if (Object.keys(set).length == this.__col) {
+                if (Object.keys(set).length == this.internalCol) {
                     break;
                 }
             }
             let order = Object.values(set).sort((a, b) => a.bottomTop - b.bottomTop);
-            if (curIndex < this.__col) {
+            if (curIndex < this.internalCol) {
                 curCol = curIndex;
                 curTop = 0;
             } else {

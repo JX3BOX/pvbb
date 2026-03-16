@@ -1,7 +1,7 @@
 <template>
     <li class="u-item">
         <!-- Banner -->
-        <a class="u-banner" :href="item.ID | postLink" :target="target">
+        <a class="u-banner" :href="postLink(item.ID)" :target="target">
             <img :src="getBanner(item.post_banner, item.post_subtype)" :key="item.ID"
         /></a>
 
@@ -16,13 +16,13 @@
             }}</span>
 
             <!-- 标题文字 -->
-            <a class="u-title" :style="item.color | showHighlight" :href="item.ID | postLink" :target="target">{{
+            <a class="u-title" :style="showHighlight(item.color)" :href="postLink(item.ID)" :target="target">{{
                 item.post_title || "无标题"
             }}</a>
 
             <!-- 角标 -->
             <span class="u-marks" v-if="item.mark && item.mark.length">
-                <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark | showMark }}</i>
+                <i v-for="mark in item.mark" class="u-mark" :key="mark">{{ showMark(mark) }}</i>
             </span>
 
             <span class="u-push" v-if="hasPermission">
@@ -67,21 +67,21 @@
 
         <!-- 作者 -->
         <div class="u-misc">
-            <img class="u-author-avatar" :src="item.author_info | showAvatar" :alt="item.author_info | showNickname" />
-            <a class="u-author-name" :href="item.post_author | authorLink" target="_blank">{{
-                item.author_info | showNickname
+            <img class="u-author-avatar" :src="showAvatar(item.author_info)" :alt="showNickname(item.author_info)" />
+            <a class="u-author-name" :href="authorLink(item.post_author)" target="_blank">{{
+                showNickname(item.author_info)
             }}</a>
             <span class="u-date">
                 Updated on
-                <time v-if="order == 'update'">{{ item.post_modified | dateFormat }}</time>
-                <time v-else>{{ item.post_date | dateFormat }}</time>
+                <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>
+                <time v-else>{{ dateFormat(item.post_date) }}</time>
             </span>
         </div>
     </li>
 </template>
 
 <script>
-import { appKey } from "@/../setting.json";
+import { appKey } from "@/settings.js";
 import { showAvatar, authorLink, showBanner, buildTarget } from "@jx3box/jx3box-common/js/utils";
 import { __ossMirror, __imgPath, __cdn } from "@/utils/config";
 import { cms as mark_map } from "@jx3box/jx3box-common/data/mark.json";
@@ -159,8 +159,6 @@ export default {
                 this.pushing = false;
             }, 300);
         },
-    },
-    filters: {
         authorLink,
         postLink: function (val) {
             return location.origin + `/${appKey}/` + val;

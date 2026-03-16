@@ -42,7 +42,6 @@ export default {
     },
     watch: {},
     methods: {},
-    filters: {},
     created: function () {},
     mounted: function () {},
 };

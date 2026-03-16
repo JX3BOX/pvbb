@@ -35,11 +35,11 @@
             <!-- 列表 -->
             <div class="m-joke-list-container" v-else>
                 <!-- 搜索 -->
-                <div class="m-archive-search m-joke-search" slot="search-before">
+                <div class="m-archive-search m-joke-search">
                     <!-- <a :href="publish_link" class="u-publish el-button el-button--primary">+ 发布作品</a> -->
                     <el-input
                         placeholder="请输入搜索内容"
-                        v-model.trim.lazy="search"
+                        v-model.trim="search"
                         @keydown.enter="onSearch"
                         clearable
                         @clear="onSearch"
@@ -221,12 +221,10 @@ export default {
             return this.jokeRewardArr.length === this.jokes.filter((item) => item.user_id).length;
         },
     },
-    filters: {
+    methods: {
         showSchoolIcon: function (val) {
             return __imgPath + "image/school/" + val + ".png";
         },
-    },
-    methods: {
         setType(type) {
             this.type = type;
         },
