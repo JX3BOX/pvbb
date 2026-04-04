@@ -11,8 +11,12 @@
                 @clear="onSearch"
                 @keydown.enter="onSearch"
             >
-                <span slot="prepend"><i class="el-icon-search"></i> <span class="u-search">关键词</span></span>
-                <el-button slot="append" icon="el-icon-position" class="u-btn" @click="onSearch"></el-button>
+                <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
+                <template #append>
+                    <el-button class="u-btn" @click="onSearch">
+                        <i class="el-icon-position"></i>
+                    </el-button>
+                </template>
             </el-input>
         </div>
         <Banner :subtype="'collection'"></Banner>
@@ -30,7 +34,7 @@
             background
             :page-size="per"
             :hide-on-single-page="true"
-            :current-page.sync="page"
+            v-model:current-page="page"
             layout="total, prev, pager, next, jumper"
             :total="total"
             @current-change="skipTop"

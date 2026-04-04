@@ -2,7 +2,9 @@
     <a :href="`/collection/${data.id}`" target="_blank" class="m-collection-item_v2" @mousemove="handleMove">
         <div class="u-image" ref="bookRef">
             <el-image class="u-img u-cover" :src="resolveImagePath(data.image)" fit="cover">
-                <img slot="error" :src="`${imgPath}cover-${randomNumber}.png`" />
+                <template #error>
+                    <img :src="`${imgPath}cover-${randomNumber}.png`" />
+                </template>
             </el-image>
             <img class="u-img u-mark" :ref="`mark${data.id}`" :src="`${imgPath}light.png`" />
             <img />

@@ -6,7 +6,9 @@
                     <div class="u-time">{{ dateFormat(item.updated) }}</div>
                     <div class="m-img-box">
                         <el-image class="u-img" :src="resolveImagePath(item.image)" fit="cover">
-                            <img slot="error" class="u-img" :src="`${imgPath}cover-${randomNumber()}.png`" />
+                            <template #error>
+                                <img class="u-img" :src="`${imgPath}cover-${randomNumber()}.png`" />
+                            </template>
                         </el-image>
                     </div>
                     <div class="u-content">
@@ -32,15 +34,7 @@
             </template>
         </SuspendCommon>
 
-        <el-drawer
-            :visible.sync="showSearchForm"
-            direction="btt"
-            :with-header="false"
-            custom-class="u-drawer"
-            :modal-append-to-body="false"
-            append-to-body
-            class="p-drawer-suspend"
-        >
+        <el-drawer v-model="showSearchForm" direction="btt" class="p-drawer-search" :with-header="false">
             <div class="u-drawer-title">搜索</div>
             <div class="m-search-input">
                 <input type="text" class="u-input" placeholder="请输入搜索内容" @input="onMiniSearch" />
@@ -247,7 +241,15 @@ export default {
     }
 }
 
-.p-drawer-suspend {
+.p-drawer-search {
+    background-color: #24292e;
+    box-shadow: none;
+    border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1.25rem 0.75rem calc(2.5rem + env(safe-area-inset-bottom));
+    height: auto !important;
+    .el-drawer__body {
+        padding: 0;
+    }
     .u-drawer-title {
         .fz(18px,20px);
         .bold();

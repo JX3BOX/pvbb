@@ -17,7 +17,7 @@
                         {{ collection.title }}
                     </div>
                     <div class="u-author">
-                        <avatar
+                        <commonAvatar
                             class="u-author-avatar"
                             :url="collection.collection_user_info?.user_avatar"
                             :uid="collection.collection_user_info?.user_id"
@@ -88,12 +88,14 @@ import User from "@jx3box/jx3box-common/js/user.js";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { __imgPath } from "@/utils/config";
 import AuthorCard from "@/components/mobile/author-card.vue";
+import commonAvatar from "@jx3box/jx3box-ui/src/author/Avatar.vue";
 
 export default {
     name: "CollectionSingle",
     props: [],
     components: {
         AuthorCard,
+        commonAvatar,
     },
     data: function () {
         return {

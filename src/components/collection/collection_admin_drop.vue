@@ -4,21 +4,23 @@
             <el-button type="primary" class="c-admin-button c-admin-drop__button" :size="buttonSize"
                 ><i class="el-icon-setting"></i> 管理<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
-            <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-if="hasPermission('update_post')" command="toggleAdminPanel" icon="el-icon-setting">
-                    <span>设置</span>
-                </el-dropdown-item>
-                <el-dropdown-item
-                    v-if="hasPermission('create_system_message')"
-                    command="directMessage"
-                    icon="el-icon-message"
-                >
-                    <span>私信</span>
-                </el-dropdown-item>
-                <el-dropdown-item icon="el-icon-upload" command="designTask" v-if="hasPermission('push_banner')">
-                    <span>推送</span>
-                </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item v-if="hasPermission('update_post')" command="toggleAdminPanel" icon="el-icon-setting">
+                        <span>设置</span>
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                        v-if="hasPermission('create_system_message')"
+                        command="directMessage"
+                        icon="el-icon-message"
+                    >
+                        <span>私信</span>
+                    </el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-upload" command="designTask" v-if="hasPermission('push_banner')">
+                        <span>推送</span>
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
         </el-dropdown>
 
         <design-task v-model="showDesignTask" :post="post"></design-task>

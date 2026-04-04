@@ -106,7 +106,7 @@ export default {
         return {
             count: 0,
             isLike: false,
-            isStar: this.emotion.star,
+            isStar: this.emotion?.star || false,
 
             ext: "gif",
             types: [],
@@ -189,23 +189,19 @@ export default {
                         type: "success",
                     });
                     this.isStar = true;
-                    this.emotion.star = true;
-                    this.$forceUpdate();
                 });
             } else {
                 this.unStar();
             }
         },
         unStar: function () {
-            unstarEmotion(this.emotion.id).then(() => {
+            unStarEmotion(this.emotion.id).then(() => {
                 this.$notify({
                     title: "成功",
                     message: "取消加精成功",
                     type: "success",
                 });
                 this.isStar = false;
-                this.emotion.star = false;
-                this.$forceUpdate();
             });
         },
         // 删除

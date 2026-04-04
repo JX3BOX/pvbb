@@ -34,5 +34,5 @@ export default {
 </script>
 
 <style lang="less">
-@import "../assets/css/bbs/index.less";
+// @import "../assets/css/bbs/index.less";
 </style>

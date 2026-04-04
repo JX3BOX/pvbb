@@ -10,7 +10,7 @@
             show-word-limit
         ></el-input>
         <div class="u-actions">
-            <div>
+            <div class="u-left">
                 <joke-emotion @emotion="insertVariable"></joke-emotion>
                 <el-select class="u-type" v-model="type" size="small" placeholder="选择门派">
                     <el-option v-for="(school, i) in schoolmap" :key="i" :value="i" :label="school">
@@ -20,7 +20,7 @@
                                 style="margin-right: 5px"
                                 width="24"
                                 height="24"
-                                showSchoolIcon(:src="i)"
+                                :src="showSchoolIcon(i)"
                                 :alt="school"
                             />
                             {{ school }}

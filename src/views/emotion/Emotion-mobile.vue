@@ -3,26 +3,21 @@
         <div class="m-chat-container" ref="chatContainer" @scroll="handleScroll">
             <!-- 聊天消息列表 -->
             <div class="m-chat-list" ref="chatList">
-                <template v-for="(item, index) in list">
-                    <template>
-                        <div :key="item.id || index" class="m-chat-item">
-                            <div class="m-message">
-                                <div class="m-avatar">
-                                    <img class="u-avatar" :src="showAvatar(item.user_info?.user_avatar)" />
-                                </div>
-                                <div class="m-content">
-                                    <div class="m-header">
-                                        <span class="u-author">{{ item.user_info?.display_name || "匿名" }}</span>
-                                    </div>
-                                    <div class="m-body">
-                                        <el-image class="u-img" :src="item.url" :preview-src-list="[item.url]">
-                                        </el-image>
-                                    </div>
-                                </div>
+                <div v-for="(item, index) in list" :key="item.id || index" class="m-chat-item">
+                    <div class="m-message">
+                        <div class="m-avatar">
+                            <img class="u-avatar" :src="showAvatar(item.user_info?.user_avatar)" />
+                        </div>
+                        <div class="m-content">
+                            <div class="m-header">
+                                <span class="u-author">{{ item.user_info?.display_name || "匿名" }}</span>
+                            </div>
+                            <div class="m-body">
+                                <el-image class="u-img" :src="item.url" :preview-src-list="[item.url]"> </el-image>
                             </div>
                         </div>
-                    </template>
-                </template>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="m-send">
@@ -44,7 +39,7 @@
             </div>
         </div>
 
-        <el-drawer v-model="filterVisible" direction="btt" custom-class="m-filter-drawer">
+        <el-drawer v-model="filterVisible" direction="btt" class="m-filter-drawer">
             <div class="m-filter-all" @click="drawerType = 'all'" :class="{ active: drawerType == 'all' }">全部</div>
             <div class="m-filter-group">
                 <div
@@ -221,5 +216,5 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/app.less";
-@import "~@/assets/css/emotion/emotion-mobile.less";
 </style>
+<style lang="less" src="@/assets/css/emotion/emotion-mobile.less"></style>

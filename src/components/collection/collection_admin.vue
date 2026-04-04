@@ -22,7 +22,7 @@
 
             <div class="c-admin-title">
                 <el-input v-model="title" placeholder="请输入小册标题" class="input-author drawer-item-content">
-                    <template slot="prepend">标题</template>
+                    <template #prepend>标题</template>
                 </el-input>
             </div>
 
@@ -40,10 +40,10 @@
                     <i class="el-icon-plus" v-else></i>
                 </el-upload>
                 <el-input class="u-banner" v-model="image">
-                    <span slot="prepend">海报地址</span>
-                    <span slot="append">
+                    <template #prepend>海报地址</template>
+                    <template #append>
                         <span class="u-btn" @click="removeBanner"> <i class="el-icon-circle-close"></i> 移除海报 </span>
-                    </span>
+                    </template>
                 </el-input>
             </div>
 
@@ -56,7 +56,7 @@
                         placeholder="请输入作者uid"
                         class="input-author drawer-item-content"
                     >
-                        <template slot="prepend">作者</template>
+                        <template #prepend>作者</template>
                     </el-input>
                 </div>
             </div>

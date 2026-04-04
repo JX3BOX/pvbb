@@ -1,21 +1,23 @@
 <template>
     <ListLayout>
         <!-- 搜索 -->
-        <template #search-before>
-            <div class="m-archive-search m-namespace-search" key="namespace-search">
-                <el-input
-                    placeholder="请输入搜索内容"
-                    v-model.trim="search"
-                    clearable
-                    @clear="onSearch"
-                    @keydown.enter="onSearch"
-                    class="input-with-select"
-                >
-                    <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
-                    <template #append><el-button icon="Position" @click="onSearch"></el-button></template>
-                </el-input>
-            </div>
-        </template>
+        <div class="m-archive-search m-namespace-search" key="namespace-search">
+            <el-input
+                placeholder="请输入搜索内容"
+                v-model.trim="search"
+                clearable
+                @clear="onSearch"
+                @keydown.enter="onSearch"
+                class="input-with-select"
+            >
+                <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
+                <template #append>
+                    <el-button class="u-btn" @click="onSearch">
+                        <i class="el-icon-position"></i>
+                    </el-button>
+                </template>
+            </el-input>
+        </div>
         <div class="v-namespace" v-loading="loading">
             <!-- tab切换 -->
             <el-tabs class="m-namespace-tab" v-model="type">
@@ -75,7 +77,7 @@
                     :hide-on-single-page="true"
                     :page-size="per"
                     :total="total"
-                    :current-page.sync="page"
+                    v-model:current-page="page"
                 ></el-pagination>
             </div>
         </div>
@@ -194,4 +196,7 @@ export default {
 
 <style lang="less">
 @import "../assets/css/namespace/namespace.less";
+.c-main {
+    padding: 0;
+}
 </style>

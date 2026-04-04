@@ -1,5 +1,5 @@
 <template>
-    <el-dialog class="m-emotion-preview-dialog" :visible.sync="show" :close-on-click-modal="false">
+    <el-dialog class="m-emotion-preview-dialog" v-model="show" :close-on-click-modal="false">
         <div class="u-close" @click="close"><i class="el-icon-close"></i></div>
         <a class="m-emotion" :href="getLink('emotion', emotion.id)" target="_blank">
             <!-- <div class="u-img" :style="{ backgroundImage: `url(${showEmotion(emotion.url)})` }"></div> -->
@@ -174,8 +174,6 @@ export default {
                         type: "success",
                     });
                     this.isStar = true;
-                    this.emotion.star = true;
-                    this.$forceUpdate();
                 });
             } else {
                 this.unStar();
@@ -189,8 +187,6 @@ export default {
                     type: "success",
                 });
                 this.isStar = false;
-                this.emotion.star = false;
-                this.$forceUpdate();
             });
         },
         // 删除

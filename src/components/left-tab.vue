@@ -2,12 +2,14 @@
     <div class="m-left-tab">
         <el-tabs v-model="type" :tab-position="windowWidth <= 768 ? 'top' : 'left'">
             <el-tab-pane name="all" label="全部">
-                <span slot="label"> <i class="u-icon el-icon-menu" style="vertical-align: 0"></i> </span>
+                <template #label>
+                    <i class="u-icon el-icon-menu" style="vertical-align: 0"></i>
+                </template>
             </el-tab-pane>
             <el-tab-pane v-for="(item, i) in schoolmap" :key="i" :name="i">
-                <div slot="label">
+                <template #label>
                     <img class="u-icon" :src="showSchoolIcon(i)" :alt="item" :title="item" />
-                </div>
+                </template>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -57,6 +59,9 @@ export default {
             background-color: rgba(#0366d6, 0.1);
             color: #0366d6;
         }
+        .el-icon-menu {
+            line-height: 28px;
+        }
     }
     .u-icon {
         .size(24px);
@@ -66,6 +71,11 @@ export default {
     }
     .el-tabs--top .el-tabs__item.is-top:nth-child(2) {
         padding-left: 10px;
+    }
+    @media screen and (max-width: 768px) {
+        .el-tabs__item {
+            flex-shrink: 0;
+        }
     }
 }
 </style>

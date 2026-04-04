@@ -1,12 +1,17 @@
 <template>
     <div class="m-single-nav">
-        <Author :uid="uid"/>
+        <CommonAuthor :uid="uid"/>
     </div>
 </template>
 
 <script>
+import CommonAuthor from "@jx3box/jx3box-ui/src/single/Author.vue";
+
 export default {
     name: "single_nav",
+    components: {
+        CommonAuthor,
+    },
     props: [],
     data: function() {
         return {

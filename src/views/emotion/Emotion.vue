@@ -136,7 +136,7 @@
                                 background
                                 :page-size="per"
                                 :hide-on-single-page="true"
-                                :current-page.sync="page"
+                                v-model:current-page="page"
                                 layout="total, prev, pager, next, jumper,sizes"
                                 :total="total"
                                 :page-sizes="[10, 30, 50, 70, 90]"
@@ -568,5 +568,5 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/app.less";
-@import "~@/assets/css/emotion/emotion.less";
 </style>
+<style lang="less" src="@/assets/css/emotion/emotion.less"></style>

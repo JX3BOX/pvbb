@@ -42,7 +42,7 @@
                                     style="margin-right: 5px"
                                     width="24"
                                     height="24"
-                                    showSchoolIcon(:src="i)"
+                                    :src="showSchoolIcon(i)"
                                     :alt="school"
                                 />
                                 {{ school }}
@@ -235,6 +235,10 @@ export default {
         align-items: center;
         .el-select {
             margin-top: 3px;
+            .size(215px, 32px);
+            .el-select__wrapper {
+                .h(100%);
+            }
         }
         .el-icon-info {
             cursor: pointer;

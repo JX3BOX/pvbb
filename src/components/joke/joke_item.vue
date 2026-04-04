@@ -70,9 +70,11 @@ import { showAvatar, authorLink, editLink } from "@jx3box/jx3box-common/js/utils
 import { starJoke, removeJoke, unstarJoke } from "@/service/joke";
 import User from "@jx3box/jx3box-common/js/user";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
+
 export default {
     name: "joke_item",
     props: ["joke", "mode", "jokeRewardArr"],
+    emits: ["update", "doReward"], // Vue 3 需要声明 emits
     data() {
         return {
             disabled: false,
@@ -113,8 +115,9 @@ export default {
         joke: {
             handler: function (val) {
                 this.count = val.count;
-
                 this.parse(val.content);
+                // 同步 isStar 状态
+                this.isStar = val.star;
             },
             deep: true,
             immediate: true,
@@ -174,9 +177,7 @@ export default {
                         type: "success",
                     });
                     this.isStar = true;
-                    this.joke.star = true;
-                    this.$forceUpdate();
-                    // this.$emit("update");
+                    this.$emit("update");
                 });
             } else {
                 this.unStar();
@@ -190,8 +191,7 @@ export default {
                     type: "success",
                 });
                 this.isStar = false;
-                this.joke.star = false;
-                this.$forceUpdate();
+                this.$emit("update");
             });
         },
         // 删除

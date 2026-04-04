@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <el-drawer :visible.sync="copyVisible" direction="btt" custom-class="m-joke-copy-drawer">
+        <el-drawer v-model:visible="copyVisible" direction="btt" custom-class="m-joke-copy-drawer">
             <div class="m-copy-tip">
                 <img class="u-icon" src="../../assets/img/joke/copy-icon.svg" alt="" />
                 <div class="u-text">复制骚话</div>

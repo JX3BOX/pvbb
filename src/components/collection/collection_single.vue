@@ -149,7 +149,7 @@
                     <el-divider content-position="left">
                         <span style="color: #999999"> <i class="el-icon-chat-line-square"></i> 讨论 </span>
                     </el-divider>
-                    <Comment :id="id" category="collection" />
+                    <CommonComment :id="id" category="collection" />
                 </div>
             </template>
         </div>
@@ -176,11 +176,13 @@ import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { __imgPath } from "@/utils/config";
 
 import CollectionLayout from "@/layouts/CollectionLayout.vue";
+import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
 export default {
     name: "CollectionSingle",
     props: [],
     components: {
         CollectionLayout,
+        CommonComment,
     },
     data: function () {
         return {

@@ -12,6 +12,9 @@
     }
 }
 @media screen and (max-width: @phone) {
+    .c-main {
+        padding: 0;
+    }
     .wechat-miniprogram {
         .m-joke-types {
             position: relative;
@@ -76,11 +79,17 @@
         justify-content: space-between;
         align-items: center;
         margin-top: 10px;
-    }
-    .u-type {
-        margin-left: 10px;
-        position: relative;
-        top: -1px;
+        .u-left {
+            display: flex;
+            .u-type {
+                margin-left: 10px;
+                width: 215px;
+                height: 32px;
+                .el-select__wrapper {
+                    height: 100%;
+                }
+            }
+        }
     }
 }
 @media screen and (max-width: @phone) {
@@ -257,7 +266,8 @@
             .mr(5px);
         }
         a {
-            .underline(@color-link);
+            color: @color-link;
+            text-decoration: none;
         }
 
         .ml(10px);
@@ -266,6 +276,8 @@
     .u-like {
         .mr(20px);
         .fz(12px);
+        color: @color-link;
+        text-decoration: none;
     }
     .u-like {
         .pr;
