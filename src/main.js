@@ -92,5 +92,8 @@ app.use(VueSvgInlinePlugin, {
     },
 });
 
+import { copyText } from "@/utils/common";
+app.config.globalProperties.$copyText = copyText;
+
 // Final.Mount DOM
 app.mount("#app");

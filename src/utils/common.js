@@ -54,4 +54,35 @@ function isPhone() {
     return mobile !== null;
 }
 
-export { getAppID, getAppType, getStarSign, isPhone };
+const copyText = (text) => {
+    if (navigator.clipboard) {
+        return navigator.clipboard.writeText(text);
+    } else {
+        return new Promise((resolve, reject) => {
+            const copyDom = document.createElement("textarea");
+            copyDom.value = text;
+            document.body.appendChild(copyDom);
+            copyDom.style.top = "-999999999px";
+            copyDom.style.left = "-9999999999px";
+
+            copyDom.select();
+
+            const success = document.execCommand("copy");
+
+            document.body.removeChild(copyDom);
+
+            if (success) {
+                // ElNotification({
+                //     type: "success",
+                //     title: "复制成功",
+                //     message: text,
+                // });
+                resolve();
+            } else {
+                reject(new Error("复制失败"));
+            }
+        });
+    }
+};
+
+export { getAppID, getAppType, getStarSign, isPhone, copyText };

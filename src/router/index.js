@@ -134,6 +134,61 @@ const routes = [
             },
         },
     },
+
+    // ====== qqbot ======
+    {
+        name: "qqbot",
+        path: "/qqbot",
+        component: () => import("@/views/QQBot.vue"),
+        meta: {
+            i18n: {
+                title: "pages.qqbot.title",
+                keywords: "pages.qqbot.keywords",
+                description: "pages.qqbot.description",
+            },
+        },
+    },
+    {
+        name: "help",
+        path: "/qqbot/help",
+        component: () => import("@/views/qqbot/Help.vue"),
+        meta: { title: "指令手册" },
+    },
+    {
+        name: "bind",
+        path: "/qqbot/bind",
+        component: () => import("@/views/qqbot/Bind.vue"),
+        meta: { title: "绑定账号" },
+    },
+    {
+        name: "team",
+        path: "/qqbot/team",
+        component: () => import("@/views/qqbot/Team.vue"),
+        meta: { title: "开团管理" },
+        redirect: {
+            name: "raid-list",
+        },
+        children: [
+            {
+                name: "raid-list",
+                path: "/qqbot/team/raid-list",
+                component: () => import("@/views/qqbot/components/RaidList.vue"),
+                meta: { title: "开团列表" },
+            },
+            {
+                name: "raid-detail",
+                path: "/qqbot/team/raid-detail",
+                component: () => import("@/views/qqbot/components/RaidDetail.vue"),
+                meta: { title: "开团详情" },
+            },
+        ],
+    },
+    {
+        name: "raid-detail-noauth",
+        path: "/qqbot/team/raid-detail-noauth",
+        component: () => import("@/views/qqbot/components/RaidDetailNoAuth.vue"),
+        meta: { title: "开团详情" },
+    },
 ];
 
 const router = createRouter({
