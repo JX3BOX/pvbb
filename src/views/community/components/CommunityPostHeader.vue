@@ -279,7 +279,7 @@ export default {
     .u-title {
         color: @color;
         // &:hover {
-        //     color: @primary;
+        //     color: @v4primary;
         // }
         letter-spacing: 0.5px;
         font-weight: 300;
@@ -343,7 +343,7 @@ export default {
     .u-only-btn {
         top: 10px;
         position: relative;
-        // background: @color-link;
+        // background: @v4primary;
         // border: 1px solid rgba(64, 128, 255, 1);
         display: inline-block;
         height: 32px;
@@ -478,7 +478,7 @@ export default {
 
     .u-author {
         a:hover {
-            box-shadow: 0 1px 0 @color-link;
+            box-shadow: 0 1px 0 @v4primary;
         }
         i {
             .pr;
@@ -511,7 +511,7 @@ export default {
             .mr(3px);
         }
         &:hover {
-            box-shadow: 0 1px 0 @color-link;
+            box-shadow: 0 1px 0 @v4primary;
         }
     }
 }

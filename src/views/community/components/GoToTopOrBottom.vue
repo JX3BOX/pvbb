@@ -133,7 +133,7 @@ export default {
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
     cursor: pointer;
-    color: @color-link;
+    color: @v4primary;
     &:hover {
         background: #000;
         background-color: #f2f6fc;

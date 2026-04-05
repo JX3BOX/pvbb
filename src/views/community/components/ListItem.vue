@@ -327,7 +327,7 @@ export default {
     background-color: #fff;
 
     &:hover {
-        border: 1px solid @color-link !important;
+        border: 1px solid @v4primary !important;
     }
 
     .u-post {

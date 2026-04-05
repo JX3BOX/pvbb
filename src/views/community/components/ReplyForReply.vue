@@ -139,7 +139,7 @@ export default {
     }
 
     .u-link {
-        color: @primary;
+        color: @v4primary;
     }
 }
 .m-comment-mask {

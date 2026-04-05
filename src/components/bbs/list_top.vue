@@ -182,7 +182,7 @@ export default {
         .pointer;
 
         &.active {
-            background-color: @color-link;
+            background-color: @v4primary;
             color: #fff;
             cursor: default;
         }

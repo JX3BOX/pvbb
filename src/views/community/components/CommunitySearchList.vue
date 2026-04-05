@@ -143,7 +143,7 @@ export default {
 // --item
 .m-post {
     a {
-        color: @color-link;
+        color: @v4primary;
     }
     .u-list {
         padding: 0;
@@ -169,7 +169,7 @@ export default {
             color: @pink;
         }
         &:hover .u-text {
-            box-shadow: 0 1px 0 @color-link;
+            box-shadow: 0 1px 0 @v4primary;
         }
     }
     .u-link {
