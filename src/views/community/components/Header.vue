@@ -109,7 +109,7 @@ export default {
         window.addEventListener("resize", this.handleResize);
         this.handleResize();
     },
-    beforeDestroy() {
+    beforeUnmount() {
         window.removeEventListener("resize", this.handleResize);
     },
     watch: {

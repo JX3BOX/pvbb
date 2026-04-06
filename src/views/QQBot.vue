@@ -11,6 +11,7 @@ import { defineAsyncComponent } from "vue";
 const componentMap = {
     "pvp": defineAsyncComponent(() => import("@/views/qqbot/Pvp.vue")),
     "baizhan": defineAsyncComponent(() => import("@/views/qqbot/Pve.vue")),
+    "pvx": defineAsyncComponent(() => import("@/views/qqbot/Pvx.vue")),
 }
 export default {
     name: "QQBot",

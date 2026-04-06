@@ -155,6 +155,12 @@ const routes = [
         meta: { title: "指令手册" },
     },
     {
+        name: "qqbot-pvx",
+        path: "/qqbot/pvx",
+        component: () => import("@/views/qqbot/Pvx.vue"),
+        meta: { title: "PVX" },
+    },
+    {
         name: "bind",
         path: "/qqbot/bind",
         component: () => import("@/views/qqbot/Bind.vue"),
