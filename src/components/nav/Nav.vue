@@ -1,8 +1,6 @@
 <template>
-    <div>
-        <list-nav v-if="mode == 'list'" class="m-nav" />
-        <single-nav v-if="mode == 'single'" />
-    </div>
+    <list-nav v-if="mode == 'list'" class="m-nav" />
+    <single-nav v-if="mode == 'single'" />
 </template>
 
 <script>

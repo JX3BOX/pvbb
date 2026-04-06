@@ -1,0 +1,343 @@
+
+body {
+    padding: 0;
+}
+.p-qqrobot-pvp-detail {
+    position: relative;
+    width: 560px;
+    background-color: #000;
+    box-sizing: border-box;
+    .m-pvp__item {
+        margin-top: 26px;
+    }
+    .m-pvp__content {
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        border-radius: 8px;
+        background: linear-gradient(to top, #2e2f52 0%, #000000 100%);
+
+        border: 1px solid #6e6e6e;
+
+        box-shadow: inset 0px 5px 5px #000000;
+        text-shadow: none !important;
+        font-size: 10px;
+        &.is-normal {
+            background: linear-gradient(to top, rgba(56, 56, 56, 1) 0%, rgba(0, 0, 0, 1) 100%);
+        }
+    }
+    .m-pvp__container {
+        margin: 0 auto;
+        width: 560px;
+        height: 100%;
+        overflow: hidden;
+        .r(12px);
+        padding: 10px;
+        box-sizing: border-box;
+        color: rgba(#ffffff, 0.75);
+        border: 0.5px solid transparent;
+        background-clip: padding-box, border-box;
+        background-origin: padding-box, border-box;
+        background-image: linear-gradient(to top, rgba(64, 64, 64, 1), rgba(87, 87, 87, 1)),
+            linear-gradient(to top, #000, rgba(255, 255, 255, 0.75));
+
+        overflow-y: auto;
+        .c-wiki-panel {
+            margin-top: 12px !important;
+        }
+        .m-wiki-post-panel {
+            margin-top: 0 !important;
+            .r(8px);
+            overflow: hidden;
+            .c-wiki-panel {
+                margin-bottom: 0;
+            }
+            .m-panel-actions {
+                .none;
+            }
+        }
+    }
+
+    .m-wiki-post-empty {
+        &.is-robot-empty {
+            width: 100%;
+            height: 42px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: linear-gradient(to top, #383838 0%, #000000 100%);
+
+            border: 1px solid #6e6e6e !important;
+
+            box-shadow: inset 0px 10px 5px #000000;
+            text-shadow: none !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+
+            color: rgba(#fff, 0.75) !important;
+            margin: 10px 0 !important;
+        }
+    }
+    .m-single-wrapper .m-wiki-post-panel > div {
+        margin-bottom: 0 !important;
+    }
+}
+
+.m-robot-pvp-single {
+    .m-robot__pvp-header {
+        opacity: 1;
+        border-radius: 8px;
+        background: #000000;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 12px;
+    }
+    .m-title {
+        .flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        // padding-top: 4px;
+    }
+    .u-info {
+        .flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .u-header-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #fff;
+        max-width: 350px;
+        .nobreak;
+    }
+    .u-tag {
+        border-radius: 3px;
+        padding: 4px;
+        background-color: #b82525;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        box-sizing: border-box;
+        height: 24px;
+        line-height: 16px;
+    }
+    .u-video {
+        .size(14px, 13px);
+    }
+    .u-zlp {
+        .size(67px, 24px);
+    }
+    .u-content {
+        font-size: 12px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 1px;
+        line-height: 18px;
+        margin-top: 8px;
+        margin-bottom: 20px;
+        .break(3);
+    }
+    .m-info {
+        .flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 16px;
+        color: #fff;
+        width: 100%;
+    }
+    .u-info {
+        .flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .u-avatar {
+        .size(16px);
+        .r(50%);
+    }
+    .u-info-tag {
+        height: 12px;
+        line-height: 12px;
+        border-radius: 2px;
+        padding: 0 4px;
+        font-size: 8px;
+        .bold;
+    }
+    .u-super {
+        background: #4080ff;
+    }
+    .u-level {
+        background: #ffa739;
+    }
+    .u-pro {
+        background: #6f42c1;
+    }
+    .u-pvp__title {
+        .flex;
+        align-items: center;
+        gap: 4px;
+        .u-icon {
+            .size(20px);
+        }
+        span {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+    }
+
+    .m-talent-box-qqrobot {
+        width: 100%;
+        .w-qixue-box {
+            .dbi;
+            width: 100%;
+            border: none;
+            box-shadow: none;
+            background-color: transparent;
+            padding: 0 22px 12px;
+            box-sizing: border-box;
+        }
+        .w-qixue-xf,
+        .w-qixue-obox {
+            .none;
+        }
+        .w-qixue-clist {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .w-qixue-clist-item {
+            .flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .w-qixue-box .w-qixue-clist-item {
+            padding: 0 6px;
+        }
+        .w-qixue-box .w-qixue-clist-item .u-title {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 4px;
+        }
+        .w-qixue-box .w-qixue-clist-item .u-pic:after {
+            .none;
+        }
+        .w-qixue-box img {
+            .size(40px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .w-qixue-box li,
+        .w-qixue-box .w-qixue-xf {
+            float: left;
+            margin-bottom: 0;
+        }
+
+        @media screen and (max-width: @notebook) {
+            .w-qixue-box {
+                .dbi;
+                margin-top: 0;
+            }
+            @media screen and (max-width: 1133px) {
+                .w-qixue-box li,
+                .w-qixue-box .w-qixue-xf {
+                    float: left;
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+    .m-desc {
+        .u-sub-title {
+            color: #61adff;
+            font-size: 14px;
+            font-weight: 700;
+            .lh(21px);
+            margin-bottom: 4px;
+        }
+        .u-desc {
+            font-size: 12px;
+            font-weight: 400;
+            .lh(17px);
+            color: rgba(255, 255, 255, 0.75);
+        }
+    }
+    .u-skills {
+        .flex;
+        gap: 17px;
+        flex-wrap: wrap;
+
+        .u-skill {
+            .pr;
+            .flex;
+            flex-direction: column;
+            align-items: center;
+            &:not(:last-of-type)::after {
+                content: "▲";
+                .pa;
+                right: -14px;
+                top: 24px;
+                transform: rotate(90deg);
+                color: #fff;
+            }
+            .u-skill-icon {
+                .size(40px);
+                .r(4px);
+            }
+            .u-gcd-icon {
+                .pa;
+                // 左上角
+                left: 7px;
+                top: 0;
+                background-color: #0366d6;
+                .size(12px);
+                .r(50%);
+                .db;
+
+                i {
+                    color: #fff;
+                    .fz(12px);
+                    .db;
+                }
+            }
+        }
+
+        .u-skill-name {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 4px;
+            width: 56px;
+            overflow: hidden;
+            text-overflow: clip;
+            white-space: pre-wrap;
+            text-align: center;
+        }
+    }
+
+    .m-skills {
+        .m-skill-item {
+            &:not(:last-of-type) {
+                margin-bottom: 10px;
+            }
+        }
+        .m-desc {
+            margin-top: 12px;
+        }
+        .u-sub-title {
+            color: #f0b801;
+        }
+    }
+}

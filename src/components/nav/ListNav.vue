@@ -1,34 +1,36 @@
 <template>
-    <div class="m-list-nav">
-        <Banner class="m-ladder-carousel"></Banner>
+    <div class="m-nav">
+        <Banner class="m-nav-banner"></Banner>
 
-        <div class="m-nav-app">
+        <div class="m-nav--links">
             <h5 class="u-title">茶馆矩阵</h5>
-            <a href="/community" :class="{ 'is-active': routeActive('community') }">
-                <img svg-inline class="u-app-icon" :src="getAppIcon('community')" alt="" />
-                <span>论坛</span>
-                <em>Community</em>
-            </a>
-            <a href="/joke" :class="{ 'is-active': routeActive('joke') }">
-                <img svg-inline class="u-app-icon" :src="getAppIcon('joke')" alt="" />
-                <span>骚话</span>
-                <em>Joke</em>
-            </a>
-            <a href="/emotion" :class="{ 'is-active': routeActive('emotion') }">
-                <img svg-inline class="u-app-icon" :src="getAppIcon('emotion')" alt="" />
-                <span>趣图</span>
-                <em>Emotion</em>
-            </a>
-            <a href="/collection" :class="{ 'is-active': routeActive('collection') }">
-                <img svg-inline class="u-app-icon" :src="getAppIcon('collection')" alt="" />
-                <span>小册</span>
-                <em>Collection</em>
-            </a>
-            <a href="/namespace" :class="{ 'is-active': routeActive('namespace') }">
-                <img svg-inline class="u-app-icon" :src="getAppIcon('namespace')" alt="" />
-                <span>铭牌</span>
-                <em>Namespace</em>
-            </a>
+            <div class="m-nav--links__list">
+                <a href="/community" :class="{ 'is-active': routeActive('community') }">
+                    <img svg-inline class="u-icon" :src="getAppIcon('community')" alt="" />
+                    <span>论坛</span>
+                    <em>Community</em>
+                </a>
+                <a href="/joke" :class="{ 'is-active': routeActive('joke') }">
+                    <img svg-inline class="u-icon" :src="getAppIcon('joke')" alt="" />
+                    <span>骚话</span>
+                    <em>Joke</em>
+                </a>
+                <a href="/emotion" :class="{ 'is-active': routeActive('emotion') }">
+                    <img svg-inline class="u-icon" :src="getAppIcon('emotion')" alt="" />
+                    <span>趣图</span>
+                    <em>Emotion</em>
+                </a>
+                <a href="/collection" :class="{ 'is-active': routeActive('collection') }">
+                    <img svg-inline class="u-icon" :src="getAppIcon('collection')" alt="" />
+                    <span>小册</span>
+                    <em>Collection</em>
+                </a>
+                <a href="/namespace" :class="{ 'is-active': routeActive('namespace') }">
+                    <img svg-inline class="u-icon" :src="getAppIcon('namespace')" alt="" />
+                    <span>铭牌</span>
+                    <em>Namespace</em>
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -153,5 +155,5 @@ export default {
 };
 </script>
 <style lang="less">
-@import "@/assets/css/community/nav.less";
+@import "@/assets/css/common/side_nav.less";
 </style>

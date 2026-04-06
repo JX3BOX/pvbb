@@ -1,5 +1,5 @@
 <template>
-    <div v-if="list.length" class="c-bbs-banner">
+    <div v-if="list.length" class="m-bbs-banner">
         <el-carousel class="m-carousel" autoplay indicator-position="none">
             <el-carousel-item v-for="(item, index) in list" :key="index">
                 <a class="u-link" :href="item.link">
@@ -46,12 +46,13 @@ export default {
 </script>
 
 <style lang="less">
-.c-bbs-banner {
+.m-bbs-banner {
     .mb(10px);
+    .r(5px);
     overflow: hidden;
     .m-carousel .el-carousel__container {
         box-sizing: border-box;
-        .size(100%, 300px);
+        .size(100%, 145px);
     }
     .u-cover {
         overflow: hidden;
@@ -61,11 +62,12 @@ export default {
         img {
             height: 100%;
             width: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
     }
     .el-image__inner {
         width: auto;
     }
 }
+
 </style>
