@@ -2,7 +2,7 @@
     <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
         <el-tab-pane label="全部内容" name="all">
             <template #label>
-                <img class="u-icon-img" src="@/assets/img/community/category/all.png" alt="" />
+                <img class="u-icon-img" src="@/assets/img/community/category/all.svg" alt="" />
                 <b>全部内容</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </template>
