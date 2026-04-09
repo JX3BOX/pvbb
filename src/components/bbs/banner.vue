@@ -48,21 +48,21 @@ export default {
 <style lang="less">
 .m-bbs-banner {
     .mb(10px);
-    .r(5px);
     overflow: hidden;
     .m-carousel .el-carousel__container {
         box-sizing: border-box;
-        .size(100%, 145px);
+        .size(100%, 150px);
     }
     .u-cover {
         overflow: hidden;
         width: 100%;
         text-align: center;
+        .r(5px);
 
         img {
             height: 100%;
             width: 100%;
-            object-fit: cover;
+            // object-fit: cover;
         }
     }
     .el-image__inner {

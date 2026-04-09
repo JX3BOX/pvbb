@@ -3,6 +3,9 @@ const webpack = require("webpack");
 const commonDomains = require("@jx3box/jx3box-common/data/jx3box.json");
 
 module.exports = {
+    productionSourceMap: false,
+    transpileDependencies: true,
+
     //❤️ define path for static files ~
     publicPath: process.env.NODE_ENV === "development" ? "/" : process.env.STATIC_PATH + "/" + process.env.APP_NAME,
 
@@ -97,11 +100,11 @@ module.exports = {
 function addStyleResource(rule) {
     var preload_styles = [];
     preload_styles.push(
+        path.resolve(__dirname, "./node_modules/csslab/base.less"),
         path.resolve(__dirname, "./node_modules/@jx3box/jx3box-common/css/var.less"),
         path.resolve(__dirname, "./node_modules/@jx3box/jx3box-common/css/mixin.less"),
         path.resolve(__dirname, "./src/assets/css/var.less"),
         path.resolve(__dirname, "./src/assets/css/mixin.less"),
-        path.resolve(__dirname, "./node_modules/csslab/base.less")
     );
     rule.use("style-resource").loader("style-resources-loader").options({
         patterns: preload_styles,

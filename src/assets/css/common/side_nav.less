@@ -85,7 +85,6 @@
 
 // 应用链接组
 .m-nav--links {
-
     .u-title {
         .side-nav-title;
     }
@@ -128,21 +127,19 @@
                 .size(12px);
             }
 
-            &:hover {
+            &:hover,&.on {
                 // background-color: #fff;
                 color: @v4primary;
                 svg {
                     fill: @v4primary;
                 }
+                font-weight: 600;
                 background-color: #f5f7fa;
                 border-color: @v4primary;
                 em {
                     color: @v4primary;
                 }
             }
-
-            // border-top:1px solid transparent;
-            // border-bottom:1px solid transparent;
 
             .u-mark {
                 color: #fff;
@@ -176,17 +173,6 @@
                 transform: scale(0.7);
                 transform-origin: right center;
             }
-        }
-        .router-link-exact-active,
-        .on {
-            background-color: #fff;
-            color: @v4primary;
-            svg {
-                fill: @v4primary;
-            }
-            .bold;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #eee;
         }
     }
 }

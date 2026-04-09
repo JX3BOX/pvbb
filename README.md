@@ -7,6 +7,8 @@
 -   emotion 趣图
 -   collection 小册
 -   namespace 铭牌
+-   qqbot QQ机器人
+-   team 团队平台
 
 ## QQBOT
 

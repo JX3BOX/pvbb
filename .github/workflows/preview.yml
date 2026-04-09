@@ -16,10 +16,12 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
 
+            ## TODO:下方修改1处
             - name: Install && Build
               run: |
                   npm install
-                  npm run preview
+                  npm run build:dev
+                  mv dist pvbb
 
             ## TODO:下方修改1处
             - name: GrayEnv
@@ -28,7 +30,7 @@ jobs:
                   host: ${{ secrets.HOST_NANJING2 }}
                   username: ${{ secrets.DEPLOY_USER }}
                   key: ${{ secrets.DEPLOY_KEY }}
-                  source: index/*
+                  source: pvbb/*
                   target: /www/wwwroot/jx3box/test
                   timeout: 600s
                   command_timeout: 600s
