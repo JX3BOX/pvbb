@@ -1,0 +1,109 @@
+import { getRoleGameAchievements, getAdventures, getAchievements } from "@/service/qqbot-pvx";
+
+const perfectAchievement = {
+    1: { hasClass: "sssh", zIndex: 1 },
+    90: { hasClass: "lnrh", zIndex: 2 },
+    135: { hasClass: "fgzm", zIndex: 3 },
+    111: { hasClass: "zhg", zIndex: 4 },
+    154: { hasClass: "gdsg", zIndex: 5 },
+    3: { hasClass: "yylj", zIndex: 6 },
+    21: { hasClass: "swbj", zIndex: 7 },
+    126: { hasClass: "swxf", zIndex: 8 },
+    88: { hasClass: "xxjt", zIndex: 9 },
+    142: { hasClass: "gsyj", zIndex: 10 },
+    136: { hasClass: "kwyh", zIndex: 11 },
+    106: { hasClass: "qqj", zIndex: 12 },
+    83: { hasClass: "zzwg", zIndex: 13 },
+    66: { hasClass: "jcs", zIndex: 14 },
+    2: { hasClass: "scqf", zIndex: 15 },
+    78: { hasClass: "tjh", zIndex: 16 },
+    121: { hasClass: "rjg", zIndex: 17 },
+    104: { hasClass: "wldg", zIndex: 18 },
+};
+
+function formatDateTime(dateTimeString) {
+    const dateTime = new Date(dateTimeString);
+    const year = dateTime.getFullYear();
+    const month = String(dateTime.getMonth() + 1).padStart(2, "0");
+    const date = String(dateTime.getDate()).padStart(2, "0");
+    const hours = String(dateTime.getHours()).padStart(2, "0");
+    const minutes = String(dateTime.getMinutes()).padStart(2, "0");
+    const seconds = String(dateTime.getSeconds()).padStart(2, "0");
+    return `${year}年${month}月${date}日 ${hours}:${minutes}:${seconds}`;
+}
+
+export default function getTreasureData(userJx3Id) {
+    const client = location.href.includes("origin") ? "origin" : "std";
+    return new Promise((resolve, reject) => {
+        const returnData = {
+            pet: [],
+            normal: [],
+            perfect: [],
+        };
+
+        Promise.all([getRoleGameAchievements(userJx3Id), getAchievements(client)])
+            .then(([res, mapRule]) => {
+                const achievements = res?.data?.data?.achievements || "";
+                let list = achievements.split(",");
+                const newList = [];
+                (mapRule?.data || []).forEach((item) => {
+                    if (list.includes(String(item.achievement_id))) {
+                        newList.push(item.adventure_id);
+                    }
+                });
+                list = newList;
+
+                if (res?.data?.data?.updated_at) {
+                    returnData.updated_at = formatDateTime(res.data.data.updated_at);
+                } else {
+                    returnData.updated_at = "暂无记录";
+                }
+
+                const adventureTypes = ["pet", "normal", "perfect"];
+                const adventurePromises = adventureTypes.map((type) => {
+                    return getAdventures({ type, _no_page: 1 }, client).then((adventureRes) => {
+                        const achievementsList = [];
+                        let actNum = 0;
+                        let unNum = 0;
+
+                        (adventureRes?.data?.list || []).forEach((item) => {
+                            if (type === "perfect") {
+                                try {
+                                    item.isAct = false;
+                                    if (list.includes(item.dwID)) {
+                                        item.isAct = true;
+                                        actNum++;
+                                    }
+                                    achievementsList.push({
+                                        ...item,
+                                        ...perfectAchievement[item.dwID],
+                                    });
+                                } catch (error) {
+                                    unNum++;
+                                }
+                            } else if (list.includes(item.dwID)) {
+                                achievementsList.push(item);
+                                actNum++;
+                            }
+                        });
+
+                        returnData[`${type}AllNum`] = (adventureRes?.data?.list?.length || 0) - unNum;
+                        returnData[`${type}NowNum`] = actNum;
+                        returnData[type] = achievementsList;
+                    });
+                });
+
+                return Promise.all(adventurePromises);
+            })
+            .then(() => {
+                returnData.progress =
+                    (returnData.petNowNum + returnData.normalNowNum + returnData.perfectNowNum) /
+                    (returnData.petAllNum + returnData.normalAllNum + returnData.perfectAllNum);
+                returnData.progress = (returnData.progress * 100).toFixed(2);
+                resolve(returnData);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
