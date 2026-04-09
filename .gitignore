@@ -1,5 +1,6 @@
 .DS_Store
 .playwright-cli
+.claude
 
 node_modules
 /dist
