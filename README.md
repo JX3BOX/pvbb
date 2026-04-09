@@ -20,3 +20,10 @@ http://localhost:12028/qqbot/pvx?type=reputation&id=264
 http://localhost:12028/qqbot/pvx?type=book&id=48_3
 http://localhost:12028/qqbot/pvx?type=treasure&mode=portrait
 http://localhost:12028/qqbot/pvx?type=treasure&mode=landscape
+
+
+### wiki
+http://localhost:12028/qqbot/wiki?type=cj&id=2041
+http://localhost:12028/qqbot/wiki?type=knowledge&id=1
+http://localhost:12028/qqbot/wiki?type=quest&id=10660
+http://localhost:12028/qqbot/wiki?type=item&id=74862

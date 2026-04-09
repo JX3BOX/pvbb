@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vue-cli-service:*)",
+      "Bash(curl -s \"http://localhost:12028/qqbot/wiki?type=cj&id=2041\")",
+      "Bash(curl -s \"http://localhost:12028/\")",
+      "Bash(curl -s \"http://localhost:12028/api/node/achievement/2041?client=std\")",
+      "Bash(curl -s \"https://node.jx3box.com/api/node/achievement/2041?client=std\")",
+      "Bash(curl -s \"https://cms.jx3box.com/api/cms/wiki/post/type/achievement/source/2041?client=std\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('keys:', list\\(d.get\\('data',{}\\).keys\\(\\)\\)\\); print\\('users:', d.get\\('data',{}\\).get\\('users'\\)\\); print\\('source keys:', list\\(\\(d.get\\('data',{}\\).get\\('source'\\) or {}\\).keys\\(\\)\\) if d.get\\('data',{}\\).get\\('source'\\) else 'no source'\\); p=d.get\\('data',{}\\).get\\('post'\\) or {}; print\\('post keys:', list\\(p.keys\\(\\)\\)\\); print\\('updated:', p.get\\('updated'\\), p.get\\('post_modified'\\), p.get\\('post_date'\\)\\)\")",
+      "Bash(curl -s \"https://cms.jx3box.com/api/cms/wiki/post/type/achievement/source/2041?client=std\" -o /tmp/wiki_resp.json)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/tmp/wiki_resp.json'\\)\\); print\\('data keys:', list\\(d.get\\('data',{}\\).keys\\(\\)\\)\\); print\\(\\); print\\('post keys:', list\\(d.get\\('data',{}\\).get\\('post',{}\\).keys\\(\\)\\)\\); print\\(\\); print\\('users:', d.get\\('data',{}\\).get\\('users'\\)\\); print\\(\\); src=d.get\\('data',{}\\).get\\('source'\\); print\\('source:', type\\(src\\).__name__\\); print\\(json.dumps\\(src,ensure_ascii=False\\)[:500] if src else 'none'\\)\")",
+      "Bash(python -c \"import json; d=json.load\\(open\\('/tmp/wiki_resp.json'\\)\\); data=d.get\\('data',{}\\); print\\('data keys:', list\\(data.keys\\(\\)\\)\\); p=data.get\\('post'\\) or {}; print\\('post keys:', list\\(p.keys\\(\\)\\)\\); print\\('users:', data.get\\('users'\\)\\); s=data.get\\('source'\\); print\\('source type:', type\\(s\\).__name__\\)\")",
+      "Bash(node -e \"const d=require\\('/tmp/wiki_resp.json'\\); const data=d.data||{}; console.log\\('keys:', Object.keys\\(data\\)\\); const p=data.post||{}; console.log\\('post keys:', Object.keys\\(p\\)\\); console.log\\('users:', JSON.stringify\\(data.users\\)\\); console.log\\('source:', typeof data.source, data.source?Object.keys\\(data.source\\):'n/a'\\); console.log\\('updated/post_modified:', p.updated, p.post_modified, p.post_date\\);\")",
+      "Bash(node -e \"const d=require\\('./wiki_resp.json'\\); const data=d.data||{}; console.log\\('data keys:', Object.keys\\(data\\)\\); const p=data.post||{}; console.log\\('post keys:', Object.keys\\(p\\)\\); console.log\\('users:', JSON.stringify\\(data.users\\)\\); console.log\\('source keys:', data.source?Object.keys\\(data.source\\):'n/a'\\); console.log\\('post timestamps:', p.updated, p.post_modified, p.post_date\\);\")",
+      "Bash(grep -rn \"point.svg\\\\|point\\\\\\\\.4b7b724c\" \"d:/work/fuyan/jx3box/pvbb/tmp/\")",
+      "Bash(curl -s -o \"d:/work/fuyan/jx3box/pvbb/src/assets/img/cj/point.svg\" \"https://cdn.jx3box.com/static/wiki/img/point.svg\")",
+      "Bash(curl -s -o \"d:/work/fuyan/jx3box/pvbb/src/assets/img/cj/point.svg\" \"https://cdn.jx3box.com/static/wiki/img/point.4b7b724c.svg\")",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

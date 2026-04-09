@@ -161,6 +161,12 @@ const routes = [
         meta: { title: "PVX" },
     },
     {
+        name: "qqbot-wiki",
+        path: "/qqbot/wiki",
+        component: () => import("@/views/qqbot/Wiki.vue"),
+        meta: { title: "百科" },
+    },
+    {
         name: "bind",
         path: "/qqbot/bind",
         component: () => import("@/views/qqbot/Bind.vue"),
