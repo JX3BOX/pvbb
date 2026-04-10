@@ -2,6 +2,12 @@
     <div class="m-qqbot-wiki-item" v-loading="loading">
         <div class="m-item-detail" v-if="source && Object.keys(source).length">
             <div class="m-item-header">
+                <img
+                    v-if="source.IconID"
+                    class="u-item-icon"
+                    :src="iconLink(source.IconID, client)"
+                    :style="{ borderColor: item_color(source.Quality) }"
+                />
                 <div class="m-item-header__left">
                     <div class="u-top">
                         <div
@@ -9,10 +15,9 @@
                             :class="{ white: source.Quality == 1 }"
                             v-text="source.Name"
                             :style="{
-                                color: source.Quality ? item_color(source.Quality) : '#808080',
+                                color: item_color(source.Quality),
                             }"
                         ></div>
-                        <span class="u-id">(ID: {{ source.id }})</span>
                         <template v-if="source.MaxStrengthLevel">
                             <img
                                 src="@/assets/img/item/star.svg"
@@ -45,7 +50,8 @@
                 </div>
                 <img src="@/assets/img/item/item_robot.svg" class="u-item-img__right" />
             </div>
-            <div class="m-item-content">
+        </div>
+        <div class="m-item-content" v-if="source && Object.keys(source).length">
                 <div class="u-line">
                     <div v-if="source.Level" class="u-level u-yellow" v-text="'品质等级' + source.Level"></div>
                     <div
@@ -98,7 +104,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="m-spec-wrapper">
+                <div class="m-spec-wrapper" v-if="orange_std_attribute.length > 0 || orange_wujie_attribute.length > 0">
                     <div class="m-client-spec" v-if="orange_std_attribute.length > 0">
                         <div class="u-spec-attribute-title u-yellow">
                             <span>特殊属性效果 - <span class="u-client">旗舰</span></span>
@@ -161,7 +167,6 @@
                 </p>
 
                 <div class="m-attributes m-wucai-attributes" v-if="source.WuCaiHtml" v-html="source.WuCaiHtml"></div>
-            </div>
         </div>
 
         <div class="m-wiki-post-panel is-robot" v-if="wiki_post && wiki_post.post">
@@ -171,7 +176,28 @@
                     <span class="u-txt">物品攻略</span>
                 </div>
                 <div class="m-wiki-panel__body">
-                    <Article id="wikiArticle" :content="wiki_post.post.content" />
+                    <div class="m-wiki-metas">
+                        <div class="u-meta">
+                            <em class="u-label">参与贡献</em>
+                            <div class="u-avatars" v-if="users.length">
+                                <img
+                                    v-for="(user, index) in displayUsers"
+                                    :key="user.id || index"
+                                    class="u-avatar"
+                                    :src="showAvatar(user.avatar)"
+                                    :alt="user.nickname || ''"
+                                    @error.once="onAvatarError"
+                                />
+                                <span v-if="extraUsersCount > 0" class="u-extra">+{{ extraUsersCount }}人</span>
+                            </div>
+                            <span class="u-empty" v-else>暂无</span>
+                        </div>
+                        <div class="u-meta" v-if="updatedAt">
+                            <em class="u-label">更新时间</em>
+                            <span class="u-value">{{ updatedAt }}</span>
+                        </div>
+                    </div>
+                    <Article id="wikiArticle" :content="wiki_post.post.content" @contentRendered="onContentRendered" />
                 </div>
             </div>
         </div>
@@ -184,6 +210,7 @@
 </template>
 
 <script>
+import { showAvatar, ts2str, iconLink } from "@jx3box/jx3box-common/js/utils";
 import { wiki } from "@jx3box/jx3box-common/js/wiki";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import GameText from "@jx3box/jx3box-editor/src/GameText.vue";
@@ -192,14 +219,14 @@ import WikiRobotBottom from "./Bottom.vue";
 
 function item_color(quality) {
     const map = {
-        1: "#808080",
-        2: "#ffffff",
-        3: "#1eff00",
-        4: "#0070dd",
-        5: "#a335ee",
-        6: "#ff8000",
+        0: "rgb(167,167,167)",
+        1: "rgb(255,255,255)",
+        2: "rgb(0,210,75)",
+        3: "rgb(0,126,255)",
+        4: "rgb(254,45,254)",
+        5: "rgb(255,165,0)",
     };
-    return map[quality] || "#ffffff";
+    return map[quality] || "rgb(255,255,255)";
 }
 
 export default {
@@ -251,6 +278,26 @@ export default {
         orange_wujie_attribute() {
             return this.source?.attributes?.filter((item) => item.color == "orange" && item.is_mobile) || [];
         },
+        users() {
+            return this.wiki_post?.users || [];
+        },
+        displayUsers() {
+            return this.users.slice(0, 5);
+        },
+        extraUsersCount() {
+            return Math.max(this.users.length - this.displayUsers.length, 0);
+        },
+        updatedAt() {
+            const updated = this.wiki_post?.post?.updated || this.wiki_post?.post?.post_modified;
+            if (!updated) return "";
+            if (typeof updated === "number" || /^\d+$/.test(String(updated))) {
+                return ts2str(updated);
+            }
+            const dt = new Date(updated);
+            if (isNaN(dt.getTime())) return "";
+            const pad = (v) => (v < 10 ? "0" + v : v);
+            return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+        },
     },
     watch: {
         id: {
@@ -262,6 +309,13 @@ export default {
     },
     methods: {
         item_color,
+        iconLink,
+        showAvatar(url) {
+            return showAvatar(url, 36);
+        },
+        onAvatarError(e) {
+            e.target.src = showAvatar("", 36);
+        },
         setNotReady() {
             this.imagesLoaded = false;
             window.__READY__ = false;
@@ -299,6 +353,22 @@ export default {
                 setTimeout(() => this.setReady(), 5000);
             });
         },
+        neutralizeFoldBlocks(container) {
+            container.querySelectorAll(".e-summary").forEach((el) => {
+                const clone = el.cloneNode(true);
+                el.parentNode.replaceChild(clone, el);
+            });
+            container.querySelectorAll(".e-details").forEach((el) => {
+                el.style.display = "block";
+                el.style.height = "auto";
+                el.style.overflow = "visible";
+            });
+        },
+        onContentRendered() {
+            const container = document.getElementById("wikiArticle");
+            if (container) this.neutralizeFoldBlocks(container);
+            this.initImageLoader();
+        },
         async loadData() {
             this.setNotReady();
             this.loading = true;
@@ -311,6 +381,7 @@ export default {
                 this.wiki_post = {
                     post: mixRes?.post || null,
                     source: mixRes?.source || null,
+                    users: mixRes?.users || [],
                 };
                 if (this.source?.Name) {
                     document.title = this.source.Name + (this.$t ? this.$t("pages.common.appendTitle") : "");
@@ -320,7 +391,9 @@ export default {
                 this.wiki_post = null;
             } finally {
                 this.loading = false;
-                this.initImageLoader();
+                if (!this.wiki_post?.post) {
+                    this.setReady();
+                }
             }
         },
     },
@@ -344,8 +417,15 @@ export default {
         .m-item-header {
             .flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             .gap(8px);
+
+            .u-item-icon {
+                .size(48px);
+                border-radius: 4px;
+                border: 2px solid #808080;
+                flex: none;
+            }
 
             .m-item-header__left {
                 flex: 1;
@@ -390,9 +470,12 @@ export default {
                     }
                 }
 
-                .u-weapon-type-label,
-                .u-type-label {
+                .u-weapon-type-label {
                     color: #ffc300;
+                }
+
+                .u-type-label {
+                    color: rgba(255, 255, 255, 0.75);
                 }
 
                 .u-from {
@@ -405,10 +488,20 @@ export default {
             }
         }
 
-        .m-item-content {
-            margin-top: 10px;
-            font-size: 12px;
-            line-height: 18px;
+    }
+
+    .m-item-content {
+        margin-top: 10px;
+        width: 100%;
+        border-radius: 8px;
+        background: linear-gradient(to top, #383838 0%, #000000 100%);
+        border: 1px solid #6e6e6e;
+        box-shadow: inset 0px 10px 5px #000000;
+        padding: 12px;
+        box-sizing: border-box;
+        color: #fff;
+        font-size: 12px;
+        line-height: 18px;
 
             .u-line {
                 .flex;
@@ -483,52 +576,114 @@ export default {
                 }
             }
 
-            .u-desc {
-                margin-top: 8px;
-                font-style: italic;
-                color: rgba(255, 255, 255, 0.75);
-            }
+        .u-desc {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.75);
         }
     }
 
     .m-wiki-post-panel {
         margin-top: 10px;
         border-radius: 8px;
-        background: linear-gradient(to top, #383838 0%, #000000 100%);
-        border: 1px solid #6e6e6e;
-        box-shadow: inset 0px 10px 5px #000000;
-        padding: 12px;
+        background: #ffffff;
+        border: 1px solid #e4e4e4;
+        box-shadow: none;
+        padding: 14px 16px;
+        color: #333;
 
         .m-wiki-panel__head {
             .flex;
             align-items: center;
-            .gap(4px);
-            font-size: 16px;
-            color: #ffc300;
-            font-weight: 700;
-            margin-bottom: 8px;
+            .gap(6px);
+            line-height: 1.2;
 
             .u-icon {
-                .size(16px, auto);
+                .size(28px);
+                flex: none;
+                filter: brightness(0) saturate(100%) invert(32%) sepia(87%) saturate(3656%) hue-rotate(260deg)
+                    brightness(92%) contrast(97%);
+            }
+
+            .u-txt {
+                font-size: 18px;
+                font-weight: 400;
+                color: #222;
+            }
+        }
+
+        .m-wiki-metas {
+            .flex;
+            flex-direction: column;
+            .gap(6px);
+            margin-bottom: 10px;
+
+            .u-meta {
+                .flex;
+                align-items: center;
+                .gap(10px);
+                font-size: 13px;
+            }
+
+            .u-label {
+                flex: none;
+                width: 60px;
+                font-style: normal;
+                color: #999;
+                font-size: 12px;
+                background: #f5f5f5;
+                border-radius: 4px;
+                padding: 2px 6px;
+            }
+
+            .u-value {
+                color: #333;
+            }
+
+            .u-avatars {
+                .flex;
+                align-items: center;
+                .gap(4px);
+            }
+
+            .u-avatar {
+                .size(22px);
+                border-radius: 50%;
+                border: 1px solid #e4e4e4;
+                background-color: #f5f5f5;
+                object-fit: cover;
+            }
+
+            .u-extra {
+                margin-left: 4px;
+                color: #666;
+            }
+
+            .u-empty {
+                color: #999;
             }
         }
 
         .m-wiki-panel__body {
-            color: #fff;
-            font-size: 12px;
-            line-height: 18px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.7;
+
+            .c-article-tinymce {
+                .e-summary {
+                    pointer-events: none;
+                }
+
+                .e-details {
+                    display: block !important;
+                }
+            }
 
             img {
                 max-width: 100%;
                 height: auto !important;
-            }
-
-            p,
-            span,
-            a,
-            div {
-                color: #fff !important;
-                font-size: 12px !important;
             }
         }
     }
@@ -543,6 +698,8 @@ export default {
         box-shadow: inset 0px 10px 5px #000000;
         padding: 12px;
         color: rgba(255, 255, 255, 0.75);
+        font-size: 12px;
+        text-align: center;
     }
 }
 </style>

@@ -25,5 +25,6 @@ http://localhost:12028/qqbot/pvx?type=treasure&mode=landscape
 ### wiki
 http://localhost:12028/qqbot/wiki?type=cj&id=2041
 http://localhost:12028/qqbot/wiki?type=knowledge&id=1
-http://localhost:12028/qqbot/wiki?type=quest&id=10660
-http://localhost:12028/qqbot/wiki?type=item&id=74862
+http://localhost:12028/qqbot/wiki?type=quest&id=4981
+http://localhost:12028/qqbot/wiki?type=item&id=8_22537
+http://localhost:12028/qqbot/wiki?type=item&id=6_9981

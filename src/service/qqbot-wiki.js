@@ -1,6 +1,7 @@
 import { $node } from "@jx3box/jx3box-common/js/api";
 
 const $ = $node();
+const $mute = $node({ mute: true });
 
 // 获取单个成就
 export function get_achievement(achievement_id, params) {
@@ -15,5 +16,10 @@ export function get_quest(id, client = "std") {
     });
 }
 
-// 物品详情沿用 jx3box-editor 的封装
-export { get_item } from "@jx3box/jx3box-editor/src/service/item";
+// 获取单个物品（与 tmp item-icon 一致的接口）
+export function get_item(item_id, client = "std") {
+    if (!item_id) return;
+    return $mute.get(`api/node/item/${item_id}`, {
+        params: { client },
+    });
+}

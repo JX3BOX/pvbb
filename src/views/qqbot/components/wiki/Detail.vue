@@ -69,6 +69,8 @@ export default {
         box-shadow: inset 0px 10px 5px #000000;
         padding: 12px;
         color: rgba(#ffffff, 0.75);
+        font-size: 12px;
+        text-align: center;
     }
 }
 </style>
