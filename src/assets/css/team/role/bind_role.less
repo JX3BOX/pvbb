@@ -1,0 +1,84 @@
+.v-role-bind {
+
+    .u-tab-tip{
+        .fz(12px,2);
+        color:#c00;
+    }
+
+    .m-tutorial {
+        .x;
+        .u-title {
+            font-size: 14px;
+            // padding: 8px 10px;
+            // border-radius: 4px;
+            margin:0;
+        }
+        .u-demo {
+            // .size(520px);
+            height: auto;
+        }
+        background-color: #f5f7fa;
+        border:1px solid #eee;
+        padding:30px;
+        line-height:1.8;
+        p{margin:0 0 5px 0;}
+        max-width:1080px;
+        .auto(x);
+    }
+
+    .m-token{
+        .x;
+        .u-title{
+            margin:20px 0 30px;
+            .u-desc{
+                .fz(12px,2);
+                // color:#888;
+                color:#ff9a03;
+                font-weight:normal;
+                .db;
+            }
+        }
+        .u-token{
+            .fz(32px);
+            background-color:#e6f0fb;
+            border:1px solid @v4primary;
+            color:@v4primary;
+            padding:20px;
+            .r(4px);
+
+            i{
+                .fz(20px);
+                .y;
+            }
+            .pointer;
+        }
+        .mb(40px);
+    }
+
+    .m-custom-tip{
+        .x;
+        .mt(20px);
+        max-width:680px;
+        .auto(x);
+
+        .el-alert__icon{
+            font-size: 16px;
+            width: 16px;
+        }
+        .el-alert__description{
+            .mt(0);
+        }
+    }
+}
+
+@media screen and (max-width:@phone){
+    .v-role-bind{
+        .m-token .u-token{
+            .fz(12px);
+            i{.none;}
+        }
+        .m-tutorial{
+            .fz(12px);
+        }
+    }
+}

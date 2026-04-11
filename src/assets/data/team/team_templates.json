@@ -1,0 +1,27 @@
+[
+    { "key": "25std", "label": "5×5 队伍规格", "data": [], "count": 25, "row": 5, "col": 5 },
+    {
+        "key": "10std",
+        "label": "5×2 队伍规格",
+        "data": [],
+        "count": 10,
+        "row": 5,
+        "col": 2
+    },
+    {
+        "key": "15std",
+        "label": "5×3 队伍规格",
+        "data": [],
+        "count": 10,
+        "row": 5,
+        "col": 3
+    },
+    {
+        "key": "custom",
+        "label": "自定义规格",
+        "data": [],
+        "count": "",
+        "row": 5,
+        "col": 5
+    }
+]

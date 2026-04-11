@@ -1,0 +1,220 @@
+.m-main {
+    padding: 20px 25px;
+}
+.m-create-team {
+    margin-top: 64px;
+}
+@media screen and (max-width: @ipad) {
+    .m-main {
+        padding: 10px 20px;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-main {
+        padding: 10px 15px;
+    }
+
+    .wechat-miniprogram {
+        .c-breadcrumb {
+            position: sticky;
+            top: 0;
+        }
+
+        .c-main {
+            margin-top: 0;
+        }
+
+        .c-sidebar-left,
+        .c-sidebar-right {
+            top: 48px;
+        }
+
+        #tab-comment {
+            .none;
+        }
+    }
+}
+
+.el-tabs--card {
+    .el-tabs__item {
+        background-color: @bg-light;
+        border-bottom: 1px solid @border !important;
+        outline: none !important;
+
+        &.is-active {
+            border-bottom: none !important;
+            background-color: #fff;
+            .bold;
+        }
+    }
+}
+.m-raid-card-tabs {
+    .u-org-logo {
+        .size(24px);
+        .y;
+        .mr(5px);
+        .r(2px);
+    }
+}
+
+// 为空
+.m-archive-null {
+    margin-top: 10px;
+}
+
+// 加载更多
+.m-archive-more {
+    .mb(10px);
+    .w(100%);
+    .none;
+}
+.m-archive-more.show {
+    .db;
+}
+
+// 分页
+.m-archive-pages {
+    overflow-x: auto;
+}
+
+.m-title {
+    .fz(2em);
+    margin: 0;
+    font-weight: 300;
+    border-bottom: 1px solid @border;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+
+    i {
+        .y(-1px);
+    }
+    .u-txt {
+        .ml(10px);
+        .mr(10px);
+    }
+
+    .pr;
+    .u-op {
+        .pa;
+        .rt(0);
+    }
+
+    .u-help {
+        .fz(13px);
+        font-weight: normal;
+        .mr(20px);
+        color: @v4primary;
+        i {
+            .fz(16px);
+        }
+
+        &:hover {
+            color: @pink;
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-title {
+        .fz(1rem);
+        & > i {
+            .fz(1rem);
+        }
+        .u-txt {
+            .fz(1rem);
+        }
+        .u-op {
+            .ps;
+            .mt(10px);
+        }
+        padding: 10px 0;
+    }
+    .u-help {
+        display: none;
+    }
+}
+
+.m-side-title {
+    margin: 0 0 10px 0;
+    padding: 0 15px 10px 15px;
+    font-size: 16px;
+    border-bottom: 1px solid #ddd;
+    .db;
+    .bold;
+    a {
+        color: @color;
+    }
+    svg {
+        .size(18px);
+        .y(-3px);
+        fill: #333;
+        .mr(5px);
+    }
+    &:hover {
+        a {
+            color: @v4primary;
+        }
+        svg {
+            fill: @v4primary;
+        }
+    }
+    .pr;
+    .u-switch {
+        .pa;
+        .rt(0, -3px);
+    }
+}
+
+.m-team-limit {
+    .x;
+    max-width: 520px;
+    .auto(x);
+    .mt(40px);
+    // border:1px solid #eee;
+    padding: 50px 20px 60px 20px;
+    // background-color:#f5f7fa;
+
+    .u-title {
+        .fz(32px);
+    }
+    .u-icon {
+        .size(60px);
+        .y;
+    }
+    .u-buy {
+        .mt(20px);
+    }
+    p,
+    div {
+        a:hover {
+            box-shadow: 0 1px 0 @v4primary;
+        }
+    }
+}
+
+// 团队选择
+.m-select-org-options {
+    .u-org-logo {
+        // .fl;
+        .size(28px);
+        .y;
+        .mr(5px);
+    }
+    .u-org-name {
+        .fz(14px);
+    }
+}
+
+// 模拟系统对话框
+.el-dialog {
+    max-width: 1000px;
+}
+@media screen and (max-width: @phone) {
+    .el-message-box {
+        .w(100%);
+    }
+    .el-dialog {
+        .size(100%) !important;
+        margin: 0 !important;
+        overflow: scroll;
+    }
+}

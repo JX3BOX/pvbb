@@ -1,0 +1,134 @@
+.v-raid-view {
+    .m-title {
+        .u-delete {
+            margin: 0 10px;
+        }
+    }
+}
+.m-raid-view-header {
+    .u-title a {
+        .fz(1.6rem);
+        color: @color;
+        &:hover {
+            color: @v4primary;
+        }
+    }
+    background-color: #fafbfc;
+    border: 1px dashed #eee;
+    padding: 10px;
+    .r(4px);
+}
+
+.m-raid-view-meta {
+    padding: 0 2px;
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    // background-color:#fafbfc;
+    // border:1px dashed #eee;
+    // padding:10px;
+    .r(4px);
+    .mt(10px);
+    .fz(13px, 2);
+    // border:1px solid #eee;
+
+    li {
+        .mb(5px);
+    }
+
+    em {
+        background-color: #f0f9eb;
+        border: 1px solid #e1f3d8;
+        color: #67c23a;
+        font-style: normal;
+        padding: 2px 5px;
+        .r(2px);
+        .mr(10px);
+        letter-spacing: 1px;
+    }
+    .u-time,
+    .u-leader {
+        color: #fba524;
+        .bold;
+    }
+}
+
+.m-raid-view-info {
+    padding: 0 2px;
+    margin-bottom: 12px;
+    .u-title {
+        .fz(14px);
+    }
+    .u-desc {
+        color: #888;
+        .fz(13px, 2);
+        letter-spacing: 1px;
+        white-space: pre-line;
+    }
+}
+
+.m-raid-lackmount {
+    .mb(12px);
+    .u-title {
+        .fz(14px);
+    }
+    .u-list {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: #888;
+    }
+    .u-item {
+        display: flex;
+        align-items: center;
+        .mb(6px);
+        .mr(20px);
+    }
+    .u-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 4px;
+    }
+}
+
+.m-raid-view-join {
+    .x;
+
+    .u-tip {
+        .fz(13px, 3);
+        color: #67c23a;
+
+        &.isError {
+            color: #fc3c3c;
+            .bold;
+        }
+    }
+}
+
+.m-raid-normalbox {
+    .u-mount-group {
+        .ml(20px);
+
+        .u-item {
+            .ml(6px);
+            .pr;
+
+            &:not(:last-child) {
+                .mr(12px);
+                &::after {
+                    content: '';
+                    .pa;
+                    width: 1px;
+                    height: 14px;
+                    background-color: #888;
+                    top: 1px;
+                    right: -10px;
+                }
+            }
+        }
+    }
+}

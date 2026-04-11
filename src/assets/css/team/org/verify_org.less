@@ -1,0 +1,74 @@
+.c-sidebar-right-msg {
+    .u-icon {
+        .none;
+    }
+}
+
+.m-org-verify-ac {
+    background-color: @bg-light;
+}
+.m-org-verify-info {
+    h3 {
+        .color(#333);
+    }
+    p {
+        .color(#666);
+    }
+}
+
+// 局部恢复 h3/p 的浏览器默认排版，避免被全局 reset 抹平
+@supports (all: revert) {
+    .v-org-verify .m-org-verify-info h3,
+    .v-org-verify .m-org-verify-info p {
+        all: revert;
+    }
+}
+
+.v-org-verify .m-org-verify-info h3 {
+    display: block;
+    margin: 1em 0;
+    font-size: 1.17em;
+    font-weight: bold;
+    line-height: normal;
+    .color(#333);
+}
+
+.v-org-verify .m-org-verify-info p {
+    display: block;
+    margin: 1em 0;
+    line-height: normal;
+    .color(#666);
+}
+.m-org-verify-alert .u-org-verify-alert-a {
+    .color(#49c10f);
+}
+.m-org-verify-alert {
+    i {
+        .fz(16px) !important;
+        .w(16px) !important;
+    }
+    .el-alert .el-alert__description {
+        .mt(0);
+    }
+}
+
+.m-verify-logs {
+    margin: 0 15px;
+    .u-title {
+        .fz(14px);
+        background-color: @bg-light;
+        padding: 5px 10px;
+        margin: 24px 0;
+    }
+    .u-list {
+        .fz(13px);
+        border-collapse: collapse;
+        .w(100%);
+    }
+    td,
+    th {
+        border-bottom: 1px solid #eee;
+        padding: 8px 5px;
+        .x;
+    }
+}

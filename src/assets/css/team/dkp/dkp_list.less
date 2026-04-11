@@ -1,0 +1,40 @@
+.m-dkp-table {
+    .mb(10px);
+
+    .u-character-logo {
+        .size(28px, 28px);
+    }
+    .u-user-name {
+        &:hover {
+            color: @pink;
+        }
+    }
+    .u-user-avatar{
+        .size(24px);
+        .y;
+        .mr(3px);
+        .r(2px);
+    }
+
+    .u-role-list{
+        display: flex;
+        align-items: center;
+        a{
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    :deep(.el-table__header-wrapper .el-checkbox__input::after) {
+        content: '全选';
+        position: absolute;
+        margin-left: 5px;
+        color:#909399;
+        .fz(12px);
+        .bold;
+    }
+}
+
+.m-dkp-list-footer{
+    .mt(15px);
+}

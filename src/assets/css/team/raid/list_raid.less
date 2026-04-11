@@ -1,0 +1,265 @@
+.m-raid-table {
+    .fz(13px, 20px);
+    overflow-x: auto;
+
+    table {
+        border-collapse: collapse;
+        .w(100%);
+    }
+
+    td,
+    th {
+        border: 1px solid #eee;
+        padding: 8px 10px;
+    }
+
+    th {
+        background-color: @bg-light;
+        .x;
+    }
+
+    .u-placeholder {
+        .none;
+    }
+
+    .u-name,
+    .u-count,
+    .u-op,
+    .u-team,
+    .u-time,
+    .u-date {
+        .x;
+    }
+    .u-t,
+    .u-leader {
+        .x;
+    }
+    .u-t {
+        white-space: nowrap;
+    }
+
+    .u-item {
+        &:hover {
+            background-color: #f2f6fc;
+        }
+    }
+
+    .u-server {
+        .x;
+    }
+
+    .u-team {
+        img {
+            .y;
+            .r(2px);
+        }
+    }
+
+    .u-blue {
+        background-color: #ecf5ff;
+        border: 1px solid #d9ecff;
+        color: #409eff;
+    }
+    .u-date,
+    .u-time {
+        padding: 2px 5px;
+        .r(2px);
+        letter-spacing: 1px;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+    }
+    .u-week {
+        .ml(5px);
+        letter-spacing: 2px;
+    }
+
+    .u-green {
+        background-color: #f0f9eb;
+        border: 1px solid #e1f3d8;
+        color: #67c23a;
+    }
+
+    .u-title {
+        .db;
+        .bold;
+        &:hover {
+            color: #f00;
+        }
+    }
+
+    .u-tip {
+        .x;
+        .fz(12px);
+        color: #999;
+        margin: 20px auto;
+    }
+
+    b.rich {
+        color: #49c10f;
+    }
+    b.full {
+        color: #f00;
+    }
+    b.warning {
+        color: #fd8218;
+    }
+
+    .u-team {
+        a {
+            .underline(@v4primary);
+        }
+    }
+
+    .u-t,
+    .u-name {
+        .pr;
+    }
+    .u-today {
+        background-color: #fc3c3c;
+        border: 1px solid #c00;
+        border-top: none;
+        border-right: none;
+        color: #fff;
+        padding: 2px 5px;
+        .pa;
+        .rt(0);
+        .fz(12px, 14px);
+    }
+}
+
+.m-raid-filter {
+    .u-custom-name {
+        // .fl;
+        .w(auto);
+        .mr(10px);
+    }
+    .u-week {
+        .fz(12px);
+        color: #aaa;
+        .ml(3px);
+    }
+    .u-sp {
+        color: #49c10f;
+    }
+    border-bottom: 1px solid @border-hr;
+    .mb(20px);
+
+    .el-form-item {
+        .mb(10px);
+    }
+
+    // .u-radio{
+    //     .mr(5px);
+    // }
+    .u-label {
+        .bold;
+        i {
+            .fz(16px);
+            .mr(5px);
+        }
+    }
+    .el-radio {
+        color: @color;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-raid-filter {
+        .el-form-item__content {
+            .el-radio {
+                .dbi;
+                .y(top);
+            }
+            white-space: nowrap;
+            overflow-x: auto;
+
+            .el-select {
+                .db;
+                .w(100%);
+            }
+        }
+    }
+}
+
+.m-raid-pages {
+    .x;
+    .mt(20px);
+}
+
+.m-raid-index {
+    .m-raid-table .u-title {
+        .bold;
+        .fz(13px);
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-raid-table {
+        thead {
+            .none;
+        }
+        table,
+        tr,
+        th,
+        td,
+        tbody {
+            .db;
+        }
+        th,
+        td {
+            border: none;
+            .x(left) !important;
+            padding: 0;
+        }
+        td {
+            .mb(5px);
+            .nobreak;
+        }
+        tr {
+            border: 1px solid @border-hr;
+            .mb(20px);
+            .r(3px);
+            background-color: @bg-light;
+            padding: 10px;
+        }
+        .u-placeholder {
+            display: inline;
+            font-style: normal;
+            padding: 2px 10px;
+            background-color: #e6f0fb;
+            .mr(10px);
+        }
+        .u-title {
+            display: inline;
+        }
+        .u-op {
+            .x(right) !important;
+        }
+
+        .u-item {
+            .pr;
+            padding-top: 50px;
+            background-color: #fff;
+        }
+        .u-sp {
+            .pa;
+            .lt(0);
+            em {
+                .none;
+            }
+            padding: 10px;
+            background-color: rgb(246, 248, 250);
+            color: black;
+            border-bottom-right-radius: 4px;
+            width: calc(100% - 20px);
+            border-bottom: 1px solid #e4e7ed;
+            font-weight: bold;
+            .nobreak;
+        }
+    }
+}
+
+.m-raid-myteam-tip {
+    .x;
+    .fz(12px, 2);
+    color: #888;
+    padding: 20px 0;
+}

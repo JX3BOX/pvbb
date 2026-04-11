@@ -1,0 +1,81 @@
+.m-raid-joinpop {
+    .u-list {
+        .mb(0);
+    }
+    .el-dialog {
+        max-height: 640px;
+        min-height: 300px;
+        // height: auto;
+    }
+}
+
+.m-raid-joinpop-box {
+    .mt(20px);
+}
+
+
+.m-team-joinpop-block {
+    .mb(5px);
+    .u-label {
+        margin: 0;
+        .bold;
+        // color: #fba524;
+        // color:@v4primary;
+        .fz(13px,2.6);
+        b{
+            color:#c00;
+            .fz(12px);
+        }
+    }
+
+    &.isFirstBlock {
+        .mt(10px);
+    }
+
+    .m-team-xf {
+        .u-pic {
+            .db;
+            .size(32px);
+            background-color: @bg-black;
+            .r(4px);
+            transition: 0.1s ease-in;
+            .tm(0.4);
+            box-sizing: border-box;
+
+            &:hover {
+                .tm(1)
+            }
+        }
+        .u-txt {
+            .db;
+            .x;
+            .fz(12px, 2);
+            white-space: nowrap;
+            overflow: hidden;
+            .w(32px);
+        }
+
+        .el-radio {
+            .ml(0);
+            .mr(15px);
+        }
+        .el-radio__input {
+            .none;
+        }
+        .el-radio__label {
+            .db;
+            padding-left: 0;
+        }
+
+        .is-checked {
+            .u-pic {
+                border: 3px solid @v4primary;
+                // filter: saturate(120%)  brightness(120%);
+                .tm(1);
+            }
+            .u-txt {
+                .bold;
+            }
+        }
+    }
+}

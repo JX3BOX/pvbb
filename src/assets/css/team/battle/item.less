@@ -1,0 +1,149 @@
+.m-rank-top100-item {
+    background: linear-gradient(90deg, #3f586e 0%, #264259 50%);
+    .pr;
+    border-left: 4px solid #ffedc6;
+    border-bottom-right-radius: 20px;
+    @padding: 40px;
+    @logosize: 88px;
+    @leftspace: 40px + @logosize + 20px;
+    @logopadding: 5px;
+    padding: @padding;
+    padding-bottom: @padding - 10px;
+    .pl(100px + @logosize + @logopadding*2);
+
+    &:hover {
+        background: linear-gradient(90deg, rgba(38, 66, 89, 1) 0%, rgba(63, 88, 110, 1) 50%);
+    }
+
+    .u-logo {
+        .db;
+
+        .el-image {
+            .db;
+            .size(120px);
+            img {
+                .size(100%);
+                .db;
+            }
+        }
+
+        .pa;
+        .lt(38px, 80px);
+    }
+
+    .u-title {
+        .db;
+        i {
+            color: #eee;
+            .mr(5px);
+        }
+        .mb(6px);
+    }
+
+    .u-teamname {
+        .nobreak;
+        .mr(5px);
+        color: #ffedc6;
+        .fz(24px, 24px);
+        .bold;
+
+        &:hover {
+            // color: #f39;
+            // i {
+            //     color: #f39;
+            // }
+        }
+
+        &.u-teamname-null {
+            color: #aaa;
+            &:hover {
+                color: #aaa;
+            }
+        }
+    }
+
+    .u-server {
+        &:before {
+            content: "@";
+        }
+        color: #fff;
+        font-weight: bold;
+        .fz(12px);
+    }
+
+    .u-verified,
+    .u-not-verified {
+        .fz(16px, 40px);
+        .ml(5px);
+        .mr(3px);
+        .fz(14px);
+    }
+    .u-verified {
+        color: #7ecb83;
+    }
+    .u-not-verified {
+        color: #d04949;
+    }
+
+    .u-time {
+        .pa;
+        .rt(40px);
+        font-size: 12px;
+        cursor: default;
+
+        .u-time-finish {
+            color: rgba(255, 255, 255, 0.5);
+            display: block;
+        }
+        .u-time-fight {
+            color: white;
+        }
+    }
+
+    .u-time-fight {
+        .x(right);
+        b {
+            color: #ffedc6;
+            .fz(20px);
+        }
+    }
+
+    .u-teammates {
+        .clearfix;
+        .mt(10px);
+    }
+
+    .u-leader {
+        .bold;
+        .fz(14px, 24px);
+        color: #fff;
+        .u-username {
+            .y(top);
+            white-space: visible;
+            .w(auto);
+        }
+    }
+    .u-mount {
+        .size(24px);
+        .y(top);
+        .mr(2px);
+    }
+
+    .u-member {
+        .fz(12px);
+        .mb(5px);
+
+        &-content {
+            .flex;
+            align-items: center;
+        }
+    }
+
+    .u-username {
+        .nobreak;
+        color: #fff;
+        width: 97px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+}

@@ -1,0 +1,104 @@
+.m-team-list {
+    .u-team {
+        padding: 10px;
+        border: 1px solid #eee;
+        .r(3px);
+        background-color: #fafbfc;
+        .clearfix;
+        .mb(15px);
+
+        &:hover,
+        &.my {
+            background-color: #ebf7fd;
+        }
+        .pr;
+    }
+    .u-team-logo {
+        .size(68px);
+        .fl;
+        .mr(10px);
+    }
+    .u-team-name {
+        .fz(15px);
+        .bold;
+        color: @v4primary;
+        .flex;
+        align-items: center;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .u-team-status {
+        .fz(12px);
+        font-style: normal;
+        font-weight: normal;
+        // background-color:#49c10f;
+        // color:#fff;
+        padding: 2px 5px;
+        color: #00d26f;
+        svg {
+            .size(16px);
+            .y(-3px);
+            .mr(3px);
+        }
+    }
+    .u-team-info,
+    .u-team-setting {
+        .fz(12px);
+        margin: 8px 0;
+    }
+    .u-team-meta {
+        em {
+            margin-right: 5px;
+            background-color: #f2f6fc;
+            color: #637a9c;
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-style: normal;
+        }
+        .mr(10px);
+    }
+
+    .u-team-op {
+        .pa;
+        .rt(10px);
+    }
+
+    // .u-myroles{
+    //     border-top:1px solid #eee;
+    //     .mt(8px);
+    //     padding-top:8px;
+    // }
+    // .u-role{
+    //     border-bottom:1px dashed #eee;
+    //     .fz(13px,2.5);
+    // }
+}
+@media screen and (max-width: @phone) {
+    .m-team-list {
+        .u-team-setting {
+            .none;
+        }
+        .u-team-logo {
+            .size(48px);
+        }
+    }
+}
+
+.m-team-list-null {
+    .x;
+    .u-add-team {
+        .mt(20px);
+    }
+}
+
+.v-org-list {
+    .m-title {
+        .u-op {
+            .flex;
+            align-items: center;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+}

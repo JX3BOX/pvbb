@@ -1,0 +1,106 @@
+.m-events {
+    h3 {
+        margin: 0;
+        line-height: 52px;
+        letter-spacing: 6px;
+        border-bottom: 1px solid #dcdfe6;
+        user-select: none;
+    }
+    &-box {
+        padding: 20px 0;
+        .u-item {
+            .flex;
+            .pointer;
+            .r(4px);
+            .mb(20px);
+            padding: 10px;
+            box-sizing: border-box;
+            //color: @v4primary;
+            background-color: #fff;
+            border: 1px solid #ebeef5;
+            transition: all 0.2s ease-in-out;
+            &:hover {
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            img {
+                .size(280px,100px);
+                flex-shrink: 0;
+                border: 1px dashed #eee;
+            }
+            .u-info {
+                .flex;
+                flex: 1;
+                box-sizing: border-box;
+                margin-left: 10px;
+                justify-content: space-between;
+            }
+            .u-title {
+                .fz(16px,1.5);
+                .bold;
+                letter-spacing: 2px;
+            }
+            .u-time {
+                .fz(12px,2);
+                // color: #888;
+                // background-color:@bg-light;
+            }
+            .u-desc {
+                .fz(12px,2);
+                // .pt(5px);
+                .break(2);
+                color: #666;
+                .mt(4px);
+
+                p {
+                    margin: 0;
+                    line-height: 1.5;
+                    .break(2);
+                }
+            }
+            .u-txt,
+            .u-status {
+                .flex;
+                flex-direction: column;
+            }
+            .u-status {
+                .bold;
+                .fz(14px);
+                .ml(20px);
+                flex-shrink: 0;
+                align-items: flex-end;
+                justify-content: space-between;
+                .el-button {
+                    .w(100px);
+                }
+            }
+            .u-open {
+                color: #00c200;
+            }
+            .u-close {
+                color: #c8cdc8;
+            }
+        }
+    }
+}
+
+.m-events-null {
+    .mt(20px);
+}
+
+@media screen and (max-width: @phone) {
+    .m-events-box {
+        .u-item {
+            flex-direction: column;
+            img {
+                width: 100%;
+            }
+            .u-info {
+                .mt(20px);
+                flex-direction: column;
+                .u-status{
+                    .mt(20px);
+                }
+            }
+        }
+    }
+}

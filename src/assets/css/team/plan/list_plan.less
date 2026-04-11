@@ -1,0 +1,42 @@
+.m-select-org {
+  .ml(5px);
+}
+.m-list-box {
+  .mb(20px);
+  padding: 10px;
+  background: #fafaff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #eee;
+  .m-list-txt {
+    .title {
+      .fz(16px, 2);
+      .color(#222);
+    }
+    .time {
+      .fz(13px, 2);
+      .color(#777);
+    }
+  }
+}
+@media screen and (max-width: @phone) {
+  .m-list-box {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    .m-list-txt {
+      .w(100%);
+      .title {
+        .w(100%);
+        .db;
+        .nobreak;
+      }
+    }
+    .m-list-btn {
+      padding-top: 10px;
+      align-self: flex-end;
+    }
+  }
+}

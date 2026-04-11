@@ -1,0 +1,96 @@
+.u-battle-team {
+    .w(100%);
+    padding: 10px;
+    border: 1px solid #eee;
+    .r(3px);
+    background-color: #fafbfc;
+    .clearfix;
+    .mb(15px);
+
+    &:hover,
+    &.my {
+        background-color: #ebf7fd;
+    }
+    .pr;
+
+    .u-rank-tag {
+        line-height: 18px;
+        height: 20px;
+    }
+
+    .u-team-logo {
+        .size(68px);
+        .fl;
+        .mr(10px);
+        .r(2px);
+    }
+    .u-team-name {
+        .fz(15px);
+        .bold;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .u-team-status {
+        .fz(12px);
+        font-style: normal;
+        font-weight: normal;
+        // background-color:#49c10f;
+        // color:#fff;
+        padding: 2px 5px;
+        color: #00d26f;
+        svg {
+            .size(16px);
+            .y(-3px);
+            .mr(3px);
+        }
+    }
+    .u-team-info,
+    .u-team-setting {
+        .flex;
+        align-items: center;
+        .fz(12px);
+        margin: 8px 0;
+    }
+    .u-team-meta {
+        .flex;
+        align-items: center;
+        em {
+            margin-right: 5px;
+            background-color: #f2f6fc;
+            color: #637a9c;
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-style: normal;
+            line-height: 14px;
+        }
+        .mr(10px);
+        img {
+            vertical-align: bottom;
+        }
+    }
+
+    .u-link {
+        color: @v4primary;
+        &:hover {
+            color: #2d8cf0;
+        }
+    }
+
+    .u-team-op {
+        .pa;
+        top: 10px;
+        right: 30px;
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .u-battle-team {
+        .u-team-setting {
+            .none;
+        }
+        .u-team-logo {
+            .size(48px);
+        }
+    }
+}

@@ -6,17 +6,17 @@
             </el-button>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item v-if="hasPermission('update_post')" command="toggleAdminPanel" icon="el-icon-setting">
+                    <el-dropdown-item v-if="hasPermission('update_post')" command="toggleAdminPanel" icon="Setting">
                         <span>设置</span>
                     </el-dropdown-item>
                     <el-dropdown-item
                         v-if="hasPermission('create_system_message')"
                         command="directMessage"
-                        icon="el-icon-message"
+                        icon="Message"
                     >
                         <span>私信</span>
                     </el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-upload" command="designTask" v-if="hasPermission('push_banner')">
+                    <el-dropdown-item icon="Upload" command="designTask" v-if="hasPermission('push_banner')">
                         <span>推送</span>
                     </el-dropdown-item>
                 </el-dropdown-menu>

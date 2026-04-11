@@ -1,0 +1,92 @@
+.m-activity-item {
+    display: flex;
+    // align-items: center;
+    width: 100%;
+    gap: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    cursor: pointer;
+    &:hover {
+        background-color: @bg-light;
+    }
+
+    &:not(:last-of-type) {
+        // .mb(10px);
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .u-logo {
+        .db;
+        flex-shrink: 0;
+    }
+
+    .u-team-logo {
+        .size(70px);
+        .r(4px);
+        border: 1px solid #eee;
+    }
+
+    .u-content {
+        // flex: auto;
+        // display: flex;
+        // flex-direction: column;
+        // gap: 2px;
+        // padding:5px 0;
+        padding-left: 5px;
+    }
+
+    .u-title {
+        .bold;
+        color: @v4primary;
+        .fz(15px,1.2);
+        .mb(5px);
+    }
+
+    .u-info {
+        .fz(12px,1.8);
+        margin: 4px 0 3px 0;
+        letter-spacing: 1px;
+        // color:#666;
+        em {
+            margin-right: 5px;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-style: normal;
+            color: #777;
+        }
+    }
+
+    .u-server {
+        .mr(10px);
+    }
+
+    .u-desc {
+        .fz(12px);
+        color: #666;
+        .nobreak;
+    }
+
+    .pr;
+    .u-actions {
+        // display: flex;
+        // align-items: center;
+        .pa;
+        .rt(0, 10px);
+    }
+}
+@media screen and (max-width:@phone){
+    .m-activity-item{
+        .u-info{
+            display: flex;
+            flex-direction: column;
+        }
+        .u-server{
+            .mb(5px);
+            text-align: left;
+        }
+        .u-desc{
+            white-space: pre-wrap;
+        }
+    }
+}

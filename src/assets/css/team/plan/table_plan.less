@@ -1,0 +1,63 @@
+.planTable {
+  .color(#606266);
+  border: 1px solid #ddd;
+  border-bottom: 0;
+  .clip;
+  .fz(14px, 48px);
+  .mb(20px);
+  .m-title {
+    .fz(16px, 32px); 
+    padding:10px;
+    margin: 0;
+    background: #e6f0fb;
+    .x;
+  }
+  .m-label,
+  .m-line {
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+  }
+  .m-label {
+    background: #f5f7fa;
+    .m-col {
+      .x;
+    }
+  }
+
+  .m-col {
+    .x;
+    padding: 0 5px;
+    width: 10%;
+    min-width: 100px;
+    border-right: 1px solid #ddd;
+    &:last-child {
+      border-right: 0;
+    }
+  }
+  .m-txt {
+    width: 80%;
+    .nobreak;
+    .x(left);
+  }
+}
+@media screen and (max-width: @phone) {
+  .planTable {
+    .fz(13px);
+    .m-title {
+      padding: 10px 0;
+      .fz(14px, 2);
+      span {
+        .db;
+      }
+    }
+    .m-label,
+    .m-line {
+      padding: 0;
+      .m-col {
+        min-width: 80px;
+      }
+    }
+  }
+}

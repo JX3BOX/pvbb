@@ -1,0 +1,139 @@
+.m-team-info {
+    .clearfix;
+    .pr;
+    .u-logo {
+        .size(108px);
+        .fl;
+        .mr(20px);
+        img {
+            .db;
+            .size(100%);
+        }
+        .pr;
+    }
+    .u-title {
+        font-weight: 300;
+
+        margin: 0 0 10px 0;
+        .flex;
+        a {
+            color: @color;
+        }
+    }
+    .u-team-name {
+        font-size: 2em;
+    }
+    .u-icons {
+        align-self: center;
+    }
+    .u-id {
+        .fz(12px);
+        font-weight: normal;
+        font-style: normal;
+        .pa;
+        .rb(0);
+        background-color: @v4primary;
+        color: #fff;
+        padding: 2px 5px;
+    }
+    .u-status {
+        .fz(12px);
+        font-style: normal;
+        font-weight: normal;
+        .flex;
+        gap: 4px;
+        padding: 2px 5px;
+
+        svg {
+            .size(16px);
+            .y(-3px);
+            .mr(3px);
+        }
+    }
+    .isVerified {
+        color: #00ca6b;
+    }
+    .isNotVerified {
+        color: #888;
+    }
+    .u-meta {
+        .db;
+        .fz(13px, 2);
+        em {
+            font-style: normal;
+            color: #888;
+            .mr(5px);
+        }
+        a {
+            color: @v4primary;
+            &:hover {
+                .underline(@v4primary);
+            }
+        }
+    }
+    .u-meta-item {
+        .mr(20px);
+    }
+    .u-avatar {
+        .size(20px);
+    }
+    // border-bottom:1px solid @border;
+    // padding-bottom:15px;
+    // margin-bottom:15px;
+
+    .u-meta-yy,
+    .u-meta-qq {
+        color: @v4primary;
+        .pointer;
+        &:hover {
+            color: @pink;
+        }
+    }
+
+    .u-namespace {
+        background-color: @bg-black;
+        color: #eee;
+        padding: 3px 5px;
+        .fz(12px);
+        .r(2px);
+        &:hover {
+            text-decoration: none;
+            box-shadow: none !important;
+            color: #fff;
+            background-color: #111;
+        }
+    }
+
+    .u-op {
+        .pa;
+        .rt(10px);
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-team-info {
+        .u-logo {
+            .db;
+            .size(180px);
+            .auto(x);
+            .mb(10px);
+            float: none;
+        }
+        .u-title {
+            .fz(1.5rem);
+            .x;
+        }
+        .u-id {
+            .none;
+        }
+        .u-meta {
+            clear: both;
+            .x;
+        }
+        .u-meta-item {
+            .db;
+        }
+        .u-icons {
+            .db;
+        }
+    }
+}

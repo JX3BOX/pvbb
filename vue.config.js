@@ -9,7 +9,7 @@ const pages = {
         filename: "index.html",
     },
     team: {
-        entry: "./src/pages/team.js",
+        entry: "./src/pages/team/index.js",
         template: "./public/index.html",
         filename: "team/index.html",
     },

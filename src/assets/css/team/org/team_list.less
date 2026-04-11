@@ -1,0 +1,245 @@
+.m-team-list-header {
+    border-bottom: 1px solid @border-hr;
+    .clearfix;
+    padding-bottom: 10px;
+    .u-title {
+        .fz(14px);
+        .dbi;
+        .y;
+        i {
+            .fz(16px);
+        }
+        margin: 0 10px 0 0;
+    }
+    .u-server {
+        .y(-2px);
+        .w(120px);
+        .mr(10px);
+    }
+    .u-name {
+        .w(auto);
+        .y(-2px);
+        i {
+            .pointer;
+        }
+    }
+    .u-type {
+        .y(-2px);
+        .ml(10px);
+        .w(120px);
+    }
+    .u-isVerified {
+        .y(-2px);
+        .ml(10px);
+        .el-checkbox__label {
+            .fz(12px);
+        }
+    }
+    .pr;
+    .db;
+    .u-more {
+        // .fz(12px,28px);
+        .pa;
+        .rt(0);
+    }
+
+    .m-filter__sub {
+        margin-top: 10px;
+        .flex;
+        align-items: center;
+
+        .el-checkbox {
+            margin-right: 20px;
+        }
+
+        .u-server {
+            .w(180px);
+        }
+
+        .u-isVerified {
+            margin-left: 0 !important;
+            margin-right: 20px;
+        }
+    }
+    .m-filter {
+        .el-input__prefix {
+            padding-left: 5px;
+            .el-icon-search {
+                height: 100%;
+                line-height: 38px;
+            }
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-team-list-header {
+        .u-isVerified {
+            .none;
+        }
+        .u-title {
+            .db;
+            .mb(10px);
+        }
+        .u-name {
+            .w(160px);
+        }
+        .u-type {
+            .none;
+        }
+    }
+}
+
+.m-team-list {
+    .u-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .u-item {
+        .db;
+        .pr;
+        padding-left: 70px + 15px;
+        min-height: 70px;
+        border-bottom: 1px solid @border;
+        padding-bottom: 15px;
+        padding-top: 15px;
+        color: @color;
+        &:hover {
+            background-color: @bg-light;
+        }
+
+        .u-pic {
+            .db;
+            .size(70px);
+            border: 1px solid #eee;
+            .pa;
+            .lt(0, 15px);
+            box-sizing: border-box;
+            .r(4px);
+            overflow: hidden;
+            img {
+                .r(4px);
+            }
+        }
+        .u-name {
+            .fz(15px, 1.2);
+            .bold;
+            .db;
+            .mb(5px);
+            color: @v4primary;
+            .flex;
+            align-items: center;
+        }
+        .u-status {
+            .fz(12px);
+            font-style: normal;
+            font-weight: normal;
+            // background-color:#49c10f;
+            // color:#fff;
+            padding: 2px 5px;
+            color: #00d26f;
+            svg {
+                .size(16px);
+                .y(-3px);
+                .mr(3px);
+            }
+        }
+        .u-meta {
+            .db;
+            .fz(12px, 1.8);
+            .pr;
+            .flex;
+            align-items: center;
+            // left: -2px;
+
+            em {
+                margin-right: 5px;
+                background-color: #eee;
+                padding: 2px 5px;
+                border-radius: 2px;
+                font-style: normal;
+                color: #777;
+                line-height: 14px;
+            }
+
+            span {
+                .mr(15px);
+            }
+        }
+
+        .u-server {
+            .flex;
+            align-items: center;
+        }
+
+        .u-super {
+            .flex;
+            align-items: center;
+            color: @v4primary;
+            gap: 4px;
+        }
+
+        .u-user-avatar {
+            .size(16px);
+            border-radius: 50%;
+            .pr;
+        }
+
+        .u-time {
+            .fz(12px);
+            color: #888;
+        }
+        .u-recruit {
+            .db;
+            .fz(12px, 2.5);
+            color: #666;
+            .nobreak;
+        }
+
+        .u-tag-item {
+            padding: 2px 5px;
+            .r(3px);
+            .mr(8px) !important;
+            font-size: 12px;
+
+            background-color: #f2f6fc;
+            color: #637a9c;
+
+            &.love {
+                &::before {
+                    content: "♥";
+                    .mr(5px);
+                    color: #ff93bb;
+                }
+            }
+        }
+
+        .u-medal-icon {
+            .size(20px);
+            .y;
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-team-list {
+        .u-item {
+            .u-meta {
+                span {
+                    .db;
+                    .mb(5px);
+                    &:last-child {
+                        .mb(0);
+                    }
+                }
+            }
+            .u-tag {
+                .none !important;
+            }
+        }
+    }
+}
+
+.m-team-list-pages {
+    .mt(40px);
+    overflow-x: auto;
+}

@@ -1,0 +1,83 @@
+.m-team-joinpop{
+    .fz(1rem);
+    .el-dialog{
+        min-width:520px;
+        height:620px;
+    }
+    .el-dialog__body {
+        padding: 0 20px;
+        height : calc(100% - 140px);
+        overflow-y: auto;
+    }
+    .u-msg{
+        .mb(5px);
+        border-bottom:1px dotted #ddd;
+        // background-color:@bg-light;
+        // .r(3px);
+        padding:5px 0;
+    }
+    .u-all{
+        padding:5px 0 8px 0;
+    }
+    .u-list{
+        .clearfix;
+        .mb(20px);
+    }
+    .u-item{
+        .pr;
+        .db;.fl;
+        .size(90px);
+        .pr;
+        margin:0 12px 12px 0 !important;
+        display: flex;
+        flex-direction: column;
+
+        .el-checkbox__input{
+            .none;
+        }
+
+        .el-checkbox__label{
+            .pa;.lt(0);
+            .size(100%);
+            padding:0;
+            margin:0;
+            padding:10px;
+            box-sizing: border-box;
+            .x;
+            .nobreak;
+        }
+    }
+    .el-checkbox__input.is-checked+.el-checkbox__label{
+        color:#222;
+        background-color:#fafbfc;
+        .r(4px);
+    }
+    .u-item-avatar{
+        .size(32px);
+        // .y;
+        // .pa;.lt(50%,10px);
+        // transform:translateX(-50%);
+    }
+    .u-item-name{
+        // .bold;
+        .fz(12px);
+        .db;
+        .nobreak;
+    }
+    .u-item-server{
+        .db;
+        .fz(12px);
+        color:#999;
+    }
+}
+.m-team-joinpop-null{
+    .lh(1.6);
+}
+
+@media screen and (max-width:@phone){
+    .m-team-joinpop .el-dialog{
+        .size(100%) !important;
+        min-width:0;
+        margin:0 !important;
+    }
+}

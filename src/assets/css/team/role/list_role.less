@@ -1,0 +1,254 @@
+.m-team-rolelist {
+    .u-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .u-item {
+        .pr;
+        padding-left: 68px + 10px;
+        min-height: 68px;
+        border-bottom: 1px solid @border;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+
+        .u-pic {
+            .db;
+            .size(68px);
+            border: 1px solid #eee;
+            .pa;
+            .lt(0);
+            background-color: #f5f7fa;
+            .r(2px);
+        }
+        .u-avatar {
+            // 带link
+            &:hover {
+                border-color: #ddd;
+            }
+        }
+        .u-title {
+            .bold;
+            .db;
+            .mb(5px);
+            .flex;
+            align-items: center;
+        }
+        .u-rolename {
+            .fz(15px, 1.2);
+            .mr(2px);
+            color: @v4primary;
+            &:hover {
+                color: @pink;
+            }
+        }
+        .u-status {
+            .fz(12px);
+            font-style: normal;
+            font-weight: normal;
+            // background-color:#49c10f;
+            // color:#fff;
+            padding: 2px 5px;
+            color: #00d26f;
+            svg {
+                .size(16px);
+                .y(-3px);
+                .mr(3px);
+            }
+        }
+        .u-note {
+            .fz(12px);
+            color: #999;
+            .mr(10px);
+        }
+        .u-addnote {
+            color: @v4primary;
+            .pointer;
+            &:hover {
+                color: @pink;
+            }
+        }
+        .u-star {
+            .ml(5px);
+            color: #888;
+            .pointer;
+            &.on {
+                color: #fba524;
+            }
+        }
+        .u-meta {
+            .db;
+            .fz(12px, 1.8);
+            .pr;
+            left: -2px;
+            .flex;
+            align-items: center;
+
+            em {
+                margin-right: 5px;
+                padding: 2px 5px;
+                border-radius: 2px;
+                font-style: normal;
+                background-color: #f2f6fc;
+                color: #888;
+                line-height: 14px;
+            }
+
+            span {
+                .mr(15px);
+            }
+        }
+
+        .u-mount {
+            .flex;
+            align-items: center;
+            img {
+                .size(18px);
+                .y(-3px);
+                .mr(3px);
+            }
+        }
+
+        .u-time {
+            .fz(12px);
+            color: #888;
+        }
+
+        .u-op {
+            .pa;
+            .rt(0);
+            .u-btn {
+                .mt(0);
+            }
+        }
+        .u-unbind {
+            .fz(12px, 14px);
+            svg {
+                .size(14px);
+                .y(-3px);
+                .mr(5px);
+                // fill:#FC3C3C;
+                fill: #fba524;
+            }
+            &:hover {
+                svg {
+                    fill: #fff;
+                }
+            }
+        }
+        .u-misc {
+            .mt(5px);
+
+            .fz(12px);
+            color: #888;
+
+            .u-team-name {
+                color: @v4primary;
+                text-decoration: none;
+                &:hover {
+                    .underline(@v4primary);
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-team-rolelist {
+        .u-item {
+            .u-unbind {
+                .ps;
+                .mt(10px);
+            }
+            .u-meta {
+                span {
+                    .db;
+                    .mb(5px);
+                    &:last-child {
+                        .mb(0);
+                    }
+                }
+            }
+            .u-op {
+                .ps;
+                .u-btn {
+                    .mt(10px);
+                }
+            }
+        }
+    }
+}
+
+.m-role-null {
+    .mt(20px);
+    .x;
+
+    .u-btn {
+        .size(200px, 80px);
+        .fz(24px);
+    }
+}
+
+.m-team-note-dialog {
+    .el-dialog {
+        min-width: 520px;
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-team-note-dialog {
+        .el-dialog {
+            .w(100%) !important;
+        }
+    }
+}
+
+.m-role-list-filter {
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 10px;
+    .mb(20px);
+    .clearfix;
+    .u-name {
+        .fl;
+        .w(280px);
+        .mr(10px);
+        .mb(10px);
+    }
+
+    .u-mount {
+        .clearfix;
+    }
+    .u-mount-unit {
+        .el-radio__input {
+            .none;
+        }
+        .el-radio__label {
+            padding-left: 0;
+        }
+
+        .mb(10px);
+        .fl;
+        background-color: @bg-gray;
+        padding: 5px 10px;
+        .pointer;
+        .r(2px);
+        img {
+            .size(20px);
+            .y(-4px);
+            .mr(3px);
+        }
+        .mr(10px);
+        .fz(13px,22px);
+    }
+
+    .el-radio__input.is-checked + .el-radio__label {
+        .bold;
+        color: @color;
+    }
+}
+
+.m-school-pop {
+    .u-school {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}

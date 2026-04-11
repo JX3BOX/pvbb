@@ -1,0 +1,96 @@
+.m-plan-form {
+    .u-btn {
+        .w(180px);
+    }
+}
+.m-plan-list {
+    .u-tr {
+        display: flex;
+        border-bottom: 1px solid #eee;
+    }
+    .u-thead {
+        border-bottom: 2px solid #eee;
+    }
+    .u-label {
+        .w(120px);
+    }
+    .u-fix {
+        .w(40px);
+    }
+    .u-handle {
+        .fz(18px);
+        color: #c0c4cc;
+        cursor: move;
+    }
+    .u-list {
+        .u-tr {
+            padding: 5px 0;
+        }
+        .u-value {
+            .el-textarea {
+                .db;
+            }
+            flex-grow: 1;
+        }
+        .u-week {
+            .db;
+            .bold;
+        }
+        .u-date {
+            .fz(12px, 22px);
+            background-color: #f2f6fc;
+            color: #637a9c;
+            .dbi;
+            padding: 0 5px;
+        }
+    }
+}
+.v-plan-add {
+    .u-tip {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+.m-plan-form-line {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    .m-plan-form-input,
+    .m-plan-form-select,
+    .m-plan-form-picker {
+        .mr(10px);
+        min-width: 200px;
+    }
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+.m-plan-form-addBtn {
+    .size(100%, 40px);
+}
+.m-plan-form-submit {
+    .x;
+    padding-top: 20px;
+    .el-button {
+        .w(240px);
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-plan-form-line {
+        flex-direction: column;
+        padding: 10px;
+        border: 1px solid #ddd;
+        .m-plan-form-input,
+        .m-plan-form-select,
+        .m-plan-form-picker {
+            .mb(10px);
+            .w(100%);
+            order: 2;
+        }
+        .m-plan-form-btn {
+            align-self: flex-end;
+            .mb(10px);
+            order: 1;
+        }
+    }
+}

@@ -1,0 +1,121 @@
+.v-role-view {
+    .m-title {
+        .el-button {
+            .h(28px);
+            .y(bottom);
+        }
+    }
+}
+.m-role-info {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    .u-avatar {
+        .lt(0);
+        .size(122px);
+    }
+    em {
+        margin-right: 5px;
+        padding: 2px 5px;
+        border-radius: 2px;
+        font-style: normal;
+        background-color: #f2f6fc;
+        color: #888;
+        .fz(13px);
+        .w(50px);
+        .dbi;
+        .x;
+    }
+    .u-meta {
+        .fz(14px);
+        .mt(10px);
+
+        .u-author-avatar {
+            .pr;
+            top: 6px;
+        }
+
+        &>span{
+            .mr(10px);
+        }
+    }
+    .u-school {
+        img {
+            .size(24px);
+            .y(-6px);
+            .ml(5px);
+        }
+    }
+    .u-icon{
+        .size(24px);
+    }
+    .u-verify{
+        .size(18px);
+        .y;
+    }
+    .u-name{
+        .fz(20px);
+    }
+    .u-author{
+        a{
+            .underline(@v4primary);
+        }
+    }
+    // border-bottom:1px dashed #eee;
+}
+.m-role-belongs {
+    .mt(30px);
+    // .el-divider__text {
+    //     color: #888;
+    // }
+
+    .u-teams{
+        .clearfix;
+    }
+    .u-team {
+        .fl;
+        .db;
+        .w(128px + 5px*2);
+        .mb(20px);
+        .mr(20px);
+
+        &:hover {
+            .u-team-logo{background-color: #f2f6fc;}
+            .u-team-name{color:@pink;}
+        }
+    }
+    .u-team-logo {
+        .db;
+        .size(128px);
+        .r(3px);
+        border:1px solid #eee;
+        padding:5px;
+
+        background-color: @bg-light;
+    }
+    .u-team-name {
+        .db;
+        .nobreak;
+        .fz(12px, 2.5);
+        .x;
+    }
+    .u-lock {
+        .x;
+        .fz(12px);
+        color: #999;
+        font-weight: normal;
+        i {
+            .mr(2px);
+        }
+    }
+}
+
+.m-role-player{
+    .u-null{
+        padding:50px;
+        .x;
+        .fz(14px);
+        color:#f00;
+    }
+}
