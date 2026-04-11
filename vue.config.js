@@ -2,6 +2,19 @@ const path = require("path");
 const webpack = require("webpack");
 const commonDomains = require("@jx3box/jx3box-common/data/jx3box.json");
 
+const pages = {
+    index: {
+        entry: "./src/main.js",
+        template: "./public/index.html",
+        filename: "index.html",
+    },
+    team: {
+        entry: "./src/pages/team.js",
+        template: "./public/index.html",
+        filename: "team/index.html",
+    },
+};
+
 module.exports = {
     productionSourceMap: false,
     transpileDependencies: true,
@@ -10,7 +23,7 @@ module.exports = {
     publicPath: process.env.NODE_ENV === "development" ? "/" : process.env.STATIC_PATH + "/" + process.env.APP_NAME,
 
     //🌈多页面配置，详见 https://cli.vuejs.org/zh/config/#pages
-    // pages: pages,
+    pages: pages,
 
     //⚛️ Proxy ~
     devServer: {
@@ -104,7 +117,7 @@ function addStyleResource(rule) {
         path.resolve(__dirname, "./node_modules/@jx3box/jx3box-common/css/var.less"),
         path.resolve(__dirname, "./node_modules/@jx3box/jx3box-common/css/mixin.less"),
         path.resolve(__dirname, "./src/assets/css/var.less"),
-        path.resolve(__dirname, "./src/assets/css/mixin.less"),
+        path.resolve(__dirname, "./src/assets/css/mixin.less")
     );
     rule.use("style-resource").loader("style-resources-loader").options({
         patterns: preload_styles,

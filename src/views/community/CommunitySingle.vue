@@ -392,6 +392,8 @@ export default {
             fun(this.id, params).then((res) => {
                 this.post = res.data.data;
 
+                document.title = this.post.title + this.$t("pages.common.appendTitle");
+
                 getStat(appKey, this.id).then((res) => {
                     this.stat = res.data;
                     this.post.likes = this.stat.likes || 0;

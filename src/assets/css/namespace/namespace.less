@@ -65,9 +65,9 @@
     .u-author {
         .mr(10px);
         a {
-            .underline(@v4primary);
             color: #999;
             &:hover {
+                .underline(@v4primary);
                 color: @v4primary;
             }
         }
@@ -96,6 +96,7 @@
 .m-namespace-pages {
     overflow-x: auto;
     .x;
+    justify-content: center;
 }
 .m-namespace-null {
     margin-top: 20px;
@@ -135,6 +136,9 @@
 }
 
 @media screen and (max-width: @phone) {
+    .c-main {
+        padding: 0;
+    }
     .m-main {
         padding-top: 15px;
     }

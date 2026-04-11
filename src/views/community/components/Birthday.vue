@@ -76,6 +76,11 @@ export default {
         .u-date {
             color: #8d29ae;
         }
+
+        .u-title {
+            .flex;
+            align-items: center;
+        }
     }
 }
 </style>

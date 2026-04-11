@@ -80,9 +80,9 @@ const routes = [
         component: () => import("@/components/namespace/namespace_single.vue"),
         meta: {
             i18n: {
-                title: "pages.namespace.single.title",
-                keywords: "pages.namespace.single.keywords",
-                description: "pages.namespace.single.description",
+                title: "pages.namespace.title",
+                keywords: "pages.namespace.keywords",
+                description: "pages.namespace.description",
             },
         },
     },
@@ -92,9 +92,9 @@ const routes = [
         component: isMiniProgram() || isApp() ? JokeMobile : Joke,
         meta: {
             i18n: {
-                title: "pages.joke.single.title",
-                keywords: "pages.joke.single.keywords",
-                description: "pages.joke.single.description",
+                title: "pages.joke.title",
+                keywords: "pages.joke.keywords",
+                description: "pages.joke.description",
             },
         },
     },
@@ -104,9 +104,9 @@ const routes = [
         component: isMiniProgram() || isApp() ? EmotionMobile : Emotion,
         meta: {
             i18n: {
-                title: "pages.emotion.single.title",
-                keywords: "pages.emotion.single.keywords",
-                description: "pages.emotion.single.description",
+                title: "pages.emotion.title",
+                keywords: "pages.emotion.keywords",
+                description: "pages.emotion.description",
             },
         },
     },
@@ -128,31 +128,31 @@ const routes = [
         component: isMiniProgram() || isApp() ? CollectionMiniSingle : CollectionSingle,
         meta: {
             i18n: {
-                title: "pages.collection.single.title",
-                keywords: "pages.collection.single.keywords",
-                description: "pages.collection.single.description",
+                title: "pages.collection.title",
+                keywords: "pages.collection.keywords",
+                description: "pages.collection.description",
             },
         },
     },
 
     // ====== qqbot ======
     {
-        name: "qqbot",
-        path: "/qqbot",
-        component: () => import("@/views/QQBot.vue"),
-        meta: {
-            i18n: {
-                title: "pages.qqbot.title",
-                keywords: "pages.qqbot.keywords",
-                description: "pages.qqbot.description",
-            },
-        },
-    },
-    {
         name: "help",
         path: "/qqbot/help",
         component: () => import("@/views/qqbot/Help.vue"),
         meta: { title: "指令手册" },
+    },
+    {
+        name: "qqbot-pve",
+        path: "/qqbot/pve",
+        component: () => import("@/views/qqbot/Pve.vue"),
+        meta: { title: "PVE" },
+    },
+    {
+        name: "qqbot-pvp",
+        path: "/qqbot/pvp",
+        component: () => import("@/views/qqbot/Pvp.vue"),
+        meta: { title: "PVP" },
     },
     {
         name: "qqbot-pvx",

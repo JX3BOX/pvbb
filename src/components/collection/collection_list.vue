@@ -2,13 +2,14 @@
     <div class="m-collection-box" v-loading="loading" ref="listRef">
         <!-- 搜索 -->
         <div class="m-archive-search m-collection-search">
-            <a :href="publish_link" class="u-publish el-button el-button--primary">+ 创建小册</a>
+            <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">+ 创建小册</a>
             <el-input
                 placeholder="请输入搜索内容"
                 v-model.trim="search"
                 class="input-with-select"
                 clearable
                 @clear="onSearch"
+                size="large"
                 @keydown.enter="onSearch"
             >
                 <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>

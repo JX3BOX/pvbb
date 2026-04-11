@@ -25,7 +25,7 @@
             <RightSidebar class="m-bbs-right-side" :show-toggle="true">
                 <ListSide class="m-extend" />
             </RightSidebar>
-            <CommonFooter></CommonFooter>
+            <Footer></Footer>
         </Main>
     </div>
 </template>

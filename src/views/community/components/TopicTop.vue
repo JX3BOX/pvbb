@@ -33,7 +33,7 @@
                             class="u-icon"
                             :src="require(`@/assets/img/community/category/${styles.icon}.svg`)"
                         />
-                        <div>{{ data.category }}</div>
+                        <div class="u-category-text">{{ getCategoryText(data.category) }}</div>
                     </div>
                 </div>
             </div>
@@ -118,6 +118,7 @@ import { __cdn } from "@/utils/config";
 import { showAvatar, authorLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { getSkinJson } from "@/service/community";
 const skinKey = "community_topic_skin";
+import { tabsMap } from "@/assets/data/community_category";
 
 export default {
     props: ["data"],
@@ -224,6 +225,9 @@ export default {
                 return getThumbnail(val, 48 * 2);
             }
             return val;
+        },
+        getCategoryText(key) {
+            return tabsMap[key];
         },
     },
 };

@@ -8,21 +8,18 @@ export default {
     community: {
         title: "Bamboo Teahouse",
         keywords: "gameplay tips,fan videos,player stories,memoirs,discussion",
-        description:
-            "Share JX3 gameplay tips, fan-made videos, and original player memoirs.",
+        description: "Share JX3 gameplay tips, fan-made videos, and original player memoirs.",
         single: {
             title: "Bamboo Teahouse",
             keywords: "gameplay tips,fan videos,player stories,memoirs,discussion",
-            description:
-                "Share JX3 gameplay tips, fan-made videos, and original player memoirs.",
+            description: "Share JX3 gameplay tips, fan-made videos, and original player memoirs.",
         },
     },
 
     joke: {
         title: "Jokes",
         keywords: "JX3 jokes,JX3 memes,funny moments,banter",
-        description:
-            "Collect JX3 player banter and classic jokes, and share fun moments in-game.",
+        description: "Collect JX3 player banter and classic jokes, and share fun moments in-game.",
         single: {
             title: "Joke Details",
             keywords: "JX3 jokes,JX3 memes,funny moments",
@@ -44,13 +41,11 @@ export default {
     collection: {
         title: "Booklet",
         keywords: "JX3 guide collection,JX3 resources,gameplay collections",
-        description:
-            "A collection of gameplay guides and resource summaries curated by JX3 players.",
+        description: "A collection of gameplay guides and resource summaries curated by JX3 players.",
         single: {
             title: "Booklet Details",
             keywords: "JX3 guide collection,JX3 resources",
-            description:
-                "View gameplay guides and resource collections curated by JX3 players.",
+            description: "View gameplay guides and resource collections curated by JX3 players.",
         },
     },
 
@@ -63,5 +58,9 @@ export default {
             keywords: "JX3 nameplate,signature",
             description: "View a player's personalized JX3 nameplate.",
         },
+    },
+
+    common: {
+        appendTitle: "- JX3BOX",
     },
 };

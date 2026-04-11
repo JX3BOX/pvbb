@@ -11,9 +11,7 @@
                 </div>
                 <el-row class="m-joke-list" :gutter="20">
                     <el-col :span="24">
-                        <div class="m-joke-item">
-                            <joke-item :joke="joke" mode="single" />
-                        </div>
+                        <joke-item :joke="joke" mode="single" />
                     </el-col>
                 </el-row>
                 <Thx
@@ -43,9 +41,10 @@
                         @keydown.enter="onSearch"
                         clearable
                         @clear="onSearch"
+                        size="large"
                     >
                         <template #prepend
-                            ><i class="el-icon-search"></i> <span class="u-search">关键词</span></template
+                            ><i class="el-icon-search"></i>&nbsp;<span class="u-search">关键词</span></template
                         >
                         <template #append>
                             <el-switch
@@ -66,14 +65,12 @@
                         <!-- 列表 -->
                         <div class="m-joke-list" :gutter="20" v-if="jokes && jokes.length">
                             <div :span="24" v-for="joke in jokes" :key="joke.id">
-                                <div class="m-joke-item">
-                                    <joke-item
-                                        :joke="joke"
-                                        :jokeRewardArr="jokeRewardArr"
-                                        @doReward="doReward"
-                                        @update="handleJokeUpdate"
-                                    />
-                                </div>
+                                <joke-item
+                                    :joke="joke"
+                                    :jokeRewardArr="jokeRewardArr"
+                                    @doReward="doReward"
+                                    @update="handleJokeUpdate"
+                                />
                             </div>
                         </div>
                         <!-- 空 -->
@@ -368,5 +365,5 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/app.less";
+@import "@/assets/css/joke/joke.less";
 </style>
-<style lang="less" src="@/assets/css/joke/joke.less"></style>

@@ -252,6 +252,8 @@ export default {
                     this.collection = res?.data?.data || {};
                     this.$store.state.user_id = this.collection.user_id;
 
+                    document.title = this.title + this.$t("pages.common.appendTitle");
+
                     User.isLogin() &&
                         postHistory({
                             source_type: "collection",

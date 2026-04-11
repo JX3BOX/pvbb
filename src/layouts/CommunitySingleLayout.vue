@@ -12,18 +12,12 @@
             :showExtend="true"
         >
             <TopStickyInfo :post="post" />
-            <!-- <Info /> -->
             <template #op-append>
                 <publish-gate />
             </template>
             <template #op-prepend>
                 <AdminDrop v-if="isTeammate" :is-community="true" :post="finalPost" :user-id="user_id" />
             </template>
-            <!-- <template #title>
-                <span>
-                    {{ title }}
-                </span>
-            </template> -->
         </Breadcrumb>
 
         <Main :withoutRight="false">
@@ -47,6 +41,7 @@ import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import Side from "@/components/bbs/single_side.vue";
+
 const postTypeMaps = {
     求助: "newbie",
     萌新: "newbie",

@@ -35,14 +35,14 @@
             <div class="u-other">
                 <template v-if="isEditor">
                     <!-- 精选 -->
-                    <span class="u-op-item u-op-star el-link el-link--primary is-underline" @click="handleStar">
+                    <a class="u-op-item u-op-star el-link el-link--primary" @click="handleStar">
                         <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
                         {{ isStar ? "取消精选" : "设为精选" }}
-                    </span>
+                    </a>
                     <!-- 删除 -->
-                    <span class="u-op-item u-op-delete el-link el-link--primary is-underline" @click="handleDelete">
+                    <a class="u-op-item u-op-delete el-link el-link--primary" @click="handleDelete">
                         <i class="el-icon-delete"></i> 删除
-                    </span>
+                    </a>
                     <!-- 打赏 -->
                     <el-checkbox
                         v-if="mode !== 'single'"

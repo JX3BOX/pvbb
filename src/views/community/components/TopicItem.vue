@@ -31,7 +31,7 @@
                         class="u-icon"
                         :src="require(`@/assets/img/community/category/${styles.icon}.svg`)"
                     />
-                    <div>{{ data.category }}</div>
+                    <div class="u-category-text">{{ getCategoryText(data.category) }}</div>
                 </div>
                 <img svg-inline class="u-mocha" src="@/assets/img/community/mocha.svg" alt="" />
             </div>
@@ -81,7 +81,12 @@
                 </div>
 
                 <div class="m-topic-userInfo">
-                    <a :href="authorLink(data.ext_user_info.id)" target="_blank" v-if="!data.anonymous">
+                    <a
+                        class="u-topic-author"
+                        :href="authorLink(data.ext_user_info.id)"
+                        target="_blank"
+                        v-if="!data.anonymous"
+                    >
                         <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
                         <span class="m-topic-userInfo__name">{{ data.ext_user_info.display_name }}</span>
                     </a>
@@ -118,6 +123,7 @@ import { random } from "lodash";
 import { getTimeAgo } from "@/utils/dateFormat";
 import { getSkinJson } from "@/service/community";
 const skinKey = "community_topic_skin";
+import { tabsMap } from "@/assets/data/community_category";
 
 export default {
     props: ["data"],
@@ -251,6 +257,9 @@ export default {
             const url = new URL(window.location.href);
             url.searchParams.set("tag", item.label);
             return url.toString();
+        },
+        getCategoryText(key) {
+            return tabsMap[key];
         },
     },
 };

@@ -28,13 +28,7 @@
                     </el-option>
                 </el-select>
             </div>
-            <el-button
-                type="primary"
-                size="small"
-                @click="publish"
-                icon="Position"
-                :loading="processing"
-                :disabled="processing"
+            <el-button type="primary" @click="publish" icon="Position" :loading="processing" :disabled="processing"
                 >提交</el-button
             >
         </div>

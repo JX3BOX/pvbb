@@ -489,10 +489,11 @@ export default {
     }
     .u-star-checkbox {
         height: 28px;
-        .el-checkbox__label{
+        box-sizing: content-box;
+        .el-checkbox__label {
             font-weight: normal;
             .fz(12px);
-            color:@color;
+            color: @color;
         }
     }
     .m-list-view {

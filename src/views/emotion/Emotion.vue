@@ -19,6 +19,7 @@
                         @keydown.enter="onSearch"
                         @clear="onSearch"
                         clearable
+                        size="large"
                     >
                         <template #prepend>
                             <i class="el-icon-search"></i>

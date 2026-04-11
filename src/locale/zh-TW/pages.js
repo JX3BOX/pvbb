@@ -59,4 +59,8 @@ export default {
             description: "查看玩家的劍網3個性銘牌",
         },
     },
+
+    common: {
+        appendTitle: "- 劍網3魔盒（JX3BOX）",
+    },
 };

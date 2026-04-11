@@ -8,27 +8,22 @@ export default {
     community: {
         title: "Trà Quán Trúc Lâm",
         keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
-        description:
-            "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
+        description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
         single: {
             title: "Trà Quán Trúc Lâm",
-            keywords:
-                "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
-            description:
-                "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
+            keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
+            description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
         },
     },
 
     joke: {
         title: "Câu Nói Vui",
         keywords: "câu nói vui JX3,meme JX3,hài hước JX3,trêu đùa JX3",
-        description:
-            "Tổng hợp các câu nói vui và mẩu chuyện kinh điển của người chơi JX3.",
+        description: "Tổng hợp các câu nói vui và mẩu chuyện kinh điển của người chơi JX3.",
         single: {
             title: "Chi Tiết Câu Nói Vui",
             keywords: "câu nói vui JX3,meme JX3,hài hước JX3",
-            description:
-                "Xem các câu nói vui và mẩu chuyện thú vị được người chơi JX3 chia sẻ.",
+            description: "Xem các câu nói vui và mẩu chuyện thú vị được người chơi JX3 chia sẻ.",
         },
     },
 
@@ -46,13 +41,11 @@ export default {
     collection: {
         title: "Sổ Tay",
         keywords: "tổng hợp hướng dẫn JX3,tài liệu JX3,tổng hợp lối chơi",
-        description:
-            "Tổng hợp các hướng dẫn và tài liệu lối chơi do người chơi JX3 biên soạn.",
+        description: "Tổng hợp các hướng dẫn và tài liệu lối chơi do người chơi JX3 biên soạn.",
         single: {
             title: "Chi Tiết Sổ Tay",
             keywords: "tổng hợp hướng dẫn JX3,tài liệu JX3",
-            description:
-                "Xem các hướng dẫn và tài liệu lối chơi do người chơi JX3 tổng hợp.",
+            description: "Xem các hướng dẫn và tài liệu lối chơi do người chơi JX3 tổng hợp.",
         },
     },
 
@@ -65,5 +58,9 @@ export default {
             keywords: "bảng tên JX3,chữ ký cá nhân JX3",
             description: "Xem bảng tên cá nhân của người chơi JX3.",
         },
+    },
+
+    common: {
+        appendTitle: "- JX3BOX",
     },
 };

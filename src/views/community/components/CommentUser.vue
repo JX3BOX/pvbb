@@ -3,8 +3,7 @@
         <CommentUserInfo :uid="uid" @ready="installModules" :isAnonymous="isAnonymous" />
         <template v-if="data">
             <div class="u-interact">
-                <AuthorFollow v-if="!isMaster" :uid="uid" />
-                <AuthorRss v-else :uid="uid" />
+                <AuthorRss :uid="uid" />
                 <el-button icon="Message" class="u-btn" size="small" @click="onMessage">私信</el-button>
             </div>
             <AuthorMedals class="u-block u-trophy" :uid="uid" />
@@ -17,7 +16,6 @@
 
 <script>
 import CommentUserInfo from "./CommentUserInfo.vue";
-import AuthorFollow from "@jx3box/jx3box-ui/src/author/AuthorFollow.vue";
 import AuthorMedals from "@jx3box/jx3box-ui/src/author/AuthorMedals.vue";
 import AuthorRss from "@jx3box/jx3box-ui/src/author/AuthorRss.vue";
 import AuthorCommunity from "./AuthorCommunity.vue";
@@ -96,7 +94,6 @@ export default {
     },
     components: {
         CommentUserInfo,
-        AuthorFollow,
         AuthorMedals,
         AuthorRss,
         AuthorCommunity,
@@ -108,10 +105,12 @@ export default {
 .m-comment-user {
     position: sticky;
     top: 110px;
+    box-sizing: content-box;
 }
 
 @media screen and (max-width: @ipad) {
     .m-comment-user {
+        box-sizing: content-box;
         position: unset;
         .c-author-honor,
         .u-bio,

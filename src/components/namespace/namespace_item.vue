@@ -2,23 +2,24 @@
     <div class="m-namespace-item" @click="goNamespace(namespace.link)">
         <h5 class="u-title">
             <a :href="namespace.link" target="_blank" @click.stop
-                ><i class="u-icon el-icon-postcard"></i
-                >{{ namespace.key || "未知" }} <span class="u-preview">剑网3.com/{{namespace.key}}</span>
+                ><i class="u-icon el-icon-postcard"></i>{{ namespace.key || "未知" }}
+                <span class="u-preview">剑网3.com/{{ namespace.key }}</span>
             </a>
             <i class="u-my" v-if="isMyNamespace(namespace.uid)">由我创建的</i>
         </h5>
         <p class="u-desc">{{ namespace.desc || namespace.key || "未知" }}</p>
         <div class="u-misc">
             <span class="u-author">
-                <i class="el-icon-user"></i
-                ><a :href="authorLink(namespace.uid)" target="_blank" @click.stop>
+                <i class="el-icon-user"></i>&nbsp;<a
+                    class="u-name"
+                    :href="authorLink(namespace.uid)"
+                    target="_blank"
+                    @click.stop
+                >
                     {{ (namespace.creator && namespace.creator.display_name) || "匿名" }}</a
                 >
             </span>
-            <time class="u-time"
-                ><i class="el-icon-date"></i>
-                >{{ dataFormat(namespace.created) }}</time
-            >
+            <time class="u-time"><i class="el-icon-date"></i> {{ dataFormat(namespace.created) }}</time>
         </div>
     </div>
 </template>
@@ -30,28 +31,28 @@ import User from "@jx3box/jx3box-common/js/user";
 export default {
     name: "namespaceItem",
     props: ["data"],
-    data: function() {
+    data: function () {
         return {
             uid: User.getInfo().uid,
         };
     },
     computed: {
-        namespace: function() {
+        namespace: function () {
             return this.data;
         },
     },
     methods: {
         authorLink,
-        dataFormat: function(val) {
+        dataFormat: function (val) {
             return (val && showDate(~~val * 1000)) || "-";
         },
-        isMyNamespace: function(val) {
+        isMyNamespace: function (val) {
             return this.uid && val == this.uid;
         },
         goNamespace(link) {
-            window.open(link,'_blank')
-        }
+            window.open(link, "_blank");
+        },
     },
-    mounted: function() {},
+    mounted: function () {},
 };
 </script>

@@ -9,6 +9,7 @@
                 @clear="onSearch"
                 @keydown.enter="onSearch"
                 class="input-with-select"
+                size="large"
             >
                 <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
                 <template #append>
@@ -70,16 +71,15 @@
                 <el-alert title="没有相关条目" type="info" show-icon></el-alert>
             </div>
             <!-- 分页 -->
-            <div class="m-namespace-pages">
-                <el-pagination
-                    background
-                    layout="total, prev, pager, next,jumper"
-                    :hide-on-single-page="true"
-                    :page-size="per"
-                    :total="total"
-                    v-model:current-page="page"
-                ></el-pagination>
-            </div>
+            <el-pagination
+                class="m-namespace-pages"
+                background
+                layout="total, prev, pager, next,jumper"
+                :hide-on-single-page="true"
+                :page-size="per"
+                :total="total"
+                v-model:current-page="page"
+            ></el-pagination>
         </div>
     </ListLayout>
 </template>
@@ -196,7 +196,4 @@ export default {
 
 <style lang="less">
 @import "../assets/css/namespace/namespace.less";
-.c-main {
-    padding: 0;
-}
 </style>

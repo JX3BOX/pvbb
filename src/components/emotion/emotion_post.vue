@@ -52,14 +52,7 @@
                         <i class="el-icon-info"></i>
                     </el-tooltip>
                 </div>
-                <el-button
-                    class="u-action-btn"
-                    type="primary"
-                    @click="post"
-                    :disabled="loading"
-                    :loading="loading"
-                    icon="Position"
-                    size="small"
+                <el-button type="primary" @click="post" :disabled="loading" :loading="loading" icon="Position"
                     >提交</el-button
                 >
             </div>

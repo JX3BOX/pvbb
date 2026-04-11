@@ -130,7 +130,7 @@ export default {
     },
     computed: {
         id() {
-            return this.sourceId;
+            return this.sourceId || this.$route.query.id;
         },
         post_type: function () {
             return this.post?.post_type;
@@ -325,7 +325,7 @@ export default {
                         });
                     }
                     this.$nextTick(() => {
-                        this.installTalent();
+                        if (this.visible) this.installTalent();
                     });
                 })
                 .finally(() => {
@@ -342,8 +342,14 @@ export default {
             this.initImageLoader();
         },
         installTalent() {
+            if (!this.visible) return;
+            if (!Object.keys(this.talent || {}).length) return;
+
+            const containerSelector = `.m-qx-container-${this.data?.ID}`;
+            if (!this.data?.ID || !document.querySelector(containerSelector)) return;
+
             this.talentDriver = new JX3_QIXUE({
-                container: `.m-qx-container-${this.data?.ID}`,
+                container: containerSelector,
                 version: this.talent.version,
                 xf: this.talent.xf,
                 editable: false,

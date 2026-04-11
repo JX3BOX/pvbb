@@ -92,5 +92,8 @@ export default {
     .c-sidebar-left {
         padding: 15px;
     }
+    .c-admin-drop {
+        margin-right: 0;
+    }
 }
 </style>

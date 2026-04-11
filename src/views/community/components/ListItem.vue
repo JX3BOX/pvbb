@@ -116,15 +116,17 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
 
         <!-- 作者 -->
         <div class="u-misc">
-            <img
-                class="u-author-avatar"
-                :src="showAvatar(item.ext_user_info)"
-                :alt="showNickname(item.ext_user_info)"
-            />
-            <a class="u-author-name" :href="authorLink(item.user_id)" target="_blank" v-if="!item.anonymous">{{
-                showNickname(item.ext_user_info)
-            }}</a>
-            <span v-else>神秘侠士</span>
+            <div class="u-misc__author">
+                <img
+                    class="u-author-avatar"
+                    :src="showAvatar(item.ext_user_info)"
+                    :alt="showNickname(item.ext_user_info)"
+                />
+                <a class="u-author-name" :href="authorLink(item.user_id)" target="_blank" v-if="!item.anonymous">{{
+                    showNickname(item.ext_user_info)
+                }}</a>
+                <span v-else>神秘侠士</span>
+            </div>
             <span class="u-date">
                 Updated on
                 <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>

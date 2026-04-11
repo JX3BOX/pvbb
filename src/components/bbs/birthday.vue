@@ -83,5 +83,10 @@ export default {
         height: 14px;
         border-radius: 50%;
     }
+
+    .u-title {
+        .flex;
+        align-items: center;
+    }
 }
 </style>
