@@ -60,6 +60,12 @@ export default {
         },
     },
 
+    team: {
+        title: "團隊管理平臺",
+        keywords: "開團,團隊管理,幫會管理,角色管理,DKP,團本招募",
+        description: "劍網3團隊管理中心，支援幫會、角色、團員、DKP、開團與申請管理。",
+    },
+
     common: {
         appendTitle: "- 劍網3魔盒（JX3BOX）",
     },

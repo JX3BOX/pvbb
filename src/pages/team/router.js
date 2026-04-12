@@ -40,48 +40,456 @@ const Battle = () => import("@/views/team/battle/index.vue");
 const myBattle = () => import("@/views/team/battle/myBattle.vue");
 
 const routes = [
-    { name: "index", path: "/", meta: { isPublic: true }, component: ListOrg },
-    { name: "manage_org", path: "/org/manage", meta: { isPublic: false }, component: ManageOrg },
-    { name: "list_org", path: "/org/list", meta: { isPublic: true }, component: ListOrg },
-    { name: "add_org", path: "/org/add", meta: { isPublic: false }, component: AddOrg },
-    { name: "edit_org", path: "/org/edit/:id", meta: { isPublic: false }, component: EditOrg },
-    { name: "view_org", path: "/org/:id", meta: { isPublic: true }, component: ViewOrg },
-    { name: "verify_org", path: "/org/verify/:id", meta: { isPublic: false }, component: VerifyOrg },
-    { name: "view_my_org", path: "/my/org/:id", meta: { isPublic: false }, component: ViewMyOrg },
+    {
+        name: "index",
+        path: "/",
+        meta: {
+            isPublic: true,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListOrg,
+    },
+    {
+        name: "manage_org",
+        path: "/org/manage",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ManageOrg,
+    },
+    {
+        name: "list_org",
+        path: "/org/list",
+        meta: {
+            isPublic: true,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListOrg,
+    },
+    {
+        name: "add_org",
+        path: "/org/add",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddOrg,
+    },
+    {
+        name: "edit_org",
+        path: "/org/edit/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: EditOrg,
+    },
+    {
+        name: "view_org",
+        path: "/org/:id",
+        meta: {
+            isPublic: true,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ViewOrg,
+    },
+    {
+        name: "verify_org",
+        path: "/org/verify/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: VerifyOrg,
+    },
+    {
+        name: "view_my_org",
+        path: "/my/org/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ViewMyOrg,
+    },
 
-    { name: "bind_role", path: "/role/bind", meta: { isPublic: false }, component: BindRole },
-    { name: "list_role", path: "/role/manage", meta: { isPublic: false }, component: ListRole },
-    { name: "add_role", path: "/role/add", meta: { isPublic: false }, component: AddRole },
-    { name: "edit_role", path: "/role/edit/:id", meta: { isPublic: false }, component: EditRole },
-    { name: "group_role", path: "/role/group", meta: { isPublic: false }, component: GroupRole },
-    { name: "view_role", path: "/role/:id", meta: { isPublic: false }, component: ViewRole },
+    {
+        name: "bind_role",
+        path: "/role/bind",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: BindRole,
+    },
+    {
+        name: "list_role",
+        path: "/role/manage",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListRole,
+    },
+    {
+        name: "add_role",
+        path: "/role/add",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddRole,
+    },
+    {
+        name: "edit_role",
+        path: "/role/edit/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: EditRole,
+    },
+    {
+        name: "group_role",
+        path: "/role/group",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: GroupRole,
+    },
+    {
+        name: "view_role",
+        path: "/role/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ViewRole,
+    },
 
-    { name: "list_member", path: "/member/list/:tab?", meta: { isPublic: false }, component: ListMember },
+    {
+        name: "list_member",
+        path: "/member/list/:tab?",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListMember,
+    },
 
-    { name: "manage_dkp", path: "/dkp/manage", meta: { isPublic: false }, component: ManageDkp },
-    { name: "my_dkp", path: "/dkp/my", meta: { isPublic: false }, component: MyDkp },
+    {
+        name: "manage_dkp",
+        path: "/dkp/manage",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ManageDkp,
+    },
+    {
+        name: "my_dkp",
+        path: "/dkp/my",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: MyDkp,
+    },
 
-    { name: "add_plan", path: "/plan/add", meta: { isPublic: false }, component: AddPlan },
-    { name: "edit_plan", path: "/plan/edit/:id", meta: { isPublic: false }, component: AddPlan },
-    { name: "list_plan", path: "/plan/list", meta: { isPublic: false }, component: ListPlan },
-    { name: "all_plan", path: "/plan/:id/all", meta: { isPublic: false }, component: AllPlan },
+    {
+        name: "add_plan",
+        path: "/plan/add",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddPlan,
+    },
+    {
+        name: "edit_plan",
+        path: "/plan/edit/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddPlan,
+    },
+    {
+        name: "list_plan",
+        path: "/plan/list",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListPlan,
+    },
+    {
+        name: "all_plan",
+        path: "/plan/:id/all",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AllPlan,
+    },
 
-    { name: "list_snapshot", path: "/snapshot/list", meta: { isPublic: false }, component: ListSnapshot },
-    { name: "add_snapshot", path: "/snapshot/add", meta: { isPublic: false }, component: AddSnapshot },
-    { name: "edit_snapshot", path: "/snapshot/edit/:id", meta: { isPublic: false }, component: AddSnapshot },
+    {
+        name: "list_snapshot",
+        path: "/snapshot/list",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListSnapshot,
+    },
+    {
+        name: "add_snapshot",
+        path: "/snapshot/add",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddSnapshot,
+    },
+    {
+        name: "edit_snapshot",
+        path: "/snapshot/edit/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddSnapshot,
+    },
 
-    { name: "add_raid", path: "/raid/add", meta: { isPublic: false }, component: AddRaid },
-    { name: "edit_raid", path: "/raid/edit/:id", meta: { isPublic: false }, component: EditRaid },
-    { name: "manage_raid", path: "/raid/manage", meta: { isPublic: false }, component: ManageRaid },
-    { name: "my_raid", path: "/raid/my", meta: { isPublic: false }, component: MyTeamRaid },
-    { name: "list_raid", path: "/raid/list", meta: { isPublic: true }, component: ListRaid },
-    { name: "view_raid", path: "/raid/:id", meta: { isPublic: true }, component: ViewRaid },
+    {
+        name: "add_raid",
+        path: "/raid/add",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: AddRaid,
+    },
+    {
+        name: "edit_raid",
+        path: "/raid/edit/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: EditRaid,
+    },
+    {
+        name: "manage_raid",
+        path: "/raid/manage",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ManageRaid,
+    },
+    {
+        name: "my_raid",
+        path: "/raid/my",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: MyTeamRaid,
+    },
+    {
+        name: "list_raid",
+        path: "/raid/list",
+        meta: {
+            isPublic: true,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ListRaid,
+    },
+    {
+        name: "view_raid",
+        path: "/raid/:id",
+        meta: {
+            isPublic: true,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ViewRaid,
+    },
 
-    { name: "apply_list", path: "/apply/list", meta: { isPublic: false }, component: ApplyList },
-    { name: "apply_single", path: "/apply/:id", meta: { isPublic: false }, component: ApplySingle },
+    {
+        name: "apply_list",
+        path: "/apply/list",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ApplyList,
+    },
+    {
+        name: "apply_single",
+        path: "/apply/:id",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: ApplySingle,
+    },
 
-    { name: "Battle", path: "/battle", meta: { isPublic: false }, component: Battle },
-    { name: "myBattle", path: "/myBattle", meta: { isPublic: false }, component: myBattle },
+    {
+        name: "Battle",
+        path: "/battle",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: Battle,
+    },
+    {
+        name: "myBattle",
+        path: "/myBattle",
+        meta: {
+            isPublic: false,
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        component: myBattle,
+    },
 ];
 
 const router = createRouter({
