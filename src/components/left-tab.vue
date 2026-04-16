@@ -1,6 +1,6 @@
 <template>
     <div class="m-left-tab">
-        <el-tabs v-model="type" :tab-position="windowWidth <= 768 ? 'top' : 'left'">
+        <el-tabs v-model="type" :tab-position="windowWidth < 900 ? 'top' : 'left'">
             <el-tab-pane name="all" label="全部">
                 <template #label>
                     <i class="u-icon el-icon-menu" style="vertical-align: 0"></i>
@@ -72,7 +72,7 @@ export default {
     .el-tabs--top .el-tabs__item.is-top:nth-child(2) {
         padding-left: 10px;
     }
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 899px) {
         .el-tabs__item {
             flex-shrink: 0;
         }
