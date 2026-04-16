@@ -35,6 +35,15 @@ module.exports = {
         port: process.env.DEV_PORT || 12028,
         hot: true,
         liveReload: true,
+        client: {
+            webSocketURL: {
+                protocol: "ws",
+                hostname: "localhost",
+                port: Number(process.env.DEV_PORT || 12028),
+                pathname: "/ws",
+            },
+        },
+        watchFiles: ["src/**/*", "public/**/*"],
     },
 
     // 依赖包（element-plus/theme-chalk 等）会输出大量 Sass deprecation 警告

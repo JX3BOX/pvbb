@@ -74,26 +74,26 @@
     }
 }
 .m-namespace-list {
-    .flex;
+    .grid(x,2);
     .pt(20px);
-    flex-wrap: wrap;
+    gap:20px;
 
     .u-namespace {
-        .w(50%);
         box-sizing: border-box;
-        padding: 0 20px 20px 0;
     }
 }
 
 @media screen and (max-width: @phone) {
     .m-namespace-list {
+        display: block;
         .u-namespace {
             .w(100%);
-            padding-right: 0;
+            margin-bottom: 20px;
         }
     }
 }
 .m-namespace-pages {
+    margin-top:20px;
     overflow-x: auto;
     .x;
     justify-content: center;
