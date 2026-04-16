@@ -30,6 +30,7 @@ export default {
 
 <style lang="less">
 .m-joke-popover {
+    padding:0 !important;
     .m-publish-joke-emotion {
         margin: 0;
         .c-jx3box-emotion-item {
