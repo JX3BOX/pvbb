@@ -1,8 +1,5 @@
 // 列表页
 // =======================
-.v-collection {
-    padding: 0 30px;
-}
 .m-collection-list {
     .mt(20px);
     // display: grid;
@@ -11,6 +8,30 @@
     .flex;
     justify-content: space-between;
     flex-wrap: wrap;
+}
+@media screen and (max-width: @ipad) {
+    .m-collection-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        justify-content: center;
+    }
+    .m-collection-item_v2 {
+        min-width: 0;
+        height: auto;
+        width: auto !important;
+        .u-content {
+            .w(128px);
+            overflow: hidden;
+            *{
+                .fz(12px);
+            }
+        }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-collection-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .m-collection-null {
@@ -188,9 +209,6 @@
     .m-thx {
         margin-top: 40px;
     }
-}
-.c-main {
-    padding: 0;
 }
 @media screen and (max-width: @phone) {
     .m-collection-single {

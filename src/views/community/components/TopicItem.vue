@@ -57,14 +57,14 @@
                     <template v-for="(_item, index) in data.color_tag" :key="index">
                         <a
                             v-if="!getBg(_item.label)"
-                            class="u-tag"
+                            class="u-tag u-topic"
                             :style="{ backgroundColor: _item.color }"
                             :href="getLink(_item)"
                             target="_blank"
                         >
                             {{ _item.label }}
                         </a>
-                        <a v-else class="u-tag" :href="getLink(_item)" target="_blank">
+                        <a v-else class="u-tag u-topic" :href="getLink(_item)" target="_blank">
                             <img class="u-tag-bg" :src="getBg(_item.label)" alt="" />
                             <span class="u-tag-text">{{ _item.label }}</span>
                         </a>

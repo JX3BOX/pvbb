@@ -2,7 +2,8 @@
     <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
         <el-tab-pane label="全部内容" name="all">
             <template #label>
-                <img class="u-icon-img" src="@/assets/img/community/category/all.svg" alt="" />
+                <!-- <img class="u-icon-img" src="@/assets/img/community/category/all.svg" alt="" /> -->
+                <el-icon class="u-icon-img"><Menu /></el-icon>
                 <b>全部内容</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </template>
@@ -10,7 +11,8 @@
 
         <el-tab-pane label="攻略心得" name="guide">
             <template #label>
-                <img class="u-icon-img" src="@/assets/img/community/category/guide.png" alt="" />
+                <!-- <img class="u-icon-img" src="@/assets/img/community/category/guide.png" alt="" /> -->
+                <el-icon class="u-icon-img"><Notebook /></el-icon>
                 <b>攻略心得</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </template>
@@ -18,21 +20,24 @@
 
         <el-tab-pane label="江湖故事" name="story">
             <template #label>
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="" />
+                <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="" /> -->
+                <el-icon class="u-icon-img"><Reading /></el-icon>
                 <b>江湖故事</b>
             </template>
         </el-tab-pane>
 
         <el-tab-pane label="交流分享" name="discuz">
             <template #label>
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="" />
+                <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="" /> -->
+                <el-icon class="u-icon-img"><ChatLineSquare /></el-icon>
                 <b>交流分享</b>
             </template>
         </el-tab-pane>
 
         <el-tab-pane label="求助寻觅" name="help">
             <template #label>
-                <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="" />
+                <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="" /> -->
+                <el-icon class="u-icon-img" ><Warning /></el-icon>
                 <b>求助寻觅</b>
             </template>
         </el-tab-pane>

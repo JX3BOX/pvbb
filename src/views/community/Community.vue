@@ -35,9 +35,9 @@
                         >只看精选</el-checkbox
                     >
                 </div>
-                <el-radio-group class="m-list-view" v-model="view" size="small" @change="onViewChange">
-                    <el-radio-button :value="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
-                    <el-radio-button :value="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
+                <el-radio-group class="m-filter__mode" v-model="view" size="small" @change="onViewChange">
+                    <el-radio-button :value="1"><el-icon><Menu /></el-icon> 卡片</el-radio-button>
+                    <el-radio-button :value="2"><el-icon style="transform:rotate(90deg)"><Histogram /></el-icon> 列表</el-radio-button>
                 </el-radio-group>
             </div>
 
@@ -475,13 +475,14 @@ export default {
 @import "~@/assets/css/community/list.less";
 .p-community-v2 {
     // padding: 20px 30px;
-    .m-tabs {
-        padding: 20px 30px 0 30px;
-    }
-    .m-archive-search,
-    .m-archive-filter {
-        margin: 0 30px 10px 30px;
-    }
+    min-height: calc(100vh - @header-height - @bread-height);
+    // .m-tabs {
+    //     padding: 20px 30px 0 30px;
+    // }
+    // .m-archive-search,
+    // .m-archive-filter {
+    //     margin: 0 30px 10px 30px;
+    // }
     background-color: #fff;
 
     .m-community-top {
@@ -496,10 +497,16 @@ export default {
             color: @color;
         }
     }
-    .m-list-view {
+    .m-filter__mode {
         .el-radio-button__inner {
             padding: 8px 11px;
+            .flex(y);
+            gap:5px;
         }
+        // .el-radio-button.is-active .el-radio-button__inner{
+        //     color: @v4primary;
+        //     background:none;
+        // }
     }
 }
 </style>

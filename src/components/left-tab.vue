@@ -56,8 +56,8 @@ export default {
     .el-tabs__item {
         padding: 0 10px;
         &.is-active {
-            background-color: rgba(#0366d6, 0.1);
-            color: #0366d6;
+            // background-color: @v4primary;
+            color: @v4primary;
         }
         .el-icon-menu {
             line-height: 28px;

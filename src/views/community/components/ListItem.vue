@@ -15,10 +15,10 @@
             <!-- 资料片 -->
             <!-- <span class="u-label u-zlp" v-if="item.post_subtype && showSubtype(item.post_subtype)">{{ showSubtype(item.post_subtype) }}</span> -->
 
-            <img svg-inline class="u-post-icon" v-if="isTop" src="@/assets/img/community/is_top.svg" alt="" srcset="" />
+            <img svg-inline class="u-icon" v-if="isTop" src="@/assets/img/community/is_top.svg" alt="" srcset="" />
             <img
                 svg-inline
-                class="u-post-icon"
+                class="u-icon"
                 v-if="item.is_star"
                 src="@/assets/img/community/is_star.svg"
                 alt=""
@@ -88,14 +88,14 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                         <template v-for="(_item, index) in item.color_tag" :key="index">
                             <a
                                 v-if="!getBg(_item.label)"
-                                class="u-tag"
+                                class="u-tag u-topic"
                                 :style="{ backgroundColor: _item.color }"
                                 :href="getLink(_item)"
                                 target="_blank"
                             >
                                 {{ _item.label }}
                             </a>
-                            <a v-else class="u-tag" :href="getLink(_item)" target="_blank">
+                            <a v-else class="u-tag u-topic" :href="getLink(_item)" target="_blank">
                                 <img class="u-tag-bg" :src="getBg(_item.label)" alt="" />
                                 <span class="u-tag-text">{{ _item.label }}</span>
                             </a>
@@ -104,7 +104,7 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                     <!-- <span class="u-tag u-star-tag" v-if="item.is_star">精选</span> -->
                     <template v-if="~~item.collection_id">
                         <a
-                            class="u-tag u-tag--collection"
+                            class="u-topic u-tag u-tag--collection"
                             :href="`/collection/${item.collection_id}`"
                             target="_blank"
                             >{{ item.collection && item.collection.title.replace(/(^《|》$)/g, "") }}</a
@@ -320,33 +320,33 @@ export default {
 
 <style lang="less">
 .u-community-item {
-    background-position: right bottom;
-    background-size: cover;
+    // background-position: right bottom;
+    // background-size: cover;
     padding-top: 20px;
-    border-radius: 4px;
-    padding-left: 10px;
-    border: 1px solid #fff !important;
-    background-color: #fff;
+    // border-radius: 4px;
+    // padding-left: 10px;
+    // border: 1px solid #fff !important;
+    // background-color: #fff;
 
-    &:hover {
-        border: 1px solid @v4primary !important;
-    }
+    // &:hover {
+    //     border: 1px solid @v4primary !important;
+    // }
 
-    .u-post {
-        .flex;
-        .pr;
-        align-items: center;
-    }
-    .u-post-icon {
-        width: 18px;
-        height: 18px;
-        margin-right: 5px;
-        flex-shrink: 0;
-    }
-    .u-topics {
-        .flex !important;
-        align-items: center;
-    }
+    // .u-post {
+    //     .flex;
+    //     .pr;
+    //     align-items: center;
+    // }
+    // .u-post-icon {
+    //     width: 18px;
+    //     height: 18px;
+    //     margin-right: 5px;
+    //     flex-shrink: 0;
+    // }
+    // .u-topics {
+    //     .flex !important;
+    //     align-items: center;
+    // }
 }
 @media screen and (max-width: @phone) {
     .m-topic-list .u-community-item {

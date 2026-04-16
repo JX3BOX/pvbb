@@ -60,16 +60,10 @@ export default {
 </script>
 
 <style lang="less">
+@import "~@/assets/css/app.less";
 .l-community-layout {
     .c-header {
         z-index: 9999;
-    }
-    background: #fafbfc;
-    .m-main {
-        padding: 0;
-    }
-    .c-main {
-        padding: 0;
     }
 }
 .m-bbs-right-side {

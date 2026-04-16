@@ -66,7 +66,7 @@ export default {
     .flex;
     .mb(20px);
     .size(250px, 350px);
-    min-width: 250px;
+    min-width: 128px;
     flex-direction: column;
     background-color: #fff;
     justify-content: center;
@@ -114,7 +114,7 @@ export default {
         .db;
         .x;
         .w(100%);
-        .fz(16px, 1.8);
+        .fz(14px, 1.8);
         color: #000;
     }
 
@@ -153,7 +153,7 @@ export default {
             }
         }
         .u-title {
-            color: rgba(42, 130, 228, 1);
+            color: @v4primary;
         }
     }
     .el-button--text,

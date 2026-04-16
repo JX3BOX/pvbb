@@ -11,7 +11,7 @@
 // =======================
 .m-emotion-types {
     position: sticky;
-    top: 112px;
+    top: @header-height + @bread-height;
     margin-bottom: 10px;
     background-color: #fff;
     z-index: 100;
@@ -42,6 +42,9 @@
     }
     .u-original {
         .ml(10px);
+    }
+    .u-search{
+        .ml(5px);
     }
 }
 .u-item-bottom {
@@ -198,9 +201,6 @@
     }
 }
 @media screen and (max-width: @phone) {
-    .c-main {
-        padding: 0;
-    }
     .m-emotion-list {
         .u-item {
             margin: 0 5px 10px 5px;

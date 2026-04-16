@@ -139,5 +139,10 @@ export default {
         gap: 0;
         justify-content: flex-start;
     }
+    .m-collection-search{
+        .u-search{
+            margin-left:3px;
+        }
+    }
 }
 </style>

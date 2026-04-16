@@ -2,7 +2,7 @@
 // =======================
 .m-joke-types {
     position: sticky;
-    top: 112px;
+    top: @header-height + @bread-height;
     margin-bottom: 10px;
     background-color: #fff;
     z-index: 100;
@@ -12,9 +12,6 @@
     }
 }
 @media screen and (max-width: @phone) {
-    .c-main {
-        padding: 0;
-    }
     .wechat-miniprogram {
         .m-joke-types {
             position: relative;
@@ -66,6 +63,11 @@
     align-items: flex-end;
     .m-joke-all {
         margin-right: 10px;
+    }
+}
+@media screen and (max-width:@ipad){
+    .m-joke-reward{
+        .none;
     }
 }
 .m-joke-publish {
@@ -205,9 +207,8 @@
         transition: 0.1s ease-in-out;
         &:hover,
         &.on {
-            background-color: #f3f9ff;
-            border-color: #3585de;
-            .arrows(b, 10px, #f3f9ff, 1px, #3585de, @x:20px);
+            border-color: @v4primary;
+            .arrows(b, 10px, #f3f9ff, 1px, @v4primary, @x:20px);
         }
 
         &.on {

@@ -33,6 +33,8 @@ module.exports = {
         proxy: buildEnvProxy(),
         allowedHosts: "all",
         port: process.env.DEV_PORT || 12028,
+        hot: true,
+        liveReload: true,
     },
 
     // 依赖包（element-plus/theme-chalk 等）会输出大量 Sass deprecation 警告
@@ -49,13 +51,6 @@ module.exports = {
                     quietDeps: true,
                 },
             },
-        },
-    },
-
-    // 过滤依赖包里的已知兼容性 warning（不影响运行，但会刷屏）
-    configureWebpack: {
-        stats: {
-            warningsFilter: [/node_modules[\\\\/]+@jx3box[\\\\/]+jx3box-common[\\\\/]+/],
         },
     },
 
@@ -97,14 +92,27 @@ module.exports = {
         };
     },
 
-    configureWebpack: {
+    // 统一维护 configureWebpack，避免对象键重复导致前面的配置被后面的覆盖
+    configureWebpack: () => ({
+        // 某些机器上 less/css 变更不会稳定触发 fs 事件，开发环境改为轮询监听更稳妥
+        watchOptions:
+            process.env.NODE_ENV === "development"
+                ? {
+                      poll: Number(process.env.WEBPACK_WATCH_POLL || 1000),
+                      aggregateTimeout: 300,
+                      ignored: /node_modules/,
+                  }
+                : undefined,
+        stats: {
+            warningsFilter: [/node_modules[\\\\/]+@jx3box[\\\\/]+jx3box-common[\\\\/]+/],
+        },
         plugins: [
             new webpack.DefinePlugin({
                 // 全局注入，用于 JS 或其他代码中
                 __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
             }),
         ],
-    },
+    }),
 };
 
 // 注入全局样式资源（变量、mixin 等）
