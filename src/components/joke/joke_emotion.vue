@@ -32,6 +32,9 @@ export default {
 .m-joke-popover {
     .m-publish-joke-emotion {
         margin: 0;
+        .c-jx3box-emotion-item {
+            box-sizing: content-box;
+        }
     }
 }
 .m-publish-joke-button {
