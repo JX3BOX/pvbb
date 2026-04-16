@@ -23,7 +23,7 @@
                 <slot></slot>
             </div>
             <RightSidebar class="m-bbs-right-side" :show-toggle="true">
-                <ListSide class="m-extend" />
+                <ListSide />
             </RightSidebar>
             <Footer></Footer>
         </Main>
@@ -75,6 +75,10 @@ export default {
 .m-bbs-right-side {
     .c-sidebar-right-inner {
         background: #fff;
+    }
+
+    .m-extend-list {
+        padding: 10px 30px;
     }
 }
 </style>

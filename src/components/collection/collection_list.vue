@@ -24,7 +24,7 @@
         <!-- 列表 -->
         <div class="m-collection-list" v-if="data && data.length">
             <template v-for="(item, i) in data" :key="i">
-                <collection-item :data="item" :style="!isPhone ? `width: calc(100% / ${count})` : ''" />
+                <collection-item :data="item" />
             </template>
         </div>
         <!-- 空 -->
