@@ -1,11 +1,9 @@
 <template>
-    <li
-        class="u-item u-community-item"
-        :class="{ hasMoka: skin.background }"
-        :style="{
-            backgroundImage: `url(${skin.background})`,
-        }"
-    >
+    <li class="u-item u-community-item" :class="{ hasMoka: skin.background }">
+        <div v-if="skin.background" class="u-bg-art">
+            <i class="u-bg-mask"></i>
+            <img class="u-bg-image" :src="skin.background" alt="" />
+        </div>
         <!-- Banner -->
         <a class="u-banner" :href="postLink(item.id)" :target="target">
             <img :src="getBanner(item.banner_img, item.post_subtype)" :key="item.ID" />
@@ -24,6 +22,14 @@
                 alt=""
                 srcset=""
             />
+
+            <template v-if="item.color_tag">
+                <template v-for="(_item, index) in item.color_tag" :key="index">
+                    <a class="u-label" target="_blank" :href="getLink(_item)">
+                        {{ _item.label }}
+                    </a>
+                </template>
+            </template>
 
             <!-- 标题文字 -->
             <a
@@ -57,22 +63,8 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
         </h2>
 
         <!-- 字段 -->
-        <!-- <div class="u-content u-desc">
-            {{ item.post_excerpt || item.title || "这个作者很懒,什么都没有留下" }}
-        </div> -->
-        <!-- 字段 -->
         <div class="u-content u-desc">
-            <!-- {{ item.post_excerpt || item.title || "这个作者很懒,什么都没有留下" }} -->
             <div class="u-metalist u-collection">
-                <!-- <strong>小册</strong>
-                <em>
-                    <template v-if="~~item.collection_id">
-                        <a :href="`/collection/${item.collection_id}`" target="_blank"
-                            >《{{ item.collection && item.collection.title }}》</a
-                        >
-                    </template>
-                    <template v-else>-</template>
-                </em> -->
                 <strong>摘要</strong>
                 <em>
                     <span v-html="highlightText(item.introduction)"></span>
@@ -80,37 +72,16 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
             </div>
             <div class="u-metalist u-topics">
                 <strong>标签</strong>
-                <span class="m-topic-tag">
-                    <a class="u-tag" :href="`/community?category=${item.category}&page=1`" target="_blank">{{
+                <em>
+                    <a class="u-topic" :href="`/community?category=${item.category}&page=1`" target="_blank">{{
                         showCategory(item.category)
                     }}</a>
-                    <template v-if="item.color_tag">
-                        <template v-for="(_item, index) in item.color_tag" :key="index">
-                            <a
-                                v-if="!getBg(_item.label)"
-                                class="u-tag"
-                                :style="{ backgroundColor: _item.color }"
-                                :href="getLink(_item)"
-                                target="_blank"
-                            >
-                                {{ _item.label }}
-                            </a>
-                            <a v-else class="u-tag" :href="getLink(_item)" target="_blank">
-                                <img class="u-tag-bg" :src="getBg(_item.label)" alt="" />
-                                <span class="u-tag-text">{{ _item.label }}</span>
-                            </a>
-                        </template>
-                    </template>
-                    <!-- <span class="u-tag u-star-tag" v-if="item.is_star">精选</span> -->
-                    <template v-if="~~item.collection_id">
-                        <a
-                            class="u-tag u-tag--collection"
-                            :href="`/collection/${item.collection_id}`"
-                            target="_blank"
-                            >{{ item.collection && item.collection.title.replace(/(^《|》$)/g, "") }}</a
-                        >
-                    </template>
-                </span>
+                </em>
+                <em v-if="~~item.collection_id">
+                    <a class="u-topic u-collection" :href="`/collection/${item.collection_id}`" target="_blank"
+                        >《{{ item.collection && item.collection.title.replace(/(^《|》$)/g, "") }}》</a
+                    >
+                </em>
             </div>
         </div>
 
@@ -320,22 +291,104 @@ export default {
 
 <style lang="less">
 .u-community-item {
-    background-position: right bottom;
-    background-size: cover;
+    .pr;
+    overflow: hidden;
     padding-top: 20px;
     border-radius: 4px;
     padding-left: 10px;
     border: 1px solid #fff !important;
     background-color: #fff;
+    transition: border-color 0.2s ease;
+
+    .u-bg-art {
+        .pa;
+        inset: 0;
+        left: auto;
+        width: 44%;
+        z-index: 0;
+        pointer-events: none;
+
+        .u-bg-mask,
+        .u-bg-image {
+            .pa;
+            inset: 0;
+        }
+
+        .u-bg-mask {
+            z-index: 1;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(255, 255, 255, 0.82) 18%,
+                rgba(255, 255, 255, 0.6) 40%,
+                rgba(255, 255, 255, 0.3) 62%,
+                rgba(255, 255, 255, 0.08) 82%,
+                rgba(255, 255, 255, 0) 100%
+            );
+        }
+
+        .u-bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: right center;
+        }
+    }
 
     &:hover {
         border: 1px solid @v4primary !important;
+    }
+
+    > *:not(.u-bg-art) {
+        .pr;
+        z-index: 1;
+    }
+
+    .u-metalist {
+        .nobreak;
+        .db;
+        .fz(12px, 25px);
+        .mb(4px);
+        strong {
+            .dbi;
+            .y(top);
+            padding: 0 10px;
+            .mr(10px);
+            .r(4px);
+            background-color: #f1f8ff;
+            color: @v4primary;
+            font-weight: normal;
+        }
+        em {
+            font-style: normal;
+        }
+        b {
+            font-weight: normal;
+        }
+        a {
+            color: #333;
+            &:hover {
+                color: @v4primary;
+                box-shadow: 0 1px 0 @v4primary;
+            }
+        }
     }
 
     .u-post {
         .flex;
         .pr;
         align-items: center;
+
+        .u-label {
+            font-size: 12px;
+            line-height: 1.2;
+            height: auto;
+            border-radius: 3px;
+            margin-right: 5px;
+            padding: 2px 5px;
+            border: 1px solid #fa80a2;
+            color: #fa80a2;
+        }
     }
     .u-post-icon {
         width: 18px;
@@ -343,9 +396,15 @@ export default {
         margin-right: 5px;
         flex-shrink: 0;
     }
-    .u-topics {
-        .flex !important;
-        align-items: center;
+    .u-topic {
+        background-color: @bg-gray;
+        padding: 3px 5px;
+        .r(2px);
+        .mr(5px);
+        &:hover {
+            box-shadow: none !important;
+            background-color: #def;
+        }
     }
 }
 @media screen and (max-width: @phone) {
