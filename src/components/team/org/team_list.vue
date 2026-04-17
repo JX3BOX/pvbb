@@ -90,10 +90,10 @@
                     </span>
                 </span>
                 <span class="u-recruit">
-                    {{ item.recruit || item.desc }}
+                    {{ item.recruit || item.desc || "" }}
                 </span>
-                <span class="u-tag" v-if="item.tags && item.tags.length">
-                    <span class="u-tag-list">
+                <div class="u-tag">
+                    <span class="u-tag-list" v-if="item.tags && item.tags.length">
                         <span
                             class="u-tag-item"
                             :class="{ love: tag == '可教学' }"
@@ -102,7 +102,8 @@
                             >{{ tag }}</span
                         >
                     </span>
-                </span>
+                    <span class="u-tag-list" v-else></span>
+                </div>
             </router-link>
         </div>
         <el-alert v-else class="m-team-list-null" title="没有找到相关条目" type="info" center show-icon></el-alert>

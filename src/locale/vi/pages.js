@@ -1,10 +1,4 @@
 export default {
-    index: {
-        title: "Trang chủ",
-        keywords: "JX3,JX3BOX,công cụ,hướng dẫn,tin tức,cộng đồng",
-        description: "Trang chủ JX3BOX: tin tức, cộng đồng và bản tin giang hồ.",
-    },
-
     community: {
         title: "Trà Quán Trúc Lâm",
         keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
@@ -18,52 +12,32 @@ export default {
 
     joke: {
         title: "Câu Nói Vui",
-        keywords: "câu nói vui JX3,meme JX3,hài hước JX3,trêu đùa JX3",
-        description: "Tổng hợp các câu nói vui và mẩu chuyện kinh điển của người chơi JX3.",
-        single: {
-            title: "Chi Tiết Câu Nói Vui",
-            keywords: "câu nói vui JX3,meme JX3,hài hước JX3",
-            description: "Xem các câu nói vui và mẩu chuyện thú vị được người chơi JX3 chia sẻ.",
-        },
+        keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
+        description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
     },
 
     emotion: {
         title: "Ảnh Vui",
-        keywords: "ảnh vui JX3,sticker JX3,meme JX3,sáng tác người chơi",
-        description: "Chia sẻ ảnh vui và sticker do người chơi JX3 tạo ra.",
-        single: {
-            title: "Chi Tiết Ảnh Vui",
-            keywords: "ảnh vui JX3,sticker JX3,meme JX3",
-            description: "Xem ảnh vui và sticker do người chơi JX3 sáng tác.",
-        },
+        keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
+        description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
     },
 
     collection: {
         title: "Sổ Tay",
-        keywords: "tổng hợp hướng dẫn JX3,tài liệu JX3,tổng hợp lối chơi",
-        description: "Tổng hợp các hướng dẫn và tài liệu lối chơi do người chơi JX3 biên soạn.",
-        single: {
-            title: "Chi Tiết Sổ Tay",
-            keywords: "tổng hợp hướng dẫn JX3,tài liệu JX3",
-            description: "Xem các hướng dẫn và tài liệu lối chơi do người chơi JX3 tổng hợp.",
-        },
+        keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
+        description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
     },
 
     namespace: {
         title: "Bảng Tên",
-        keywords: "bảng tên JX3,chữ ký cá nhân JX3,danh hiệu JX3",
-        description: "Không gian trưng bày bảng tên cá nhân của người chơi JX3.",
-        single: {
-            title: "Chi Tiết Bảng Tên",
-            keywords: "bảng tên JX3,chữ ký cá nhân JX3",
-            description: "Xem bảng tên cá nhân của người chơi JX3.",
-        },
+        keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
+        description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
     },
 
     team: {
-        title: "團隊管理平臺",
-        keywords: "開團,團隊管理,幫會管理,角色管理,DKP,團本招募",
-        description: "劍網3團隊管理中心，支援幫會、角色、團員、DKP、開團與申請管理。",
+        title: "Nen Tang Quan Ly Nhom",
+        keywords: "lap doan,quan ly nhom,quan ly bang hoi,quan ly nhan vat,DKP,tuyen nguoi raid",
+        description: "Nen tang quan ly nhom JX3 cho raid, bang hoi, thanh vien, DKP va quy trinh dang ky.",
     },
 
     common: {
