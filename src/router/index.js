@@ -20,6 +20,8 @@ const CollectionMiniSingle = () => import("@/components/collection/collection_mi
 
 const routes = [
     { name: "index", path: "/", redirect: { name: "community" } },
+
+    // 论坛旧茶馆兼容
     { name: "bbs", path: "/bbs", redirect: { name: "community" } },
     {
         name: "single",
@@ -62,6 +64,7 @@ const routes = [
         },
     },
 
+    // 铭牌
     {
         name: "namespace",
         path: "/namespace",
@@ -86,6 +89,8 @@ const routes = [
             },
         },
     },
+
+    // 骚话
     {
         name: "joke",
         path: "/joke/:id?",
@@ -98,6 +103,8 @@ const routes = [
             },
         },
     },
+
+    // 趣图
     {
         name: "emotion",
         path: "/emotion/:id?",
@@ -110,6 +117,8 @@ const routes = [
             },
         },
     },
+
+    // 小册
     {
         name: "collection",
         path: "/collection",
@@ -135,7 +144,7 @@ const routes = [
         },
     },
 
-    // ====== qqbot ======
+    // QQ机器人
     {
         name: "help",
         path: "/qqbot/help",
