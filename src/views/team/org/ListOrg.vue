@@ -3,7 +3,7 @@
         <h1 class="m-title">
             <span class="u-title">
                 <img class="u-logo" :src="getAppIcon('team')" />
-                <span class="u-txt">团队大厅</span>
+                <span class="u-txt">查找团队</span>
             </span>
             <div class="u-op">
                 <router-link to="/org/add" class="el-button el-button--primary el-button--mini"

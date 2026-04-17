@@ -173,14 +173,14 @@
 .m-nav-teams {
     border: 1px solid #eee;
     background-color: #fff;
-    .r(3px);
+    .r(6px);
     .m-team-item {
         .flex;
         align-items: center;
         padding: 8px 10px;
         gap: 6px;
         .pr;
-        .r(3px);
+        // .r(3px);
 
         &:not(:last-child) {
             border-bottom: 1px solid #eee;
@@ -191,7 +191,15 @@
         }
 
         &.active {
-            border-left: 3px solid @v4primary;
+            &::before{
+                content: '';
+                .size(4px, 30px);
+                background-color: @v4primary;
+                .pa;
+                left: 0;
+                top: 6px;
+                .r(6px);
+            }
             .u-name{
                 font-weight: bold;
                 color:@v4primary;
@@ -222,6 +230,19 @@
         .pa;
         right: 5px;
         font-size: 12px;
+        line-height: 16px;
         transform: scale(0.8);
+        // padding:2px 6px;
+        border:1px solid @v4yellow;
+        color:@v4yellow;
+        .r(50%);
+        .size(16px);
+        .x;
+    }
+    .u-super{
+        .pa;.rt(10px,50%);
+        transform: translateY(-50%);
+        .size(14px);
+        color:@v4tip;
     }
 }

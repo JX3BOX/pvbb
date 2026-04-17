@@ -6,7 +6,7 @@
             <!-- <h5 class="u-title">茶馆矩阵</h5> -->
             <a href="/team" class="u-item" :class="{ 'is-active': routeActive('index') }">
                 <i class="el-icon-office-building"></i>
-                <span>团队大厅</span>
+                <span>查找团队</span>
                 <em>Teams</em>
             </a>
             <a href="/dashboard/role" class="u-item" target="_blank">
@@ -43,9 +43,10 @@
                     <span class="u-name">
                         {{ item.name }}
                     </span>
-                    <el-tag class="u-tag" title="创始人" v-if="item.super == uid" size="small" type="warning"
-                        >创始人</el-tag
-                    >
+                    <!-- <span class="u-tag" title="创始人" v-if="item.super == uid" size="small" color="#fff"
+                        >★</span
+                    > -->
+                    <span class="u-super" v-if="item.super == uid"><el-icon><Setting /></el-icon></span>
                 </router-link>
             </div>
         </template>
