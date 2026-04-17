@@ -51,6 +51,7 @@ export default {
 
 <style lang="less">
 .p-qqbot {
+    min-width: 1420px;
     .c-main {
         margin-top: 59px;
         height: calc(100vh - 64px);
