@@ -8,11 +8,11 @@ const pages = {
         template: "./public/index.html",
         filename: "index.html",
     },
-    qqbot: {
-        entry: "./src/pages/qqbot/index.js",
-        template: "./public/index.html",
-        filename: "qqbot/index.html",
-    },
+    // qqbot: {
+    //     entry: "./src/pages/qqbot/index.js",
+    //     template: "./public/index.html",
+    //     filename: "qqbot/index.html",
+    // },
     team: {
         entry: "./src/pages/team/index.js",
         template: "./public/index.html",

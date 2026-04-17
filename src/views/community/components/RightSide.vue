@@ -1,5 +1,5 @@
 <template>
-    <div class="m-extend-list">
+    <div class="m-extend-list m-extend">
         <minirank />
         <listside></listside>
     </div>

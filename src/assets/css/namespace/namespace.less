@@ -74,8 +74,11 @@
     }
 }
 .m-namespace-list {
-    .grid(x,2);
+
     .pt(20px);
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap:20px;
 
     .u-namespace {

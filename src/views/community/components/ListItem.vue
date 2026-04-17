@@ -441,12 +441,4 @@ export default {
         background: #f6fff2;
     }
 }
-@media screen and (max-width: @phone) {
-    .m-topic-list .u-community-item {
-        .u-post {
-            .flex;
-            align-items: flex-start;
-        }
-    }
-}
 </style>
