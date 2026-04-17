@@ -43,7 +43,7 @@
                     <span class="u-name">
                         {{ item.name }}
                     </span>
-                    <el-tag class="u-tag" title="创始人" v-if="item.super == uid" size="small" type="success"
+                    <el-tag class="u-tag" title="创始人" v-if="item.super == uid" size="small" type="warning"
                         >创始人</el-tag
                     >
                 </router-link>

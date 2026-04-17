@@ -147,7 +147,7 @@ export default {
     .u-displayname {
         .lh(2.2);
         .bold;
-        color: @darkblue;
+        color: @v4primary;
         .nobreak;
         &:hover {
             color: #f39;

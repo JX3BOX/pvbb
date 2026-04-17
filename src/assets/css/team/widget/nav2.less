@@ -68,10 +68,10 @@
         }
 
         &:not(.disabled):hover {
-            color: @darkblue;
+            color: @v4primary;
 
             svg {
-                fill: @darkblue;
+                fill: @v4primary;
             }
 
             .bold;
@@ -79,7 +79,7 @@
             border-color: @v4primary;
 
             em {
-                color: #5277a1;
+                color: @v4primary;
             }
         }
 
@@ -133,10 +133,10 @@
         }
 
         &.is-active {
-            color: @darkblue;
+            color: @v4primary;
 
             svg {
-                fill: @darkblue;
+                fill: @v4primary;
             }
 
             .bold;
@@ -144,7 +144,7 @@
             border-color: @v4primary;
 
             em {
-                color: #5277a1;
+                color: @v4primary;
             }
         }
     }
@@ -152,10 +152,10 @@
     .router-link-exact-active,
     .on {
         background-color: #fff;
-        color: @darkblue;
+        color: @v4primary;
 
         svg {
-            fill: @darkblue;
+            fill: @v4primary;
         }
 
         .bold;
@@ -201,7 +201,7 @@
 
     .u-pic {
         .db;
-        .size(30px);
+        .size(26px);
         border: 1px solid #eee;
         box-sizing: border-box;
         .r(4px);
@@ -213,8 +213,9 @@
 
     .u-name {
         // .bold;
-        .fz(13px);
-        color:#444;
+        .fz(12px);
+        color:@color;
+        // font-weight: 500;
     }
 
     .u-tag {

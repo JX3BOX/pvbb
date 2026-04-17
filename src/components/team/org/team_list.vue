@@ -74,11 +74,11 @@
                     </span>
                 </span>
                 <span class="u-meta">
-                    <span class="u-server">
+                    <span class="u-meta-item u-server">
                         <em>服务器</em>
                         {{ item.server }}
                     </span>
-                    <span class="u-server">
+                    <span class="u-meta-item u-leader">
                         <em>团长</em>
                         <a class="u-super" :href="authorLink(item.super)" target="_blank">
                             <img
@@ -88,22 +88,26 @@
                             {{ item.super_user_info && item.super_user_info.display_name }}
                         </a>
                     </span>
+                    <div class="u-meta-item u-tag">
+                        <em>类型</em>
+                        <span class="u-tag-list" v-if="item.tags && item.tags.length">
+                            <span
+                                class="u-tag-item"
+                                :class="{ love: tag == '可教学' }"
+                                v-for="(tag, i) in item.tags"
+                                :key="i"
+                                >{{ tag }}</span
+                            >
+                        </span>
+                        <span class="u-tag-list" v-else></span>
+                    </div>
                 </span>
-                <span class="u-recruit">
-                    {{ item.recruit || item.desc || "" }}
+                <span class="u-recruit u-meta">
+                    <div class="u-meta-item">
+                        <em>公告</em>
+                        <span>{{ item.recruit || item.desc || "-" }}</span>
+                    </div>
                 </span>
-                <div class="u-tag">
-                    <span class="u-tag-list" v-if="item.tags && item.tags.length">
-                        <span
-                            class="u-tag-item"
-                            :class="{ love: tag == '可教学' }"
-                            v-for="(tag, i) in item.tags"
-                            :key="i"
-                            >{{ tag }}</span
-                        >
-                    </span>
-                    <span class="u-tag-list" v-else></span>
-                </div>
             </router-link>
         </div>
         <el-alert v-else class="m-team-list-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
