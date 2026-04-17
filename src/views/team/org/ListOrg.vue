@@ -1,6 +1,6 @@
 <template>
     <div class="v-org-list">
-        <h1 class="m-title">
+        <!-- <h1 class="m-title">
             <span class="u-title">
                 <img class="u-logo" :src="getAppIcon('team')" />
                 <span class="u-txt">团队大厅</span>
@@ -10,7 +10,7 @@
                     ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
                 >
             </div>
-        </h1>
+        </h1> -->
         <team-list @changePage="changePage" />
     </div>
 </template>
