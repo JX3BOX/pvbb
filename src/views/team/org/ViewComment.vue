@@ -1,14 +1,14 @@
 <template>
     <div class="m-team-comment">
         <el-divider content-position="left"><i class="el-icon-chat-line-square"></i> 团队留言板</el-divider>
-        <Comment :id="id" category="team" :normal="hasRight" />
+        <CommonComment :id="id" category="team" :normal="hasRight" />
         <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon v-if="!hasRight"> </el-alert>
     </div>
 </template>
 
 <script>
-
 import User from "@jx3box/jx3box-common/js/user";
+import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
 export default {
     name: "ViewComment",
     props: ["v", "super", "authority"],
@@ -26,7 +26,7 @@ export default {
     methods: {},
     mounted: function () {},
     components: {
-        Comment,
+        CommonComment,
     },
 };
 </script>
