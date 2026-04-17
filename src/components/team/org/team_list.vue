@@ -2,6 +2,9 @@
     <div class="m-team-list" v-loading="loading" :class="{ isIndex }">
         <div class="m-team-list-header">
             <div class="m-filter">
+                <router-link to="/org/add" class="el-button el-button--primary el-button--large"
+                    ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
+                >
                 <el-input
                     class="u-name u-filter"
                     v-model="name"
@@ -10,27 +13,29 @@
                     @change="searchTeam"
                     style="width: 100%"
                 >
-                    <template #prefix>
+                    <template #prepend>
+                        <el-select
+                            style="width: 120px"
+                            v-model="server"
+                            placeholder="选择服务器"
+                            filterable
+                            @change="changeServer"
+                        >
+                            <el-option key="all" label="全部服务器" value=""></el-option>
+                            <el-option
+                                v-for="(item, i) in serversWithClient"
+                                :key="item + i"
+                                :label="item"
+                                :value="item"
+                            ></el-option>
+                        </el-select>
+                    </template>
+                    <template #suffix>
                         <i class="el-icon-search" @click="loadData"></i>
                     </template>
                 </el-input>
             </div>
             <div class="m-filter__sub">
-                <el-select
-                    class="u-server u-select u-filter"
-                    v-model="server"
-                    placeholder="选择服务器"
-                    filterable
-                    @change="changeServer"
-                >
-                    <el-option key="all" label="全部服务器" value=""></el-option>
-                    <el-option
-                        v-for="(item, i) in serversWithClient"
-                        :key="item + i"
-                        :label="item"
-                        :value="item"
-                    ></el-option>
-                </el-select>
                 <template v-if="!isIndex">
                     <el-switch
                         class="u-isVerified u-filter"
@@ -134,6 +139,7 @@ import tags from "@/assets/data/team/tags.json";
 import { getThumbnail, showAvatar, authorLink } from "@jx3box/jx3box-common/js/utils";
 import { __ossMirror, __cdn } from "@/utils/config";
 import { getTeams } from "@/service/team/team.js";
+import { uniq } from "lodash";
 export default {
     name: "TeamList",
     props: ["limit", "isIndex"],
@@ -200,7 +206,7 @@ export default {
             return this.$store.state.client;
         },
         serversWithClient: function () {
-            return this.client == "std" ? server_std : server_origin;
+            return uniq(this.client == "std" ? server_std : server_origin);
         },
     },
     methods: {

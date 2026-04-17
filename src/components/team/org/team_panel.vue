@@ -11,7 +11,7 @@
                 :count="likes"
             />
 
-            <template v-if="isAdmin && !isRaid">
+            <!-- <template v-if="isAdmin && !isRaid">
                 <el-tooltip class="item" effect="dark" content placement="top">
                     <template #content>
                         <div class="m-admin-assessor">
@@ -26,7 +26,7 @@
                         >取消认证</el-button
                     >
                 </el-tooltip>
-            </template>
+            </template> -->
         </div>
 
         <div class="u-panel">
