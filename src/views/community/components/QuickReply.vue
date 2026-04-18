@@ -68,7 +68,6 @@ export default {
     .u-reference {
         cursor: pointer;
         position: relative;
-        top: 8px;
         margin-left: 10px;
     }
 }

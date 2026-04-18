@@ -228,6 +228,7 @@ export default {
                 post_title: this.item.title,
                 ID: this.item.id,
                 author: this.item?.ext_user_info?.display_name || "匿名",
+                client: this.item.client,
             };
             bus.emit("design-task", data);
             setTimeout(() => {
@@ -413,7 +414,7 @@ export default {
             color: #fa80a2;
             white-space: nowrap;
         }
-        .u-title{
+        .u-title {
             .nobreak;
         }
     }

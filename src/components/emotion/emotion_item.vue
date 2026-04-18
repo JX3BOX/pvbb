@@ -70,7 +70,7 @@
                 />
                 <div class="m-single-comment">
                     <el-divider content-position="left">评论</el-divider>
-                    <Comment :id="emotion.id" category="emotion" />
+                    <CommonComment :id="emotion.id" category="emotion" />
                 </div>
             </div>
         </div>
@@ -93,10 +93,14 @@ import { getRelativeTime } from "@/utils/dateFormat.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { starEmotion, unstarEmotion, removeEmotion } from "@/service/emotion";
+import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
 
 export default {
     props: ["emotion", "mode", "index"],
     name: "emotion_item",
+    components: {
+        CommonComment,
+    },
     data() {
         return {
             count: 0,

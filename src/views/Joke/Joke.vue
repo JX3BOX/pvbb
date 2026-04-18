@@ -26,7 +26,7 @@
                 />
                 <div class="m-single-comment">
                     <el-divider content-position="left">评论</el-divider>
-                    <Comment :id="id" category="joke" />
+                    <CommonComment :id="id" category="joke" />
                 </div>
             </div>
 
@@ -130,6 +130,7 @@ import { getLikes } from "@/service/next";
 import emotion from "@jx3box/jx3box-emotion/data/default.json";
 import { publishLink } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
+import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
 
 export default {
     name: "Joke",
@@ -138,6 +139,7 @@ export default {
         "joke-post": joke_post,
         ListLayout,
         LeftTab,
+        CommonComment,
     },
     data: function () {
         return {

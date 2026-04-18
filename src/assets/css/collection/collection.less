@@ -22,7 +22,7 @@
         .u-content {
             .w(128px);
             overflow: hidden;
-            *{
+            * {
                 .fz(12px);
             }
         }
@@ -239,9 +239,11 @@
     }
 
     .u-item {
-        .db;
+        .flex;
+        align-items: center;
         border-bottom: 1px solid #eee;
         .mb(10px);
+        .pr;
 
         .fz(14px);
         padding: 10px 0;
@@ -260,7 +262,6 @@
         .u-item-icon {
             .size(22px);
             .pr;
-            top: 6px;
             margin-right: 5px;
         }
 
@@ -274,9 +275,12 @@
         }
 
         .u-updated {
-            .fr;
+            .pa;
             .fz(12px);
             color: #999;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .u-item-author {

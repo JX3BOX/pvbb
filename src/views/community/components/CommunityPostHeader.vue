@@ -292,7 +292,7 @@ export default {
 
     .u-status {
         .size(20px);
-        margin-right: 5px;
+        margin-right: 15px;
         svg,
         i {
             .size(20px);

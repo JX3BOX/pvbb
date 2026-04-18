@@ -293,7 +293,6 @@ export default {
     .c-comment-emotion {
         margin: 0;
         position: relative;
-        top: 7px;
     }
     .u-publish {
         // margin-bottom: 4px;

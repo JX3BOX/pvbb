@@ -231,7 +231,7 @@ export default {
 </script>
 <style lang="less">
 .m-emotion-preview-dialog {
-    .el-dialog {
+    &.el-dialog {
         background: transparent;
         height: auto !important;
         box-shadow: none !important;

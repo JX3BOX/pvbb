@@ -52,6 +52,7 @@
                         :is-master="false"
                         :is-author="isAuthor"
                         :comment-strict="comment_strict"
+                        :ref="'reply' + i"
                     />
                 </div>
             </div>
@@ -107,6 +108,7 @@
             :userId="postUserId"
             :article-id="~~id"
             category="community"
+            @updateRecord="updateRecord"
         ></Homework>
         <boxCoinRecords
             v-model="showBoxCoin"
@@ -138,7 +140,7 @@ import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { getLikes } from "@/service/next";
 import User from "@jx3box/jx3box-common/js/user";
 import Homework from "@jx3box/jx3box-ui/src/interact/Homework.vue";
-import boxCoinRecords from "@jx3box/jx3box-ui/src/interact/BoxcoinRecords.vue";
+import boxCoinRecords from "./components/BoxcoinRecords.vue";
 import bus from "@/utils/bus";
 import { atAuthors } from "@/service/pay";
 import Collection from "@jx3box/jx3box-ui/src/single/Collection.vue";
@@ -552,6 +554,23 @@ export default {
         handleReplyTopic() {
             // 展示快捷回复弹窗
             this.showComment = true;
+        },
+        updateRecord(data) {
+            const targetPostId = Number(data?.post_id || this.postId);
+            const targetIndex = this.replyList.findIndex((item) => Number(item.id) === targetPostId);
+
+            if (targetIndex === -1) return;
+
+            // 替换一遍对象，确保子组件能感知到这条 reply 的最新状态
+            this.replyList.splice(targetIndex, 1, {
+                ...this.replyList[targetIndex],
+            });
+
+            this.$nextTick(() => {
+                const replyRef = this.$refs[`reply${targetIndex}`];
+                const replyItem = Array.isArray(replyRef) ? replyRef[0] : replyRef;
+                replyItem?.loadHomeworkBoxcoin?.();
+            });
         },
         updateCollection: function (val) {
             this.collection_data = val;
