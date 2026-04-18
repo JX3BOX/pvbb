@@ -48,7 +48,10 @@ module.exports = {
                 pathname: "/ws",
             },
         },
-        watchFiles: ["src/**/*", "public/**/*"],
+        // `src` 内源码本来就由 webpack 自己监听并走 HMR。
+        // 这里如果再用 dev-server 的 watchFiles 监听一次，会让 less/css 变更退化成整页 live reload。
+        // 只保留对 public 目录的额外监听，用于模板/静态资源变更时刷新页面。
+        watchFiles: ["public/**/*"],
     },
 
     // 依赖包（element-plus/theme-chalk 等）会输出大量 Sass deprecation 警告

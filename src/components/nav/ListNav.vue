@@ -32,6 +32,10 @@
                 </a>
             </div>
         </div>
+
+        <div class="m-nav__qqbot">
+            <a href="/qqbot" target="_blank"><img src="@/assets/img/qqbot/qqbot.gif" alt="魔盒QQ机器人"></a>
+        </div>
     </div>
 </template>
 
@@ -157,6 +161,10 @@ export default {
 <style lang="less">
 .m-nav{
     padding:5px;
+}
+.m-nav__qqbot{
+    .r(6px);
+    overflow: hidden;
 }
 @import "@/assets/css/common/side_nav.less";
 </style>

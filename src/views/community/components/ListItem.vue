@@ -104,9 +104,12 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                 <span v-else>神秘侠士</span>
             </div>
             <span class="u-date">
-                Updated on
+                <!-- Updated on
                 <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>
-                <time v-else>{{ dateFormat(item.updated_at) }}</time>
+                <time v-else>{{ dateFormat(item.updated_at) }}</time> -->
+
+                Last replied on
+                <time>{{ dateFormat(item.latest_reply_at) }}</time>
             </span>
         </div>
     </li>

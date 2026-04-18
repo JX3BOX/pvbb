@@ -147,10 +147,10 @@ export default {
     .u-displayname {
         .lh(2.2);
         .bold;
-        // color: @v4primary;
+        color: #24292e;
         .nobreak;
         &:hover {
-            color: #f39;
+            color: @pink;
         }
     }
     .u-anonymous {
