@@ -104,7 +104,7 @@ export default {
 <style lang="less">
 .m-comment-user {
     position: sticky;
-    top: 110px;
+    top: 108px;
     box-sizing: content-box;
 }
 

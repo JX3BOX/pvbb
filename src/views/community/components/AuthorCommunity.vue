@@ -76,30 +76,50 @@ export default {
             color: #999;
         }
         list-style-position: outside;
+        &:hover {
+            &::marker {
+                color: @v4primary;
+            }
+        }
     }
     .u-item {
-        .db;
-        padding: 3px 2px;
+        // display: flex;
+        // align-items: center;
+        display: block;
+        gap: 5px;
+        padding: 3px 2px 3px 5px;
         .nobreak;
         .fz(12px,2);
-        color: #666;
-        border-bottom: 1px solid transparent;
+        color: @color;
+        // border-bottom: 1px solid transparent;
         &:hover {
-            color: @pink;
-            // background-color:#fff;
-            // border-bottom: 1px solid @border;
-            .u-icon {
-                transform: translateX(5px);
-            }
+            color: @v4primary;
+            .underline(3px,solid,@v4primary);
+            font-weight: 500;
+            // .u-icon {
+            //     transform: translateX(5px);
+            // }
         }
     }
     .u-icon {
         .fz(12px);
         .size(12px);
+        .pr;
+        top: -1px;
         // .y;
         color: #999;
+        flex: 0 0 auto;
         // .mr(5px);
         transition: all 0.3s;
+        font-style: normal;
+        margin-right: 8px;
+    }
+    .u-title {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .u-label {
@@ -110,7 +130,8 @@ export default {
             .rb(0,10px);
             color: #999;
             &:hover {
-                color: @pink;
+                color: @v4primary;
+                fill: @v4primary;
             }
         }
     }
