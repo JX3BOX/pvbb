@@ -13,14 +13,14 @@
                 <!--  -->
                 <div class="u-op" v-if="isAuthor || isEditor">
                     <span class="u-delete el-link el-link--primary is-underline" @click="handleDelete">
-                        <i class="el-icon-delete"></i> 删除
+                        <i class="el-icon-delete"></i>&nbsp;删除
                     </span>
                     <a
                         class="u-edit el-link el-link--primary is-underline"
                         :href="editLink('emotion', emotion.id)"
                         target="blank"
                     >
-                        <i class="el-icon-edit-outline"></i> 编辑
+                        <i class="el-icon-edit-outline"></i>&nbsp;编辑
                     </a>
                 </div>
             </div>
@@ -56,11 +56,6 @@
                     {{ emotion.author || "匿名" }}
                 </span>
                 <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
-                <!-- <a class="u-like" :class="{ on: isLike }" title="赞" @click="addLike" v-if="isListPage">
-                <i class="like-icon">{{ isLike ? "♥" : "♡" }}</i>
-                <span class="like-text">Like</span>
-                <span class="like-count" v-if="count">{{ count }}</span>
-            </a> -->
             </div>
             <div class="u-info-thx" v-if="mode && emotion">
                 <Thx

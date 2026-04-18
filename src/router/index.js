@@ -49,8 +49,8 @@ const routes = [
             },
         },
     },
-    { path: "/community_topic/:id", redirect: "/community/:id" },
-    { path: "/community/topic/:id", redirect: "/community/:id" },
+    { path: "/community_topic/:id", redirect: (to) => ({ name: "community-single", params: { id: to.params.id } }) },
+    { path: "/community/topic/:id", redirect: (to) => ({ name: "community-single", params: { id: to.params.id } }) },
     {
         name: "community-single",
         path: "/community/:id",

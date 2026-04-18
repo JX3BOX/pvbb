@@ -108,7 +108,7 @@
                                                     title="赞"
                                                     @click="addLike(item.data)"
                                                 >
-                                                    <i class="like-icon">{{ item.data.isLike ? "♥" : "♡" }}</i>
+                                                    <i class="like-icon">{{ item.data.isLike ? "♥ " : "♡ " }}</i>
                                                     <span class="like-text">Like</span>
                                                     <span class="like-count" v-if="item.data.count">{{
                                                         item.data.count

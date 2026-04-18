@@ -1,8 +1,5 @@
 <template>
-    <el-button link :disabled="!allowBlock" type="primary" @click="addBlock">
-        <i class="el-icon-circle-close"></i>
-        拉黑
-    </el-button>
+    <el-button link :disabled="!allowBlock" type="primary" @click="addBlock" icon="CircleClose"> 拉黑 </el-button>
 </template>
 
 <script>

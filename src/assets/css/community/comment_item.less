@@ -72,6 +72,9 @@
         margin: 0 0 4px 0;
         white-space: pre-line;
         line-height: 1.8;
+        img {
+            .dbi;
+        }
     }
     // 操作 工具栏
     .u-comment-toolbar {
@@ -83,9 +86,11 @@
         // like 按钮 爱心
         .u-btn-content {
             .u-like-icon {
-                font-weight: 500;
-                font-size: 16px;
-                font-family: BlinkMacSystemFont, Helvetica;
+                margin-right: 4px;
+                svg {
+                    width: 14px;
+                    height: 14px;
+                }
             }
             .is-like {
                 color: red;
@@ -102,19 +107,22 @@
         .el-button {
             padding: 0;
             height: 32px;
+            color: #989cb1;
+            font-weight: normal;
+            &:hover {
+                color: @v4primary;
+            }
         }
         // 文本按钮
         .el-button--text {
             font-size: 12px;
             opacity: 0.7;
+            color: #989cb1;
+            font-weight: normal;
             &:not(.is-disabled):hover {
                 color: #0366d6;
                 opacity: 1;
             }
-        }
-        // 按钮之间的间距
-        .el-button + .el-button {
-            margin-left: 12px;
         }
     }
 }
@@ -143,6 +151,6 @@
         }
     }
 }
-.m-comment-time{
+.m-comment-time {
     .fz(12px);
 }

@@ -103,6 +103,8 @@ export default {
         getTeam: function () {
             return getTeam(this.id).then((res) => {
                 this.data = res.data.data;
+
+                document.title = this.data.name + this.$t("pages.common.appendTitle");
             });
         },
         loadData: function () {

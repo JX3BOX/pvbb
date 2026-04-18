@@ -35,7 +35,13 @@
                     <div class="flex items-center">
                         <el-button link size="small" type="primary" @click="addLike" class="">
                             <div class="u-btn-content flex items-center">
-                                <i :class="`u-like-icon ${isLike && 'is-like'}`">{{ isLike ? "♥" : "♡" }}</i>
+                                <i :class="`u-like-icon ${isLike && 'is-like'}`"
+                                    ><img
+                                        v-if="!isLike"
+                                        src="@/assets/img/community/heart_1.svg"
+                                        svg-inline
+                                        alt="" /><img v-else src="@/assets/img/community/heart_2.svg" svg-inline alt=""
+                                /></i>
                                 {{ isLike ? "已赞" : "赞" }}
                                 <span class="u-count" v-if="likeCount"> ({{ likeCountRender }})</span>
                             </div>

@@ -343,8 +343,6 @@ export default {
     .u-only-btn {
         top: 10px;
         position: relative;
-        // background: @v4primary;
-        // border: 1px solid rgba(64, 128, 255, 1);
         display: inline-block;
         height: 32px;
         &.u-unset {
@@ -355,11 +353,9 @@ export default {
             opacity: 0.8;
         }
         svg {
-            vertical-align: middle;
-            position: relative;
-            top: -1px;
             width: 12px;
             height: 12px;
+            margin-right: 4px;
         }
     }
 }
