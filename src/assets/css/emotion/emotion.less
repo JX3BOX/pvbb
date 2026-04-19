@@ -199,6 +199,10 @@
             animation: fadeIn 0.2s ease-in-out forwards;
         }
     }
+
+    .m-emotion-item .u-info-user{
+        justify-content: flex-start;
+    }
 }
 @media screen and (max-width: @phone) {
     .m-emotion-list {
@@ -289,6 +293,7 @@
     .u-info-user {
         display: flex;
         align-items: center;
+        justify-content: center;
         .mt(10px);
     }
     .u-user-avatar {
@@ -353,7 +358,6 @@
     }
     .u-op {
         .x;
-        .mt(10px);
         // background-color: #e6f0fb;
         padding: 5px;
         .r(3px);
@@ -388,6 +392,18 @@
 
 .m-emotion-goback {
     .mb(10px);
+    .flex;
+    justify-content: space-between;
+
+    .u-op{
+        .flex(y);
+        .gap(10px);
+
+        .el-link{
+            font-weight: normal;
+            font-size:12px;
+        }
+    }
 }
 .m-emotion-item.list {
     .u-info-meta {
@@ -406,12 +422,12 @@
     .u-extend {
         .mt(20px);
     }
-    .u-info-user {
-        justify-content: space-around;
-    }
     .u-info-user-left {
         .flex;
         align-items: center;
+    }
+    .u-time{
+        margin-left:10px;
     }
 }
 

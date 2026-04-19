@@ -5,6 +5,27 @@
             <div class="m-emotion-single-container" v-if="id">
                 <div class="m-emotion-goback">
                     <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                    <div class="u-op">
+                        <span v-if="isEditor" class="u-star el-link el-link--primary" @click="handleStar">
+                            <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
+                            {{ isStar ? "取消精选" : "设为精选" }}
+                        </span>
+                        <span
+                            v-if="isAuthor || isEditor"
+                            class="u-delete el-link el-link--primary"
+                            @click="handleDelete"
+                        >
+                            <i class="el-icon-delete"></i>&nbsp;删除
+                        </span>
+                        <a
+                            v-if="isAuthor || isEditor"
+                            class="u-edit el-link el-link--primary"
+                            :href="editLink('emotion', emotion.id)"
+                            target="blank"
+                        >
+                            <i class="el-icon-edit-outline"></i>&nbsp;编辑
+                        </a>
+                    </div>
                 </div>
                 <emotion-item :emotion="emotion" mode="single"></emotion-item>
             </div>
@@ -196,7 +217,7 @@ import LeftTab from "@/components/left-tab.vue";
 import emotion_item from "@/components/emotion/emotion_item";
 import emotion_post from "@/components/emotion/emotion_post";
 import EmotionPreview from "@/components/emotion/emotion_preview.vue";
-import { resolveImagePath, getThumbnail, authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
+import { resolveImagePath, getThumbnail, authorLink, showAvatar,editLink, } from "@jx3box/jx3box-common/js/utils";
 import { getRelativeTime } from "@/utils/dateFormat.js";
 
 // 分类
@@ -296,8 +317,12 @@ export default {
         isEditor: function () {
             return User.isEditor();
         },
+        isAuthor: function () {
+            return this.emotion.user_id == User.getInfo().uid;
+        },
     },
     methods: {
+        editLink,
         //调整展示条数
         handleSizeChange(val) {
             this.per = val;

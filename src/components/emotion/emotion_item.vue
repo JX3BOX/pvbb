@@ -28,7 +28,7 @@
                     </span>
                 </div>
                 <div class="u-info-user-right">
-                    <div class="u-op u-editor" v-if="isEditor">
+                    <!-- <div class="u-op u-editor" v-if="isEditor">
                         <span class="u-op-star el-link el-link--primary" @click="handleStar">
                             <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
                             {{ isStar ? "取消精选" : "设为精选" }}
@@ -45,7 +45,7 @@
                         >
                             <i class="el-icon-edit-outline"></i>&nbsp;编辑
                         </a>
-                    </div>
+                    </div> -->
                     <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
                 </div>
             </div>
