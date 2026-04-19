@@ -61,7 +61,6 @@
 </template>
 
 <script>
-import joke_emotion from "@/components/joke/joke_emotion.vue";
 import { uploadEmotion, postEmotion } from "@/service/emotion";
 import schoolmap from "@jx3box/jx3box-data/data/xf/schoolid.json";
 import { __imgPath, __cdn } from "@/utils/config";
@@ -70,6 +69,7 @@ import cloneDeep from "lodash/cloneDeep";
 const imgTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];
 export default {
     name: "emotion_post",
+    emits: ["success"],
     components: {
         // "joke-emotion": joke_emotion,
     },
@@ -195,6 +195,9 @@ export default {
                             message: "表情发布成功",
                         });
                         this.fileInput.value = "";
+                        this.list = [];
+                        this.content = "";
+                        this.$emit("success");
                         this.loading = false;
                     });
             }

@@ -195,17 +195,19 @@ export default {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
                 type: "warning",
-            }).then(() => {
-                removeEmotion(this.emotion.id).then(() => {
-                    this.$notify({
-                        title: "成功",
-                        message: "删除成功",
-                        type: "success",
+            })
+                .then(() => {
+                    removeEmotion(this.emotion.id).then(() => {
+                        this.$notify({
+                            title: "成功",
+                            message: "删除成功",
+                            type: "success",
+                        });
+                        this.$emit("del");
+                        this.close();
                     });
-                    this.$emit("del");
-                    this.close();
-                });
-            });
+                })
+                .catch(() => {});
         },
 
         // 图片格式
