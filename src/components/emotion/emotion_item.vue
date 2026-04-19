@@ -1,30 +1,5 @@
 <template>
-    <!-- mode === 'single' ? 'single' : 'list' -->
     <div class="m-emotion-item" :class="mode || 'list'">
-        <div class="u-info-comment" v-if="mode">
-            <div class="u-comment-editor">
-                <!--   -->
-                <div class="u-op u-editor" v-if="isEditor">
-                    <span class="u-op-star el-link el-link--primary is-underline" @click="handleStar">
-                        <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
-                        {{ isStar ? "取消精选" : "设为精选" }}
-                    </span>
-                </div>
-                <!--  -->
-                <div class="u-op" v-if="isAuthor || isEditor">
-                    <span class="u-delete el-link el-link--primary is-underline" @click="handleDelete">
-                        <i class="el-icon-delete"></i>&nbsp;删除
-                    </span>
-                    <a
-                        class="u-edit el-link el-link--primary is-underline"
-                        :href="editLink('emotion', emotion.id)"
-                        target="blank"
-                    >
-                        <i class="el-icon-edit-outline"></i>&nbsp;编辑
-                    </a>
-                </div>
-            </div>
-        </div>
         <div class="u-emotion">
             <div class="u-img" @click="preview">
                 <img
@@ -34,28 +9,45 @@
                     :key="emotion.url"
                 />
             </div>
-            <!-- @click="preview" -->
-            <!-- <router-link class="u-img" :to="{ name: 'emotion', params: { id: emotion.id } }">
-                <img class="u-pic u-emotion-pic waterfall-img" :src="showEmotion(emotion.url)" :alt="emotion.desc"
-                    :key="emotion.url" />
-            </router-link> -->
             <i class="u-star" v-if="emotion.star"
                 ><i class="el-icon-star-off"></i><i class="u-original" v-if="emotion.original">原创</i></i
             >
         </div>
         <div class="u-info">
-            <div class="u-info-meta" v-if="mode">
+            <!-- <div class="u-info-meta" v-if="mode">
                 <span class="u-desc">{{ emotion.desc }}</span>
-            </div>
+            </div> -->
             <div class="u-info-user">
-                <img class="u-user-avatar waterfall-img" :src="showAvatar(user_avatar)" :key="user_avatar" />
-                <a class="u-user-name" :href="authorLink(emotion.user_id)" target="_blank" v-if="emotion.user_id">{{
-                    showUserName(emotion)
-                }}</a>
-                <span class="u-user-name" v-else>
-                    {{ emotion.author || "匿名" }}
-                </span>
-                <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
+                <div class="u-info-user-left">
+                    <img class="u-user-avatar waterfall-img" :src="showAvatar(user_avatar)" :key="user_avatar" />
+                    <a class="u-user-name" :href="authorLink(emotion.user_id)" target="_blank" v-if="emotion.user_id">{{
+                        showUserName(emotion)
+                    }}</a>
+                    <span class="u-user-name" v-else>
+                        {{ emotion.author || "匿名" }}
+                    </span>
+                </div>
+                <div class="u-info-user-right">
+                    <div class="u-op u-editor" v-if="isEditor">
+                        <span class="u-op-star el-link el-link--primary" @click="handleStar">
+                            <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
+                            {{ isStar ? "取消精选" : "设为精选" }}
+                        </span>
+                    </div>
+                    <div class="u-op" v-if="isAuthor || isEditor">
+                        <span class="u-delete el-link el-link--primary" @click="handleDelete">
+                            <i class="el-icon-delete"></i>&nbsp;删除
+                        </span>
+                        <a
+                            class="u-edit el-link el-link--primary"
+                            :href="editLink('emotion', emotion.id)"
+                            target="blank"
+                        >
+                            <i class="el-icon-edit-outline"></i>&nbsp;编辑
+                        </a>
+                    </div>
+                    <time class="u-time">{{ showTime(emotion.updated_at) }}</time>
+                </div>
             </div>
             <div class="u-info-thx" v-if="mode && emotion">
                 <Thx
@@ -74,16 +66,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="u-extend" v-if="mode == 'single'">
-            <el-radio-group v-model="ext" size="small" v-if="types.length">
-                <el-radio-button
-                    :label="item"
-                    v-for="item in types"
-                    :key="item"
-                >{{item.toUpperCase()}}</el-radio-button>
-            </el-radio-group>
-            <div class="u-tip"></div>
-        </div>-->
     </div>
 </template>
 

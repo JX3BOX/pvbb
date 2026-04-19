@@ -4,7 +4,7 @@
             <img class="u-icon" svg-inline src="../../assets/img/common/rank.svg" />排行榜
             <span class="u-more" @click="viewRank">查看更多 &raquo;</span>
         </h3>
-        <el-tabs v-model="active" @tab-click="handleClick">
+        <el-tabs v-model="active" @tab-change="handleClick">
             <el-tab-pane label="综合" name="mix"></el-tab-pane>
             <el-tab-pane label="下载" name="download"></el-tab-pane>
             <el-tab-pane label="订阅" name="subscribers"></el-tab-pane>

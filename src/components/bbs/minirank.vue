@@ -4,7 +4,7 @@
             <img class="u-icon" svg-inline src="@/assets/img/common/rank.svg" />剑三年度大事件
             <!-- <span class="u-more" @click="viewRank">查看更多 &raquo;</span> -->
         </h3>
-        <el-tabs v-model="active" @tab-click="handleClick">
+        <el-tabs v-model="active" @tab-change="handleClick">
             <el-tab-pane v-for="tab in tabs" :label="tab" :key="tab" :name="`bbs_rank_${tab}`"></el-tab-pane>
         </el-tabs>
         <ul class="u-list" v-loading="loading">

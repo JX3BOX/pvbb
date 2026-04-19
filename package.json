@@ -38,7 +38,7 @@
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.2",
         "@imengyu/vue3-context-menu": "^1.5.4",
-        "@jx3box/jx3box-common": "^9.2.2",
+        "@jx3box/jx3box-common": "^9.2.3",
         "@jx3box/jx3box-data": "^3.9.5",
         "@jx3box/jx3box-editor": "^3.1.4",
         "@jx3box/jx3box-emotion": "^1.2.14",

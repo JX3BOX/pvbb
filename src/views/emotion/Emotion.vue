@@ -471,12 +471,12 @@ export default {
         },
         // 图片预览
         handlePreview: function (data) {
-            if (this.windowWidth < 900) {
-                this.$router.push({ name: "emotion", params: { id: data.id } });
-            } else {
-                this.emotion = data;
-                this.dialogVisible = true;
-            }
+            this.$router.push({ name: "emotion", params: { id: data.id } });
+            // if (this.windowWidth < 900) {
+            // } else {
+            //     this.emotion = data;
+            //     this.dialogVisible = true;
+            // }
             // this.$hevueImgPreview({
             //     multiple: true, // 开启多图预览模式
             //     nowImgIndex: i, // 多图预览，默认展示第二张图片

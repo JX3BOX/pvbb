@@ -43,7 +43,7 @@
     .u-original {
         .ml(10px);
     }
-    .u-search{
+    .u-search {
         .ml(5px);
     }
 }
@@ -354,7 +354,7 @@
     .u-op {
         .x;
         .mt(10px);
-        background-color: #e6f0fb;
+        // background-color: #e6f0fb;
         padding: 5px;
         .r(3px);
         i {
@@ -365,6 +365,10 @@
         .el-link {
             .fz(12px);
             .mr(10px);
+
+            &:hover {
+                color: #f39;
+            }
         }
         display: inline-flex;
         align-items: center;
@@ -403,9 +407,14 @@
         .mt(20px);
     }
     .u-info-user {
-        justify-content: center;
+        justify-content: space-around;
+    }
+    .u-info-user-left {
+        .flex;
+        align-items: center;
     }
 }
+
 .m-emotion-item.preview {
     //弹窗预览
     display: flex;
@@ -469,9 +478,6 @@
 .m-emotion-publish {
     margin-bottom: 16px;
 }
-// .el-dialog__header {
-//     padding: 0;
-// }
 
 .m-emotion-footer {
     .flex;

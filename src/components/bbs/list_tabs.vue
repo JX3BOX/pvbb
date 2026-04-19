@@ -1,5 +1,5 @@
 <template>
-    <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
+    <el-tabs class="m-tabs" v-model="view" @tab-change="changeView">
         <el-tab-pane label="全部作品" name="all">
             <span slot="label">
                 <img class="u-icon-img" src="@/assets/img/nav/all.png" alt="" />

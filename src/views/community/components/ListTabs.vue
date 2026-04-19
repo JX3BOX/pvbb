@@ -1,5 +1,5 @@
 <template>
-    <el-tabs class="m-tabs" v-model="view" @tab-click="changeView">
+    <el-tabs class="m-tabs" v-model="view" @tab-change="changeView">
         <el-tab-pane label="全部内容" name="all">
             <template #label>
                 <!-- <img class="u-icon-img" src="@/assets/img/community/category/all.svg" alt="" /> -->
@@ -37,7 +37,7 @@
         <el-tab-pane label="求助寻觅" name="help">
             <template #label>
                 <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="" /> -->
-                <el-icon class="u-icon-img" ><Warning /></el-icon>
+                <el-icon class="u-icon-img"><Warning /></el-icon>
                 <b>求助寻觅</b>
             </template>
         </el-tab-pane>
