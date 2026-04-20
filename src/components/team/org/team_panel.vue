@@ -39,7 +39,7 @@
         </div>
 
         <!-- 加入弹层 -->
-        <joinpop title="加入团队" v-model="join_pop_visible" :team_id="team_id" />
+        <joinpop title="加入团队" v-model:show="join_pop_visible" :team_id="team_id" />
     </div>
 </template>
 

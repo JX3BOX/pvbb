@@ -15,7 +15,7 @@
                 >全选</el-checkbox
             >
             <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
-                <el-checkbox v-for="item in data" :label="item.ID" :key="item.ID" class="u-item" border>
+                <el-checkbox v-for="item in data" :value="item.ID" :key="item.ID" class="u-item" border>
                     <el-tooltip class="item" effect="dark" :content="item.note || item.name" placement="bottom">
                         <div>
                             <img class="u-item-avatar" :src="showAvatar(item.mount)" />
@@ -55,20 +55,22 @@ export default {
             isIndeterminate: false,
         };
     },
-    model: {
-        prop: "show",
-        event: "switchJoinPop",
-    },
     watch: {
         show: function (newval) {
             this.visible = newval;
         },
         visible: function (newval) {
-            this.$emit("switchJoinPop", newval);
-            if (newval) {
+            this.$emit("update:show", newval);
+            if (newval && this.team_id) {
                 getMyPureRoles(this.team_id).then((res) => {
                     this.data = res.data.data || [];
+                }).catch((err) => {
+                    console.error("获取角色列表失败:", err);
+                    this.$message.error("获取角色列表失败，请稍后重试");
                 });
+            } else if (newval && !this.team_id) {
+                console.error("team_id 未传入");
+                this.$message.error("团队ID缺失");
             }
         },
     },
