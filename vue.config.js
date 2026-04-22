@@ -40,14 +40,8 @@ module.exports = {
         port: process.env.DEV_PORT || 12028,
         hot: true,
         liveReload: true,
-        client: {
-            webSocketURL: {
-                protocol: "ws",
-                hostname: "localhost",
-                port: Number(process.env.DEV_PORT || 12028),
-                pathname: "/ws",
-            },
-        },
+        // 不写死 HMR websocket 地址，避免默认端口被占用后 dev-server 自动顺延端口，
+        // 但客户端仍连回旧端口，进而出现反复断开、整页刷新。
         // `src` 内源码本来就由 webpack 自己监听并走 HMR。
         // 这里如果再用 dev-server 的 watchFiles 监听一次，会让 less/css 变更退化成整页 live reload。
         // 只保留对 public 目录的额外监听，用于模板/静态资源变更时刷新页面。

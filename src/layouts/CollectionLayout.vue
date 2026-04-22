@@ -13,6 +13,9 @@
             <template #op-prepend>
                 <AdminDrop v-if="isTeammate" :post="finalPost" :user-id="user_id" />
             </template>
+            <template #logo>
+                <img svg-inline :src="logo" />
+            </template>
         </Breadcrumb>
         <LeftSidebar :uid="user_id">
             <Nav :id="id" class="m-nav" />
@@ -33,6 +36,7 @@ import Side from "@/components/single/single_side.vue";
 import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import AdminDrop from "@/components/collection/collection_admin_drop.vue";
+import JX3BOX from "@jx3box/jx3box-common/data/jx3box";
 
 export default {
     name: "CollectionLayout",
@@ -56,6 +60,7 @@ export default {
             id: getAppID(),
 
             showDrawer: false,
+            logo: JX3BOX.__cdn + "logo/logo-light/collection.svg",
         };
     },
     computed: {
@@ -95,8 +100,8 @@ export default {
     .c-admin-drop {
         margin-right: 0;
     }
-    .c-main{
-        padding:0;
+    .c-main {
+        padding: 0;
     }
 }
 </style>
