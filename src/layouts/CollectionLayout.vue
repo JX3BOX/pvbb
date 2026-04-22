@@ -1,5 +1,5 @@
 <template>
-    <div class="m-collection-layout">
+    <div class="p-collection-layout">
         <CommonHeader></CommonHeader>
         <Breadcrumb
             name="剑三小册"
@@ -22,7 +22,7 @@
             <RightSidebar>
                 <Side :id="id" class="m-extend" />
             </RightSidebar>
-            <CommonFooter></CommonFooter>
+            <Footer></Footer>
         </Main>
     </div>
 </template>
@@ -88,12 +88,15 @@ export default {
 <style lang="less">
 @import "~@/assets/css/collection/list.less";
 
-.m-collection-layout {
+.p-collection-layout {
     .c-sidebar-left {
         padding: 15px;
     }
     .c-admin-drop {
         margin-right: 0;
+    }
+    .c-main{
+        padding:0;
     }
 }
 </style>

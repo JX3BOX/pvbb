@@ -283,8 +283,8 @@ export default {
         // }
         letter-spacing: 0.5px;
         font-weight: 300;
-        .db;
         .nobreak;
+        .flex;
     }
     .u-author {
         .pr;
