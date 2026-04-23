@@ -52,6 +52,7 @@ export default {
 <style lang="less">
 .p-qqbot {
     min-width: 1420px;
+    .pr;
     .c-main {
         margin-top: 59px;
         height: calc(100vh - 64px);
@@ -75,11 +76,11 @@ export default {
     gap: 100px;
 
     .u-girl {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
-        width: 558px;
-        height: 581px;
+        width: 20rem;
+        // height: 581px;
         pointer-events: none;
     }
     @media screen and (max-width: 1440px) {
