@@ -128,7 +128,7 @@ import bus from "@/utils/bus";
 import { getSkinJson } from "@/service/community";
 const appKey = "community";
 const skinKey = "community_topic_skin";
-import { tabsMap } from "@/assets/data/community_category.js";
+import { tabsMap, designTaskCategoryMap } from "@/assets/data/community_category.js";
 
 export default {
     name: "ListItem",
@@ -232,6 +232,8 @@ export default {
                 ID: this.item.id,
                 author: this.item?.ext_user_info?.display_name || "匿名",
                 client: this.item.client,
+
+                subtype: designTaskCategoryMap[this.item.category] || "",
             };
             bus.emit("design-task", data);
             setTimeout(() => {

@@ -35,6 +35,9 @@
                         >只看精选</el-checkbox
                     >
                 </div>
+                <div class="m-filter__right">
+                    <ReplyOrderBy @filter="filterImperceptibly" :type="order_by_last_reply" />
+                </div>
                 <!-- <el-radio-group class="m-list-view" v-model="view" size="small" @change="onViewChange">
                     <el-radio-button :value="1"><i class="el-icon-s-grid"></i> 卡片</el-radio-button>
                     <el-radio-button :value="2"><i class="el-icon-tickets"></i> 列表</el-radio-button>
@@ -118,6 +121,7 @@ import ListItem from "@/views/community/components/ListItem.vue";
 import TopicTop from "@/views/community/components/TopicTop.vue";
 import DesignTask from "@jx3box/jx3box-ui/src/bread/DesignTask.vue";
 import ListTop from "@/views/community/components/ListTop.vue";
+import ReplyOrderBy from "@/views/community/components/ReplyOrderBy.vue";
 
 export default {
     name: "Community_v2",
@@ -131,6 +135,7 @@ export default {
         Waterfall,
         DesignTask,
         ListTop,
+        ReplyOrderBy,
     },
     data: function () {
         return {
@@ -140,6 +145,7 @@ export default {
             isSearch: false,
             client: "all", // 版本过滤，默认不过滤
             is_star: 0, // 只看精选，0否1是
+            order_by_last_reply: 1, // 最新回复排序，1是，空为最新发布
             tag: "",
 
             view: 2, // 列表视图，1卡片，2列表
@@ -154,6 +160,9 @@ export default {
             loading: false, // 加载状态
             list: [], // 文章列表
             topTopicData: null, // 置顶文章数据
+            currentRequestKey: "",
+            currentRequest: null,
+            skipRouteQueryKey: "",
 
             currentPost: null,
             showDesignTask: false,
@@ -221,6 +230,11 @@ export default {
                     }
                 }
                 // 路由参数更新后加载数据
+                const requestKey = JSON.stringify(this.buildQuery());
+                if (this.skipRouteQueryKey === requestKey) {
+                    this.skipRouteQueryKey = "";
+                    return;
+                }
                 this.loadData();
             },
         },
@@ -257,6 +271,10 @@ export default {
             this.loadData();
         },
         client: function () {
+            this.page = 1;
+            this.loadData();
+        },
+        order_by_last_reply: function () {
             this.page = 1;
             this.loadData();
         },
@@ -297,11 +315,17 @@ export default {
             this.loadData();
         },
         // 加载数据
-        loadData(appendMode = false) {
+        loadData(appendMode = false, page = this.page) {
             this.isSearch = false;
-            let query = this.buildQuery(appendMode);
+            let query = this.buildQuery(page);
+            const requestKey = JSON.stringify(query);
+            if (!appendMode && this.currentRequestKey === requestKey && this.currentRequest) {
+                return this.currentRequest;
+            }
+
             this.loading = true;
-            return getTopicList(query)
+            this.currentRequestKey = requestKey;
+            this.currentRequest = getTopicList(query)
                 .then(async (res) => {
                     let list = res.data.data.list || [];
                     list = list.map((item) => {
@@ -343,12 +367,26 @@ export default {
 
                     this.total = res.data.data.page.total;
                     this.pages = res.data.data.page.pageTotal;
+                    if (appendMode) {
+                        this.page = query.index;
+                    } else {
+                        const routeQuery = Object.assign({}, this.$route.query, {
+                            category: this.category,
+                            page: this.page,
+                        });
+                        if (!this.isSameRouteQuery(routeQuery)) {
+                            this.skipRouteQueryKey = requestKey;
+                        }
+                        this.replaceRoute({ category: this.category, page: this.page });
+                    }
 
                     this.$forceUpdate();
                 })
                 .finally(() => {
                     this.loading = false;
+                    this.currentRequest = null;
                 });
+            return this.currentRequest;
         },
         // 翻页加载
         changePage: function () {
@@ -356,20 +394,27 @@ export default {
         },
         // 路由绑定
         replaceRoute: function (extend) {
-            return this.$router.push({ name: this.$route.name, query: Object.assign({}, this.$route.query, extend) });
+            const query = Object.assign({}, this.$route.query, extend);
+            if (this.isSameRouteQuery(query)) return Promise.resolve();
+            return this.$router.push({ name: this.$route.name, query });
+        },
+        isSameRouteQuery: function (query) {
+            return (
+                Object.keys(query).length === Object.keys(this.$route.query).length &&
+                Object.keys(query).every((key) => `${query[key]}` === `${this.$route.query[key]}`)
+            );
         },
         // 追加加载
         appendPage: function () {
-            this.loadData(true);
+            if (this.loading || !this.hasNextPage) return;
+            const nextPage = this.page + 1;
+            this.loadData(true, nextPage);
         },
         // 构建最终请求参数
-        buildQuery: function (appendMode) {
-            if (appendMode) {
-                this.page += 1;
-            }
+        buildQuery: function (page = this.page) {
             let _query = {
                 pageSize: this.per,
-                index: this.page,
+                index: page,
             };
             if (this.category && this.category !== "all") {
                 _query.category = this.category;
@@ -386,7 +431,9 @@ export default {
             if (this.tag) {
                 _query.tag = this.tag;
             }
-            this.replaceRoute({ category: this.category, page: this.page });
+            if (this.order_by_last_reply) {
+                _query.order_by_last_reply = 1;
+            }
 
             return _query;
         },

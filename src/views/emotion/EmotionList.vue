@@ -80,7 +80,7 @@
                                             :disabled="!item.data.user_id || isSelf(item.data)"
                                             @change="doReward($event, item.data)"
                                         >
-                                            打赏
+                                            选中
                                         </el-checkbox>
                                         <a
                                             v-else
@@ -119,14 +119,16 @@
                         <el-button class="m-emotion-all" type="primary" size="small" @click="rewardAll">
                             {{ rewardAllType ? "取消" : "" }} 全选
                         </el-button>
-                        <Thx
+                        <!-- <Thx
                             type="batchReward"
                             postType="emotion"
                             :postId="rewardArr"
                             :adminBoxcoinEnable="true"
                             :userBoxcoinEnable="true"
                             client="all"
-                        />
+                        /> -->
+                        <!-- TODO: 实装 -->
+                        <el-button type="primary" size="small">设为精选</el-button>
                     </div>
                     <template v-else>
                         <el-button
@@ -217,14 +219,30 @@ export default {
     watch: {
         keys: {
             deep: true,
-            immediate: true,
             handler() {
                 this.rewardArr = [];
                 if (this.page !== 1) {
                     this.page = 1;
+                    if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
+                }
+                if (!this.updatePaginationQuery({ page: 1, per: this.per })) {
                     this.loadList();
+                }
+            },
+        },
+        "$route.query": {
+            deep: true,
+            immediate: true,
+            handler(query) {
+                const { page, per } = this.getPaginationFromQuery(query);
+                this.page = page;
+                this.per = per;
+
+                if (this.shouldReplacePaginationQuery(query, page, per)) {
+                    this.updatePaginationQuery({ page, per }, true);
                     return;
                 }
+
                 this.loadList();
             },
         },
@@ -244,19 +262,21 @@ export default {
             this.rewardArr = [];
             if (this.page !== 1) {
                 this.page = 1;
-                this.loadList();
-                return;
+                if (this.updatePaginationQuery({ page: 1, per: val })) return;
             }
-            this.loadList();
+            if (!this.updatePaginationQuery({ page: 1, per: val })) {
+                this.loadList();
+            }
         },
         handlePublishSuccess() {
             this.rewardArr = [];
             if (this.page !== 1) {
                 this.page = 1;
-                this.loadList();
-                return;
+                if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
             }
-            this.loadList();
+            if (!this.updatePaginationQuery({ page: 1, per: this.per })) {
+                this.loadList();
+            }
         },
         doReward(val, data) {
             if (val) {
@@ -300,15 +320,19 @@ export default {
         onSearch() {
             if (this.page !== 1) {
                 this.page = 1;
-                this.loadList();
-                return;
+                if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
             }
-            this.loadList();
+            if (!this.updatePaginationQuery({ page: 1, per: this.per })) {
+                this.loadList();
+            }
         },
-        handleCurrentChange() {
+        handleCurrentChange(page) {
+            this.page = page;
             this.rewardArr = [];
             this.skipTop();
-            this.loadList();
+            if (!this.updatePaginationQuery({ page, per: this.per })) {
+                this.loadList();
+            }
         },
         handleDelete() {
             this.onSearch();
@@ -363,6 +387,40 @@ export default {
         },
         loadMore() {
             this.loadList(true);
+        },
+        normalizePositiveInteger(value, fallback) {
+            const rawValue = Array.isArray(value) ? value[0] : value;
+            const number = parseInt(rawValue, 10);
+            return number > 0 ? number : fallback;
+        },
+        getPaginationFromQuery(query = this.$route.query) {
+            return {
+                page: this.normalizePositiveInteger(query.page, 1),
+                per: this.normalizePositiveInteger(query.per, this.per),
+            };
+        },
+        shouldReplacePaginationQuery(query = this.$route.query, page = this.page, per = this.per) {
+            const hasPage = Object.prototype.hasOwnProperty.call(query, "page");
+            const hasPer = Object.prototype.hasOwnProperty.call(query, "per");
+            return (hasPage && String(query.page) !== String(page)) || (hasPer && String(query.per) !== String(per));
+        },
+        updatePaginationQuery({ page = this.page, per = this.per } = {}, replace = false) {
+            const query = {
+                ...this.$route.query,
+                page: String(page),
+                per: String(per),
+            };
+
+            if (String(this.$route.query.page) === query.page && String(this.$route.query.per) === query.per) {
+                return false;
+            }
+
+            this.$router[replace ? "replace" : "push"]({
+                name: this.$route.name,
+                params: this.$route.params,
+                query,
+            });
+            return true;
         },
         loadLike() {
             if (!this.emotions.length) return Promise.resolve();

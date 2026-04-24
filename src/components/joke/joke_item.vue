@@ -1,7 +1,7 @@
 <template>
     <div class="m-joke-item">
         <div class="u-content" @click="handleContent" :class="mode === 'single' ? 'on' : ''">
-            <i class="u-star" :class="joke.star ? 'on' : ''" v-if="joke.star" title="精选">★</i>
+            <i class="u-star" :class="isStar ? 'on' : ''" v-if="isStar" title="精选">★</i>
             <span class="u-sentence" v-html="content"></span>
         </div>
         <div class="u-misc">
@@ -50,7 +50,7 @@
                         v-model="checked"
                         @change="doReward"
                         class="u-op-item u-op-gift"
-                        >打赏</el-checkbox
+                        >选中</el-checkbox
                     >
                 </template>
                 <!-- 时间 -->
@@ -80,7 +80,8 @@ export default {
             disabled: false,
 
             // 加星
-            isStar: this.joke.star,
+            isStar: !!this.joke?.star,
+            starLoading: false,
 
             // 点赞
             count: 0,
@@ -114,10 +115,11 @@ export default {
     watch: {
         joke: {
             handler: function (val) {
+                if (!val) return;
                 this.count = val.count;
-                this.parse(val.content);
+                this.parse(val.content || "");
                 // 同步 isStar 状态
-                this.isStar = val.star;
+                this.isStar = !!val.star;
             },
             deep: true,
             immediate: true,
@@ -169,19 +171,24 @@ export default {
         },
         // 精选
         handleStar() {
-            if (!this.isStar) {
-                starJoke(this.joke.id).then(() => {
+            if (this.starLoading) return;
+
+            const nextStatus = !this.isStar;
+            const request = nextStatus ? starJoke : unstarJoke;
+            this.starLoading = true;
+            request(this.joke.id)
+                .then(() => {
                     this.$notify({
                         title: "成功",
-                        message: "加精成功",
+                        message: nextStatus ? "加精成功" : "取消加精成功",
                         type: "success",
                     });
-                    this.isStar = true;
-                    this.$emit("update");
+                    this.isStar = nextStatus;
+                    this.$emit("update", { noCache: true });
+                })
+                .finally(() => {
+                    this.starLoading = false;
                 });
-            } else {
-                this.unStar();
-            }
         },
         unStar: function () {
             unstarJoke(this.joke.id).then(() => {

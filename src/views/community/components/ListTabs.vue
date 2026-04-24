@@ -49,7 +49,12 @@ import { tabsMap, reversedTabsMap } from "@/assets/data/community_category.js";
 
 export default {
     name: "tabs",
+    emits: ["update:modelValue", "input"],
     props: {
+        modelValue: {
+            type: String,
+            default: "",
+        },
         value: {
             type: String,
             default: "all",
@@ -62,10 +67,11 @@ export default {
         view: {
             get() {
                 // 将接收的中文转换为英文key用于内部绑定
-                return this.value;
+                return this.modelValue || this.value;
             },
             set(val) {
                 // 将英文key转换为中文后传出
+                this.$emit("update:modelValue", val);
                 this.$emit("input", val);
             },
         },
@@ -74,9 +80,8 @@ export default {
         },
     },
     methods: {
-        changeView(tab) {
-            // el-tabs 的 tab-click 事件会传入 tab 对象
-            this.view = tab.name;
+        changeView(name) {
+            this.view = name;
         },
     },
     mounted: function () {},

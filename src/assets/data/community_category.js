@@ -13,3 +13,11 @@ export const reversedTabsMap = {
     "交流分享": "discuz",
     "求助寻觅": "help",
 }
+
+// design-task 组件中使用的分类映射
+export const designTaskCategoryMap = {
+    guide: "wiki",
+    story: "poem",
+    discuz: "pvx",
+    help: "newbie",
+}

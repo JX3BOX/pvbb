@@ -11,7 +11,7 @@
                 </div>
                 <el-row class="m-joke-list" :gutter="20">
                     <el-col :span="24">
-                        <joke-item :joke="joke" mode="single" />
+                        <joke-item :joke="joke" mode="single" @update="handleJokeUpdate" />
                     </el-col>
                 </el-row>
                 <Thx
@@ -85,7 +85,7 @@
                                 layout="total, prev, pager, next, jumper,sizes"
                                 :total="total"
                                 :page-sizes="[10, 30, 50, 70, 90]"
-                                @current-change="skipTop"
+                                @current-change="handleCurrentChange"
                                 @size-change="handleSizeChange"
                             ></el-pagination>
                             <!--  -->
@@ -93,14 +93,16 @@
                                 <el-button class="m-joke-all" type="primary" size="small" @click="rewardAll"
                                     >{{ this.rewardAllType ? "取消" : "" }} 全选</el-button
                                 >
-                                <Thx
+                                <!-- <Thx
                                     type="batchReward"
                                     postType="joke"
                                     :postId="jokeRewardArr"
                                     :adminBoxcoinEnable="true"
                                     :userBoxcoinEnable="true"
                                     client="all"
-                                />
+                                /> -->
+                                <!-- TODO: 实装 -->
+                                <el-button type="primary" size="small">设为精选</el-button>
                             </div>
                         </div>
                         <!-- 分页 -->
@@ -189,9 +191,6 @@ export default {
             };
         },
         keys: function () {
-            return [this.type, this.star, this.page, this.per];
-        },
-        reset_keys: function () {
             return [this.type, this.star];
         },
         user_id: function () {
@@ -215,7 +214,11 @@ export default {
         //调整展示条数
         handleSizeChange(val) {
             this.per = val;
-            this.loadList();
+            this.page = 1;
+            this.jokeRewardArr = [];
+            if (!this.updatePaginationQuery({ page: 1, per: val })) {
+                this.loadList();
+            }
         },
         // 表情排序
         sortEmotion() {
@@ -231,9 +234,12 @@ export default {
                 this.sortedEmotions.push(obj);
             });
         },
-        loadList() {
+        loadList(extraParams = {}) {
             this.loading = true;
-            getJokes(this.params)
+            getJokes({
+                ...this.params,
+                ...extraParams,
+            })
                 .then((res) => {
                     this.jokes = res?.data?.data?.list;
                     this.total = res?.data?.data?.total;
@@ -253,23 +259,65 @@ export default {
                     this.loading = false;
                 });
         },
-        handleJokeUpdate: function () {
-            this.loadList();
+        handleJokeUpdate: function (options = {}) {
+            if (this.id) {
+                this.loadSingle();
+                return;
+            }
+            this.loadList(options.noCache ? { _no_cache: 1 } : {});
         },
         init: function () {
             this.id ? this.loadSingle() : this.loadList();
+        },
+        normalizePositiveInteger(value, fallback) {
+            const rawValue = Array.isArray(value) ? value[0] : value;
+            const number = parseInt(rawValue, 10);
+            return number > 0 ? number : fallback;
+        },
+        getPaginationFromQuery(query = this.$route.query) {
+            return {
+                page: this.normalizePositiveInteger(query.page, 1),
+                per: this.normalizePositiveInteger(query.per, this.per),
+            };
+        },
+        shouldReplacePaginationQuery(query = this.$route.query, page = this.page, per = this.per) {
+            const hasPage = Object.prototype.hasOwnProperty.call(query, "page");
+            const hasPer = Object.prototype.hasOwnProperty.call(query, "per");
+            return (hasPage && String(query.page) !== String(page)) || (hasPer && String(query.per) !== String(per));
+        },
+        updatePaginationQuery({ page = this.page, per = this.per } = {}, replace = false) {
+            const query = {
+                ...this.$route.query,
+                page: String(page),
+                per: String(per),
+            };
+
+            if (String(this.$route.query.page) === query.page && String(this.$route.query.per) === query.per) {
+                return false;
+            }
+
+            this.$router[replace ? "replace" : "push"]({
+                name: this.$route.name,
+                params: this.$route.params,
+                query,
+            });
+            return true;
         },
 
         // 杂项
         goBack: function () {
             this.$router.push("/joke");
-
-            this.$nextTick(() => {
-                this.init();
-            });
         },
         skipTop: function () {
             window.scrollTo(0, 0);
+        },
+        handleCurrentChange(page) {
+            this.page = page;
+            this.jokeRewardArr = [];
+            this.skipTop();
+            if (!this.updatePaginationQuery({ page, per: this.per })) {
+                this.loadList();
+            }
         },
         // 批量获取点赞
         loadLike: function () {
@@ -319,25 +367,25 @@ export default {
         onSearch: function () {
             if (this.page !== 1) {
                 this.page = 1;
-                return;
+                if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
             }
-            this.init();
+            if (!this.updatePaginationQuery({ page: 1, per: this.per })) {
+                this.init();
+            }
         },
     },
     watch: {
         keys: {
             deep: true,
             handler() {
-                this.init();
-            },
-            immediate: true,
-        },
-        // 分页重置
-        reset_keys: {
-            deep: true,
-            handler: function () {
                 this.jokeRewardArr = [];
-                this.page = 1;
+                if (this.page !== 1) {
+                    this.page = 1;
+                    if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
+                }
+                if (!this.updatePaginationQuery({ page: 1, per: this.per })) {
+                    this.init();
+                }
             },
         },
         page: {
@@ -348,8 +396,35 @@ export default {
         },
         id: {
             immediate: true,
-            handler: function (val) {
-                val && this.init();
+            handler: function (val, oldVal) {
+                if (val) {
+                    this.init();
+                    return;
+                }
+                if (!oldVal) return;
+
+                const { page, per } = this.getPaginationFromQuery();
+                this.page = page;
+                this.per = per;
+                this.init();
+            },
+        },
+        "$route.query": {
+            deep: true,
+            immediate: true,
+            handler: function (query) {
+                if (this.id) return;
+
+                const { page, per } = this.getPaginationFromQuery(query);
+                this.page = page;
+                this.per = per;
+
+                if (this.shouldReplacePaginationQuery(query, page, per)) {
+                    this.updatePaginationQuery({ page, per }, true);
+                    return;
+                }
+
+                this.init();
             },
         },
     },
