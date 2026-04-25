@@ -7,11 +7,10 @@
 
                 <!-- 可视状态 -->
                 <i class="u-status u-status-private" v-if="post.status != 1 || post.visible != 0">
-                    <i class="el-icon-lock" style="color: #fb9b24"></i>
+                    <el-icon><Lock /></el-icon>
                 </i>
-
                 <i class="u-status u-status-deleted" v-if="post.is_deleted">
-                    <i class="el-icon-delete" style="color: #c00"></i>
+                    <el-icon><Delete /></el-icon>
                 </i>
 
                 <!-- 标题与高亮 -->
@@ -293,9 +292,27 @@ export default {
     .u-status {
         .size(20px);
         margin-right: 15px;
-        svg,
-        i {
-            .size(20px);
+        .flex(o);
+
+        &.u-status-private,
+        &.u-status-deleted {
+            .r(4px);
+            svg,
+            i {
+                .size(14px);
+            }
+            color: #fff;
+            svg {
+                fill: #fff;
+            }
+        }
+
+        &.u-status-private {
+            background-color: rgb(255, 187, 105);
+        }
+
+        &.u-status-deleted {
+            background-color: #ff6969;
         }
     }
 

@@ -27,10 +27,11 @@
                     <RightSidebar :show-toggle="true">
                         <Side :id="id" type="community" class="m-extend" />
                     </RightSidebar>
-                    <CommonFooter></CommonFooter>
                 </div>
             </div>
         </Main>
+
+        <CommonFooter></CommonFooter>
     </div>
 </template>
 
