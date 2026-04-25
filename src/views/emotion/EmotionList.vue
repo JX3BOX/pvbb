@@ -73,15 +73,15 @@
                                     </div>
                                     <div class="u-info-misc">
                                         <time class="u-time">{{ doEmotionUser(item.data).time }}</time>
-                                        <el-checkbox
+                                        <span
                                             v-if="isEditor"
-                                            v-model="rewardObj[item.data.id]"
-                                            class="u-op-item u-op-gift"
-                                            :disabled="!item.data.user_id || isSelf(item.data)"
-                                            @change="doReward($event, item.data)"
+                                            class="u-op-item u-op-star el-link el-link--primary"
+                                            :class="{ 'is-disabled': starLoadingObj[item.data.id] }"
+                                            @click="handleStar(item.data)"
                                         >
-                                            选中
-                                        </el-checkbox>
+                                            <i :class="item.data.star ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
+                                            {{ item.data.star ? "取消精选" : "设为精选" }}
+                                        </span>
                                         <a
                                             v-else
                                             class="u-like"
@@ -115,34 +115,18 @@
                         @current-change="handleCurrentChange"
                         @size-change="handleSizeChange"
                     />
-                    <div class="m-emotion-reward" v-if="isEditor">
-                        <el-button class="m-emotion-all" type="primary" size="small" @click="rewardAll">
-                            {{ rewardAllType ? "取消" : "" }} 全选
-                        </el-button>
-                        <!-- <Thx
-                            type="batchReward"
-                            postType="emotion"
-                            :postId="rewardArr"
-                            :adminBoxcoinEnable="true"
-                            :userBoxcoinEnable="true"
-                            client="all"
-                        /> -->
-                        <!-- TODO: 实装 -->
-                        <el-button type="primary" size="small">设为精选</el-button>
-                    </div>
-                    <template v-else>
-                        <el-button
-                            v-show="page < pages"
-                            class="m-emotion-more"
-                            type="primary"
-                            icon="ArrowDown"
-                            size="small"
-                            :disabled="loading"
-                            @click="loadMore"
-                        >
-                            加载更多
-                        </el-button>
-                    </template>
+                    <el-button
+                        v-if="!isEditor"
+                        v-show="page < pages"
+                        class="m-emotion-more"
+                        type="primary"
+                        icon="ArrowDown"
+                        size="small"
+                        :disabled="loading"
+                        @click="loadMore"
+                    >
+                        加载更多
+                    </el-button>
                 </div>
             </div>
         </div>
@@ -158,7 +142,7 @@ import LeftTab from "@/components/left-tab.vue";
 import emotion_post from "@/components/emotion/emotion_post";
 import { resolveImagePath, getThumbnail, authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getRelativeTime } from "@/utils/dateFormat.js";
-import { getEmotions } from "@/service/emotion";
+import { getEmotions, starEmotion, unstarEmotion } from "@/service/emotion";
 import { getLikes } from "@/service/next";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
@@ -190,8 +174,7 @@ export default {
                 col: 5,
             },
             resizeHandler: null,
-            rewardObj: {},
-            rewardArr: [],
+            starLoadingObj: {},
         };
     },
     computed: {
@@ -208,10 +191,6 @@ export default {
         keys() {
             return [this.type, this.star, this.original];
         },
-        rewardAllType() {
-            const validCount = this.emotions.filter((item) => item.user_id).length;
-            return validCount > 0 && this.rewardArr.length === validCount;
-        },
         isEditor() {
             return User.isEditor();
         },
@@ -220,7 +199,6 @@ export default {
         keys: {
             deep: true,
             handler() {
-                this.rewardArr = [];
                 if (this.page !== 1) {
                     this.page = 1;
                     if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
@@ -259,7 +237,6 @@ export default {
     methods: {
         handleSizeChange(val) {
             this.per = val;
-            this.rewardArr = [];
             if (this.page !== 1) {
                 this.page = 1;
                 if (this.updatePaginationQuery({ page: 1, per: val })) return;
@@ -269,7 +246,6 @@ export default {
             }
         },
         handlePublishSuccess() {
-            this.rewardArr = [];
             if (this.page !== 1) {
                 this.page = 1;
                 if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
@@ -278,41 +254,39 @@ export default {
                 this.loadList();
             }
         },
-        doReward(val, data) {
-            if (val) {
-                if (!this.rewardArr.find((item) => ~~item.article_id === ~~data.id)) {
-                    this.rewardArr.push({
-                        user_id: data.user_id,
-                        article_id: data.id.toString(),
-                        article_type: "emotion",
+        handleStar(emotion) {
+            const id = emotion?.id;
+            if (!id || this.starLoadingObj[id]) return;
+
+            const isStar = !!emotion.star;
+            const nextStar = isStar ? 0 : 1;
+            const request = isStar ? unstarEmotion(id) : starEmotion(id);
+
+            this.starLoadingObj = {
+                ...this.starLoadingObj,
+                [id]: true,
+            };
+
+            request
+                .then(() => {
+                    emotion.star = nextStar;
+                    const target = this.emotions.find((item) => item.id === id);
+                    if (target) target.star = nextStar;
+
+                    this.$notify({
+                        title: "成功",
+                        message: isStar ? "取消加精成功" : "加精成功",
+                        type: "success",
                     });
-                }
-                return;
-            }
 
-            this.rewardArr = this.rewardArr.filter((item) => ~~item.article_id !== ~~data.id);
-        },
-        rewardAll() {
-            const arr = [];
-
-            this.emotions.forEach((item) => {
-                if (item.user_id && this.isNotSelf(item.user_id)) {
-                    arr.push({
-                        user_id: item.user_id,
-                        article_id: item.id.toString(),
-                        article_type: "emotion",
-                    });
-                }
-                this.rewardObj[item.id] = !this.rewardAllType;
-            });
-
-            this.rewardArr = this.rewardAllType ? [] : arr;
-        },
-        isNotSelf(id) {
-            return id != User.getInfo().uid;
-        },
-        isSelf(emotion) {
-            return emotion.user_id == User.getInfo().uid;
+                    return this.loadList(false, { _no_cache: 1 });
+                })
+                .finally(() => {
+                    this.starLoadingObj = {
+                        ...this.starLoadingObj,
+                        [id]: false,
+                    };
+                });
         },
         setType(type) {
             this.type = type;
@@ -328,7 +302,6 @@ export default {
         },
         handleCurrentChange(page) {
             this.page = page;
-            this.rewardArr = [];
             this.skipTop();
             if (!this.updatePaginationQuery({ page, per: this.per })) {
                 this.loadList();
@@ -337,11 +310,12 @@ export default {
         handleDelete() {
             this.onSearch();
         },
-        loadList(appendMode = false) {
+        loadList(appendMode = false, extraParams = {}) {
             this.loading = true;
             const params = {
                 ...this.params,
                 page: appendMode ? this.page + 1 : this.page,
+                ...extraParams,
             };
 
             return getEmotions(params)
@@ -356,7 +330,6 @@ export default {
                         this.list = [...this.list, ...rows];
                         this.emotions = cloneDeep(this.list);
                     } else {
-                        this.rewardObj = {};
                         this.list = rows;
                         this.emotions = cloneDeep(rows);
                     }

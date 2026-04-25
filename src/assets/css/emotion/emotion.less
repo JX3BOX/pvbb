@@ -64,6 +64,21 @@
         flex-wrap: wrap;
         align-items: center;
     }
+    .u-op-star {
+        font-size: 12px;
+        line-height: 1;
+        cursor: pointer;
+        i {
+            margin-right: 3px;
+        }
+        &:hover {
+            color: #f39;
+        }
+        &.is-disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    }
     .u-user-name {
         .flex;
         align-items: center;

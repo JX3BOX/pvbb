@@ -21,6 +21,10 @@
 </template>
 
 <script>
+const resolveOrder = (type) => {
+    return type == 1 ? "reply" : "publish";
+};
+
 export default {
     name: "ReplyOrderBy",
     emits: ["filter"],
@@ -33,7 +37,7 @@ export default {
     data: function () {
         return {
             visible: false,
-            order: this.type === "" ? "reply" : this.type == 1 ? "reply" : "publish",
+            order: resolveOrder(this.type),
         };
     },
     computed: {
@@ -43,7 +47,7 @@ export default {
     },
     watch: {
         type: function (val) {
-            this.order = val === "" ? "reply" : val == 1 ? "reply" : "publish";
+            this.order = resolveOrder(val);
         },
     },
     methods: {
