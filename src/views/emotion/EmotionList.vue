@@ -76,7 +76,7 @@
                                         <span
                                             v-if="isEditor"
                                             class="u-op-item u-op-star el-link el-link--primary"
-                                            :class="{ 'is-disabled': starLoadingObj[item.data.id] }"
+                                            :class="{ 'is-disabled': starLoadingObj[item.data.id],'on': item.data.star }"
                                             @click="handleStar(item.data)"
                                         >
                                             <i :class="item.data.star ? 'el-icon-star-off' : 'el-icon-star-on'"></i>

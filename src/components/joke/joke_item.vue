@@ -35,7 +35,7 @@
             <div class="u-other">
                 <template v-if="isEditor">
                     <!-- 精选 -->
-                    <a class="u-op-item u-op-star el-link el-link--primary" @click="handleStar">
+                    <a class="u-op-item u-op-star el-link el-link--primary" :class="{'on': isStar}" @click="handleStar">
                         <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
                         {{ isStar ? "取消精选" : "设为精选" }}
                     </a>
