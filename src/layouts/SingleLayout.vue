@@ -18,11 +18,6 @@
                 <publish-gate />
             </template>
             <template #op-prepend>
-                <!-- <AdminDirectMessage
-                    :user-id="user_id"
-                    :sourceId="String(post.ID)"
-                    :sourceType="post.post_type"
-                ></AdminDirectMessage> -->
                 <AdminDrop v-if="isTeammate" :post="post" :user-id="user_id" show-move />
             </template>
             <template #title>

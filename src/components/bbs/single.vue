@@ -1,6 +1,5 @@
 <template>
     <singlebox :post="post" :stat="stat" v-loading="loading" @extendUpdate="updateExtend">
-        <!-- 头部子类型 -->
         <template #single-header>
             <div class="u-meta u-sub-block">
                 <em class="u-label">类型</em>
@@ -8,7 +7,6 @@
                     {{ post_subtype }}
                 </span>
             </div>
-            <!-- <span v-for="item in topics" :key="item" class="u-label u-topic">{{ item }}</span> -->
         </template>
     </singlebox>
 </template>
