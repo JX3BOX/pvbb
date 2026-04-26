@@ -29,6 +29,7 @@ import emotion_item from "@/components/emotion/emotion_item";
 import { editLink } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { getEmotion, removeEmotion, starEmotion, unstarEmotion } from "@/service/emotion";
+import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 
 export default {
     name: "EmotionSingle",
@@ -45,6 +46,7 @@ export default {
         return {
             loading: false,
             emotion: {},
+            starLoading: false,
         };
     },
     computed: {
@@ -84,21 +86,53 @@ export default {
                 });
         },
         handleStar() {
-            const request = this.isStar ? unstarEmotion(this.emotion.id) : starEmotion(this.emotion.id);
-            const message = this.isStar ? "取消加精成功" : "加精成功";
-            const nextStar = this.isStar ? 0 : 1;
+            if (this.starLoading || !this.emotion?.id) return;
 
-            request.then(() => {
-                this.emotion = {
-                    ...this.emotion,
-                    star: nextStar,
-                };
-                this.$notify({
-                    title: "成功",
-                    message,
-                    type: "success",
+            const isStar = this.isStar;
+            this.starLoading = true;
+
+            toggleStarWithAutoAppraise({
+                postType: "emotion",
+                articleId: this.emotion.id,
+                userId: this.emotion.user_id,
+                isStar,
+                starRequest: starEmotion,
+                unstarRequest: unstarEmotion,
+            })
+                .then(({ nextStar, skippedAutoAppraise }) => {
+                    this.emotion = {
+                        ...this.emotion,
+                        star: nextStar,
+                    };
+                    this.$notify({
+                        title: "成功",
+                        message: isStar ? "取消加精成功" : "加精成功",
+                        type: "success",
+                    });
+
+                    if (skippedAutoAppraise) {
+                        this.$notify({
+                            title: "提示",
+                            message: "该作品无作者ID，未执行自动品鉴",
+                            type: "warning",
+                        });
+                    }
+                })
+                .catch((error) => {
+                    const rollbackFailed = !!error?.rollbackError;
+                    this.$notify({
+                        title: "失败",
+                        message: rollbackFailed
+                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            : isStar
+                              ? "自动取消品鉴失败，已回滚精选状态"
+                              : "自动品鉴失败，已回滚精选状态",
+                        type: "error",
+                    });
+                })
+                .finally(() => {
+                    this.starLoading = false;
                 });
-            });
         },
         handleDelete() {
             this.$confirm("此操作将会删除该表情，是否继续？", "提示", {

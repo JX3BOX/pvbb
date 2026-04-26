@@ -1,4 +1,4 @@
-import { $cms, $next } from "@jx3box/jx3box-common/js/api";
+import { $cms, $next, $pay } from "@jx3box/jx3box-common/js/api";
 
 // 发布
 const postEmotion = (data) => {
@@ -35,5 +35,7 @@ const removeEmotion = (id) => {
 function uploadEmotion(formdata, category = "emotions") {
     return $next().post(`/api/${category}/upload`, formdata);
 }
+
+
 
 export { getEmotions, getEmotion, starEmotion, removeEmotion, postEmotion, unstarEmotion, uploadEmotion };

@@ -82,6 +82,7 @@ import { getRelativeTime } from "@/utils/dateFormat.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { starEmotion, unstarEmotion, removeEmotion } from "@/service/emotion";
+import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 export default {
     name: "EmotionPreview",
     emits: ["close"],
@@ -91,6 +92,7 @@ export default {
             show: false,
             isLike: false,
             isStar: false,
+            starLoading: false,
             ext: "gif",
             types: [],
         };
@@ -166,28 +168,50 @@ export default {
         },
         // 精选
         handleStar() {
-            if (!this.isStar) {
-                starEmotion(this.emotion.id).then(() => {
+            if (this.starLoading || !this.emotion?.id) return;
+
+            const isStar = !!this.isStar;
+            this.starLoading = true;
+
+            toggleStarWithAutoAppraise({
+                postType: "emotion",
+                articleId: this.emotion.id,
+                userId: this.emotion.user_id,
+                isStar,
+                starRequest: starEmotion,
+                unstarRequest: unstarEmotion,
+            })
+                .then(({ nextStar, skippedAutoAppraise }) => {
+                    this.isStar = !!nextStar;
                     this.$notify({
                         title: "成功",
-                        message: "加精成功",
+                        message: isStar ? "取消加精成功" : "加精成功",
                         type: "success",
                     });
-                    this.isStar = true;
+
+                    if (skippedAutoAppraise) {
+                        this.$notify({
+                            title: "提示",
+                            message: "该作品无作者ID，未执行自动品鉴",
+                            type: "warning",
+                        });
+                    }
+                })
+                .catch((error) => {
+                    const rollbackFailed = !!error?.rollbackError;
+                    this.$notify({
+                        title: "失败",
+                        message: rollbackFailed
+                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            : isStar
+                              ? "自动取消品鉴失败，已回滚精选状态"
+                              : "自动品鉴失败，已回滚精选状态",
+                        type: "error",
+                    });
+                })
+                .finally(() => {
+                    this.starLoading = false;
                 });
-            } else {
-                this.unStar();
-            }
-        },
-        unStar: function () {
-            unstarEmotion(this.emotion.id).then(() => {
-                this.$notify({
-                    title: "成功",
-                    message: "取消加精成功",
-                    type: "success",
-                });
-                this.isStar = false;
-            });
         },
         // 删除
         handleDelete: function () {

@@ -146,6 +146,7 @@ import { getEmotions, starEmotion, unstarEmotion } from "@/service/emotion";
 import { getLikes } from "@/service/next";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
+import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 
 export default {
     name: "EmotionList",
@@ -259,16 +260,21 @@ export default {
             if (!id || this.starLoadingObj[id]) return;
 
             const isStar = !!emotion.star;
-            const nextStar = isStar ? 0 : 1;
-            const request = isStar ? unstarEmotion(id) : starEmotion(id);
 
             this.starLoadingObj = {
                 ...this.starLoadingObj,
                 [id]: true,
             };
 
-            request
-                .then(() => {
+            toggleStarWithAutoAppraise({
+                postType: "emotion",
+                articleId: id,
+                userId: emotion.user_id,
+                isStar,
+                starRequest: starEmotion,
+                unstarRequest: unstarEmotion,
+            })
+                .then(({ nextStar, skippedAutoAppraise }) => {
                     emotion.star = nextStar;
                     const target = this.emotions.find((item) => item.id === id);
                     if (target) target.star = nextStar;
@@ -279,7 +285,27 @@ export default {
                         type: "success",
                     });
 
+                    if (skippedAutoAppraise) {
+                        this.$notify({
+                            title: "提示",
+                            message: "该作品无作者ID，未执行自动品鉴",
+                            type: "warning",
+                        });
+                    }
+
                     return this.loadList(false, { _no_cache: 1 });
+                })
+                .catch((error) => {
+                    const rollbackFailed = !!error?.rollbackError;
+                    this.$notify({
+                        title: "失败",
+                        message: rollbackFailed
+                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            : isStar
+                              ? "自动取消品鉴失败，已回滚精选状态"
+                              : "自动品鉴失败，已回滚精选状态",
+                        type: "error",
+                    });
                 })
                 .finally(() => {
                     this.starLoadingObj = {

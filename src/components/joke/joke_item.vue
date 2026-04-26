@@ -70,6 +70,7 @@ import { showAvatar, authorLink, editLink } from "@jx3box/jx3box-common/js/utils
 import { starJoke, removeJoke, unstarJoke } from "@/service/joke";
 import User from "@jx3box/jx3box-common/js/user";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
+import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 
 export default {
     name: "joke_item",
@@ -171,35 +172,52 @@ export default {
         },
         // 精选
         handleStar() {
-            if (this.starLoading) return;
+            if (this.starLoading || !this.joke?.id) return;
 
-            const nextStatus = !this.isStar;
-            const request = nextStatus ? starJoke : unstarJoke;
+            const isStar = !!this.isStar;
             this.starLoading = true;
-            request(this.joke.id)
-                .then(() => {
+
+            toggleStarWithAutoAppraise({
+                postType: "joke",
+                articleId: this.joke.id,
+                userId: this.joke.user_id,
+                isStar,
+                starRequest: starJoke,
+                unstarRequest: unstarJoke,
+            })
+                .then(({ nextStar, skippedAutoAppraise }) => {
                     this.$notify({
                         title: "成功",
-                        message: nextStatus ? "加精成功" : "取消加精成功",
+                        message: isStar ? "取消加精成功" : "加精成功",
                         type: "success",
                     });
-                    this.isStar = nextStatus;
+                    this.isStar = !!nextStar;
+
+                    if (skippedAutoAppraise) {
+                        this.$notify({
+                            title: "提示",
+                            message: "该作品无作者ID，未执行自动品鉴",
+                            type: "warning",
+                        });
+                    }
+
                     this.$emit("update", { noCache: true });
+                })
+                .catch((error) => {
+                    const rollbackFailed = !!error?.rollbackError;
+                    this.$notify({
+                        title: "失败",
+                        message: rollbackFailed
+                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            : isStar
+                              ? "自动取消品鉴失败，已回滚精选状态"
+                              : "自动品鉴失败，已回滚精选状态",
+                        type: "error",
+                    });
                 })
                 .finally(() => {
                     this.starLoading = false;
                 });
-        },
-        unStar: function () {
-            unstarJoke(this.joke.id).then(() => {
-                this.$notify({
-                    title: "成功",
-                    message: "取消加精成功",
-                    type: "success",
-                });
-                this.isStar = false;
-                this.$emit("update");
-            });
         },
         // 删除
         handleDelete() {
