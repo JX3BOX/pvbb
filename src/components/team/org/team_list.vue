@@ -124,7 +124,7 @@
             :hide-on-single-page="true"
             :page-size="per"
             :total="total"
-            :current-page="page"
+            v-model:current-page="page"
             @current-change="changePage"
         ></el-pagination>
     </div>
@@ -224,7 +224,8 @@ export default {
                     this.loading = false;
                 });
         },
-        changePage: function () {
+        changePage: function (val) {
+            this.page = val;
             this.$emit("changePage", this.page);
         },
         changeServer: function () {
