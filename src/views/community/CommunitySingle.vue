@@ -135,7 +135,12 @@ import GoToTopOrBottom from "@/views/community/components/GoToTopOrBottom.vue";
 import CommunitySingleLayout from "@/layouts/CommunitySingleLayout.vue";
 import CommunityPostHeader from "@/views/community/components/CommunityPostHeader.vue";
 import CommentEditor from "@/views/community/components/CommentEditor.vue";
-import { getTopicDetails, getTopicDetailsFromAdmin, getTopicReplyList, replyTopic } from "@/service/community";
+import {
+    getTopicDetails,
+    getTopicDetailsFromAdmin,
+    getTopicReplyList,
+    replyTopic,
+} from "@/service/community";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { getLikes } from "@/service/next";
 import User from "@jx3box/jx3box-common/js/user";
@@ -239,8 +244,14 @@ export default {
         isAuthor() {
             return this.post?.user_id == User.getInfo().uid;
         },
+        isSuper() {
+            return User.getInfo()?.group >= 64;
+        },
         isPhone() {
             return window.innerWidth < 768;
+        },
+        isAdminMode() {
+            return this.mode === "admin" || (this.isSuper && this.$route.query.from === "admin");
         },
         // 是否显示加载更多
         hasNextPage: function () {
@@ -271,7 +282,7 @@ export default {
     mounted() {
         if (!this.id) return this.$message.error("文章id不存在");
         this.getDetails();
-        this.getReplyList().then(() => {
+        Promise.resolve(this.getReplyList()).then(() => {
             this.$nextTick(() => {
                 renderJx3Element(this);
             });
@@ -321,6 +332,9 @@ export default {
         },
     },
     methods: {
+        getErrorMessage(error, fallback = "请求失败，请稍后再试") {
+            return error?.response?.data?.msg || error?.response?.data?.message || error?.message || fallback;
+        },
         /**
          * 获取url楼诚参数
          */
@@ -384,51 +398,56 @@ export default {
         },
         getDetails: function () {
             let fun = getTopicDetails;
-            if (this.mode == "admin") {
+            if (this.isAdminMode) {
                 fun = getTopicDetailsFromAdmin;
             }
             const params = {};
             if (this.password) {
                 params.password = this.password;
             }
-            fun(this.id, params).then((res) => {
-                this.post = res.data.data;
+            return fun(this.id, params)
+                .then((res) => {
+                    this.post = res.data.data;
 
-                document.title = this.post.title + this.$t("pages.common.appendTitle");
+                    document.title = this.post.title + this.$t("pages.common.appendTitle");
 
-                getStat(appKey, this.id).then((res) => {
-                    this.stat = res.data;
-                    this.post.likes = this.stat.likes || 0;
-                });
-                postStat(appKey, this.id);
-
-                if (User.isLogin()) {
-                    postHistory({
-                        source_type: "community",
-                        source_id: ~~this.id,
-                        link: location.href,
-                        title: this.post.title,
-                        author_id: this.post.user_id,
-                        banner: this.post.banner_img,
-                        content_meta_id: this.post.link_content_meta_id,
+                    getStat(appKey, this.id).then((res) => {
+                        this.stat = res.data;
+                        this.post.likes = this.stat.likes || 0;
                     });
+                    postStat(appKey, this.id);
 
-                    this.post.visible > 1 &&
-                        this.post.visible_validate &&
-                        postReadHistory({
-                            id: this.id,
-                            category: "communicate",
-                            subcategory: "default",
-                            visible_type: ~~this.post.visible,
+                    if (User.isLogin()) {
+                        postHistory({
+                            source_type: "community",
+                            source_id: ~~this.id,
+                            link: location.href,
+                            title: this.post.title,
                             author_id: this.post.user_id,
                             banner: this.post.banner_img,
-                            contentMetaId: this.post.link_content_meta_id,
+                            content_meta_id: this.post.link_content_meta_id,
                         });
-                }
-            });
+
+                        this.post.visible > 1 &&
+                            this.post.visible_validate &&
+                            postReadHistory({
+                                id: this.id,
+                                category: "communicate",
+                                subcategory: "default",
+                                visible_type: ~~this.post.visible,
+                                author_id: this.post.user_id,
+                                banner: this.post.banner_img,
+                                contentMetaId: this.post.link_content_meta_id,
+                            });
+                    }
+                })
+                .catch((error) => {
+                    this.$message.error(this.getErrorMessage(error, "获取帖子详情失败"));
+                    return null;
+                });
         },
         getReplyList: function (appendMode) {
-            if (this.mode == "admin") return;
+            const previousPage = this.page;
             this.loading = true;
             if (appendMode) {
                 this.page += 1;
@@ -454,6 +473,13 @@ export default {
                     this.$nextTick(() => {
                         this.page = page.index;
                     });
+                })
+                .catch((error) => {
+                    if (appendMode) {
+                        this.page = previousPage;
+                    }
+                    // this.$message.error(this.getErrorMessage(error, "获取回复列表失败"));
+                    return null;
                 })
                 .finally(() => {
                     this.loading = false;

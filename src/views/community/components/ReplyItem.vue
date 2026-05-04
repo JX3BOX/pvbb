@@ -42,7 +42,7 @@
                     </span>
                 </span>
                 <div class="u-reply-content">
-                    <template v-if="visible">
+                    <template v-if="visible || isSuper">
                         <Article v-if="isMaster" :content="post.content || ''" />
                     </template>
                     <div class="m-single-null" v-else-if="isMaster">

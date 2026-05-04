@@ -49,8 +49,14 @@ const routes = [
             },
         },
     },
-    { path: "/community_topic/:id", redirect: (to) => ({ name: "community-single", params: { id: to.params.id } }) },
-    { path: "/community/topic/:id", redirect: (to) => ({ name: "community-single", params: { id: to.params.id } }) },
+    {
+        path: "/community_topic/:id",
+        redirect: (to) => ({ name: "community-single", params: { id: to.params.id }, query: to.query, hash: to.hash }),
+    },
+    {
+        path: "/community/topic/:id",
+        redirect: (to) => ({ name: "community-single", params: { id: to.params.id }, query: to.query, hash: to.hash }),
+    },
     {
         name: "community-single",
         path: "/community/:id",
