@@ -33,9 +33,9 @@ export default {
         return {
             loading: false,
             data: [],
-            active: "bbs_rank_2025",
+            active: "bbs_rank_2026",
 
-            tabs: ["2025", "2024", "2023", "2022"],
+            tabs: ["2026","2025", "2024", "2023", "2022"],
         };
     },
     computed: {
