@@ -45,7 +45,6 @@
 
 <script>
 import { publishLink } from "@jx3box/jx3box-common/js/utils";
-// import collection_item from "./collection_item.vue";
 import collection_item_v2 from "./collection_item_v2.vue";
 import { getCollections } from "@/service/collection.js";
 import Banner from "@/components/bbs/banner.vue";
@@ -54,7 +53,6 @@ export default {
     name: "CollectionList",
     props: [],
     components: {
-        // "collection-item": collection_item,
         "collection-item": collection_item_v2,
         Banner,
     },

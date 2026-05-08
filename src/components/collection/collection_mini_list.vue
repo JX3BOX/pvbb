@@ -1,7 +1,7 @@
 <template>
     <div class="m-mini-collection-box" v-loading="loading">
         <div class="m-list" @scroll="handleScroll">
-            <wc-waterfall gap="20" :cols="2" v-if="list.length">
+            <wc-waterfall ref="waterfall" gap="20" :cols="2" v-if="list.length">
                 <router-link v-for="item in list" :key="item.id" class="m-item" :to="`/collection/${item.id}`">
                     <div class="u-time">{{ dateFormat(item.updated) }}</div>
                     <div class="m-img-box">
@@ -84,6 +84,22 @@ export default {
             return showAvatar(url);
         },
         resolveImagePath,
+        relayoutWaterfall() {
+            const waterfall = this.$refs.waterfall;
+            if (!waterfall) return;
+
+            if (typeof waterfall.relayout === "function") {
+                waterfall.relayout();
+                return;
+            }
+
+            if (typeof waterfall.render === "function") {
+                waterfall.render();
+                return;
+            }
+
+            waterfall._layout?.relayout?.();
+        },
         randomNumber() {
             return Math.floor(Math.random() * 4) + 1;
         },
@@ -132,9 +148,8 @@ export default {
         list: {
             handler: function (list) {
                 if (list.length && this.$refs.waterfall) {
-                    // 重新渲染瀑布流高度
                     this.$nextTick(() => {
-                        this.$refs.waterfall.repaints();
+                        this.relayoutWaterfall();
                     });
                 }
             },

@@ -39,7 +39,15 @@
             </div>
         </div>
 
-        <el-drawer v-model="filterVisible" direction="btt" class="m-filter-drawer">
+        <el-drawer
+            v-model="filterVisible"
+            direction="btt"
+            class="m-filter-drawer"
+            modal-class="p-drawer-emotion"
+            :with-header="false"
+            :modal-append-to-body="false"
+            append-to-body
+        >
             <div class="m-filter-all" @click="drawerType = 'all'" :class="{ active: drawerType == 'all' }">全部</div>
             <div class="m-filter-group">
                 <div

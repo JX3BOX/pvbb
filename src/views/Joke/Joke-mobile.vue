@@ -1,5 +1,5 @@
 <template>
-    <div class="v-joke" v-loading="loading">
+    <div class="v-joke p-mobile-joke" v-loading="loading">
         <div class="m-chat-container" ref="chatContainer" @scroll="handleScroll">
             <!-- 聊天消息列表 -->
             <div class="m-chat-list" ref="chatList">

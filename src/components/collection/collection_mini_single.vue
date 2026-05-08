@@ -12,20 +12,17 @@
         <template v-else>
             <div class="m-collection-mini-single-content">
                 <div class="m-header">
+                    <div class="m-author">
+                        <CommonAuthor
+                            :uid="author_id"
+                            :author="collection.collection_user_info"
+                            :date="authorDate"
+                            :title="collection.title"
+                        />
+                    </div>
                     <div class="u-title">
                         <i class="u-private el-icon-lock" v-if="!collection.public" title="仅自己可见"></i>
                         {{ collection.title }}
-                    </div>
-                    <div class="u-author">
-                        <commonAvatar
-                            class="u-author-avatar"
-                            :url="collection.collection_user_info?.user_avatar"
-                            :uid="collection.collection_user_info?.user_id"
-                        />
-                        <div class="u-author-name">
-                            {{ collection.collection_user_info?.display_name || "匿名" }}
-                        </div>
-                        <div class="u-created-at">发布于 {{ dateFormat(collection.created) }}</div>
                     </div>
                 </div>
 
@@ -58,12 +55,6 @@
                         </li>
                     </ul>
                 </template>
-
-                <author-card
-                    v-if="collection.collection_user_info"
-                    :author="collection.collection_user_info"
-                    :uid="collection.collection_user_info?.user_id"
-                />
             </div>
         </template>
     </div>
@@ -73,7 +64,6 @@
 import CollectionPublish from "@jx3box/jx3box-editor/src/service/enum/CollectionPublic";
 import { getCollection, removeCollection } from "@/service/collection";
 import { dateFormat } from "@/utils/dateFormat";
-import dayjs from "dayjs";
 import Bus from "@/store/bus";
 import {
     getThumbnail,
@@ -87,15 +77,13 @@ import {
 import User from "@jx3box/jx3box-common/js/user.js";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { __imgPath } from "@/utils/config";
-import AuthorCard from "@/components/mobile/author-card.vue";
-import commonAvatar from "@jx3box/jx3box-ui/src/author/Avatar.vue";
+import CommonAuthor from "@/components/CommonAuthor.vue";
 
 export default {
     name: "CollectionSingle",
     props: [],
     components: {
-        AuthorCard,
-        commonAvatar,
+        CommonAuthor,
     },
     data: function () {
         return {
@@ -122,6 +110,9 @@ export default {
         title: function () {
             return this.collection.title;
         },
+        authorDate() {
+            return this.collection?.created ? `发布于 ${dateFormat(new Date(this.collection.created * 1000))}` : "";
+        },
     },
     watch: {
         "$route.params.id": {
@@ -142,9 +133,6 @@ export default {
         getTypeLabel,
         showAvatar,
         resolveImagePath,
-        dateFormat: function (timestamp) {
-            return dateFormat(new Date(timestamp * 1000));
-        },
         delete_handle($event, collection_id) {
             $event.preventDefault();
             this.$confirm("确认是否删除该剑三小册？", "提示", {
@@ -183,9 +171,6 @@ export default {
                 this.views = res.data.views || 0;
             });
         },
-        formatDate(date) {
-            return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
-        },
         iconUrl: function (icon) {
             const key = icon.replace("_", "/");
             return `${__imgPath}image/${key}.png`;
@@ -204,36 +189,22 @@ export default {
 <style lang="less">
 @black5: rgba(28, 28, 28, 0.05);
 @black5-dark: rgba(255, 255, 255, 0.05);
-@black40: rgba(28, 28, 28, 0.4);
-@black40-dark: rgba(255, 255, 255, 0.4);
 @black80: rgba(28, 28, 28, 0.8);
 @black80-dark: rgba(255, 255, 255, 0.8);
 @black100: #1c1c1c;
 @black100-dark: #fff;
 .m-collection-mini-single {
+    padding: 1.11rem 0.75rem;
     .m-collection-mini-single-content {
         .m-header {
-            padding: 0.75rem 1.25rem 0;
             .u-title {
                 color: @black100;
                 font-size: 1.125rem;
                 font-weight: bold;
                 line-height: 1.75rem;
             }
-            .u-author {
-                display: flex;
-                font-size: 0.75rem;
-                color: @black40;
-                margin-top: 0.5rem;
-                .u-author-avatar {
-                    margin-right: 0.25rem;
-                    .c-avatar-pic {
-                        .size(1rem);
-                    }
-                }
-                .u-created-at {
-                    margin-left: 0.75rem;
-                }
+            .m-author {
+                margin-bottom: 0.5rem;
             }
         }
         .m-description {
@@ -268,6 +239,48 @@ export default {
         }
     }
 }
+html.dark {
+    .m-collection-mini-single {
+        &::after {
+            content: "";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-color: #16181d;
+        }
+        .m-collection-mini-single-content {
+            .m-header {
+                .u-title {
+                    color: @black100-dark;
+                }
+            }
+            .el-divider {
+                background-color: @black5-dark;
+                .el-divider__text.is-left {
+                    background-color: #16181d;
+                    color: @black80-dark;
+                }
+            }
+            .m-description {
+                .u-description {
+                    color: @black100-dark;
+                }
+            }
+            .m-list {
+                .u-item {
+                    background-color: @black5-dark;
+                    .u-item-title {
+                        color: @black80-dark;
+                    }
+                }
+            }
+        }
+    }
+}
 @media (prefers-color-scheme: dark) {
     .m-collection-mini-single {
         &::after {
@@ -279,21 +292,18 @@ export default {
             width: 100%;
             height: 100%;
             z-index: -2;
-            background-color: #282828;
+            background-color: #16181d;
         }
         .m-collection-mini-single-content {
             .m-header {
                 .u-title {
                     color: @black100-dark;
                 }
-                .u-author {
-                    color: @black40-dark;
-                }
             }
             .el-divider {
                 background-color: @black5-dark;
                 .el-divider__text.is-left {
-                    background-color: @black5-dark;
+                    background-color: #16181d;
                     color: @black80-dark;
                 }
             }
