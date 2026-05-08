@@ -86,7 +86,7 @@
                     <el-alert :title="null_tip" type="warning" :closable="false"></el-alert>
                 </div>
             </div>
-            <QQBottom :type="post_type" :id="sourceId"></QQBottom>
+            <QQBottom :type="post_type" :id="id"></QQBottom>
         </div>
     </div>
 </template>
@@ -110,7 +110,6 @@ import QQBottom from "./components/Bottom.vue";
 
 export default {
     name: "PvpSingle",
-    props: ["sourceId"],
     components: { QQBottom },
     data() {
         return {
@@ -130,7 +129,7 @@ export default {
     },
     computed: {
         id() {
-            return this.sourceId || this.$route.query.id;
+            return this.$route.query.id;
         },
         post_type: function () {
             return this.post?.post_type;
