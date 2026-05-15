@@ -79,7 +79,9 @@
                     <el-option v-for="(item,i) in servers" :key="i" :label="item" :value="item"></el-option>
                 </el-select>
                 <el-input class="u-name u-filter" v-model="search" placeholder="查找活动" size="small">
-                    <i class="el-icon-search" slot="append" @click="loadRaids"></i>
+                    <template #append>
+                        <i class="el-icon-search" @click="loadRaids"></i>
+                    </template>
                 </el-input>
                 <router-link class="u-more el-button el-button--primary is-plain el-button--mini" to="/raid/list"
                     >查看更多&raquo;</router-link
