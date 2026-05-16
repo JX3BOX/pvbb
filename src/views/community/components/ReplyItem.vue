@@ -237,6 +237,7 @@ import CommentUser from "./CommentUser.vue";
 import ReplyForReply from "./ReplyForReply.vue";
 import CommentItem from "./CommentItem.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
+import { renderEmotionHTML } from "@/utils/jx3Emo";
 
 export default {
     name: "ReplyItem",
@@ -420,8 +421,8 @@ export default {
                 }
                 return `<a href="${url}" target="_blank">${url}</a>`;
             });
-            const ins = new JX3_EMOTION(val);
-            this.renderContent = await ins._renderHTML();
+            const html = await renderEmotionHTML(val.replace(/ style="[^"]*"/gi, ""));
+            this.renderContent = /<\w+[^>]*>/.test(html) ? html : html.replace(/\n/g, "<br />");
         },
         onShowReply() {
             if (this.isMaster) {
