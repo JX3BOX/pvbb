@@ -20,6 +20,7 @@
                     postType="joke"
                     :postTitle="title"
                     :userId="user_id"
+                    :author-id="user_id"
                     :adminBoxcoinEnable="true"
                     :userBoxcoinEnable="true"
                     client="all"
