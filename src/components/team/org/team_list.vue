@@ -236,7 +236,7 @@ export default {
             return getThumbnail(val, 204, true);
         },
         showTeamMedal: function (val) {
-            return __cdn + "design/medals/team/" + val + ".gif";
+            return __cdn + "design/medals/team/" + val + ".webp";
         },
     },
     watch: {
