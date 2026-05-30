@@ -13,7 +13,7 @@
                     </div>
                 </div>
                 <div class="u-cover">
-                    <img class="u-item-img__right" src="@/assets/img/item/item_robot.svg" alt="" />
+                    <img class="u-item-img__right" src="@/assets/img/qqbot/jx3box_qqbot_furniture.svg" alt="" />
                 </div>
             </div>
 
