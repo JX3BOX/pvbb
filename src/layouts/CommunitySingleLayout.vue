@@ -107,7 +107,7 @@ export default {
 <style lang="less">
 .p-community-single {
     .c-header {
-        z-index: 9999;
+        // z-index: 9999;
     }
     scroll-behavior: smooth;
     .m-community-single__main {
