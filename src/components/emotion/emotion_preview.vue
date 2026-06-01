@@ -61,6 +61,7 @@
                 postType="emotion"
                 :postTitle="title"
                 :userId="emotion.user_id"
+                :author-id="emotion.user_id"
                 :adminBoxcoinEnable="true"
                 :userBoxcoinEnable="true"
                 client="all"

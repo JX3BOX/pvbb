@@ -140,6 +140,7 @@
                     postType="collection"
                     :postTitle="title"
                     :userId="author_id"
+                    :author-id="author_id"
                     :adminBoxcoinEnable="false"
                     :userBoxcoinEnable="true"
                     client="all"

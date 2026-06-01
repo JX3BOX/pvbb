@@ -43,7 +43,7 @@
                 </span>
                 <div class="u-reply-content">
                     <template v-if="visible || isSuper">
-                        <Article v-if="isMaster" :content="post.content || ''" />
+                        <Article v-if="isMaster" :content="renderContent" />
                     </template>
                     <div class="m-single-null" v-else-if="isMaster">
                         <el-alert type="warning" show-icon v-if="post.visible > 1 && post.visible != 3">
@@ -218,7 +218,6 @@
 </template>
 
 <script>
-import JX3_EMOTION from "@jx3box/jx3box-emotion";
 import { authorLink, editLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { replyReply, getCommentList } from "@/service/community";
 import User from "@jx3box/jx3box-common/js/user.js";
@@ -237,6 +236,7 @@ import CommentUser from "./CommentUser.vue";
 import ReplyForReply from "./ReplyForReply.vue";
 import CommentItem from "./CommentItem.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
+import { renderEmotionHTML } from "@/utils/jx3Emo";
 
 export default {
     name: "ReplyItem",
@@ -269,6 +269,7 @@ export default {
             likeCount: 0,
             showReplyForReplyFrom: false,
             renderContent: "",
+            renderVersion: 0,
             commentList: [],
 
             // summary
@@ -365,9 +366,7 @@ export default {
     watch: {
         "post.content": {
             handler: function (val) {
-                if (!this.isMaster) {
-                    this.formatContent(val);
-                }
+                this.formatContent(val);
             },
             immediate: true,
         },
@@ -408,6 +407,15 @@ export default {
         },
         authorLink,
         async formatContent(val) {
+            const version = ++this.renderVersion;
+            val = String(val || "");
+            if (this.isMaster) {
+                const html = await renderEmotionHTML(val);
+                if (version === this.renderVersion) {
+                    this.renderContent = html;
+                }
+                return;
+            }
             const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])(?![^<>]*>)/gi;
             val = val.replace(urlPattern, (match, url) => {
                 // 如果匹配的是 img 标签的 src 属性，不进行替换
@@ -420,8 +428,10 @@ export default {
                 }
                 return `<a href="${url}" target="_blank">${url}</a>`;
             });
-            const ins = new JX3_EMOTION(val);
-            this.renderContent = await ins._renderHTML();
+            const html = await renderEmotionHTML(val.replace(/ style="[^"]*"/gi, ""));
+            if (version === this.renderVersion) {
+                this.renderContent = /<\w+[^>]*>/.test(html) ? html : html.replace(/\n/g, "<br />");
+            }
         },
         onShowReply() {
             if (this.isMaster) {

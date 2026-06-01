@@ -7,6 +7,7 @@
                         <TreasureLandscapeContent
                             v-if="isLandscape"
                             :__img-root="imgRoot"
+                            :layout="treasureLayout"
                             :user-achievement="userAchievement"
                             :role-info="roleInfo"
                             :add-class="addClass"
@@ -18,6 +19,7 @@
                         <TreasurePortraitContent
                             v-else
                             :__img-root="imgRoot"
+                            :layout="treasureLayout"
                             :user-achievement="userAchievement"
                             :role-info="roleInfo"
                             :add-class="addClass"
@@ -58,6 +60,7 @@ export default {
             imgRoot: __imgPath + "adventure/",
             mount: "",
             defaultRole: "",
+            treasureLayout: null,
         };
     },
     computed: {
@@ -141,7 +144,9 @@ export default {
             this.handleScreenWidthChange();
         },
         async buildTreasureData(userJx3Id) {
-            const data = await getTreasureData(userJx3Id);
+            const res = await getTreasureData(userJx3Id);
+            const data = res.data || {};
+            this.treasureLayout = res.layout || null;
             window.__DATA_READY__ = true;
             if (this.isLandscape) {
                 data.pet = this.splitArrayIntoChunks(data.pet || [], 5);

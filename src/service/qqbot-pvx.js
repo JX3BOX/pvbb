@@ -1,6 +1,11 @@
+import axios from "axios";
 import { $node, $team, $next } from "@jx3box/jx3box-common/js/api";
+import { __dataPath } from "@/utils/config";
 
 const $ = $node();
+const $data = axios.create({
+    baseURL: `${__dataPath}pvx/homeland/output/`,
+});
 
 export function getAdventure(id, client = "std") {
     return $.get(`/serendipity/${id}`, {
@@ -65,6 +70,22 @@ export function getBookList(keyword, client = "std", page = 1, pageSize = 16) {
             pageSize,
         },
     });
+}
+
+export function getFurnitureDetail(id) {
+    return $.get(`/house/furniture/${id}`);
+}
+
+export function getFurnitureSet(id) {
+    return $.get(`/house/furniture/set/${id}`);
+}
+
+export function getFurnitureColor(id) {
+    return $.get(`/house/furniture/color/${id}`);
+}
+
+export function getFurnitureCategory() {
+    return $data.get("homeland_category.json");
 }
 
 export function getUserRoles() {

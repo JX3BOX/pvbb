@@ -31,25 +31,23 @@
 
         <template v-if="userAchievement">
             <!-- 绝世奇遇 -->
-            <div class="m-world">
-                <img class="u-world__bg" :src="getCdnImgUrl('world/world_bg.svg')" />
-                <div class="m-world-count">
-                    <img class="u-count__img" :src="getCdnImgUrl('portrait/world_qy_bg.png')" />
-                    <div class="m-count-info">
+            <div class="m-world" :style="worldStageStyle">
+                <img class="u-world__bg" :src="getCdnImgUrl(perfectLayout.worldBackground.src)" :style="worldBgStyle" />
+                <div class="m-world-count" :style="perfectCountStyle">
+                    <img class="u-count__img" :src="getCdnImgUrl(perfectLayout.countBadge)" :style="perfectCountImageStyle" />
+                    <div class="m-count-info" :style="perfectCountTextStyle">
                         {{ userAchievement.perfectNowNum + "/" + userAchievement.perfectAllNum }}
                     </div>
                 </div>
                 <template v-for="(item, index) in userAchievement.perfect" :key="`group-${item.dwID}-${index}`">
                     <img
                         class="u-item__img"
-                        :class="item.hasClass"
-                        :style="{
-                            zIndex: item.zIndex,
-                        }"
-                        :src="getCdnImgUrl(`world/${item.dwID}${item.isAct ? '_act' : ''}.png`)"
+                        :class="perfectItemClass(item)"
+                        :style="perfectImageStyle(item)"
+                        :src="getCdnImgUrl(perfectItemImage(item))"
                     />
-                    <div class="m-item__text" :class="item.hasClass">
-                        <img class="u-item__bg" :src="getCdnImgUrl(`world/text_bg${item.isAct ? '_act' : ''}.png`)" />
+                    <div class="m-item__text" :class="perfectItemClass(item)" :style="perfectLabelStyle(item)">
+                        <img class="u-item__bg" :src="getCdnImgUrl(perfectTextBackground(item))" />
                         <span class="u-item__text">{{ item.szName }}</span>
                     </div>
                 </template>
@@ -134,9 +132,14 @@
 <script>
 import { showSchoolIcon } from "@jx3box/jx3box-common/js/utils";
 import { __cdn } from "@/utils/config";
+import { getPerfectItemLayout, getPerfectLayout, toCssStyle } from "@/assets/js/treasure-layout";
 export default {
     name: "TreasurePortraitContent",
     props: {
+        layout: {
+            type: Object,
+            default: () => ({}),
+        },
         userAchievement: {
             type: [Object, Boolean],
             default: () => {},
@@ -169,10 +172,55 @@ export default {
     data() {
         return {};
     },
+    computed: {
+        perfectLayout() {
+            return getPerfectLayout(this.layout, "portrait");
+        },
+        worldStageStyle() {
+            return toCssStyle(this.perfectLayout.stage);
+        },
+        worldBgStyle() {
+            return toCssStyle(this.perfectLayout.worldBackground.style);
+        },
+        perfectCountStyle() {
+            return toCssStyle(this.perfectLayout.countStyle);
+        },
+        perfectCountImageStyle() {
+            return toCssStyle(this.perfectLayout.countImageStyle);
+        },
+        perfectCountTextStyle() {
+            return toCssStyle(this.perfectLayout.countTextStyle);
+        },
+    },
     methods: {
         showSchoolIcon,
         getCdnImgUrl(img) {
+            if (/^https?:\/\//i.test(img)) return img;
             return `${__cdn}design/treasure/${img}`;
+        },
+        perfectItemLayout(item = {}) {
+            return getPerfectItemLayout(item, "portrait");
+        },
+        perfectItemClass(item = {}) {
+            return this.perfectItemLayout(item).key || item.hasClass || "";
+        },
+        perfectImageStyle(item = {}) {
+            const layout = this.perfectItemLayout(item);
+            return {
+                ...toCssStyle(layout.imageStyle),
+                zIndex: Number(layout.zIndex || item.zIndex || 1),
+            };
+        },
+        perfectLabelStyle(item = {}) {
+            return toCssStyle(this.perfectItemLayout(item).labelStyle);
+        },
+        perfectItemImage(item = {}) {
+            const layout = this.perfectItemLayout(item);
+            if (item.isAct) return layout.activeImage || `world/${item.dwID}_act.png`;
+            return layout.image || `world/${item.dwID}.png`;
+        },
+        perfectTextBackground(item = {}) {
+            return item.isAct ? this.perfectLayout.textActiveBackground : this.perfectLayout.textBackground;
         },
         getImgUrl(item) {
             const client = "std"; // 怀旧服的奇遇图片先取正式服的

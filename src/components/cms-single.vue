@@ -45,6 +45,7 @@
                 :postType="post_type"
                 :postTitle="post_title"
                 :userId="author_id"
+                :author-id="author_id"
                 :adminBoxcoinEnable="true"
                 :userBoxcoinEnable="true"
                 :authors="authors"
@@ -69,6 +70,7 @@
             :postId="id"
             :postType="post_type"
             :postTitle="post_title"
+            :author-id="author_id"
             :showComment="id && allow_comment"
             @toComment="toComment($event)"
         ></right-affix>

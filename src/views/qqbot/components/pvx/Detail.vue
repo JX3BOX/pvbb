@@ -6,6 +6,7 @@
             <HorseSingle v-else-if="type === 'horse'" :source-id="id" />
             <ReputationSingle v-else-if="type === 'reputation'" :source-id="id" />
             <BookSingle v-else-if="type === 'book'" :source-id="id" />
+            <FurnitureSingle v-else-if="type === 'furniture'" :source-id="id" />
             <MissingContent v-else :type="type" :id="id" />
             <PvxBottom v-if="supportedType" :type="type" :id="id"></PvxBottom>
         </div>
@@ -22,6 +23,7 @@ import PetSingle from "./PetSingle.vue";
 import HorseSingle from "./HorseSingle.vue";
 import ReputationSingle from "./ReputationSingle.vue";
 import BookSingle from "./BookSingle.vue";
+import FurnitureSingle from "./FurnitureSingle.vue";
 
 export default {
     name: "QQRobotPvxDetail",
@@ -31,6 +33,7 @@ export default {
         HorseSingle,
         ReputationSingle,
         BookSingle,
+        FurnitureSingle,
         PvxBottom,
         Treasure,
         MissingContent,
@@ -46,7 +49,7 @@ export default {
             return this.type === "treasure";
         },
         supportedType() {
-            return ["adventure", "pet", "horse", "reputation", "book"].includes(this.type);
+            return ["adventure", "pet", "horse", "reputation", "book", "furniture"].includes(this.type);
         },
     },
 };
