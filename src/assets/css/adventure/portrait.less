@@ -2,6 +2,7 @@
     padding: 20px;
     .m-main {
         overflow: hidden;
+        padding:0;
     }
     .m-body {
         margin: 0 auto;
@@ -33,23 +34,24 @@
                 justify-content: center;
             }
         }
-        &::after {
-            content: "";
-            display: block;
-            background-image: url("@{design_url}treasure/portrait/page_bg.jpg");
-            background-size: 100% 100%;
-            position: fixed;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-        }
+        // &::after {
+        //     content: "";
+        //     display: block;
+        //     background-image: url("@{design_url}treasure/portrait/page_bg.jpg");
+        //     background-size: 100% 100%;
+        //     position: fixed;
+        //     left: 0;
+        //     top: 0;
+        //     right: 0;
+        //     bottom: 0;
+        //     z-index: -1;
+        // }
     }
 
     #capture {
         margin: 25px auto 0;
-        width: max-content;
+        // width: max-content;
+        width:940px !important;
     }
     .m-portrait-content {
         position: relative;
