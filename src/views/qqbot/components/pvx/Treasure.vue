@@ -37,6 +37,7 @@
 
 <script>
 import { __imgPath } from "@/utils/config";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import getTreasureData from "@/assets/js/treasure";
 import { getRoleGameAchievementsByRoleAndServer, getUserRoles } from "@/service/qqbot-pvx";
 import TreasureLandscapeContent from "./TreasureLandscapeContent.vue";
@@ -101,8 +102,7 @@ export default {
     },
     methods: {
         setDataNotReady() {
-            window.__DATA_READY__ = false;
-            window.__READY__ = false;
+            resetQQBotReady({ dataReady: false });
         },
         splitArrayIntoChunks(array, chunkSize) {
             const chunks = [];
@@ -137,7 +137,7 @@ export default {
                 this.isOver = true;
                 this.addClass = false;
                 this.reelAddClass = "";
-                window.__READY__ = true;
+                markQQBotReady({ root: this.$refs.capture || "#capture" });
             }, 500);
             window.addEventListener("resize", this.handleScreenWidthChange);
             window.addEventListener("load", this.handleScreenWidthChange);
@@ -147,7 +147,7 @@ export default {
             const res = await getTreasureData(userJx3Id);
             const data = res.data || {};
             this.treasureLayout = res.layout || null;
-            window.__DATA_READY__ = true;
+            setQQBotDataReady(true);
             if (this.isLandscape) {
                 data.pet = this.splitArrayIntoChunks(data.pet || [], 5);
                 data.normal = this.splitArrayIntoChunks(data.normal || [], 3);

@@ -215,6 +215,7 @@ import { wiki } from "@jx3box/jx3box-common/js/wiki";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import GameText from "@jx3box/jx3box-editor/src/GameText.vue";
 import { get_item } from "@/service/qqbot-wiki";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import WikiRobotBottom from "./Bottom.vue";
 
 function item_color(quality) {
@@ -318,12 +319,12 @@ export default {
         },
         setNotReady() {
             this.imagesLoaded = false;
-            window.__READY__ = false;
+            resetQQBotReady();
         },
         setReady() {
             if (this.imagesLoaded) return;
             this.imagesLoaded = true;
-            window.__READY__ = true;
+            markQQBotReady({ root: this.$el });
         },
         initImageLoader() {
             this.$nextTick(() => {
@@ -391,6 +392,7 @@ export default {
                 this.wiki_post = null;
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 if (!this.wiki_post?.post) {
                     this.setReady();
                 }

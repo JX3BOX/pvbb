@@ -118,6 +118,7 @@ import { iconLink, ts2str } from "@jx3box/jx3box-common/js/utils";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import WikiPanel from "@jx3box/jx3box-ui/src/wiki/WikiPanel";
 import { __imgPath } from "@/utils/config";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import { getFurnitureCategory, getFurnitureColor, getFurnitureDetail, getFurnitureSet } from "@/service/qqbot-pvx";
 
 export default {
@@ -219,12 +220,12 @@ export default {
     methods: {
         setNotReady() {
             this.imagesLoaded = false;
-            window.__READY__ = false;
+            resetQQBotReady();
         },
         setReady() {
             if (this.imagesLoaded) return;
             this.imagesLoaded = true;
-            window.__READY__ = true;
+            markQQBotReady({ root: this.$el });
         },
         async fetchCategory() {
             try {
@@ -256,6 +257,7 @@ export default {
                 this.$message?.error?.("加载家具详情失败");
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 this.preloadImages();
             }
         },

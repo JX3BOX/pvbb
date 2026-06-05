@@ -98,6 +98,7 @@ import WikiPanel from "@jx3box/jx3box-ui/src/wiki/WikiPanel";
 import horseMapList from "@/assets/data/qqbot/pvx/horse_map.json";
 import horseSites from "@/assets/data/qqbot/pvx/horse_sites.json";
 import { getHorse } from "@/service/qqbot-pvx";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import HorseMap from "./HorseMap.vue";
 
 export default {
@@ -118,6 +119,7 @@ export default {
             loading: false,
             item: null,
             wikiPost: null,
+            imagesLoaded: false,
         };
     },
     computed: {
@@ -232,10 +234,13 @@ export default {
     },
     methods: {
         setNotReady() {
-            window.__READY__ = false;
+            this.imagesLoaded = false;
+            resetQQBotReady();
         },
         setReady() {
-            window.__READY__ = true;
+            if (this.imagesLoaded) return;
+            this.imagesLoaded = true;
+            markQQBotReady({ root: this.$el });
         },
         async loadStrategy() {
             this.wikiPost = null;
@@ -268,6 +273,7 @@ export default {
                 this.$message?.error?.("加载坐骑详情失败");
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 this.setReady();
             }
         },

@@ -108,6 +108,7 @@ import { get_item } from "@jx3box/jx3box-editor/src/service/item";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import WikiPanel from "@jx3box/jx3box-ui/src/wiki/WikiPanel";
 import { __imgPath } from "@/utils/config";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import paths from "@/assets/data/qqbot/pvx/reputation_exchange_path.json";
 import levelList from "@/assets/data/qqbot/pvx/reputation_level.json";
 import { getReputation } from "@/service/qqbot-pvx";
@@ -130,6 +131,7 @@ export default {
             reputation: null,
             rewardMetaMap: {},
             wikiPost: null,
+            imagesLoaded: false,
         };
     },
     computed: {
@@ -165,10 +167,13 @@ export default {
     },
     methods: {
         setNotReady() {
-            window.__READY__ = false;
+            this.imagesLoaded = false;
+            resetQQBotReady();
         },
         setReady() {
-            window.__READY__ = true;
+            if (this.imagesLoaded) return;
+            this.imagesLoaded = true;
+            markQQBotReady({ root: this.$el });
         },
         hideBrokenImage(e) {
             e.target.style.display = "none";
@@ -296,6 +301,7 @@ export default {
                 this.$message?.error?.("加载声望详情失败");
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 this.setReady();
             }
         },

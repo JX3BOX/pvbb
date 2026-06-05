@@ -78,6 +78,7 @@ import {
     deleteActivity,
 } from "@/service/qqbot";
 import typeMap from "@jx3box/jx3box-data/data/xf/mount_group.json";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import Card from "./Card.vue";
 import ListStatistic from "./ListStatistic.vue";
 import DetailHeader from "./DetailHeader.vue";
@@ -121,18 +122,19 @@ export default {
             return list;
         },
     },
-    mounted() {
-        this.$nextTick(() => {
-            setTimeout(() => {
-                window.__READY__ = true
-            }, 2000);
-        });
-    },
     methods: {
         getRaidDetail() {
-            getRaidDetail(this.$route.query.id).then((res) => {
-                this.raidDetail = res.data.data;
-            });
+            resetQQBotReady();
+            getRaidDetail(this.$route.query.id)
+                .then((res) => {
+                    this.raidDetail = res.data.data;
+                })
+                .finally(() => {
+                    setQQBotDataReady(true);
+                    this.$nextTick(() => {
+                        markQQBotReady({ root: this.$el || "#app" });
+                    });
+                });
         },
         drag(event) {
             const last = !event.clientX && !event.clientY;

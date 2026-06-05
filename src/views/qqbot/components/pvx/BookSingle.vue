@@ -118,6 +118,7 @@ import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import WikiPanel from "@jx3box/jx3box-ui/src/wiki/WikiPanel";
 import professionMap from "@/assets/data/qqbot/pvx/book_profession.json";
 import { getBook, getBookList } from "@/service/qqbot-pvx";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 
 export default {
     name: "QQBotPvxBookSingle",
@@ -138,6 +139,7 @@ export default {
             bookList: [],
             materialMetaMap: {},
             wikiPost: null,
+            imagesLoaded: false,
             bookTypeMap: {
                 11: "杂集",
                 10: "道学",
@@ -175,10 +177,13 @@ export default {
     },
     methods: {
         setNotReady() {
-            window.__READY__ = false;
+            this.imagesLoaded = false;
+            resetQQBotReady();
         },
         setReady() {
-            window.__READY__ = true;
+            if (this.imagesLoaded) return;
+            this.imagesLoaded = true;
+            markQQBotReady({ root: this.$el });
         },
         getProfessionType(type) {
             return professionMap.find((v) => v.id === Number(type))?.name || "";
@@ -365,6 +370,7 @@ export default {
                 this.$message?.error?.("加载书籍详情失败");
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 this.setReady();
             }
         },

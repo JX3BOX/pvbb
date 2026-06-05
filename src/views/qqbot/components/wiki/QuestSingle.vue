@@ -145,6 +145,7 @@ import { wiki } from "@jx3box/jx3box-common/js/wiki";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import GamePrice from "@jx3box/jx3box-ui/src/wiki/GamePrice.vue";
 import { get_quest } from "@/service/qqbot-wiki";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import WikiRobotBottom from "./Bottom.vue";
 import QuestItemIcon from "./QuestItemIcon.vue";
 
@@ -281,12 +282,12 @@ export default {
         },
         setNotReady() {
             this.imagesLoaded = false;
-            window.__READY__ = false;
+            resetQQBotReady();
         },
         setReady() {
             if (this.imagesLoaded) return;
             this.imagesLoaded = true;
-            window.__READY__ = true;
+            markQQBotReady({ root: this.$el });
         },
         initImageLoader() {
             this.$nextTick(() => {
@@ -364,6 +365,7 @@ export default {
                 this.wiki_post = null;
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 if (!this.wiki_post?.post) {
                     this.setReady();
                 }

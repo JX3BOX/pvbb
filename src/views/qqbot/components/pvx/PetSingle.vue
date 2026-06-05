@@ -109,6 +109,7 @@ import { wiki } from "@jx3box/jx3box-common/js/wiki";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import WikiPanel from "@jx3box/jx3box-ui/src/wiki/WikiPanel";
 import { getPet, getPetsByIds, getSkillsByIds } from "@/service/qqbot-pvx";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 
 export default {
     name: "QQBotPvxPetSingle",
@@ -129,6 +130,7 @@ export default {
             petSkills: [],
             medalList: [],
             wikiPost: null,
+            imagesLoaded: false,
         };
     },
     computed: {
@@ -165,10 +167,13 @@ export default {
     methods: {
         iconLink,
         setNotReady() {
-            window.__READY__ = false;
+            this.imagesLoaded = false;
+            resetQQBotReady();
         },
         setReady() {
-            window.__READY__ = true;
+            if (this.imagesLoaded) return;
+            this.imagesLoaded = true;
+            markQQBotReady({ root: this.$el });
         },
         showPetterDesc(str) {
             const result = extractTextContent(str || "");
@@ -292,6 +297,7 @@ export default {
                 this.$message?.error?.("加载宠物详情失败");
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 this.setReady();
             }
         },

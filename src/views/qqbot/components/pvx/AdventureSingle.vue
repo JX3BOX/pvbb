@@ -61,6 +61,7 @@ import { getAdventure, getSerendipityAchievementId } from "@/service/qqbot-pvx";
 import adventureNormalIcon from "@/assets/img/qqbot/jx3box_qqbot_adventure_normal.svg";
 import adventurePerfectIcon from "@/assets/img/qqbot/jx3box_qqbot_adventure_perfect.svg";
 import adventurePetIcon from "@/assets/img/qqbot/jx3box_qqbot_adventure_pet.svg";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 
 export default {
     name: "QQBotPvxAdventureSingle",
@@ -142,12 +143,12 @@ export default {
     methods: {
         setNotReady() {
             this.imagesLoaded = false;
-            window.__READY__ = false;
+            resetQQBotReady();
         },
         setReady() {
             if (this.imagesLoaded) return;
             this.imagesLoaded = true;
-            window.__READY__ = true;
+            markQQBotReady({ root: this.$el });
         },
         preloadImagesInProcess() {
             this.$nextTick(() => {
@@ -222,6 +223,7 @@ export default {
                 this.setReady();
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
             }
         },
     },

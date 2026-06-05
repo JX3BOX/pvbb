@@ -70,6 +70,7 @@ import { iconLink, showAvatar, ts2str } from "@jx3box/jx3box-common/js/utils";
 import { wiki } from "@jx3box/jx3box-common/js/wiki";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import { get_achievement } from "@/service/qqbot-wiki";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import WikiRobotBottom from "./Bottom.vue";
 
 export default {
@@ -143,12 +144,12 @@ export default {
         },
         setNotReady() {
             this.imagesLoaded = false;
-            window.__READY__ = false;
+            resetQQBotReady();
         },
         setReady() {
             if (this.imagesLoaded) return;
             this.imagesLoaded = true;
-            window.__READY__ = true;
+            markQQBotReady({ root: this.$el });
         },
         neutralizeFoldBlocks(container) {
             // 机器人截图无交互：移除 .e-summary 的点击事件（通过 clone 替换），并强制展开 .e-details
@@ -218,6 +219,7 @@ export default {
                 this.wiki_post = null;
             } finally {
                 this.loading = false;
+                setQQBotDataReady(true);
                 // 有攻略内容时由 Article @contentRendered 驱动 neutralize + 图片等待；
                 // 无内容时直接 ready，避免截图挂起
                 if (!this.wiki_post?.post) {

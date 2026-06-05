@@ -97,6 +97,7 @@ import { showTime } from "@jx3box/jx3box-common/js/moment";
 import { getPost, getUserInfo, isSuperAuthor } from "@/service/qqbot";
 import { getStat, postStat } from "@jx3box/jx3box-common/js/stat";
 import JX3BOX from "@/utils/config";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
 import zlp from "@jx3box/jx3box-common/data/jx3_zlp.json";
 const appKey = "pvp";
@@ -122,9 +123,6 @@ export default {
             directory: false,
             zlpList: zlp.all_map,
 
-            imageCount: 0,
-            loadedImageCount: 0,
-            images: [],
             imagesLoaded: false,
         };
     },
@@ -201,98 +199,9 @@ export default {
             return str && str.replace(/\n/g, "<br/>");
         },
         initImageLoader() {
-            // 在DOM更新后获取所有图片
             this.$nextTick(() => {
-                const container = document.getElementById("pvpArticle");
-                if (!container) {
-                    this.setGlobalReady();
-                    return;
-                }
-
-                const images = container.querySelectorAll("img");
-                this.images = images;
-                this.imageCount = images.length;
-
-                if (this.imageCount === 0) {
-                    this.setGlobalReady();
-                    return;
-                }
-
-                // 手动预加载所有图片
-                this.preloadAllImages(images);
-            });
-        },
-
-        // 手动预加载所有图片
-        preloadAllImages(images) {
-            let loadedInThisBatch = 0;
-            let totalProcessed = 0;
-            Array.from(images).forEach((img) => {
-                // 记录原始src
-                const originalSrc = img.src;
-
-                // 如果图片未加载
-                if (!img.complete) {
-                    // 创建一个Image对象来预加载
-                    const tempImg = new Image();
-
-                    tempImg.onload = () => {
-                        loadedInThisBatch++;
-
-                        // 在临时图片加载完成后，设置原始图片的src
-                        img.src = originalSrc;
-
-                        // 检查是否所有图片都已处理
-                        this.checkImageLoadCompletion(images, loadedInThisBatch);
-                    };
-
-                    tempImg.onerror = () => {
-                        console.error(`图片加载失败: ${originalSrc}`);
-                        totalProcessed++;
-
-                        // 即使加载失败，也要设置原始图片的src
-                        img.src = originalSrc;
-
-                        // 标记原始图片为已加载（错误情况）
-                        this.handleImageLoad();
-                    };
-                    console.log(totalProcessed);
-
-                    // 开始预加载
-                    tempImg.src = originalSrc;
-                } else {
-                    // 图片已经加载完成
-                    this.handleImageLoad();
-                    totalProcessed++;
-                }
-            });
-        },
-
-        // 检查图片加载状态
-        checkImageLoadCompletion(images) {
-            if (images.length === this.loadedImageCount) {
                 this.setGlobalReady();
-                return;
-            }
-
-            // 设置超时检查，防止意外情况
-            setTimeout(() => {
-                const allLoaded = Array.from(images).every((img) => img.complete);
-
-                if (allLoaded) {
-                    this.setGlobalReady();
-                } else if (this.loadedImageCount === images.length) {
-                    this.setGlobalReady();
-                }
-            }, 3000);
-        },
-
-        // 判断是否全部完成
-        handleImageLoad() {
-            this.loadedImageCount++;
-            if (this.loadedImageCount === this.imageCount) {
-                this.setGlobalReady();
-            }
+            });
         },
 
         // 设置全局就绪状态
@@ -300,29 +209,41 @@ export default {
             if (this.imagesLoaded) return; // 避免重复设置
 
             this.imagesLoaded = true;
-            window.__READY__ = true;
-            console.log("全局状态设置成功: __READY__ = ", window.__READY__);
+            markQQBotReady({ root: this.$el });
         },
         async loadData() {
             if (!this.id) {
                 return;
             }
+            resetQQBotReady();
+            this.imagesLoaded = false;
             this.loading = true;
+            const authorTasks = [];
             await getPost(this.id)
                 .then((res) => {
                     this.post = res.data.data;
 
                     document.title = this.post?.post_title;
                     if (this.post?.post_author) {
-                        getUserInfo(this.post.post_author).then((res) => {
-                            if (res.data?.data) {
-                                this.post.author_info = res.data.data;
-                                this.post.level = User.getLevel(this.post.author_info?.experience || 0);
-                            }
-                        });
-                        isSuperAuthor(this.post.post_author).then((res) => {
-                            this.post.author_info.is_super_author = !!res.data?.data;
-                        });
+                        authorTasks.push(
+                            getUserInfo(this.post.post_author).then((res) => {
+                                if (res.data?.data) {
+                                    this.post.author_info = {
+                                        ...(this.post.author_info || {}),
+                                        ...res.data.data,
+                                    };
+                                    this.post.level = User.getLevel(this.post.author_info?.experience || 0);
+                                }
+                            })
+                        );
+                        authorTasks.push(
+                            isSuperAuthor(this.post.post_author).then((res) => {
+                                this.post.author_info = {
+                                    ...(this.post.author_info || {}),
+                                    is_super_author: !!res.data?.data,
+                                };
+                            })
+                        );
                     }
                     this.$nextTick(() => {
                         if (this.visible) this.installTalent();
@@ -335,7 +256,9 @@ export default {
             await getStat(appKey, this.id).then((res) => {
                 this.stat = res.data;
             });
+            await Promise.allSettled(authorTasks);
             await postStat(appKey, this.id);
+            setQQBotDataReady(true);
 
             // 请注意，为防止QQBOT无法抓取完全，请不要删除
             // 数据加载后启动奇遇流程中的图片检测

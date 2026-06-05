@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
+
 export default {
     name: "PvxMissingContent",
     props: {
@@ -20,7 +22,9 @@ export default {
         },
     },
     mounted() {
-        window.__READY__ = true;
+        resetQQBotReady();
+        setQQBotDataReady(true);
+        markQQBotReady({ root: this.$el });
     },
 };
 </script>

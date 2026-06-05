@@ -12,6 +12,8 @@
 
 ## QQBOT
 
+截图 ready 状态说明见 [docs/QQBOT_READY.md](docs/QQBOT_READY.md)。
+
 ### pvx
 
 http://localhost:12028/qqbot/pvx?type=adventure&id=1
