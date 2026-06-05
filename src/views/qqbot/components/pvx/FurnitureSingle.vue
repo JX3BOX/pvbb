@@ -671,4 +671,5 @@ export default {
         line-height: 20px;
     }
 }
+@import "~@/assets/css/qqbot/wiki_panel.less";
 </style>

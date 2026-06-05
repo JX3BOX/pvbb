@@ -86,7 +86,7 @@
                     <el-alert :title="null_tip" type="warning" :closable="false"></el-alert>
                 </div>
             </div>
-            <QQBottom :type="post_type" :id="sourceId"></QQBottom>
+            <QQBottom :type="post_type" :id="id"></QQBottom>
         </div>
     </div>
 </template>

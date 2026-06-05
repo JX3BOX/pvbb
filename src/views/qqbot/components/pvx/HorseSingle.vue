@@ -497,4 +497,5 @@ export default {
         }
     }
 }
+@import "~@/assets/css/qqbot/wiki_panel.less";
 </style>

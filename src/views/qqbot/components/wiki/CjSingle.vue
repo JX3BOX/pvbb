@@ -422,4 +422,5 @@ export default {
         text-align: center;
     }
 }
+@import "~@/assets/css/qqbot/wiki_panel.less";
 </style>
