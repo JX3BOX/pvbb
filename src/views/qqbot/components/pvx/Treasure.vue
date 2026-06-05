@@ -234,7 +234,9 @@ export default {
 
         #capture {
             margin: 0 !important;
-            // 保留左上锚点，同时给卷轴外扩边缘留出显示空间
+            width: 940px !important;
+            box-sizing: border-box;
+            // 保留左上锚点，同时把卷轴外扩边缘计入 940px 截图画布
             padding: 0 20px 20px 20px !important;
         }
     }
