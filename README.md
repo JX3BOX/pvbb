@@ -21,7 +21,7 @@ http://localhost:12028/qqbot/pvx?type=pet&id=1
 -   普通/特殊坐骑
 http://localhost:12028/qqbot/pvx?type=horse&id=8_28793
 -   马具
-http://localhost:12028/qqbot/pvx?type=horse&id=8_45923&type=2
+http://localhost:12028/qqbot/pvx?type=horse&id=8_45923_2
 http://localhost:12028/qqbot/pvx?type=reputation&id=264
 http://localhost:12028/qqbot/pvx?type=book&id=48_3
 http://localhost:12028/qqbot/pvx?type=furniture&id=100005608

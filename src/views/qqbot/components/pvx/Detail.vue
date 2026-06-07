@@ -3,7 +3,12 @@
         <div class="m-pvx__container">
             <AdventureSingle v-if="type === 'adventure'" :source-id="id" />
             <PetSingle v-else-if="type === 'pet'" :source-id="id" />
-            <ItemSingle v-else-if="isHorseHarness" :source-id="id" origin-type="horse" :origin-query="{ type: 2 }" />
+            <ItemSingle
+                v-else-if="isHorseHarness"
+                :source-id="id"
+                origin-type="horse"
+                :origin-query="horseHarnessQuery"
+            />
             <HorseSingle v-else-if="type === 'horse'" :source-id="id" />
             <ReputationSingle v-else-if="type === 'reputation'" :source-id="id" />
             <BookSingle v-else-if="type === 'book'" :source-id="id" />
@@ -27,9 +32,18 @@ import BookSingle from "./BookSingle.vue";
 import FurnitureSingle from "./FurnitureSingle.vue";
 import ItemSingle from "../wiki/ItemSingle.vue";
 
-function queryValues(value) {
-    if (Array.isArray(value)) return value.map(String);
-    return value ? [String(value)] : [];
+function queryValue(value) {
+    if (Array.isArray(value)) return value[0] || "";
+    return value || "";
+}
+
+function parseHorseHarnessId(id) {
+    const value = String(id || "");
+    const match = value.match(/^(\d+_\d+)_2$/);
+    return {
+        id: match?.[1] || value,
+        type: match ? "2" : "",
+    };
 }
 
 export default {
@@ -47,20 +61,29 @@ export default {
         MissingContent,
     },
     computed: {
-        queryTypes() {
-            return queryValues(this.$route.query.type);
-        },
         type() {
-            return this.queryTypes.find((type) => type !== "2") || this.queryTypes[0] || "";
+            return queryValue(this.$route.query.type);
+        },
+        rawId() {
+            return queryValue(this.$route.query.id);
+        },
+        horseHarnessId() {
+            return parseHorseHarnessId(this.rawId);
+        },
+        horseHarnessType() {
+            return this.horseHarnessId.type;
         },
         id() {
-            return this.$route.query.id || "";
+            return this.horseHarnessType ? this.horseHarnessId.id : this.rawId;
         },
         isTreasure() {
             return this.type === "treasure";
         },
         isHorseHarness() {
-            return this.queryTypes.includes("horse") && this.queryTypes.includes("2");
+            return this.type === "horse" && this.horseHarnessType === "2";
+        },
+        horseHarnessQuery() {
+            return this.isHorseHarness ? { type: 2 } : {};
         },
         supportedType() {
             return ["adventure", "pet", "horse", "reputation", "book", "furniture"].includes(this.type);
