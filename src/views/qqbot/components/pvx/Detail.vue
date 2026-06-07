@@ -3,12 +3,13 @@
         <div class="m-pvx__container">
             <AdventureSingle v-if="type === 'adventure'" :source-id="id" />
             <PetSingle v-else-if="type === 'pet'" :source-id="id" />
+            <ItemSingle v-else-if="isHorseHarness" :source-id="id" origin-type="horse" :origin-query="{ type: 2 }" />
             <HorseSingle v-else-if="type === 'horse'" :source-id="id" />
             <ReputationSingle v-else-if="type === 'reputation'" :source-id="id" />
             <BookSingle v-else-if="type === 'book'" :source-id="id" />
             <FurnitureSingle v-else-if="type === 'furniture'" :source-id="id" />
             <MissingContent v-else :type="type" :id="id" />
-            <PvxBottom v-if="supportedType" :type="type" :id="id"></PvxBottom>
+            <PvxBottom v-if="supportedType && !isHorseHarness" :type="type" :id="id"></PvxBottom>
         </div>
     </div>
     <Treasure v-else></Treasure>
@@ -24,6 +25,12 @@ import HorseSingle from "./HorseSingle.vue";
 import ReputationSingle from "./ReputationSingle.vue";
 import BookSingle from "./BookSingle.vue";
 import FurnitureSingle from "./FurnitureSingle.vue";
+import ItemSingle from "../wiki/ItemSingle.vue";
+
+function queryValues(value) {
+    if (Array.isArray(value)) return value.map(String);
+    return value ? [String(value)] : [];
+}
 
 export default {
     name: "QQRobotPvxDetail",
@@ -31,6 +38,7 @@ export default {
         AdventureSingle,
         PetSingle,
         HorseSingle,
+        ItemSingle,
         ReputationSingle,
         BookSingle,
         FurnitureSingle,
@@ -39,14 +47,20 @@ export default {
         MissingContent,
     },
     computed: {
+        queryTypes() {
+            return queryValues(this.$route.query.type);
+        },
         type() {
-            return this.$route.query.type || "";
+            return this.queryTypes.find((type) => type !== "2") || this.queryTypes[0] || "";
         },
         id() {
             return this.$route.query.id || "";
         },
         isTreasure() {
             return this.type === "treasure";
+        },
+        isHorseHarness() {
+            return this.queryTypes.includes("horse") && this.queryTypes.includes("2");
         },
         supportedType() {
             return ["adventure", "pet", "horse", "reputation", "book", "furniture"].includes(this.type);

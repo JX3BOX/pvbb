@@ -48,7 +48,7 @@
                         <span class="u-from" v-if="source.GetType">获得途径: {{ source.GetType }}</span>
                     </div>
                 </div>
-                <img src="@/assets/img/item/item_robot.svg" class="u-item-img__right" />
+                <img :src="headerIcon" class="u-item-img__right" />
             </div>
         </div>
         <div class="m-item-content" v-if="source && Object.keys(source).length">
@@ -205,7 +205,7 @@
             <span>暂无相关攻略，欢迎热心侠士前往补充！</span>
         </div>
 
-        <WikiRobotBottom type="item" :id="id" />
+        <WikiRobotBottom :type="bottomType" :id="id" :query="originQuery" />
     </div>
 </template>
 
@@ -217,6 +217,8 @@ import GameText from "@jx3box/jx3box-editor/src/GameText.vue";
 import { get_item } from "@/service/qqbot-wiki";
 import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import WikiRobotBottom from "./Bottom.vue";
+import itemRobotIcon from "@/assets/img/item/item_robot.svg";
+import horseRobotIcon from "@/assets/img/qqbot/jx3box_qqbot_horse.svg";
 
 function item_color(quality) {
     const map = {
@@ -242,6 +244,14 @@ export default {
             type: [String, Number],
             default: "",
         },
+        originType: {
+            type: String,
+            default: "item",
+        },
+        originQuery: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     data() {
         return {
@@ -254,6 +264,15 @@ export default {
     computed: {
         id() {
             return this.sourceId || this.$route.query.id || "";
+        },
+        isHorseHarness() {
+            return this.originType === "horse";
+        },
+        bottomType() {
+            return this.isHorseHarness ? "horse" : "item";
+        },
+        headerIcon() {
+            return this.isHorseHarness ? horseRobotIcon : itemRobotIcon;
         },
         client() {
             return this.$store.state.client;

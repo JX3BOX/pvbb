@@ -18,8 +18,9 @@
 
 http://localhost:12028/qqbot/pvx?type=adventure&id=1
 http://localhost:12028/qqbot/pvx?type=pet&id=1
+-   普通/特殊坐骑
 http://localhost:12028/qqbot/pvx?type=horse&id=8_28793
--   马具会自动跳转到物品
+-   马具
 http://localhost:12028/qqbot/pvx?type=horse&id=8_45923&type=2
 http://localhost:12028/qqbot/pvx?type=reputation&id=264
 http://localhost:12028/qqbot/pvx?type=book&id=48_3

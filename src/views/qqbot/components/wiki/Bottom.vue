@@ -31,9 +31,36 @@
 import { __Root, __OriginRoot } from "@/utils/config";
 import QrcodeVue from "qrcode.vue";
 
+function queryString(query) {
+    const params = new URLSearchParams();
+    Object.keys(query || {}).forEach((key) => {
+        const value = query[key];
+        if (Array.isArray(value)) {
+            value.forEach((item) => params.append(key, item));
+        } else if (value !== undefined && value !== null && value !== "") {
+            params.append(key, value);
+        }
+    });
+    const search = params.toString();
+    return search ? `?${search}` : "";
+}
+
 export default {
     name: "WikiRobotBottom",
-    props: ["type", "id"],
+    props: {
+        type: {
+            type: String,
+            default: "",
+        },
+        id: {
+            type: [String, Number],
+            default: "",
+        },
+        query: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     components: {
         QrcodeVue,
     },
@@ -45,7 +72,8 @@ export default {
             return this.client === "origin" ? __OriginRoot : __Root;
         },
         qrcodeUrl() {
-            return `${this.rootPath}${this.type}/view/${this.id}`;
+            const path = this.type === "horse" ? `${this.type}/${this.id}` : `${this.type}/view/${this.id}`;
+            return `${this.rootPath}${path}${queryString(this.query)}`;
         },
     },
 };
