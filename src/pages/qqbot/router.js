@@ -1,5 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+function queryValues(value) {
+    if (Array.isArray(value)) return value.map(String);
+    return value ? [String(value)] : [];
+}
+
+function shouldRedirectHorseHarnessToItem(query) {
+    const types = queryValues(query.type);
+    return types.includes("horse") && types.includes("2");
+}
+
 const routes = [
     {
         path: "/",
@@ -29,6 +39,17 @@ const routes = [
         path: "/pvx",
         component: () => import("@/views/qqbot/Pvx.vue"),
         meta: { title: "PVX" },
+        beforeEnter(to) {
+            if (!shouldRedirectHorseHarnessToItem(to.query)) return true;
+            return {
+                name: "qqbot-wiki",
+                query: {
+                    ...to.query,
+                    type: "item",
+                },
+                replace: true,
+            };
+        },
     },
     {
         name: "qqbot-wiki",
