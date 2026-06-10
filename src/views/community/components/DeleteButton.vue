@@ -7,7 +7,6 @@ import {
     delMyComment,
     delCommentToMyReply,
     delReplyToMyTopic,
-    deleteMyReply,
     manageDelComment,
     manageDelReply,
 } from "@/service/community";
@@ -26,10 +25,6 @@ export default {
         // 作者
         isAuthor: function () {
             return this.post.user_id == User.getInfo().uid;
-        },
-        // 是我的帖子的回帖 （我是楼主）
-        isReplyToMyTopic: function () {
-            return this.type === "reply" && this.topicData.user_id == User.getInfo().uid;
         },
         // 回复我的回帖 （我是层主）
         isCommentToMyReply: function () {
@@ -52,9 +47,8 @@ export default {
     },
     methods: {
         onDeleteClick() {
-            // 删除自己的评论与回帖
-            if (this.isAuthor || this.isSuperAdmin || this.isTopicAuthor) {
-                if (this.type === "comment") {
+            if (this.type === "comment") {
+                if (this.isAuthor || this.isSuperAdmin || this.isTopicAuthor) {
                     if (this.isAuthor || this.isTopicAuthor) {
                         this.delMyComment();
                     }
@@ -62,36 +56,19 @@ export default {
                     if (this.isSuperAdmin) {
                         this.manageDeleteComment();
                     }
-                } else if (this.type === "reply") {
-                    this.isSuperAdmin ? this.manageDeleteReply() : this.deleteMyReply();
-                } else {
-                    this.$message.success("未知的组件类型：" + this.type);
-                }
-            } else {
-                // 删除回帖我的
-                if (this.isReplyToMyTopic) {
-                    // console.log("删除回帖我的");
-                    this.delReplyToMyTopic();
-                }
-                // 删除回复我
-                if (this.isCommentToMyReply) {
-                    // console.log("删除回复我的");
+                } else if (this.isCommentToMyReply) {
                     this.delCommentToMyReply();
                 }
+
+                return;
             }
-        },
-        deleteMyReply: function () {
-            this.$confirm("确认是否删除该回帖？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-            }).then(() => {
-                deleteMyReply(this.post.id).then(() => {
-                    this.$message.success("删除成功");
-                    // 调用父组件的方法，刷新回到第一页
-                    this.onSearch();
-                });
-            });
+
+            if (this.type === "reply") {
+                this.isSuperAdmin ? this.manageDeleteReply() : this.delReplyToMyTopic();
+                return;
+            }
+
+            this.$message.success("未知的组件类型：" + this.type);
         },
         delMyComment: function () {
             this.$confirm("确认是否删除该评论？", "提示", {

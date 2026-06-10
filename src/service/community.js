@@ -35,10 +35,6 @@ function getTopicReplyList(id, params) {
 function replyTopic(id, data) {
     return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply`, data);
 }
-// 删除我的回贴
-function deleteMyReply(id) {
-    return $next().delete(`${API_PREFIX}/community/discussion/my/reply/item/${id}`);
-}
 //  删除我的帖子的回帖
 function delReplyToMyTopic(id, replyId) {
     return $next().delete(`${API_PREFIX}/community/discussion/my/topic/item/${id}/reply/item/${replyId}`);
@@ -85,7 +81,7 @@ function addBlock(userId) {
  * @param {*} data
  */
 function feedback(data) {
-    return $next().post(`/api/miscfeedback`, data);
+    return $next().post(`/api/next2/miscfeedback`, data);
 }
 
 function globalSearch(params) {
@@ -127,7 +123,6 @@ export {
     delCommentToMyReply,
     replyReply,
     getCommentList,
-    deleteMyReply,
     delMyComment,
     addBlock,
     feedback,
