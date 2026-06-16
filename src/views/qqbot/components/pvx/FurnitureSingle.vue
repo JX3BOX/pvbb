@@ -184,12 +184,13 @@ export default {
         },
         furnitureAttrs() {
             return [
-                { key: "view", label: "观赏", value: this.furniture?.Attribute1, className: "blue" },
-                { key: "practical", label: "实用", value: this.furniture?.Attribute2, className: "pink" },
-                { key: "strong", label: "坚固", value: this.furniture?.Attribute3, className: "yellow" },
-                { key: "fengshui", label: "风水", value: this.furniture?.Attribute4, className: "green" },
-                { key: "interest", label: "趣味", value: this.furniture?.Attribute5, className: "purple" },
-            ].filter((item) => item.value);
+                // { key: "view", label: "观赏", value: this.furniture?.Attribute1, className: "blue" },
+                // { key: "practical", label: "实用", value: this.furniture?.Attribute2, className: "pink" },
+                // { key: "strong", label: "坚固", value: this.furniture?.Attribute3, className: "yellow" },
+                // { key: "fengshui", label: "风水", value: this.furniture?.Attribute4, className: "green" },
+                // { key: "interest", label: "趣味", value: this.furniture?.Attribute5, className: "purple" },
+                { key: "record", label: "装修评分", value: this.furniture?.Record, className: "green" },
+            ].filter((item) => item.value !== undefined && item.value !== null && item.value !== "");
         },
         colorList() {
             const list = [];
