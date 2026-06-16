@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="模板列表" :visible="visible" destory-on-close @close="handleClose">
+    <el-dialog title="模板列表" v-model="dialogVisible" destroy-on-close>
         <el-table :data="templates" size="small" v-loading="loading" class="u-table-box">
             <el-table-column label="模板名称" prop="template_name">
                 <template #default="props">
@@ -62,10 +62,32 @@ import { listRaidTemplate, deleteRaidTemplate, updateRaidTemplate } from "@/serv
 import { showTime, authorLink } from "@/utils/filters";
 export default {
     name: "TemplateList",
+    emits: ["update:visible", "close", "apply"],
     props: ["teamId", "visible"],
+    computed: {
+        dialogVisible: {
+            get() {
+                return this.visible;
+            },
+            set(val) {
+                this.$emit("update:visible", val);
+                if (!val) {
+                    this.handleClose();
+                }
+            },
+        },
+    },
     watch: {
+        visible: {
+            immediate: true,
+            handler(val) {
+                if (val && this.teamId) {
+                    this.getTemplateList();
+                }
+            },
+        },
         teamId: function (val) {
-            if (val) {
+            if (val && this.visible) {
                 this.getTemplateList();
             }
         },
@@ -120,7 +142,7 @@ export default {
                 this.getTemplateList();
                 row.editable = false;
             } catch (err) {
-                console.log(error);
+                console.log(err);
             }
         },
         handleEditCancel(row) {

@@ -11,15 +11,15 @@
             <template v-if="hasRight">
                 <el-tabs v-model="tab" type="card">
                     <el-tab-pane label="当前分值" name="list">
-                        <span slot="label">
+                        <template #label>
                             <i class="el-icon-tickets"></i> 当前分值
-                        </span>
+                        </template>
                         <dkp-list :org="id" :list="data" v-if="data.length > 0" :readOnly="true" />
                     </el-tab-pane>
                     <el-tab-pane label="历史记录" name="logs">
-                        <span slot="label">
+                        <template #label>
                             <i class="el-icon-time"></i> 历史记录
-                        </span>
+                        </template>
                         <dkp-logs v-if="tab === 'logs'" :org="id" />
                     </el-tab-pane>
                 </el-tabs>

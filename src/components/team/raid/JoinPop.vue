@@ -81,7 +81,8 @@ import User from "@jx3box/jx3box-common/js/user";
 import { showMountIcon } from "@/utils/filters";
 export default {
     name: "RaidJoinPop",
-    props: ["title", "show", "auth", "client"],
+    props: ["title", "show", "modelValue", "auth", "client"],
+    emits: ["update:modelValue", "switchJoinPop", "confirm"],
     data: function () {
         return {
             isLogin: User.isLogin(),
@@ -104,19 +105,15 @@ export default {
             loading: false,
         };
     },
-    model: {
-        prop: "show",
-        event: "switchJoinPop",
-    },
     watch: {
         show: function (newval) {
-            this.visible = newval;
-            this.resetForm();
-            this.$nextTick(() => {
-                this.form.mount = "0";
-            });
+            this.open(newval);
+        },
+        modelValue: function (newval) {
+            this.open(newval);
         },
         visible: function (newval) {
+            this.$emit("update:modelValue", newval);
             this.$emit("switchJoinPop", newval);
             if (newval) {
                 if (this.isLogin) {
@@ -185,6 +182,13 @@ export default {
         },
     },
     methods: {
+        open(newval) {
+            this.visible = newval;
+            this.resetForm();
+            this.$nextTick(() => {
+                this.form.mount = "0";
+            });
+        },
         confirm: function () {
             const [current] = this.roles || [];
             const formData = {

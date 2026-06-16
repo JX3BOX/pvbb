@@ -91,14 +91,14 @@
                     ></el-date-picker>
                 </el-form-item>
                 <el-form-item label="开组角色">
-                    <span slot="label">
+                    <template #label>
                         <el-tooltip class="item" effect="dark" content="用于游戏内插件点击指定角色进组" placement="top">
                             <span>
                                 开组角色
                                 <i class="el-icon-info"></i>
                             </span>
                         </el-tooltip>
-                    </span>
+                    </template>
                     <el-input
                         class="u-leader"
                         v-model="form.leader"
@@ -109,7 +109,7 @@
                     ></el-input>
                 </el-form-item>
                 <el-form-item label="是否广播">
-                    <span slot="label">
+                    <template #label>
                         <el-tooltip
                             class="item"
                             effect="dark"
@@ -121,7 +121,7 @@
                                 <i class="el-icon-info"></i>
                             </span>
                         </el-tooltip>
-                    </span>
+                    </template>
                     <el-checkbox
                         v-model.number="form.is_public"
                         :disabled="!isVerified"
@@ -190,9 +190,12 @@
             </el-form>
         </div>
         <!-- 模板相关 -->
-        <el-dialog title="模板列表" v-model="template_dialog_visible" destory-on-close>
-            <template-list :team-id="teamId" @close="handleTemplateClose" @apply="handleApply"></template-list>
-        </el-dialog>
+        <template-list
+            :team-id="teamId"
+            v-model:visible="template_dialog_visible"
+            @close="handleTemplateClose"
+            @apply="handleApply"
+        ></template-list>
     </div>
 </template>
 
@@ -209,8 +212,8 @@ import {
     updateRaid,
     getRaid,
     deleteRaid,
-    // addRaidTemplate,
-    // getRaidTemplate,
+    addRaidTemplate,
+    getRaidTemplate,
 } from "@/service/team/raid.js";
 
 // JSON
@@ -326,9 +329,9 @@ export default {
         "form.team_id": function (val) {
             // 仅新建模式
             if (!this.id) {
-                this.form.server = this.team.server;
-                this.form.team_name = this.team.name;
                 this.team = this.selectdTeam;
+                this.form.server = this.team?.server || "";
+                this.form.team_name = this.team?.name || "";
             }
         },
         count: function (val) {
@@ -380,7 +383,7 @@ export default {
             }
         },
         validForm: function () {
-            if (!this.form.title) this.form.title = `【${this.team.team_name}】${this.form.name}`;
+            if (!this.form.title) this.form.title = `【${this.form.team_name}】${this.form.name}`;
             if (!this.form.start_time) this.form.start_time = new Date();
 
             // 人数变更
@@ -408,7 +411,7 @@ export default {
         },
 
         // 模板相关
-        /* openTemplates: function () {
+        openTemplates: function () {
             this.template_dialog_visible = true;
         },
         saveAsTemplate: function () {
@@ -461,7 +464,7 @@ export default {
                 .finally(() => {
                     this.loading = false;
                 });
-        }, */
+        },
 
         // 排表相关
         changeDefaultSize: function (schema) {
@@ -482,6 +485,7 @@ export default {
         loadTeams: function () {
             getMyPowerTeams("r_raid").then((res) => {
                 this.teams = res.data.data.list;
+                if (!this.teams.length) return;
                 this.form.team_id = this.teams[0]["ID"];
                 this.form.team_name = this.teams[0]["name"];
                 this.form.server = this.teams[0]["server"];

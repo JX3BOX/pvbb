@@ -3,9 +3,12 @@
         <el-divider content-position="left"> <i class="el-icon-map-location"></i> 团队活动 </el-divider>
         <template v-if="hasRight">
             <div class="m-raid-table" v-loading="loading">
-                <template v-for="item in data">
-                    <activity-item :activity="item" :key="item.id" :is-home-page="isHomePage"></activity-item>
-                </template>
+                <activity-item
+                    v-for="item in data"
+                    :key="item.id"
+                    :activity="item"
+                    :is-home-page="isHomePage"
+                ></activity-item>
                 <div class="u-tip"><i class="el-icon-warning-outline"></i> 默认仅显示最近7天活动</div>
             </div>
         </template>

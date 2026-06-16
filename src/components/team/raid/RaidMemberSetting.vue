@@ -1,5 +1,5 @@
 <template>
-    <el-dialog :title="title" :visible="dialogVisivble" @close="handleCancel" width="720px">
+    <el-dialog :title="title" v-model="dialogVisible" width="720px">
         <el-form
             class="u-role-setting"
             :model="form"
@@ -120,8 +120,15 @@ export default {
         mountg,
     }),
     computed: {
-        dialogVisivble() {
-            return this.visible;
+        dialogVisible: {
+            get() {
+                return this.visible;
+            },
+            set(val) {
+                if (!val) {
+                    this.handleCancel();
+                }
+            },
         },
         xfMaps({ selectedSchool }) {
             if (selectedSchool) {
@@ -163,7 +170,7 @@ export default {
                 }
             },
         },
-        dialogVisivble(val) {
+        visible(val) {
             if (val) this.roles = cloneDeep(this.allRoles);
         },
     },

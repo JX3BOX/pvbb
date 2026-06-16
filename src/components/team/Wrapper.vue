@@ -10,7 +10,9 @@
             :feedbackEnable="true"
             :crumbEnable="true"
         >
-            <img slot="logo" svg-inline :src="logo" />
+            <template #logo>
+                <img svg-inline :src="logo" />
+            </template>
         </Breadcrumb>
         <LeftSidebar>
             <Nav />

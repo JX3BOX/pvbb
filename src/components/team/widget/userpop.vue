@@ -30,7 +30,8 @@ import { showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getUserInfo } from "@/service/team/server.js";
 export default {
     name: "userpop",
-    props: ["title", "data", "show"],
+    props: ["title", "data", "show", "modelValue"],
+    emits: ["update:modelValue", "switchUserPop", "confirm"],
     data: function () {
         return {
             visible: false,
@@ -41,10 +42,6 @@ export default {
             },
             status: false,
         };
-    },
-    model: {
-        prop: "show",
-        event: "switchUserPop",
     },
     watch: {
         data: function (newval) {
@@ -67,7 +64,11 @@ export default {
         show: function (newval) {
             this.visible = newval;
         },
+        modelValue: function (newval) {
+            this.visible = newval;
+        },
         visible: function (newval) {
+            this.$emit("update:modelValue", newval);
             this.$emit("switchUserPop", newval);
         },
     },

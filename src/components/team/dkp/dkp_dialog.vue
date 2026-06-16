@@ -125,7 +125,7 @@ export default {
             type: Number,
             default: -1,
         },
-        visible: {
+        modelValue: {
             type: Boolean,
             default: false,
         },
@@ -134,10 +134,7 @@ export default {
             default: () => [],
         },
     },
-    model: {
-        prop: "visible",
-        event: "updateVisible",
-    },
+    emits: ["update:modelValue", "updateRows"],
     components: {
         Items,
     },
@@ -208,14 +205,14 @@ export default {
     filters: {},
     watch: {
         show(val) {
-            this.$emit("updateVisible", val);
+            this.$emit("update:modelValue", val);
             if (!val) {
                 this.form = this.$options.data().form;
                 this.$refs.editForm.clearValidate();
                 this.fetchedSelectItemsOptions = [];
             }
         },
-        visible(val) {
+        modelValue(val) {
             this.show = val;
         },
     },
