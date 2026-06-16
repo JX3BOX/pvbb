@@ -1,5 +1,5 @@
 <template>
-    <el-dialog class="m-rank-relevance-dialog" :visible="modelValue" :title="title" @close="close" width="500px">
+    <el-dialog class="m-rank-relevance-dialog" v-model="dialogVisible" :title="title" width="500px">
         <el-form label-position="right" label-width="90px">
             <!-- 关联战斗 -->
             <el-form-item label="战斗统计">
@@ -60,6 +60,7 @@ import { getBattleOrJcl, setBattleJcL } from "@/service/team/battle.js";
 import ElSelectLoading from "./el-select-loading.vue";
 export default {
     components: { ElSelectLoading },
+    emits: ["update:modelValue", "update"],
     props: {
         modelValue: {
             type: Boolean,
@@ -101,6 +102,17 @@ export default {
         };
     },
     computed: {
+        dialogVisible: {
+            get() {
+                return this.modelValue;
+            },
+            set(val) {
+                this.$emit("update:modelValue", val);
+                if (!val) {
+                    this.$emit("update", false);
+                }
+            },
+        },
         id() {
             return this.data.ID;
         },
@@ -126,7 +138,7 @@ export default {
     },
     methods: {
         close() {
-            this.$emit("update", false);
+            this.dialogVisible = false;
         },
         loadBattle(title = "", pageIndex = 1) {
             if (title !== this.battleQuery.title) {
@@ -184,7 +196,6 @@ export default {
         submit() {
             setBattleJcL(this.id, this.form).then(() => {
                 this.$message.success("关联审核提交成功");
-                this.$emit("update");
                 this.close();
             });
         },
