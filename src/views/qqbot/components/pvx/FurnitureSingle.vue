@@ -183,14 +183,28 @@ export default {
             return this.getType(this.furniture);
         },
         furnitureAttrs() {
-            return [
+            const attrs = [
                 // { key: "view", label: "观赏", value: this.furniture?.Attribute1, className: "blue" },
                 // { key: "practical", label: "实用", value: this.furniture?.Attribute2, className: "pink" },
                 // { key: "strong", label: "坚固", value: this.furniture?.Attribute3, className: "yellow" },
                 // { key: "fengshui", label: "风水", value: this.furniture?.Attribute4, className: "green" },
                 // { key: "interest", label: "趣味", value: this.furniture?.Attribute5, className: "purple" },
                 { key: "record", label: "装修评分", value: this.furniture?.Record, className: "green" },
-            ].filter((item) => item.value !== undefined && item.value !== null && item.value !== "");
+            ];
+
+            if (this.isArchitectureSource) {
+                attrs.push({
+                    key: "architecture",
+                    label: "园宅币",
+                    value: this.furniture?.Architecture,
+                    className: "yellow",
+                });
+            }
+
+            return attrs.filter((item) => item.value !== undefined && item.value !== null && item.value !== "");
+        },
+        isArchitectureSource() {
+            return String(this.furniture?.szSource || "").trim() === "园宅币";
         },
         colorList() {
             const list = [];
@@ -460,7 +474,8 @@ export default {
         }
 
         .u-attr {
-            .dbi;
+            display: inline-flex;
+            align-items: center;
             min-width: 64px;
             color: rgba(255, 255, 255, 0.78);
             font-size: 12px;
