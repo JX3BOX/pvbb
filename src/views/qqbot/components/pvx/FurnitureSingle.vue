@@ -9,7 +9,7 @@
                     <div class="m-meta">
                         <span class="u-meta" v-if="furniture.LevelLimit">Lv.{{ furniture.LevelLimit }}</span>
                         <span class="u-meta" v-if="furnitureType">{{ furnitureType }}</span>
-                        <span class="u-meta" v-if="furniture.szSource">{{ furniture.szSource }}</span>
+                        <span class="u-meta" v-if="furnitureSource">{{ furnitureSource }}</span>
                     </div>
                 </div>
                 <div class="u-cover">
@@ -182,24 +182,22 @@ export default {
             if (!this.furniture || !Object.keys(this.category).length) return "";
             return this.getType(this.furniture);
         },
+        furnitureSource() {
+            const source = String(this.furniture?.szSource || "").trim();
+            const architecture = this.furniture?.Architecture;
+            const hasArchitecture = architecture !== undefined && architecture !== null && architecture !== "";
+            if (this.isArchitectureSource && hasArchitecture) return `${source} ${architecture}`;
+            return source;
+        },
         furnitureAttrs() {
             const attrs = [
-                // { key: "view", label: "观赏", value: this.furniture?.Attribute1, className: "blue" },
-                // { key: "practical", label: "实用", value: this.furniture?.Attribute2, className: "pink" },
-                // { key: "strong", label: "坚固", value: this.furniture?.Attribute3, className: "yellow" },
-                // { key: "fengshui", label: "风水", value: this.furniture?.Attribute4, className: "green" },
-                // { key: "interest", label: "趣味", value: this.furniture?.Attribute5, className: "purple" },
                 { key: "record", label: "装修评分", value: this.furniture?.Record, className: "green" },
+                { key: "view", label: "观赏", value: this.furniture?.Attribute1, className: "blue" },
+                { key: "practical", label: "实用", value: this.furniture?.Attribute2, className: "pink" },
+                { key: "strong", label: "坚固", value: this.furniture?.Attribute3, className: "yellow" },
+                { key: "fengshui", label: "风水", value: this.furniture?.Attribute4, className: "green" },
+                { key: "interest", label: "趣味", value: this.furniture?.Attribute5, className: "purple" },
             ];
-
-            if (this.isArchitectureSource) {
-                attrs.push({
-                    key: "architecture",
-                    label: "园宅币",
-                    value: this.furniture?.Architecture,
-                    className: "yellow",
-                });
-            }
 
             return attrs.filter((item) => item.value !== undefined && item.value !== null && item.value !== "");
         },
@@ -468,25 +466,27 @@ export default {
 
     .m-pvx-furniture__attrs {
         .u-attrs {
-            .flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px 10px;
         }
 
         .u-attr {
-            display: inline-flex;
+            display: inline-grid;
+            grid-template-columns: max-content 1fr;
+            column-gap: 5px;
             align-items: center;
-            min-width: 64px;
+            min-width: 0;
             color: rgba(255, 255, 255, 0.78);
             font-size: 12px;
             line-height: 20px;
+            white-space: nowrap;
         }
 
         .u-label {
             .dbi;
             .r(3px);
             min-width: 30px;
-            margin-right: 5px;
             padding: 1px 4px;
             color: #fff;
             font-size: 11px;
