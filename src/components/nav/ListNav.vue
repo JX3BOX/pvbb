@@ -1,5 +1,5 @@
 <template>
-    <div class="m-nav">
+    <div class="m-nav__bbs">
         <Banner class="m-nav-banner"></Banner>
 
         <div class="m-nav--links">
@@ -159,8 +159,8 @@ export default {
 };
 </script>
 <style lang="less">
-.m-nav{
-    padding:5px;
+.m-nav__bbs{
+    padding:15px;
 }
 .m-nav__qqbot{
     .r(6px);
