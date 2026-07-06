@@ -1,11 +1,13 @@
 import axios from "axios";
 import treasurePerfect from "@jx3box/jx3box-common/data/treasure_perfect.json";
 import { getRoleGameAchievements, getAdventures, getAchievements } from "@/service/qqbot-pvx";
-import { createPerfectLayoutMap } from "@/assets/js/treasure-layout";
+import { getPerfectItems } from "@/assets/js/treasure-layout";
 
 const REMOTE_LAYOUT_URL =
     process.env.VUE_APP_ADVENTURE_TREASURE_LAYOUT_URL ||
-    "https://cdn.jsdelivr.net/npm/@jx3box/jx3box-common@latest/data/treasure_perfect.json";
+    "https://cdn.jsdelivr.net/npm/@jx3box/jx3box-common/data/treasure_perfect.json";
+
+let layoutPromise;
 
 function formatDateTime(dateTimeString) {
     const dateTime = new Date(dateTimeString);
@@ -18,23 +20,130 @@ function formatDateTime(dateTimeString) {
     return `${year}年${month}月${date}日 ${hours}:${minutes}:${seconds}`;
 }
 
-function normalizeLayoutResponse(res) {
-    const layout = res?.data?.data || res?.data || res || treasurePerfect;
-    return layout?.perfect?.items?.length ? layout : treasurePerfect;
+function isValidTreasureLayout(layout) {
+    return Array.isArray(layout?.perfect?.items);
 }
 
-export async function getTreasureLayout(options = {}) {
-    const url = String(options.url || REMOTE_LAYOUT_URL || "").trim();
-    if (!url) return treasurePerfect;
+function getLayoutItems(layout = {}) {
+    return Array.isArray(layout?.perfect?.items) ? layout.perfect.items : [];
+}
 
-    try {
-        const res = await axios.get(url, {
-            withCredentials: false,
-        });
-        return normalizeLayoutResponse(res);
-    } catch {
-        return treasurePerfect;
+function getLayoutItemId(item = {}) {
+    return Number(item.id || item.dwID);
+}
+
+function hasAllBaseItems(baseItems = [], overrideItems = []) {
+    const overrideItemIds = new Set(overrideItems.map(getLayoutItemId).filter(Boolean));
+    return baseItems.every((item) => overrideItemIds.has(getLayoutItemId(item)));
+}
+
+function mergeTreasureLayout(baseLayout = treasurePerfect, overrideLayout = {}) {
+    const baseItems = getLayoutItems(baseLayout);
+    const overrideItems = getLayoutItems(overrideLayout);
+
+    if (hasAllBaseItems(baseItems, overrideItems)) {
+        return {
+            ...baseLayout,
+            ...overrideLayout,
+            perfect: {
+                ...(baseLayout.perfect || {}),
+                ...(overrideLayout.perfect || {}),
+                items: overrideItems,
+            },
+        };
     }
+
+    const overrideItemMap = overrideItems.reduce((map, item) => {
+        const id = getLayoutItemId(item);
+        if (id) map[id] = item;
+        return map;
+    }, {});
+    const mergedItemIds = new Set();
+    const items = baseItems.map((baseItem) => {
+        const id = getLayoutItemId(baseItem);
+        mergedItemIds.add(id);
+        return {
+            ...baseItem,
+            ...(overrideItemMap[id] || {}),
+        };
+    });
+
+    overrideItems.forEach((item) => {
+        const id = getLayoutItemId(item);
+        if (!mergedItemIds.has(id)) items.push(item);
+    });
+
+    return {
+        ...baseLayout,
+        ...overrideLayout,
+        perfect: {
+            ...(baseLayout.perfect || {}),
+            ...(overrideLayout.perfect || {}),
+            items,
+        },
+    };
+}
+
+function normalizeLayoutResponse(res) {
+    const layout = res?.data?.data || res?.data || res;
+    return isValidTreasureLayout(layout) ? mergeTreasureLayout(treasurePerfect, layout) : treasurePerfect;
+}
+
+export function getTreasureLayout(options = {}) {
+    const url = String(options.url || REMOTE_LAYOUT_URL || "").trim();
+    if (!url) return Promise.resolve(treasurePerfect);
+
+    if (!layoutPromise || options.force || options.url) {
+        layoutPromise = axios
+            .get(url, {
+                withCredentials: false,
+            })
+            .then(normalizeLayoutResponse)
+            .catch(() => treasurePerfect);
+    }
+
+    return layoutPromise;
+}
+
+function getAchievedAdventureIds(achievements = "", achievementMap = []) {
+    const achievementIds = String(achievements || "").split(",");
+    return new Set(
+        (achievementMap || [])
+            .filter((item) => achievementIds.includes(String(item.achievement_id)))
+            .map((item) => Number(item.adventure_id))
+    );
+}
+
+function buildPerfectAchievements(adventureList = [], achievedIds, layout) {
+    const adventureMap = (adventureList || []).reduce((map, item) => {
+        const id = Number(item.dwID);
+        if (id) map[id] = item;
+        return map;
+    }, {});
+    const achievementsList = [];
+    let actNum = 0;
+
+    getPerfectItems(layout).forEach((layoutItem, index) => {
+        const id = getLayoutItemId(layoutItem);
+        const adventure = adventureMap[id];
+        if (!id || !adventure) return;
+
+        const isAct = achievedIds.has(id);
+        if (isAct) actNum++;
+        achievementsList.push({
+            ...adventure,
+            isAct,
+            hasClass: layoutItem.key || "",
+            layout: layoutItem,
+            zIndex: index + 1,
+        });
+    });
+
+    return {
+        achievementsList,
+        actNum,
+        allNum: achievementsList.length,
+    };
 }
 
 export default async function getTreasureData(userJx3Id) {
@@ -50,17 +159,9 @@ export default async function getTreasureData(userJx3Id) {
         getAchievements(client),
         getTreasureLayout(),
     ]);
-    const perfectLayoutMap = createPerfectLayoutMap(layout);
 
     const achievements = res?.data?.data?.achievements || "";
-    let list = achievements.split(",");
-    const newList = [];
-    (mapRule?.data || []).forEach((item) => {
-        if (list.includes(String(item.achievement_id))) {
-            newList.push(item.adventure_id);
-        }
-    });
-    list = newList;
+    const achievedIds = getAchievedAdventureIds(achievements, mapRule?.data);
 
     if (res?.data?.data?.updated_at) {
         returnData.updated_at = formatDateTime(res.data.data.updated_at);
@@ -73,42 +174,32 @@ export default async function getTreasureData(userJx3Id) {
         const adventureRes = await getAdventures({ type, _no_page: 1 }, client);
         const achievementsList = [];
         let actNum = 0;
-        let unNum = 0;
+
+        if (type === "perfect") {
+            const perfectData = buildPerfectAchievements(adventureRes?.data?.list || [], achievedIds, layout);
+            returnData[`${type}AllNum`] = perfectData.allNum;
+            returnData[`${type}NowNum`] = perfectData.actNum;
+            returnData[type] = perfectData.achievementsList;
+            return;
+        }
 
         (adventureRes?.data?.list || []).forEach((item) => {
-            if (type === "perfect") {
-                const itemLayout = perfectLayoutMap[Number(item.dwID)];
-                if (!itemLayout) {
-                    unNum++;
-                    return;
-                }
-
-                const isAct = list.includes(item.dwID);
-                if (isAct) actNum++;
-                achievementsList.push({
-                    ...item,
-                    isAct,
-                    hasClass: itemLayout.key,
-                    layout: itemLayout,
-                    zIndex: itemLayout.zIndex,
-                });
-            } else if (list.includes(item.dwID)) {
+            if (achievedIds.has(Number(item.dwID))) {
                 achievementsList.push(item);
                 actNum++;
             }
         });
 
-        returnData[`${type}AllNum`] = (adventureRes?.data?.list?.length || 0) - unNum;
+        returnData[`${type}AllNum`] = adventureRes?.data?.list?.length || 0;
         returnData[`${type}NowNum`] = actNum;
         returnData[type] = achievementsList;
     });
 
     await Promise.all(adventurePromises);
 
-    returnData.progress =
-        (returnData.petNowNum + returnData.normalNowNum + returnData.perfectNowNum) /
-        (returnData.petAllNum + returnData.normalAllNum + returnData.perfectAllNum);
-    returnData.progress = (returnData.progress * 100).toFixed(2);
+    const totalNow = returnData.petNowNum + returnData.normalNowNum + returnData.perfectNowNum;
+    const totalAll = returnData.petAllNum + returnData.normalAllNum + returnData.perfectAllNum;
+    returnData.progress = totalAll ? ((totalNow / totalAll) * 100).toFixed(2) : "0.00";
 
     return {
         layout,

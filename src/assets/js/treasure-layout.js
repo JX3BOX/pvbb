@@ -1,3 +1,5 @@
+import treasurePerfect from "@jx3box/jx3box-common/data/treasure_perfect.json";
+
 const STYLE_LENGTH_KEYS = new Set(["top", "right", "bottom", "left", "width", "height", "fontSize", "lineHeight"]);
 
 const DEFAULT_PERFECT_ASSETS = Object.freeze({
@@ -73,22 +75,33 @@ export function toCssStyle(style = {}) {
 
 export function createPerfectLayoutMap(layout = {}) {
     return (layout?.perfect?.items || []).reduce((map, item) => {
-        const id = Number(item?.id);
+        const id = Number(item?.id || item?.dwID);
         if (id) map[id] = item;
         return map;
     }, {});
 }
 
+export function getPerfectItems(layout = treasurePerfect) {
+    const items = layout?.perfect?.items || [];
+    return items.length ? items : treasurePerfect?.perfect?.items || [];
+}
+
 export function getPerfectAssets(layout = {}) {
     return {
         ...DEFAULT_PERFECT_ASSETS,
+        ...(treasurePerfect?.perfect?.assets || {}),
         ...(layout?.perfect?.assets || {}),
     };
 }
 
 export function getPerfectModeLayout(layout = {}, mode = "portrait") {
+    const fallbackLayouts = treasurePerfect?.perfect?.layouts || {};
     const layouts = layout?.perfect?.layouts || {};
-    const base = DEFAULT_PERFECT_LAYOUTS[mode] || DEFAULT_PERFECT_LAYOUTS.portrait;
+    const base =
+        fallbackLayouts[mode] ||
+        fallbackLayouts.portrait ||
+        DEFAULT_PERFECT_LAYOUTS[mode] ||
+        DEFAULT_PERFECT_LAYOUTS.portrait;
     const selected = layouts[mode] || {};
     const selectedCount = selected.count || {};
     const baseCount = base.count || {};

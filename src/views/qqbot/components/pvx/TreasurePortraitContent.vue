@@ -208,7 +208,7 @@ export default {
             const layout = this.perfectItemLayout(item);
             return {
                 ...toCssStyle(layout.imageStyle),
-                zIndex: Number(layout.zIndex || item.zIndex || 1),
+                zIndex: Number(item.zIndex || 1),
             };
         },
         perfectLabelStyle(item = {}) {
