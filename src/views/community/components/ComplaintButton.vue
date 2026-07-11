@@ -1,5 +1,7 @@
 <template>
-    <el-button link :disabled="!allowReport" type="primary" @click="onMiscfeedback" icon="Warning">举报</el-button>
+    <el-button link :disabled="!allowReport" type="primary" @click="onMiscfeedback" icon="Warning">{{
+        $t("pages.community.reply.report")
+    }}</el-button>
 </template>
 
 <script>
@@ -26,20 +28,31 @@ export default {
             const userInfo = this.post.user_info || this.post.ext_user_info;
             const user_name = userInfo.display_name;
             const layerNum = replyData.floor || 0;
-            const layerStr = layerNum ? layerNum + "楼" : "楼主";
+            const layerStr = layerNum
+                ? this.$t("pages.community.dialogs.reportFloor", { floor: layerNum })
+                : this.$t("pages.community.dialogs.reportTopicAuthor");
 
-            this.$prompt(`请输入要举报的内容`, "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$prompt(
+                this.$t("pages.community.dialogs.reportPrompt"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 input: "textarea",
-                inputPlaceholder: "请输入要举报的内容",
+                inputPlaceholder: this.$t("pages.community.dialogs.reportPlaceholder"),
                 inputValidator: (value) => {
                     if (!value) {
-                        return "内容不能为空!";
+                        return this.$t("pages.community.dialogs.reportRequired");
                     }
                 },
-            }).then(({ value }) => {
-                const content = `魔盒论坛《${topicData.title}》${layerStr}的${user_name}：${value}`;
+                }
+            ).then(({ value }) => {
+                const content = this.$t("pages.community.dialogs.reportContent", {
+                    title: topicData.title,
+                    layer: layerStr,
+                    user: user_name,
+                    content: value,
+                });
                 feedback({
                     // 平台
                     client: topicData.client,
@@ -54,7 +67,7 @@ export default {
                     // 来源地址
                     refer: `/community/${topicData.id}#${layerNum}`,
                 }).then(() => {
-                    this.$message.success("举报成功");
+                    this.$message.success(this.$t("pages.community.messages.reportSuccess"));
                 });
             });
         },

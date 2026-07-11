@@ -4,16 +4,18 @@
             <ListTabs v-model="category" />
             <list-top></list-top>
             <div class="m-archive-search">
-                <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">+ 发布作品</a>
+                <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">
+                    {{ $t("pages.community.list.publishWork") }}
+                </a>
                 <el-input
-                    placeholder="请输入搜索内容"
+                    :placeholder="$t('pages.community.list.searchPlaceholder')"
                     v-model.trim="title"
                     clearable
                     @clear="onSearch"
                     size="large"
                     @keydown.enter="onSearch"
                 >
-                    <template #prepend><i class="el-icon-search"></i> 关键词</template>
+                    <template #prepend><i class="el-icon-search"></i> {{ $t("pages.community.list.keyword") }}</template>
                     <template #append>
                         <el-button icon="Position" @click="onSearch"></el-button>
                     </template>
@@ -24,7 +26,7 @@
             <div class="m-archive-filter">
                 <div class="m-filter__left">
                     <!-- 版本过滤 -->
-                    <clientBy @filter="filterImperceptibly" :type="client"></clientBy>
+                    <ClientBy @filter="filterImperceptibly" :type="client" :auto-detect="false" />
                     <el-checkbox
                         v-model="is_star"
                         :true-value="1"
@@ -32,7 +34,7 @@
                         border
                         @change="onIsStarChange"
                         class="u-star-checkbox"
-                        >只看精选</el-checkbox
+                        >{{ $t("pages.community.list.featuredOnly") }}</el-checkbox
                     >
                 </div>
                 <div class="m-filter__right">
@@ -105,9 +107,16 @@ const appKey = "community";
 
 import { getTopicList, getTopicBucket } from "@/service/community";
 import { getDesignLog } from "@/service/design";
+import { getRandomCoverMax } from "@/service/global-config";
 import { publishLink } from "@jx3box/jx3box-common/js/utils";
 import { getLikes } from "@/service/next";
-import { formatCategoryList } from "@/utils/community";
+import {
+    DEFAULT_COMMUNITY_CLIENT,
+    formatCategoryList,
+    isExplicitCommunityClient,
+    normalizeCommunityClient,
+} from "@/utils/community";
+import { assignUniqueRandomCovers, DEFAULT_RANDOM_COVER_MAX } from "@/utils/random-cover";
 import bus from "@/utils/bus";
 import User from "@jx3box/jx3box-common/js/user";
 import { getMenu } from "@jx3box/jx3box-common/js/system";
@@ -122,6 +131,7 @@ import TopicTop from "@/views/community/components/TopicTop.vue";
 import DesignTask from "@jx3box/jx3box-ui/src/bread/DesignTask.vue";
 import ListTop from "@/views/community/components/ListTop.vue";
 import ReplyOrderBy from "@/views/community/components/ReplyOrderBy.vue";
+import ClientBy from "@jx3box/jx3box-ui/src/filters/clientBy.vue";
 
 export default {
     name: "Community_v2",
@@ -136,6 +146,7 @@ export default {
         DesignTask,
         ListTop,
         ReplyOrderBy,
+        ClientBy,
     },
     data: function () {
         return {
@@ -143,7 +154,7 @@ export default {
             title: "",
             category: "all",
             isSearch: false,
-            client: "all", // 版本过滤，默认不过滤
+            client: DEFAULT_COMMUNITY_CLIENT,
             is_star: 0, // 只看精选，0否1是
             order_by_last_reply: 1, // 最新回复排序，1是，空为最新发布
             tag: "",
@@ -162,10 +173,14 @@ export default {
             topTopicData: null, // 置顶文章数据
             currentRequestKey: "",
             currentRequest: null,
+            requestVersion: 0,
             skipRouteQueryKey: "",
+            syncingRouteQuery: false,
+            col: 1,
 
             currentPost: null,
             showDesignTask: false,
+            designTaskHandler: null,
         };
     },
     computed: {
@@ -176,6 +191,9 @@ export default {
         // 是否显示加载更多
         hasNextPage: function () {
             return this.pages >= 1 && this.per * this.page < this.total;
+        },
+        isPhone: function () {
+            return window.innerWidth < 768;
         },
     },
     provide() {
@@ -200,7 +218,7 @@ export default {
         //     this.view = 1;
         // }
 
-        bus.on("design-task", (post) => {
+        this.designTaskHandler = (post) => {
             this.currentPost = post;
             // DesignTask 仅监听 modelValue，弹窗已打开时切换文章需要重新触发打开流程
             if (this.showDesignTask) {
@@ -211,7 +229,16 @@ export default {
                 return;
             }
             this.showDesignTask = true;
-        });
+        };
+        bus.on("design-task", this.designTaskHandler);
+    },
+    beforeUnmount() {
+        ++this.requestVersion;
+        this.currentRequest = null;
+        this.currentRequestKey = "";
+        if (this.designTaskHandler) {
+            bus.off("design-task", this.designTaskHandler);
+        }
     },
     watch: {
         // 加载路由参数
@@ -219,16 +246,19 @@ export default {
             deep: true,
             immediate: true,
             handler: function (query) {
-                if (Object.keys(query).length) {
-                    for (let key in query) {
-                        // for:element分页组件兼容性问题
-                        if (this.number_queries.includes(key)) {
-                            this[key] = ~~query[key];
-                        } else {
-                            this[key] = query[key];
-                        }
-                    }
-                }
+                this.syncingRouteQuery = true;
+                this.page = Math.max(1, Number(query.page) || 1);
+                // 保证即使全页文章都没有自定义封面，也有足够的默认封面可做页内去重。
+                this.per = Math.min(DEFAULT_RANDOM_COVER_MAX, Math.max(1, Number(query.per) || 20));
+                this.category = query.category || "all";
+                this.client = normalizeCommunityClient(query.client);
+                this.is_star = Number(query.is_star) === 1 ? 1 : 0;
+                this.order_by_last_reply = query.order_by_last_reply == null ? 1 : Number(query.order_by_last_reply);
+                this.title = query.title || "";
+                this.tag = query.tag || "";
+                this.$nextTick(() => {
+                    this.syncingRouteQuery = false;
+                });
                 // 路由参数更新后加载数据
                 const requestKey = JSON.stringify(this.buildQuery());
                 if (this.skipRouteQueryKey === requestKey) {
@@ -248,33 +278,36 @@ export default {
                     this.getLikes();
                 }
             },
-            deep: true,
+            deep: false,
         },
         topTopicData: {
             handler: function (topTopicData) {
-                if (topTopicData) {
+                if (topTopicData && topTopicData.agree_count == null) {
                     const id = `community_topic-${topTopicData.id}`;
                     getLikes({
                         post_type: "community_topic",
                         post_action: "likes",
                         id,
                     }).then((res) => {
-                        if (res.data.data[id] && res.data.data[id].likes) {
+                        if (this.topTopicData?.id == topTopicData.id && res.data.data[id]?.likes != null) {
                             this.topTopicData.agree_count = res.data.data[id].likes;
                         }
-                    });
+                    }).catch(() => {});
                 }
             },
         },
         category: function () {
+            if (this.syncingRouteQuery) return;
             this.page = 1;
             this.loadData();
         },
         client: function () {
+            if (this.syncingRouteQuery) return;
             this.page = 1;
             this.loadData();
         },
         order_by_last_reply: function () {
+            if (this.syncingRouteQuery) return;
             this.page = 1;
             this.loadData();
         },
@@ -296,18 +329,20 @@ export default {
                 post_type: "community_topic",
                 post_action: "likes",
                 id,
-            }).then((res) => {
-                const keys = Object.keys(res.data.data);
-                if (keys.length) {
-                    keys.forEach((key) => {
-                        const id = key.split("-")[1];
-                        const index = this.list.findIndex((item) => item.id == id);
-                        if (index > -1) {
-                            this.list[index].agree_count = res.data.data[key].likes;
-                        }
-                    });
-                }
-            });
+            })
+                .then((res) => {
+                    const keys = Object.keys(res.data.data);
+                    if (keys.length) {
+                        keys.forEach((key) => {
+                            const id = key.split("-")[1];
+                            const index = this.list.findIndex((item) => item.id == id);
+                            if (index > -1) {
+                                this.list[index].agree_count = res.data.data[key].likes;
+                            }
+                        });
+                    }
+                })
+                .catch(() => {});
         },
         onSearch() {
             this.page = 1;
@@ -318,21 +353,25 @@ export default {
         loadData(appendMode = false, page = this.page) {
             this.isSearch = false;
             let query = this.buildQuery(page);
-            const requestKey = JSON.stringify(query);
-            if (!appendMode && this.currentRequestKey === requestKey && this.currentRequest) {
+            const queryKey = JSON.stringify(query);
+            const requestKey = `${appendMode ? "append" : "replace"}:${queryKey}`;
+            if (this.currentRequestKey === requestKey && this.currentRequest) {
                 return this.currentRequest;
             }
 
+            const requestVersion = ++this.requestVersion;
             this.loading = true;
             this.currentRequestKey = requestKey;
-            this.currentRequest = getTopicList(query)
-                .then(async (res) => {
+            const request = Promise.all([getTopicList(query), getRandomCoverMax()])
+                .then(async ([res, randomCoverMax]) => {
+                    if (requestVersion !== this.requestVersion) return;
                     let list = res.data.data.list || [];
+                    list = assignUniqueRandomCovers(list, randomCoverMax);
                     list = list.map((item) => {
                         return {
                             ...item,
                             // 只有item.agree_cou = null 才会触发获取likes
-                            agree_count: item.agree_count || null,
+                            agree_count: item.agree_count ?? null,
                         };
                     });
 
@@ -354,9 +393,15 @@ export default {
 
                     if (User.hasPermission("push_banner") && !this.isPhone) {
                         const ids = this.list.map((item) => item.id);
-                        const logs = await getDesignLog({ source_type: "community", ids: ids.join(",") }).then(
-                            (res) => res.data.data
-                        );
+                        let logs = [];
+                        try {
+                            logs = await getDesignLog({ source_type: "community", ids: ids.join(",") }).then(
+                                (res) => res.data.data
+                            );
+                        } catch (_) {
+                            logs = [];
+                        }
+                        if (requestVersion !== this.requestVersion) return;
 
                         this.list = this.list.map((item) => {
                             const log = logs.find((log) => log.source_id == item.id) || null;
@@ -370,23 +415,26 @@ export default {
                     if (appendMode) {
                         this.page = query.index;
                     } else {
-                        const routeQuery = Object.assign({}, this.$route.query, {
+                        const routeQuery = this.buildRouteQuery({
                             category: this.category,
                             page: this.page,
                         });
                         if (!this.isSameRouteQuery(routeQuery)) {
-                            this.skipRouteQueryKey = requestKey;
+                            this.skipRouteQueryKey = queryKey;
                         }
                         this.replaceRoute({ category: this.category, page: this.page });
                     }
 
-                    this.$forceUpdate();
                 })
+                .catch(() => null)
                 .finally(() => {
-                    this.loading = false;
-                    this.currentRequest = null;
+                    if (requestVersion === this.requestVersion) {
+                        this.loading = false;
+                        this.currentRequest = null;
+                    }
                 });
-            return this.currentRequest;
+            this.currentRequest = request;
+            return request;
         },
         // 翻页加载
         changePage: function () {
@@ -394,9 +442,24 @@ export default {
         },
         // 路由绑定
         replaceRoute: function (extend) {
-            const query = Object.assign({}, this.$route.query, extend);
+            const query = this.buildRouteQuery(extend);
             if (this.isSameRouteQuery(query)) return Promise.resolve();
             return this.$router.push({ name: this.$route.name, query });
+        },
+        buildRouteQuery: function (extend = {}) {
+            const knownKeys = ["category", "page", "per", "client", "is_star", "order_by_last_reply", "title", "tag"];
+            const query = Object.assign({}, this.$route.query);
+            knownKeys.forEach((key) => delete query[key]);
+
+            query.category = extend.category ?? this.category;
+            query.page = extend.page ?? this.page;
+            if (this.per !== 20) query.per = this.per;
+            if (isExplicitCommunityClient(this.client)) query.client = this.client;
+            if (this.is_star) query.is_star = 1;
+            if (!this.order_by_last_reply) query.order_by_last_reply = 0;
+            if (this.title) query.title = this.title;
+            if (this.tag) query.tag = this.tag;
+            return query;
         },
         isSameRouteQuery: function (query) {
             return (
@@ -425,7 +488,7 @@ export default {
             if (this.title) {
                 _query.title = this.title;
             }
-            if (this.client && this.client !== "all") {
+            if (isExplicitCommunityClient(this.client)) {
                 _query.client = this.client;
             }
             if (this.tag) {
@@ -448,7 +511,11 @@ export default {
         },
         // 只看精选
         onIsStarChange() {
+            this.page = 1;
             this.loadData();
+        },
+        onCategoryChange(category) {
+            this.category = category || "all";
         },
 
         // 获取分类列表
@@ -457,8 +524,8 @@ export default {
                 // 分类前面加个全部
                 const list = [
                     {
-                        name: "全部",
-                        val: "",
+                        name: this.$t("pages.community.categories.all"),
+                        val: "all",
                     },
                     ...res.data.data,
                 ];
@@ -535,9 +602,14 @@ export default {
     .m-community-top {
         margin: 0 30px 10px 30px;
     }
+    .m-filter__left {
+        display: flex;
+        align-items: center;
+    }
     .u-star-checkbox {
-        height: 28px;
-        box-sizing: content-box;
+        height: 30px;
+        box-sizing: border-box;
+        margin: 0;
         .el-checkbox__label {
             font-weight: normal;
             .fz(12px);

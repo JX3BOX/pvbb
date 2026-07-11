@@ -3,38 +3,40 @@
         <Banner class="m-nav-banner"></Banner>
 
         <div class="m-nav--links">
-            <h5 class="u-title">茶馆矩阵</h5>
+            <h5 class="u-title">{{ $t("pages.community.sidebar.matrixTitle") }}</h5>
             <div class="m-nav--links__list">
                 <a href="/community" :class="{ 'on': routeActive('community') }">
                     <img svg-inline class="u-icon" :src="getAppIcon('community')" alt="" />
-                    <span>论坛</span>
+                    <span>{{ $t("pages.community.sidebar.apps.community") }}</span>
                     <em>Community</em>
                 </a>
                 <a href="/joke" :class="{ 'on': routeActive('joke') }">
                     <img svg-inline class="u-icon" :src="getAppIcon('joke')" alt="" />
-                    <span>骚话</span>
+                    <span>{{ $t("pages.community.sidebar.apps.joke") }}</span>
                     <em>Joke</em>
                 </a>
                 <a href="/emotion" :class="{ 'on': routeActive('emotion') }">
                     <img svg-inline class="u-icon" :src="getAppIcon('emotion')" alt="" />
-                    <span>趣图</span>
+                    <span>{{ $t("pages.community.sidebar.apps.emotion") }}</span>
                     <em>Emotion</em>
                 </a>
                 <a href="/collection" :class="{ 'on': routeActive('collection') }">
                     <img svg-inline class="u-icon" :src="getAppIcon('collection')" alt="" />
-                    <span>小册</span>
+                    <span>{{ $t("pages.community.sidebar.apps.collection") }}</span>
                     <em>Collection</em>
                 </a>
                 <a href="/namespace" :class="{ 'on': routeActive('namespace') }">
                     <img svg-inline class="u-icon" :src="getAppIcon('namespace')" alt="" />
-                    <span>铭牌</span>
+                    <span>{{ $t("pages.community.sidebar.apps.namespace") }}</span>
                     <em>Namespace</em>
                 </a>
             </div>
         </div>
 
         <div class="m-nav__qqbot">
-            <a href="/qqbot" target="_blank"><img src="@/assets/img/qqbot/qqbot.gif" alt="魔盒QQ机器人"></a>
+            <a href="/qqbot" target="_blank">
+                <img src="@/assets/img/qqbot/qqbot.gif" :alt="$t('pages.community.sidebar.qqBotAlt')" />
+            </a>
         </div>
     </div>
 </template>
@@ -131,8 +133,8 @@ export default {
         onQQClick() {
             navigator.clipboard.writeText(this.qq).then(() => {
                 this.$notify({
-                    title: "复制成功",
-                    message: "内容：" + this.qq,
+                    title: this.$t("pages.community.sidebar.copySuccess"),
+                    message: this.$t("pages.community.sidebar.copyContent", { content: this.qq }),
                     type: "success",
                 });
             });

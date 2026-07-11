@@ -1,5 +1,7 @@
 <template>
-    <el-button link :disabled="!allowBlock" type="primary" @click="addBlock" icon="CircleClose"> 拉黑 </el-button>
+    <el-button link :disabled="!allowBlock" type="primary" @click="addBlock" icon="CircleClose">
+        {{ $t("pages.community.reply.block") }}
+    </el-button>
 </template>
 
 <script>
@@ -22,21 +24,21 @@ export default {
     methods: {
         // 拉黑
         addBlock: function () {
-            this.$confirm("确定要拉黑此人？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("pages.community.dialogs.blockConfirm"), this.$t("pages.community.common.promptTitle"), {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
             })
                 .then(() => {
                     addBlock(this.post.user_id)
                         .then(() => {
-                            this.$message.success("拉黑成功");
+                            this.$message.success(this.$t("pages.community.messages.blockSuccess"));
                         })
                         .catch((err) => {
                             console.log(err);
                         });
                 })
-                .catch((_) => {});
+                .catch(() => {});
         },
     },
 };

@@ -2,7 +2,7 @@
     <div class="l-community-layout">
         <CommonHeader></CommonHeader>
         <Breadcrumb
-            name="竹林茶馆"
+            :name="$t('pages.community.title')"
             slug="community"
             :publishEnable="false"
             :topicEnable="false"

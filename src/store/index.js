@@ -4,7 +4,7 @@ import { getAppID } from "@jx3box/jx3box-common/js/utils";
 let store = {
     state: {
         // client
-        client: location.href.includes("origin") ? "origin" : "std",
+        client: location.hostname.split(".").includes("origin") ? "origin" : "std",
         subtype: "",
         // post
         id: getAppID(),

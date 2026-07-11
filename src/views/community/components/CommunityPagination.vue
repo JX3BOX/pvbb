@@ -11,7 +11,7 @@
             :icon="hasNextPage ? 'ArrowDown' : ''"
             size="large"
         >
-            {{ hasNextPage ? "加载更多" : "没有更多了" }}
+            {{ hasNextPage ? $t("pages.community.list.loadMore") : $t("pages.community.list.noMore") }}
         </el-button>
         <el-pagination
             class="m-community-pages"

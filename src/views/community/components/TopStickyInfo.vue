@@ -21,7 +21,11 @@
                 </span>
 
                 <a v-if="collection" class="u-book u-sub-block u-meta" :href="collection.url" target="_blank">
-                    <img svg-inline src="@/assets/img/community/bookmark.svg" alt="小册" />
+                    <img
+                        svg-inline
+                        src="@/assets/img/community/bookmark.svg"
+                        :alt="$t('pages.community.single.bookletAlt')"
+                    />
                     {{ collection.name }}
                 </a>
             </div>
@@ -30,11 +34,14 @@
 </template>
 
 <script>
+import throttle from "lodash/throttle";
+
 export default {
     props: ["post"],
     data() {
         return {
             show: false,
+            scrollHandler: null,
         };
     },
     computed: {
@@ -66,14 +73,16 @@ export default {
             return this.post?.is_top || this.post?.is_category_top;
         },
         title: function () {
-            return this.post?.title || "无标题";
+            return this.post?.title || this.$t("pages.community.common.untitled");
         },
     },
     mounted() {
-        document.addEventListener("scroll", this.handleScroll);
+        this.scrollHandler = throttle(this.handleScroll, 100);
+        document.addEventListener("scroll", this.scrollHandler);
     },
     beforeUnmount() {
-        document.removeEventListener("scroll", this.handleScroll);
+        document.removeEventListener("scroll", this.scrollHandler);
+        this.scrollHandler?.cancel?.();
     },
     methods: {
         handleScroll() {

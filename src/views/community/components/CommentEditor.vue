@@ -1,7 +1,11 @@
 <template>
     <el-form ref="form" :model="newComment" class="c-comment-box m-comment-reply">
         <div class="u-mask">
-            参与评论，需先进行<a href="/dashboard/auth" target="_blank" class="u-link">账号认证</a>。
+            {{ $t("pages.community.reply.authRequiredPrefix")
+            }}<a href="/dashboard/auth" target="_blank" class="u-link">{{
+                $t("pages.community.reply.accountVerification")
+            }}</a
+            >{{ $t("pages.community.reply.authRequiredSuffix") }}
         </div>
         <el-form-item>
             <el-input
@@ -10,7 +14,7 @@
                 :maxlength="maxLength"
                 show-word-limit
                 v-model="newComment.content"
-                placeholder="参与讨论..."
+                :placeholder="$t('pages.community.reply.discussionPlaceholder')"
                 :id="inputId"
                 ref="textarea"
                 class="u-comment-editor"
@@ -19,17 +23,28 @@
             ></el-input>
             <div class="c-comment-tools">
                 <div class="u-tools">
-                    <i class="el-icon-picture-outline u-upload-icon" @click="showUploader = !showUploader"></i>
+                    <i
+                        v-if="isLogin"
+                        class="el-icon-picture-outline u-upload-icon"
+                        @click="showUploader = !showUploader"
+                    ></i>
                     <Emotion class="c-comment-emotion" @selected="handleEmotionSelected" type="pop" :max="6"></Emotion>
                     <quickReply @reply="onQuickReply"></quickReply>
                 </div>
             </div>
             <div class="u-toolbar">
-                <el-button type="primary" @click="onSubmit" class="u-publish" :disabled="disableSubmitBtn">
-                    跟帖
+                <el-button
+                    type="primary"
+                    @click="onSubmit"
+                    class="u-publish"
+                    :disabled="disableSubmitBtn || submitting"
+                    :loading="submitting"
+                >
+                    {{ $t("pages.community.reply.followup") }}
                 </el-button>
             </div>
             <Uploader
+                v-if="isLogin"
                 class="u-uploader"
                 ref="uploader"
                 @onFinish="attachmentUploadFinish"
@@ -46,7 +61,9 @@ import Emotion from "@jx3box/jx3box-emotion/src/Emotion2.vue";
 import QuickReply from "./QuickReply.vue";
 import Tribute from "tributejs";
 import { getUserList } from "@/service/cms";
-import { throttle } from "lodash";
+import { debounce } from "lodash";
+import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
+import { escapeHtml } from "@/utils/community";
 
 export default {
     name: "CommentInputForm",
@@ -60,31 +77,94 @@ export default {
             type: Boolean,
             default: false,
         },
+        submitting: {
+            type: Boolean,
+            default: false,
+        },
+        isLogin: {
+            type: Boolean,
+            default: false,
+        },
+        initialContent: {
+            type: String,
+            default: "",
+        },
+        initialMentions: {
+            type: Array,
+            default: () => [],
+        },
     },
     mounted() {
         if (this.isBottom) this.inputId = "textarea-bottom";
         this.initTribute();
     },
+    beforeUnmount() {
+        ++this.mentionRequestVersion;
+        this.mentionSearch?.cancel?.();
+        if (this.tribute && this.tributeTextarea) {
+            this.tribute.detach(this.tributeTextarea);
+        }
+        this.tribute = null;
+        this.tributeTextarea = null;
+    },
     data() {
         return {
-            selectedMentions: [],
-            tribute: {
-                trigger: "@",
-                values: [],
-            },
+            selectedMentions: this.initialMentions.map((item) => ({ ...item })),
+            tribute: null,
+            tributeTextarea: null,
+            mentionSearch: null,
+            mentionRequestVersion: 0,
             maxLength: 500,
             showUploader: false,
             disableSubmitBtn: false,
             newComment: {
-                content: "",
+                content: this.initialContent,
             },
             inputId: "textarea-top",
             is_secret: false,
         };
     },
+    watch: {
+        submitting(val, oldVal) {
+            if (oldVal && !val) {
+                this.disableSubmitBtn = false;
+            }
+        },
+        initialContent(value) {
+            this.newComment.content = value || "";
+        },
+        initialMentions: {
+            deep: true,
+            handler(value) {
+                this.selectedMentions = Array.isArray(value) ? value.map((item) => ({ ...item })) : [];
+            },
+        },
+    },
     methods: {
         initTribute() {
             const textarea = this.$refs.textarea.$el.querySelector("textarea");
+            const loadingText = escapeHtml(this.$t("pages.community.reply.mentionLoading"));
+            const avatarAlt = escapeHtml(this.$t("pages.community.common.avatarAlt"));
+            const searchTip = escapeHtml(this.$t("pages.community.reply.mentionSearchTip"));
+            const runMentionSearch = debounce((text, cb, requestVersion) => {
+                getUserList({ name: text })
+                    .then((res) => {
+                        if (!this.tribute || requestVersion !== this.mentionRequestVersion) return;
+                        cb(res.data.data?.list || []);
+                    })
+                    .catch(() => {
+                        if (this.tribute && requestVersion === this.mentionRequestVersion) cb([]);
+                    });
+            }, 300);
+            this.mentionSearch = (text, cb) => {
+                const requestVersion = ++this.mentionRequestVersion;
+                if (text == "") {
+                    runMentionSearch.cancel();
+                    return cb([]);
+                }
+                runMentionSearch(text, cb, requestVersion);
+            };
+            this.mentionSearch.cancel = () => runMentionSearch.cancel();
             this.tribute = new Tribute({
                 trigger: "@",
                 requireLeadingSpace: false,
@@ -93,36 +173,39 @@ export default {
                 // 默认情况下包含要插入内容的列
                 fillAttr: "display_name",
                 menuItemLimit: 5,
-                values: throttle((text, cb) => {
-                    if (text == "") {
-                        return cb([]);
-                    }
-                    getUserList({ name: text }).then((res) => {
-                        const users = res.data.data?.list || [];
-
-                        return cb(users);
-                    });
-                }, 1000), // 节流,
+                values: this.mentionSearch,
                 // 当你的 values 函数是异步时，显示的可选加载模板
-                loadingItemTemplate: "<div>Loading...</div>",
+                loadingItemTemplate: `<div>${loadingText}</div>`,
                 // 选择时调用的函数，返回要插入的内容
                 selectTemplate: (item) => {
                     this.selectedMentions.push(item.original);
-                    return "@" + item.original.display_name;
+                    return "@" + String(item.original.display_name || "");
                 },
                 // 显示菜单中项目的模板
-                menuItemTemplate: function (item) {
-                    const avatarSrc = item.original.user_avatar || "https://img.jx3box.com/image/common/avatar.png";
+                menuItemTemplate: (item) => {
+                    const avatarSrc = escapeHtml(this.getSafeAvatarUrl(item.original.user_avatar));
+                    const displayName = escapeHtml(String(item.original.display_name || ""));
                     return `
-                        <img src="${avatarSrc}" alt="Avatar" style="width: 20px; height: 20px; border-radius: 50%;">
-                        <span>${item.original.display_name}</span>
+                        <img src="${avatarSrc}" alt="${avatarAlt}" style="width: 20px; height: 20px; border-radius: 50%;">
+                        <span>${displayName}</span>
                         `;
                 },
                 noMatchTemplate: function () {
-                    return "<li>请输入用户昵称</li>";
+                    return `<li>${searchTip}</li>`;
                 },
             });
             this.tribute.attach(textarea);
+            this.tributeTextarea = textarea;
+        },
+        getSafeAvatarUrl(value) {
+            const fallback = "https://img.jx3box.com/image/common/avatar.png";
+            const image = resolveImagePath(value || fallback);
+            try {
+                const url = new URL(image, window.location.origin);
+                return ["http:", "https:"].includes(url.protocol) ? url.href : fallback;
+            } catch (_) {
+                return fallback;
+            }
         },
         // 退格触发@搜索
         handleDel(e) {
@@ -143,6 +226,7 @@ export default {
             }
         },
         onSubmit() {
+            if (this.submitting || this.disableSubmitBtn) return;
             this.disableSubmitBtn = true;
             if (this.$refs.uploader) {
                 this.$refs.uploader.upload();
@@ -151,14 +235,18 @@ export default {
             }
         },
         onQuickReply(item) {
+            if (this.submitting || this.disableSubmitBtn) return;
+            this.disableSubmitBtn = true;
             this.$emit("submit", {
                 content: item,
+                draftContent: item,
+                draftMentions: [],
                 attachmentList: [],
                 is_template: 1,
             });
         },
         attachmentUploadFinish(data) {
-            let content = this.newComment.content?.replace(/\n/g, "<br>");
+            let content = String(this.newComment.content || "").replace(/\n/g, "<br>");
             // 去重
             let mentions = this.selectedMentions.reduce((acc, current) => {
                 if (!acc.some((item) => item.ID === current.ID)) {
@@ -174,23 +262,26 @@ export default {
 
             // at的内容 全部替换为a标签
             mentions.forEach((mention) => {
+                const id = Number(mention.ID);
+                if (!Number.isInteger(id) || id <= 0) return;
+                const displayName = String(mention.display_name || "");
+                const namePattern = displayName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                const safeDisplayName = escapeHtml(displayName);
                 content = content.replace(
-                    new RegExp("@" + mention.display_name + " ", "g"),
-                    `<a class="e-jx3-author w-jx3-element" href="/author/${mention.ID}"  target="_blank" rel="noopener" data-type="author"  data-mode="" data-id="${mention.ID}">@${mention.display_name} </a>`
+                    new RegExp("@" + namePattern + " ", "g"),
+                    () =>
+                        `<a class="e-jx3-author w-jx3-element" href="/author/${id}" target="_blank" rel="noopener" data-type="author" data-mode="" data-id="${id}">@${safeDisplayName} </a>`
                 );
             });
 
             this.$emit("submit", {
                 content: content,
+                draftContent: String(this.newComment.content || ""),
+                draftMentions: this.selectedMentions,
                 is_secret: this.is_secret ? 1 : 0,
                 attachmentList: data,
                 atUsers: mentions,
             });
-            this.newComment = {
-                content: "",
-            };
-            this.showUploader = false;
-            this.disableSubmitBtn = false;
         },
         attachmentUplodError() {
             this.disableSubmitBtn = false;
@@ -219,6 +310,7 @@ export default {
             }
         },
         handlePaste(event) {
+            if (!this.isLogin) return;
             const clipboardItems = event.clipboardData.items;
             for (let i = 0; i < clipboardItems.length; i++) {
                 const item = clipboardItems[i];
@@ -233,6 +325,15 @@ export default {
                     }
                 }
             }
+        },
+        reset() {
+            this.newComment = { content: "" };
+            this.selectedMentions = [];
+            this.showUploader = false;
+            this.disableSubmitBtn = false;
+        },
+        unlock() {
+            this.disableSubmitBtn = false;
         },
     },
 };

@@ -62,6 +62,7 @@ const routes = [
         path: "/community/:id",
         component: () => import("@/views/community/CommunitySingle.vue"),
         meta: {
+            preserveDynamicTitle: true,
             i18n: {
                 title: "pages.community.single.title",
                 keywords: "pages.community.single.keywords",

@@ -49,6 +49,7 @@ export default {
     data() {
         return {
             visible: false,
+            throttledScrollHandler: null,
         };
     },
 
@@ -62,7 +63,8 @@ export default {
     },
 
     mounted() {
-        document.addEventListener("scroll", throttle(this.onScroll, 300));
+        this.throttledScrollHandler = throttle(this.onScroll, 300);
+        document.addEventListener("scroll", this.throttledScrollHandler);
     },
 
     methods: {
@@ -99,6 +101,7 @@ export default {
 
     beforeUnmount() {
         document.removeEventListener("scroll", this.throttledScrollHandler);
+        this.throttledScrollHandler?.cancel?.();
     },
 };
 </script>

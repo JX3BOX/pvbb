@@ -4,7 +4,9 @@
         <template v-if="data">
             <div class="u-interact">
                 <AuthorRss :uid="uid" />
-                <el-button icon="Message" class="u-btn" size="small" @click="onMessage">私信</el-button>
+                <el-button icon="Message" class="u-btn" size="small" @click="onMessage">{{
+                    $t("pages.community.reply.privateMessage")
+                }}</el-button>
             </div>
             <AuthorMedals class="u-block u-trophy" :uid="uid" />
             <slot></slot>
@@ -23,6 +25,7 @@ import "@jx3box/jx3box-ui/assets/css/single/author.less";
 
 import { getDecoration } from "@/service/cms";
 import { __cdn } from "@/utils/config";
+import User from "@jx3box/jx3box-common/js/user";
 const DECORATION_SIDEBAR = "decoration_sidebar";
 export default {
     props: ["uid", "isMaster", "isAnonymous"],
@@ -37,13 +40,6 @@ export default {
     watch: {
         uid: {
             handler: function () {
-                for (let i = 0; i < sessionStorage.length; i++) {
-                    const key = sessionStorage.key(i);
-                    if (key && key.startsWith("honor_img")) {
-                        sessionStorage.removeItem(key);
-                        i--;
-                    }
-                }
                 this.user_id = this.uid;
                 this.getDecoration();
             },
@@ -58,6 +54,10 @@ export default {
             this.data = data;
         },
         onMessage: function () {
+            if (!User.isLogin()) {
+                this.$message.warning(this.$t("pages.community.messages.loginRequired"));
+                return;
+            }
             window.open("/dashboard/letter?receiver=" + this.uid, "_blank");
         },
         showDecoration: function (val, type) {
@@ -78,17 +78,19 @@ export default {
                 let sidebar = JSON.parse(decoration_sidebar);
                 this.bg = this.showDecoration(sidebar.val, "sidebar");
             } catch (err) {
-                getDecoration({ using: 1, user_id: this.user_id, type: "sidebar" }).then((data) => {
-                    let res = data.data.data || [];
-                    if (res.length == 0) {
-                        //空 则为无主题，不再加载接口，界面设No
-                        sessionStorage.setItem(DECORATION_SIDEBAR + this.user_id, "no");
-                        return;
-                    }
-                    let sidebar = res[0];
-                    this.bg = this.showDecoration(sidebar.val, "sidebar");
-                    sessionStorage.setItem(DECORATION_SIDEBAR + this.user_id, JSON.stringify(sidebar));
-                });
+                getDecoration({ using: 1, user_id: this.user_id, type: "sidebar" })
+                    .then((data) => {
+                        let res = data.data.data || [];
+                        if (res.length == 0) {
+                            //空 则为无主题，不再加载接口，界面设No
+                            sessionStorage.setItem(DECORATION_SIDEBAR + this.user_id, "no");
+                            return;
+                        }
+                        let sidebar = res[0];
+                        this.bg = this.showDecoration(sidebar.val, "sidebar");
+                        sessionStorage.setItem(DECORATION_SIDEBAR + this.user_id, JSON.stringify(sidebar));
+                    })
+                    .catch(() => {});
             }
         },
     },

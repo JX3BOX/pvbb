@@ -1,7 +1,7 @@
 <template>
     <el-button link v-if="allowForward" type="primary" @click="onForward()">
         <i class="el-icon-document-copy"></i>
-        <span class="u-copy-text__pc"> 复制党+1 </span>
+        <span class="u-copy-text__pc"> {{ $t("pages.community.reply.copyAndReply") }} </span>
         <span class="u-copy-text__phone">&nbsp; <strong>+1</strong> </span>
     </el-button>
 </template>
@@ -10,14 +10,14 @@
 import User from "@jx3box/jx3box-common/js/user.js";
 export default {
     props: ["post", "isMaster"],
-    inject: ["onReplyTopic"],
+    inject: ["onReplyTopic", "getTopicData"],
     computed: {
         isLogin: function () {
             return User.isLogin();
         },
         allowForward() {
-            // 不是主楼 && 已经登陆
-            return !this.isMaster && this.isLogin;
+            // 不是主楼 && 已经登陆 && 帖子允许回复
+            return !this.isMaster && this.isLogin && !this.getTopicData()?.disable_comment;
         },
     },
     methods: {

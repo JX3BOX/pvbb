@@ -75,7 +75,7 @@
                     v-if="data.collection_id && data.collection.id && data.collection.title"
                 >
                     <a :href="`/collection/${data.collection_id}`" target="_blank">
-                        <span class="u-label">小册</span>
+                        <span class="u-label">{{ $t("pages.community.common.collection") }}</span>
                         <span class="u-value">{{ data.collection.title }}</span>
                     </a>
                 </div>
@@ -92,7 +92,7 @@
                     </a>
                     <span v-else>
                         <img class="m-topic-userInfo__avatar" :src="avatarUrl" alt="" srcset="" />
-                        <span class="m-topic-userInfo__name">神秘侠士</span>
+                        <span class="m-topic-userInfo__name">{{ $t("pages.community.common.mysteriousHero") }}</span>
                     </span>
                 </div>
             </div>
@@ -117,13 +117,14 @@
 </template>
 
 <script>
-import { showAvatar, authorLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
+import { showAvatar, authorLink, getThumbnail, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __cdn } from "@/utils/config";
-import { random } from "lodash";
 import { getTimeAgo } from "@/utils/dateFormat";
 import { getSkinJson } from "@/service/community";
 const skinKey = "community_topic_skin";
 import { tabsMap } from "@/assets/data/community_category";
+import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
+import { getRandomCoverIndex } from "@/utils/random-cover";
 
 export default {
     props: ["data"],
@@ -171,16 +172,16 @@ export default {
         },
         introduction: function () {
             const data = this.data;
-            let introduction = data.introduction;
+            let introduction = String(data.introduction || "");
             // 去掉信封样式的css代码
             introduction = introduction.replace(/\.letter--[\s\S]*$/, "");
             if (introduction) {
                 if (introduction.length >= 200) {
-                    return introduction + "...";
+                    return resolveImagePath(sanitizeRichText(introduction + "..."));
                 } else if (introduction.length <= 0) {
                     return "......";
                 } else {
-                    return introduction;
+                    return resolveImagePath(sanitizeRichText(introduction));
                 }
             } else {
                 return "";
@@ -190,7 +191,7 @@ export default {
             return this.data.is_top || this.data.is_category_top;
         },
         avatarUrl: function () {
-            return showAvatar(this.data?.ext_user_info?.avatar);
+            return resolveImagePath(showAvatar(this.data?.ext_user_info?.avatar));
         },
         tags: function () {
             return this.$store.state.tags;
@@ -205,46 +206,51 @@ export default {
             if (skinJson) {
                 this.skinJson = JSON.parse(skinJson);
             } else {
-                getSkinJson().then((res) => {
-                    this.skinJson = res.data;
-                    sessionStorage.setItem(skinKey, JSON.stringify(res.data));
-                });
+                getSkinJson()
+                    .then((res) => {
+                        this.skinJson = res.data;
+                        sessionStorage.setItem(skinKey, JSON.stringify(res.data));
+                    })
+                    .catch(() => {});
             }
         },
-        getTimeAgo,
+        getTimeAgo(date) {
+            return getTimeAgo(date, (key) => this.$t(key));
+        },
         authorLink,
         getBanner: function (data) {
             if (data.banner_img) {
-                if (data.banner_img.indexOf("jx3box.com") >= 0) {
-                    if (data.banner_img.indexOf(".webp") > -1) return data.banner_img;
-                    return getThumbnail(data.banner_img, [168 * 2, 88 * 2]);
+                const banner = resolveImagePath(data.banner_img);
+                if (banner.indexOf("jx3box.com") >= 0) {
+                    if (banner.indexOf(".webp") > -1) return banner;
+                    return getThumbnail(banner, [168 * 2, 88 * 2]);
                 } else {
-                    return data.banner_img;
+                    return banner;
                 }
             } else if (data.extra_images && data.extra_images.length) {
-                if (data.extra_images[0].indexOf("jx3box.com") >= 0) {
-                    return getThumbnail(data.extra_images[0], [168 * 2, 88 * 2]);
+                const image = resolveImagePath(data.extra_images[0]);
+                if (image.indexOf("jx3box.com") >= 0) {
+                    return getThumbnail(image, [168 * 2, 88 * 2]);
                 } else {
-                    return data.extra_images[0];
+                    return image;
                 }
             } else {
-                // 从1-39中随机选一个
-                const randomNum = random(1, 39);
-                return __cdn + `design/random_cover/${randomNum}.jpg`;
+                return __cdn + `design/random_cover/${getRandomCoverIndex(data)}.jpg`;
             }
         },
         getSquareBanner: function (val) {
-            if (val.indexOf("jx3box.com") >= 0) {
-                return getThumbnail(val, 48 * 2);
+            const image = resolveImagePath(val);
+            if (image.indexOf("jx3box.com") >= 0) {
+                return getThumbnail(image, 48 * 2);
             }
-            return val;
+            return image;
         },
         getPostUrl(id) {
             return `/community/${id}`;
         },
         getBg(label) {
             const item = this.tags.find((tag) => tag.label === label);
-            return (item?.icon && `${__cdn}${item.icon}`) || "";
+            return (item?.icon && resolveImagePath(`${__cdn}${item.icon}`)) || "";
         },
         getBgStyle(item) {
             return {
@@ -259,7 +265,7 @@ export default {
             return url.toString();
         },
         getCategoryText(key) {
-            return tabsMap[key];
+            return tabsMap[key] ? this.$t(`pages.community.categories.${key}`) : key;
         },
     },
 };

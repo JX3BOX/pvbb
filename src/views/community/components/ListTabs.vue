@@ -1,52 +1,50 @@
 <template>
     <el-tabs class="m-tabs" v-model="view" @tab-change="changeView">
-        <el-tab-pane label="全部内容" name="all">
+        <el-tab-pane :label="$t('pages.community.categories.all')" name="all">
             <template #label>
                 <!-- <img class="u-icon-img" src="@/assets/img/community/category/all.svg" alt="" /> -->
                 <el-icon class="u-icon-img"><Menu /></el-icon>
-                <b>全部内容</b>
+                <b>{{ $t("pages.community.categories.all") }}</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </template>
         </el-tab-pane>
 
-        <el-tab-pane label="攻略心得" name="guide">
+        <el-tab-pane :label="$t('pages.community.categories.guide')" name="guide">
             <template #label>
                 <!-- <img class="u-icon-img" src="@/assets/img/community/category/guide.png" alt="" /> -->
                 <el-icon class="u-icon-img"><Notebook /></el-icon>
-                <b>攻略心得</b>
+                <b>{{ $t("pages.community.categories.guide") }}</b>
                 <!-- <em class="u-secret">权威白皮书</em> -->
             </template>
         </el-tab-pane>
 
-        <el-tab-pane label="江湖故事" name="story">
+        <el-tab-pane :label="$t('pages.community.categories.story')" name="story">
             <template #label>
                 <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/story.svg" alt="" /> -->
                 <el-icon class="u-icon-img"><Reading /></el-icon>
-                <b>江湖故事</b>
+                <b>{{ $t("pages.community.categories.story") }}</b>
             </template>
         </el-tab-pane>
 
-        <el-tab-pane label="交流分享" name="discuz">
+        <el-tab-pane :label="$t('pages.community.categories.discuz')" name="discuz">
             <template #label>
                 <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/conversation.svg" alt="" /> -->
                 <el-icon class="u-icon-img"><ChatLineSquare /></el-icon>
-                <b>交流分享</b>
+                <b>{{ $t("pages.community.categories.discuz") }}</b>
             </template>
         </el-tab-pane>
 
-        <el-tab-pane label="求助寻觅" name="help">
+        <el-tab-pane :label="$t('pages.community.categories.help')" name="help">
             <template #label>
                 <!-- <img class="u-icon-img" svg-inline src="@/assets/img/community/category/request.svg" alt="" /> -->
                 <el-icon class="u-icon-img"><Warning /></el-icon>
-                <b>求助寻觅</b>
+                <b>{{ $t("pages.community.categories.help") }}</b>
             </template>
         </el-tab-pane>
     </el-tabs>
 </template>
 
 <script>
-import { tabsMap, reversedTabsMap } from "@/assets/data/community_category.js";
-
 export default {
     name: "tabs",
     emits: ["update:modelValue", "input"],

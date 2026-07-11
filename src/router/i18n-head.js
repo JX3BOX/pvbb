@@ -15,15 +15,18 @@ function isMissingI18nValue(value, key) {
     return key ? str === String(key) : false;
 }
 
-function withSuffix(title) {
-    // 注意：suffix 由业务侧在 settings.js 中定义，可能包含刻意的前后空格
-    // 这里不要对 suffix 做 trim/replace，保持原样拼接
+function withSuffix(title, i18n) {
     const base = String(title || "").trim();
-    const suffix = String(settings?.suffix ?? "");
+    const suffixKey = "pages.common.appendTitle";
+    const translatedSuffix = i18n?.global?.t?.(suffixKey);
+    const suffix = isMissingI18nValue(translatedSuffix, suffixKey)
+        ? String(settings?.suffix ?? "")
+        : String(translatedSuffix);
     if (!base) return "";
     if (!suffix) return base;
-    if (base.endsWith(suffix)) return base;
-    return `${base}${suffix}`;
+    const normalizedSuffix = suffix.trim();
+    if (base.endsWith(normalizedSuffix)) return base;
+    return `${base} ${normalizedSuffix}`;
 }
 
 function buildHeadObjFromRoute(to, i18n) {
@@ -56,7 +59,7 @@ function buildHeadObjFromRoute(to, i18n) {
     if (description) meta.push({ name: "description", content: String(description) });
 
     return {
-        title: withSuffix(title) || undefined,
+        title: withSuffix(title, i18n) || undefined,
         htmlAttrs: { lang: htmlLang },
         meta,
     };
@@ -72,8 +75,16 @@ export function initRouterI18nHead(router, i18n, head) {
     });
     head.addHeadObjs(headObjRef);
 
-    router.afterEach((to) => {
-        headObjRef.value = buildHeadObjFromRoute(to, i18n) || headObjRef.value;
+    router.afterEach((to, from) => {
+        const nextHead = buildHeadObjFromRoute(to, i18n) || headObjRef.value;
+        const sameDynamicPage =
+            to.meta?.preserveDynamicTitle &&
+            to.name === from?.name &&
+            JSON.stringify(to.params || {}) === JSON.stringify(from?.params || {});
+        if (sameDynamicPage && document.title) {
+            nextHead.title = document.title;
+        }
+        headObjRef.value = nextHead;
         head.updateDOM();
     });
 

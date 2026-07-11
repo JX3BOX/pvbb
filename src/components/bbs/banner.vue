@@ -3,7 +3,7 @@
         <el-carousel class="m-carousel" autoplay indicator-position="none">
             <el-carousel-item v-for="(item, index) in list" :key="index">
                 <a class="u-link" :href="item.link">
-                    <el-image class="u-cover" :src="item.img" :alt="item.title" />
+                    <el-image class="u-cover" :src="resolveImagePath(item.img)" :alt="item.title" />
                 </a>
             </el-carousel-item>
         </el-carousel>
@@ -12,6 +12,7 @@
 
 <script>
 import { getConfigBanner } from "@/service/cms";
+import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 export default {
     name: "BBsBanner",
     props: {
@@ -31,6 +32,7 @@ export default {
         },
     },
     methods: {
+        resolveImagePath,
         loadData() {
             getConfigBanner({ client: this.client, status: 1, per: 10, type: "banner", subtype: this.subtype }).then(
                 (res) => {

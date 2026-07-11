@@ -1,15 +1,25 @@
 <template>
     <el-form ref="form" class="c-comment-subbox m-comment-editor" :class="{ 'm-comment-mask': commentStrict }">
         <div class="u-mask">
-            参与评论，需先进行<a href="/dashboard/auth" target="_blank" class="u-link">账号认证</a>。
+            {{ $t("pages.community.reply.authRequiredPrefix")
+            }}<a href="/dashboard/auth" target="_blank" class="u-link">{{
+                $t("pages.community.reply.accountVerification")
+            }}</a
+            >{{ $t("pages.community.reply.authRequiredSuffix") }}
         </div>
         <div class="u-subbox-label">
-            回复
+            {{ $t("pages.community.reply.reply") }}
             <el-link type="primary" target="_blank" :href="userHref">＠{{ username }}</el-link>
             ：
         </div>
         <el-form-item>
-            <el-input type="textarea" v-model="content" :id="'id' + inputId" placeholder="输入回复..."></el-input>
+            <el-input
+                ref="textarea"
+                type="textarea"
+                v-model="content"
+                :id="'reply-input-' + inputId"
+                :placeholder="$t('pages.community.reply.replyPlaceholder')"
+            ></el-input>
         </el-form-item>
         <el-form-item>
             <div class="c-comment-tools">
@@ -19,10 +29,13 @@
                     size="small"
                     type="primary"
                     @click="submintReply()"
-                    :disabled="disableSubmitBtn"
-                    >提交</el-button
+                    :disabled="disableSubmitBtn || submitting"
+                    :loading="submitting"
+                    >{{ $t("pages.community.reply.submit") }}</el-button
                 >
-                <el-button size="small" link @click="hideForm()">收起</el-button>
+                <el-button size="small" link @click="hideForm()">{{
+                    $t("pages.community.reply.collapse")
+                }}</el-button>
             </div>
         </el-form-item>
     </el-form>
@@ -32,7 +45,7 @@
 // import Upload from "./Upload.vue";
 import Emotion from "@jx3box/jx3box-emotion/src/Emotion2.vue";
 export default {
-    props: ["username", "userHref", "currentId", "commentStrict"],
+    props: ["username", "userHref", "currentId", "commentStrict", "submitting"],
     data: function () {
         return {
             content: "",
@@ -48,8 +61,16 @@ export default {
     mounted() {
         if (this.currentId) this.inputId = this.currentId;
     },
+    watch: {
+        submitting(val, oldVal) {
+            if (oldVal && !val) {
+                this.disableSubmitBtn = false;
+            }
+        },
+    },
     methods: {
         submintReply() {
+            if (this.submitting || this.disableSubmitBtn) return;
             this.disableSubmitBtn = true;
             if (this.$refs.uploader) {
                 this.$refs.uploader.upload();
@@ -61,19 +82,17 @@ export default {
             this.$emit("hideForm");
         },
         attachmentUploadFinish(data) {
-            this.disableSubmitBtn = false;
             this.$emit("doReply", {
                 content: this.content,
                 attachmentList: data,
             });
-            this.content = "";
-            this.showUploader = false;
         },
         attachmentUplodError() {
             this.disableSubmitBtn = false;
         },
         async handleEmotionSelected(emotion) {
-            const myField = document.querySelector(`#id${this.inputId}`);
+            const myField = this.$refs.textarea?.$el?.querySelector("textarea");
+            if (!myField) return;
             const value = emotion.key;
             if (myField.selectionStart || myField.selectionStart === 0) {
                 let startPos = myField.selectionStart;

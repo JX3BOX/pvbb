@@ -1,7 +1,11 @@
 <template>
     <div class="m-birthday m-jx3dat-rank-mini m-jx3dat-rank">
         <h3 class="c-sidebar-right-title">
-            <span class="u-title"><img class="u-icon" svg-inline src="@/assets/img/common/cake.svg" />今日之星</span>
+            <span class="u-title"
+                ><img class="u-icon" svg-inline src="@/assets/img/common/cake.svg" />{{
+                    $t("pages.community.sidebar.todayStar")
+                }}</span
+            >
             <span class="u-date">{{ `${icon} ${today}` }}</span>
             <!-- <span class="u-more" @click="viewRank">查看更多 &raquo;</span> -->
         </h3>
@@ -16,14 +20,20 @@
                     </a>
                 </li>
             </ul>
-            <el-alert v-else show-icon type="info" :closable="false" title="暂无今日之星"></el-alert>
+            <el-alert
+                v-else
+                show-icon
+                type="info"
+                :closable="false"
+                :title="$t('pages.community.sidebar.noTodayStar')"
+            ></el-alert>
         </div>
     </div>
 </template>
 
 <script>
 import { getBirthdayList } from "@/service/next";
-import { authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
+import { authorLink, showAvatar, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getStarSign } from "@/utils/common";
 import starSign from "@/assets/data/star_sign.json";
 import dayjs from "dayjs";
@@ -64,7 +74,9 @@ export default {
                 });
         },
         authorLink,
-        showAvatar,
+        showAvatar(value) {
+            return resolveImagePath(showAvatar(value));
+        },
     },
 };
 </script>

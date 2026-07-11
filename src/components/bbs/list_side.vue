@@ -1,8 +1,8 @@
 <template>
     <div class="m-extend-list">
         <RightSideMsg>
-            <em>综合交流群</em> :
-            <strong @click="onQQClick" class="u-link" title="点击复制">
+            <em>{{ $t("pages.community.sidebar.groupChat") }}</em> :
+            <strong @click="onQQClick" class="u-link" :title="$t('pages.community.sidebar.copyHint')">
                 <a>{{ qq }}</a>
             </strong>
         </RightSideMsg>
@@ -33,8 +33,8 @@ export default {
         onQQClick() {
             navigator.clipboard.writeText(this.qq).then(() => {
                 this.$notify({
-                    title: "复制成功",
-                    message: "内容：" + this.qq,
+                    title: this.$t("pages.community.sidebar.copySuccess"),
+                    message: this.$t("pages.community.sidebar.copyContent", { content: this.qq }),
                     type: "success",
                     zIndex: 999999,
                 });

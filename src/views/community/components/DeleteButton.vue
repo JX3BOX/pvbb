@@ -1,5 +1,7 @@
 <template>
-    <el-button link @click="onDeleteClick" type="primary" v-if="canDelete" icon="Delete"> 删除 </el-button>
+    <el-button link @click="onDeleteClick" type="primary" v-if="canDelete" icon="Delete">
+        {{ $t("pages.community.reply.delete") }}
+    </el-button>
 </template>
 
 <script>
@@ -33,12 +35,16 @@ export default {
         isSuperAdmin() {
             return User.isSuperAdmin() || User.hasPermission("manage_del_post");
         },
-        isFollower() {
-            return this.post?.user_id == User.getInfo()?.uid;
-        },
         canDelete() {
-            // 不是 1 楼 且 是超级管理 || 层主 || 楼主
-            return !this.isMaster && (this.isSuperAdmin || this.isFollower || this.isTopicAuthor);
+            if (this.isMaster || !User.isLogin()) return false;
+            if (this.type === "comment") {
+                return this.isSuperAdmin || this.isAuthor || this.isCommentToMyReply;
+            }
+            if (this.type === "reply") {
+                // 非管理员只能调用“删除我的主题下的回帖”接口，因此仅楼主可见。
+                return this.isSuperAdmin || this.isTopicAuthor;
+            }
+            return false;
         },
         // 是否为楼主
         isTopicAuthor() {
@@ -48,14 +54,10 @@ export default {
     methods: {
         onDeleteClick() {
             if (this.type === "comment") {
-                if (this.isAuthor || this.isSuperAdmin || this.isTopicAuthor) {
-                    if (this.isAuthor || this.isTopicAuthor) {
-                        this.delMyComment();
-                    }
-
-                    if (this.isSuperAdmin) {
-                        this.manageDeleteComment();
-                    }
+                if (this.isSuperAdmin) {
+                    this.manageDeleteComment();
+                } else if (this.isAuthor) {
+                    this.delMyComment();
                 } else if (this.isCommentToMyReply) {
                     this.delCommentToMyReply();
                 }
@@ -68,66 +70,88 @@ export default {
                 return;
             }
 
-            this.$message.success("未知的组件类型：" + this.type);
+            this.$message.success(
+                this.$t("pages.community.messages.unknownComponentType", { type: this.type })
+            );
         },
         delMyComment: function () {
-            this.$confirm("确认是否删除该评论？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(
+                this.$t("pages.community.dialogs.deleteCommentConfirm"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
-            }).then(() => {
+                }
+            ).then(() => {
                 delMyComment(this.post.id).then(() => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.community.messages.deleteSuccess"));
                     this.getCommentList({ index: 1 });
                 });
             });
         },
         delReplyToMyTopic: function () {
-            this.$confirm("确认是否删除该回帖？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(
+                this.$t("pages.community.dialogs.deleteReplyConfirm"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
-            }).then(() => {
+                }
+            ).then(() => {
                 delReplyToMyTopic(this.topicData.id, this.post.id).then(() => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.community.messages.deleteSuccess"));
                     // 调用父组件的方法，刷新回到第一页
                     this.onSearch();
                 });
             });
         },
         delCommentToMyReply: function () {
-            this.$confirm("确认是否删除该评论？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(
+                this.$t("pages.community.dialogs.deleteCommentConfirm"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
-            }).then(() => {
+                }
+            ).then(() => {
                 delCommentToMyReply(this.post.topic_reply_id, this.post.id).then(() => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.community.messages.deleteSuccess"));
                     // 调用父组件的方法，刷新回到第一页
                     this.getCommentList({ index: 1 });
                 });
             });
         },
         manageDeleteComment: function () {
-            this.$confirm("确认是否删除该评论？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(
+                this.$t("pages.community.dialogs.deleteCommentConfirm"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
-            }).then(() => {
+                }
+            ).then(() => {
                 manageDelComment(this.post.id).then(() => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.community.messages.deleteSuccess"));
                     this.getCommentList({ index: 1 });
                 });
             });
         },
         manageDeleteReply: function () {
-            this.$confirm("确认是否删除该回帖？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(
+                this.$t("pages.community.dialogs.deleteReplyConfirm"),
+                this.$t("pages.community.common.promptTitle"),
+                {
+                confirmButtonText: this.$t("pages.community.common.confirm"),
+                cancelButtonText: this.$t("pages.community.common.cancel"),
                 type: "warning",
-            }).then(() => {
+                }
+            ).then(() => {
                 manageDelReply(this.post.id).then(() => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.community.messages.deleteSuccess"));
                     this.onSearch();
                 });
             });

@@ -1,7 +1,7 @@
 <template>
     <a :href="publish_link" class="u-publish el-button el-button--primary el-button--medium">
         <i class="el-icon-edit-outline"></i>
-        <span>发布</span>
+        <span>{{ $t("pages.community.common.publish") }}</span>
     </a>
 </template>
 

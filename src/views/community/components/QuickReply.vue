@@ -1,15 +1,15 @@
 <template>
     <div class="c-jx3box-reply">
         <el-popover
+            v-model:visible="visible"
             :visible-arrow="true"
             placement="top"
-            ref="quickReply"
             trigger="click"
             popper-class="c-jx3box-reply-pop"
         >
             <div class="c-jx3box-reply-pop__content">
                 <i class="el-icon-close u-close" @click="closePop"></i>
-                <div class="u-title">快捷回复</div>
+                <div class="u-title">{{ $t("pages.community.reply.quickReply") }}</div>
                 <div class="m-reply-list">
                     <div
                         class="m-reply-list__item"
@@ -27,7 +27,7 @@
                     width="24"
                     height="24"
                     src="@/assets/img/community/comment.svg"
-                    alt="comment"
+                    :alt="$t('pages.community.reply.commentAlt')"
                 />
             </template>
         </el-popover>
@@ -39,21 +39,21 @@ export default {
     name: "QuickReply",
     data() {
         return {
-            replyTemplate: [
-                "真不错，谢谢楼主#胜利#笨猪#胜利",
-                "辛苦了，感谢楼主的付出",
-                "谢谢楼主，很有用",
-                "剑三真好玩，魔盒真好用",
-            ],
+            visible: false,
         };
+    },
+    computed: {
+        replyTemplate() {
+            return [1, 2, 3, 4].map((index) =>
+                this.$t(`pages.community.reply.quickReplyOption${index}`)
+            );
+        },
     },
     emits: ["reply"],
     methods: {
         // 关闭弹窗
         closePop() {
-            if (this.$refs.quickReply) {
-                this.$refs.quickReply.doClose();
-            }
+            this.visible = false;
         },
         reply(item) {
             this.$emit("reply", item);

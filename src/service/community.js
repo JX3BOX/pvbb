@@ -4,6 +4,7 @@ import { __cdn } from "@/utils/config";
 
 const API_PREFIX = `/api/next2`;
 const gs_url = process.env.NODE_ENV === "development" ? "" : "https://gs.jx3box.com";
+let skinJsonRequest = null;
 // 获取分类
 function getTopicBucket(params) {
     return $cms().get(`/api/cms/topic/bucket`, { params });
@@ -108,8 +109,14 @@ function manageDelReply(id) {
 }
 
 function getSkinJson() {
-    let url = __cdn + `design/decoration/community_skin.json?${Date.now()}`;
-    return axios.get(url);
+    if (!skinJsonRequest) {
+        const url = __cdn + "design/decoration/community_skin.json";
+        skinJsonRequest = axios.get(url).catch((error) => {
+            skinJsonRequest = null;
+            throw error;
+        });
+    }
+    return skinJsonRequest;
 }
 
 export {

@@ -2,7 +2,7 @@
     <el-dialog
         :model-value="modelValue"
         @close="onClose"
-        title="打赏记录"
+        :title="$t('pages.community.single.rewardRecords')"
         width="1002px"
         append-to-body
         destroy-on-close

@@ -5,7 +5,7 @@
                 <!--  楼主 -->
                 <div class="m-master-box">
                     <ReplyItem
-                        v-if="this.page === 1"
+                        v-if="this.page === 1 && post.id"
                         :null-tip="null_tip"
                         :isMaster="true"
                         :post="post"
@@ -47,7 +47,7 @@
                 <div class="m-reply-box">
                     <ReplyItem
                         v-for="(item, i) in replyList"
-                        :key="i"
+                        :key="item.id"
                         :post="item"
                         :is-master="false"
                         :is-author="isAuthor"
@@ -68,10 +68,14 @@
                     :link="!hasNextPage"
                     @click="nextPage"
                     :loading="loading"
-                    :disabled="!hasNextPage"
+                    :disabled="!hasNextPage || loading"
                     :icon="hasNextPage ? 'ArrowDown' : ''"
                 >
-                    {{ hasNextPage ? "下一页" : "没有更多了" }}
+                    {{
+                        hasNextPage
+                            ? $t("pages.community.common.nextPage")
+                            : $t("pages.community.common.noMore")
+                    }}
                 </el-button>
 
                 <div class="m-pagination-box">
@@ -86,14 +90,19 @@
                     ></el-pagination>
                 </div>
                 <div class="u-editor">
-                    <el-divider content-position="left">回帖</el-divider>
+                    <el-divider content-position="left">{{ $t("pages.community.single.replySection") }}</el-divider>
                     <CommentEditor
+                        ref="footerEditor"
                         @submit="onReplyTopic"
                         v-if="!isDisabledComment"
                         :class="{ 'c-comment-mask': comment_strict }"
+                        :submitting="replySubmitting"
+                        :is-login="isLogin"
+                        :initial-content="replyDraftContent"
+                        :initial-mentions="replyDraftMentions"
                     />
                     <el-alert :show-close="false" center v-else class="m-disabled-comment-tip"
-                        >作者已关闭回帖功能</el-alert
+                        >{{ $t("pages.community.single.commentsClosed") }}</el-alert
                     >
                 </div>
             </div>
@@ -101,7 +110,7 @@
 
         <Homework
             v-model="showHomeWork"
-            title="答谢"
+            :title="$t('pages.community.single.thanksDialogTitle')"
             :postType="postType"
             :postId="postId"
             :client="postClient"
@@ -117,8 +126,18 @@
             :client="postClient"
         ></boxCoinRecords>
 
-        <el-dialog v-model="showComment" title="快捷回复" :width="isPhone ? '95%' : ''">
-            <CommentEditor @submit="onReplyTopic" :class="{ 'c-comment-mask': comment_strict }"></CommentEditor>
+        <el-dialog
+            v-model="showComment"
+            :title="$t('pages.community.single.quickReplyDialogTitle')"
+            :width="isPhone ? '95%' : ''"
+        >
+            <CommentEditor
+                ref="dialogEditor"
+                @submit="onReplyTopic"
+                :class="{ 'c-comment-mask': comment_strict }"
+                :submitting="replySubmitting"
+                :is-login="isLogin"
+            ></CommentEditor>
         </el-dialog>
 
         <go-to-top-or-bottom />
@@ -151,11 +170,22 @@ import { atAuthors } from "@/service/pay";
 import Collection from "@jx3box/jx3box-ui/src/single/Collection.vue";
 import renderJx3Element from "@jx3box/jx3box-editor/src/assets/js/jx3_element";
 import Author from "@jx3box/jx3box-editor/src/components/Author.vue";
-import { __visibleMap } from "@/utils/config";
 import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
 import { getConfig } from "@jx3box/jx3box-common/js/system";
+import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 
 const appKey = "community";
+const siteClient = location.hostname.split(".").includes("origin") ? "origin" : "std";
+const supportedPostClients = new Set(["std", "origin", "wujie"]);
+const REPLY_DRAFT_PREFIX = "jx3box:pvbb:community:draft:";
+const visibilityKeys = {
+    0: "public",
+    1: "private",
+    2: "friends",
+    3: "password",
+    4: "paid",
+    5: "followers",
+};
 
 export default {
     components: {
@@ -190,6 +220,15 @@ export default {
             replyList: [],
             categoryList: [],
             loading: false,
+            currentReplyRequest: null,
+            currentReplyRequestKey: "",
+            replyRequestVersion: 0,
+            detailRequestVersion: 0,
+            routeReady: false,
+            componentActive: true,
+            replySubmitting: false,
+            replyDraftContent: "",
+            replyDraftMentions: [],
             onlyAuthor: false,
             number_queries: ["per", "page"],
             mode: null,
@@ -223,6 +262,8 @@ export default {
             },
 
             password: "",
+            thxHandler: null,
+            boxcoinHandler: null,
         };
     },
     computed: {
@@ -251,7 +292,17 @@ export default {
             return window.innerWidth < 768;
         },
         isAdminMode() {
-            return this.mode === "admin" || (this.isSuper && this.$route.query.from === "admin");
+            return this.isSuper && (this.mode === "admin" || this.$route.query.from === "admin");
+        },
+        isLogin() {
+            return User.isLogin();
+        },
+        replyClient() {
+            const queryClient = this.$route.query.client;
+            if (typeof queryClient === "string" && supportedPostClients.has(queryClient)) {
+                return queryClient;
+            }
+            return supportedPostClients.has(this.post?.client) ? this.post.client : siteClient;
         },
         // 是否显示加载更多
         hasNextPage: function () {
@@ -264,10 +315,11 @@ export default {
             return this.post?.collection_collapse;
         },
         null_tip: function () {
-            let str = "作者设置了【";
-            str += __visibleMap[this.post?.visible];
-            str += "】";
-            return str;
+            const visibilityKey = visibilityKeys[this.post?.visible];
+            const visibility = visibilityKey
+                ? this.$t(`pages.community.visibility.${visibilityKey}`)
+                : this.post?.visible;
+            return this.$t("pages.community.visibility.authorRestricted", { visibility });
         },
         visible: function () {
             return !!this.post?.visible_validate;
@@ -278,39 +330,57 @@ export default {
     },
     created() {
         this.getJumpFloor();
+        this.restoreReplyDraft();
     },
     mounted() {
-        if (!this.id) return this.$message.error("文章id不存在");
-        this.getDetails();
-        Promise.resolve(this.getReplyList()).then(() => {
-            this.$nextTick(() => {
-                renderJx3Element(this);
+        if (!this.id) return this.$message.error(this.$t("pages.community.messages.missingTopicId"));
+        this.routeReady = true;
+        Promise.resolve(this.getDetails())
+            .then(() => (this.componentActive ? this.getReplyList() : null))
+            .then(() => {
+                if (!this.componentActive) return;
+                this.$nextTick(() => {
+                    renderJx3Element(this);
+                });
             });
-        });
 
         getConfig({
             key: "comment_strict",
-        }).then((res) => {
-            if (res.data.data?.val == 1) {
-                if (User.isLogin()) {
-                    this.comment_strict = User.getInfo().group < 16;
+        })
+            .then((res) => {
+                if (!this.componentActive) return;
+                if (res.data.data?.val == 1) {
+                    if (User.isLogin()) {
+                        this.comment_strict = User.getInfo().group < 16;
+                    }
                 }
-            }
-        });
+            })
+            .catch(() => {});
 
         // 打赏
-        bus.on("onThx", (data) => {
+        this.thxHandler = (data) => {
             this.postType = data.postType;
             this.postId = data.postId;
             this.postUserId = data.postUserId;
             this.showHomeWork = true;
-        });
+        };
+        bus.on("onThx", this.thxHandler);
 
-        bus.on("boxcoin-click", (data) => {
+        this.boxcoinHandler = (data) => {
             this.postType = data.postType;
             this.postId = data.postId;
             this.showBoxCoin = true;
-        });
+        };
+        bus.on("boxcoin-click", this.boxcoinHandler);
+    },
+    beforeUnmount() {
+        this.componentActive = false;
+        ++this.detailRequestVersion;
+        ++this.replyRequestVersion;
+        this.currentReplyRequest = null;
+        this.currentReplyRequestKey = "";
+        if (this.thxHandler) bus.off("onThx", this.thxHandler);
+        if (this.boxcoinHandler) bus.off("boxcoin-click", this.boxcoinHandler);
     },
     watch: {
         // 加载路由参数
@@ -318,33 +388,41 @@ export default {
             deep: true,
             immediate: true,
             handler: function (query) {
-                if (Object.keys(query).length) {
-                    for (let key in query) {
-                        // for:element分页组件兼容性问题
-                        if (this.number_queries.includes(key)) {
-                            this[key] = ~~query[key];
-                        } else {
-                            this[key] = query[key];
-                        }
-                    }
+                const nextPage = Math.min(100000, Math.max(1, Number(query.page) || 1));
+                const nextOnlyAuthor = query.onlyAuthor === true || query.onlyAuthor === "true";
+                const shouldReload = this.page !== nextPage || this.onlyAuthor !== nextOnlyAuthor;
+                this.page = nextPage;
+                this.onlyAuthor = nextOnlyAuthor;
+                if (this.routeReady && shouldReload) {
+                    this.getReplyList();
                 }
             },
         },
     },
     methods: {
-        getErrorMessage(error, fallback = "请求失败，请稍后再试") {
-            return error?.response?.data?.msg || error?.response?.data?.message || error?.message || fallback;
+        getErrorMessage(error, fallback) {
+            return (
+                error?.response?.data?.msg ||
+                error?.response?.data?.message ||
+                error?.message ||
+                fallback ||
+                this.$t("pages.community.messages.requestFailed")
+            );
         },
         /**
          * 获取url楼诚参数
          */
         getJumpFloor: function () {
-            const hash = window.location.hash;
-            const floor = hash.substring(1).split("?")[0];
+            const floor = this.getHashFloor();
             if (floor) {
                 this.floor = floor;
-                this.page = Math.ceil((floor - 1) / this.per);
+                this.page = Math.ceil(floor / this.per);
             }
+        },
+        getHashFloor() {
+            const hash = window.location.hash;
+            const floor = Number.parseInt(hash.replace(/^#(?:floor-)?/, "").split("?")[0], 10);
+            return Number.isFinite(floor) && floor >= 1 ? floor : 0;
         },
         /**
          * 跳转到指定楼层
@@ -353,11 +431,37 @@ export default {
         jumpFloor(floor) {
             const _floor = floor || this.floor;
             this.$nextTick(() => {
-                const el = document.getElementById("floor-" + _floor);
-                if (el) {
-                    el.scrollIntoView();
-                    window.scrollBy(0, -120); // 额外滚动
-                }
+                const positionFloor = () => {
+                    if (!this.componentActive) return;
+                    const el = document.getElementById("floor-" + _floor);
+                    if (!el) return;
+                    const top = window.scrollY + el.getBoundingClientRect().top - 120;
+                    // 全局启用了 smooth scroll，连续 scrollIntoView/scrollBy 会互相取消。
+                    window.scrollTo({ top: Math.max(0, top), behavior: "instant" });
+                    this.floor = 0;
+                };
+                // 等浏览器完成 hash 的默认定位，再扣除顶部固定区域的高度。
+                window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(() => {
+                        positionFloor();
+                        const pendingImages = Array.from(document.querySelectorAll("#floor-0 img")).filter(
+                            (img) => !img.complete
+                        );
+                        if (!pendingImages.length) return;
+                        const imageSettled = Promise.all(
+                            pendingImages.map(
+                                (img) =>
+                                    new Promise((resolve) => {
+                                        img.addEventListener("load", resolve, { once: true });
+                                        img.addEventListener("error", resolve, { once: true });
+                                    })
+                            )
+                        );
+                        Promise.race([imageSettled, new Promise((resolve) => window.setTimeout(resolve, 1500))]).then(
+                            () => window.requestAnimationFrame(positionFloor)
+                        );
+                    });
+                });
             });
         },
         // 翻页按钮
@@ -397,6 +501,7 @@ export default {
             return this.post;
         },
         getDetails: function () {
+            const requestVersion = ++this.detailRequestVersion;
             let fun = getTopicDetails;
             if (this.isAdminMode) {
                 fun = getTopicDetailsFromAdmin;
@@ -407,9 +512,10 @@ export default {
             }
             return fun(this.id, params)
                 .then((res) => {
+                    if (requestVersion !== this.detailRequestVersion) return null;
                     this.post = res.data.data;
 
-                    document.title = this.post.title + this.$t("pages.common.appendTitle");
+                    this.updateDocumentTitle();
 
                     getStat(appKey, this.id).then((res) => {
                         this.stat = res.data;
@@ -424,7 +530,7 @@ export default {
                             link: location.href,
                             title: this.post.title,
                             author_id: this.post.user_id,
-                            banner: this.post.banner_img,
+                            banner: resolveImagePath(this.post.banner_img),
                             content_meta_id: this.post.link_content_meta_id,
                         });
 
@@ -436,25 +542,37 @@ export default {
                                 subcategory: "default",
                                 visible_type: ~~this.post.visible,
                                 author_id: this.post.user_id,
-                                banner: this.post.banner_img,
+                                banner: resolveImagePath(this.post.banner_img),
                                 contentMetaId: this.post.link_content_meta_id,
                             });
                     }
                 })
                 .catch((error) => {
-                    this.$message.error(this.getErrorMessage(error, "获取帖子详情失败"));
+                    if (requestVersion === this.detailRequestVersion) {
+                        this.$message.error(
+                            this.getErrorMessage(error, this.$t("pages.community.messages.topicLoadFailed"))
+                        );
+                    }
                     return null;
                 });
         },
         getReplyList: function (appendMode) {
             const previousPage = this.page;
-            this.loading = true;
             if (appendMode) {
                 this.page += 1;
             }
             const params = this.buildQuery();
-            return getTopicReplyList(this.id, params)
+            const requestKey = JSON.stringify(params);
+            if (this.currentReplyRequestKey === requestKey && this.currentReplyRequest) {
+                return this.currentReplyRequest;
+            }
+
+            const requestVersion = ++this.replyRequestVersion;
+            this.loading = true;
+            this.currentReplyRequestKey = requestKey;
+            const request = getTopicReplyList(this.id, params)
                 .then(async (res) => {
+                    if (requestVersion !== this.replyRequestVersion) return;
                     var list = res.data.data.list;
                     const page = res.data.data.page;
                     if (list == null) {
@@ -462,10 +580,12 @@ export default {
                     } else {
                         // 把点赞数量请求过来填充进去
                         list = await this.getLikes(list);
+                        if (requestVersion !== this.replyRequestVersion) return;
                         this.replyList = list;
                         // 如果有楼层参数 跳转到指定楼层
-                        if (this.floor) {
-                            this.jumpFloor();
+                        const hashFloor = this.getHashFloor();
+                        if (hashFloor) {
+                            this.jumpFloor(hashFloor);
                         }
                     }
                     this.total = page.total;
@@ -475,17 +595,27 @@ export default {
                     });
                 })
                 .catch((error) => {
-                    if (appendMode) {
+                    if (appendMode && requestVersion === this.replyRequestVersion) {
                         this.page = previousPage;
                     }
-                    // this.$message.error(this.getErrorMessage(error, "获取回复列表失败"));
+                    if (requestVersion === this.replyRequestVersion) {
+                        this.$message.error(
+                            this.getErrorMessage(error, this.$t("pages.community.messages.repliesLoadFailed"))
+                        );
+                    }
                     return null;
                 })
                 .finally(() => {
-                    this.loading = false;
+                    if (requestVersion === this.replyRequestVersion) {
+                        this.loading = false;
+                        this.currentReplyRequest = null;
+                    }
                 });
+            this.currentReplyRequest = request;
+            return request;
         },
         async getLikes(replyList) {
+            if (!replyList.length) return replyList;
             const ids = replyList.map((item) => `community_reply-${item.id}`);
             let id = ids.join(",");
             let list = [];
@@ -506,34 +636,121 @@ export default {
             return list;
         },
         /** 回帖 */
-        onReplyTopic({ attachmentList, content, atUsers }) {
-            if (!this.id) return this.$message.error("文章id不存在");
+        onReplyTopic(payload = {}) {
+            if (this.replySubmitting) return;
+            if (this.isDisabledComment) {
+                return this.$message.warning(this.$t("pages.community.single.commentsClosed"));
+            }
+            if (!this.id) return this.$message.error(this.$t("pages.community.messages.missingTopicId"));
+            if (!User.isLogin()) {
+                if (this.saveReplyDraft(payload)) {
+                    User.toLogin(location.href);
+                } else {
+                    this.$refs.footerEditor?.unlock?.();
+                    this.$refs.dialogEditor?.unlock?.();
+                }
+                return;
+            }
+
+            this.saveReplyDraft(payload, { silent: true });
+            let { attachmentList = [], content = "", atUsers = [] } = payload;
             // 拼接图片列表到 content 中
             if (attachmentList && attachmentList.length) {
                 const imageTags = attachmentList
-                    .map((image) => `<p><img class='attachment' src="${image}" /></p>`)
+                    .map((image) => `<p><img class='attachment' src="${resolveImagePath(image)}" /></p>`)
                     .join("");
                 content += imageTags;
             }
-            replyTopic(this.id, {
-                client: location.href.includes("origin") ? "origin" : "std",
+            this.replySubmitting = true;
+            return replyTopic(this.id, {
+                client: this.replyClient,
                 content: content,
-            }).then((res) => {
-                this.onReplyTopicSuccess(res.data.data);
-                this.showComment = false;
-                this.noticeMentionsUser(atUsers);
-            });
+            })
+                .then((res) => {
+                    this.onReplyTopicSuccess(res.data.data);
+                    this.showComment = false;
+                    this.clearReplyDraft();
+                    this.$refs.footerEditor?.reset?.();
+                    this.$refs.dialogEditor?.reset?.();
+                    this.noticeMentionsUser(atUsers);
+                })
+                .catch((error) => {
+                    this.$message.error(
+                        this.getErrorMessage(error, this.$t("pages.community.messages.replyFailed"))
+                    );
+                })
+                .finally(() => {
+                    this.replySubmitting = false;
+                });
+        },
+        getReplyDraftKey() {
+            return `${REPLY_DRAFT_PREFIX}${this.id}:topic`;
+        },
+        normalizeReplyDraftMentions(mentions) {
+            return (Array.isArray(mentions) ? mentions : [])
+                .map((item) => ({
+                    ID: Number(item?.ID),
+                    display_name: String(item?.display_name || ""),
+                }))
+                .filter((item) => Number.isInteger(item.ID) && item.ID > 0 && item.display_name);
+        },
+        saveReplyDraft(payload = {}, { silent = false } = {}) {
+            const content = String(payload.draftContent ?? payload.content ?? "");
+            const mentions = this.normalizeReplyDraftMentions(payload.draftMentions ?? payload.atUsers);
+            try {
+                sessionStorage.setItem(
+                    this.getReplyDraftKey(),
+                    JSON.stringify({
+                        version: 1,
+                        topicId: String(this.id),
+                        content,
+                        mentions,
+                        updatedAt: Date.now(),
+                    })
+                );
+                return true;
+            } catch (_) {
+                if (!silent) {
+                    this.$message.error(this.$t("pages.community.messages.replyDraftSaveFailed"));
+                }
+                return false;
+            }
+        },
+        restoreReplyDraft() {
+            try {
+                const raw = sessionStorage.getItem(this.getReplyDraftKey());
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                if (draft?.version !== 1 || String(draft.topicId) !== String(this.id)) {
+                    sessionStorage.removeItem(this.getReplyDraftKey());
+                    return;
+                }
+                this.replyDraftContent = String(draft.content || "");
+                this.replyDraftMentions = this.normalizeReplyDraftMentions(draft.mentions);
+            } catch (_) {
+                try {
+                    sessionStorage.removeItem(this.getReplyDraftKey());
+                } catch (_) {}
+            }
+        },
+        clearReplyDraft() {
+            try {
+                sessionStorage.removeItem(this.getReplyDraftKey());
+            } catch (_) {}
+            this.replyDraftContent = "";
+            this.replyDraftMentions = [];
         },
         // 通知at用户
         noticeMentionsUser(atUsers) {
-            const ids = atUsers.map((item) => item.ID);
+            const ids = (atUsers || []).map((item) => item.ID).filter(Boolean);
+            if (!ids.length) return;
             const userInfo = User.getInfo();
             atAuthors({
                 sendUserId: userInfo.uid,
                 accessUserId: ids.join(","),
                 postId: this.id,
                 postType: "community",
-            });
+            }).catch(() => {});
         },
         /**
          * 回复成功后的操作
@@ -541,7 +758,10 @@ export default {
          * 如果当前的回复条数已经超过一页，可以直接跳转到最后一页
          */
         onReplyTopicSuccess(data) {
-            if (this.replyList.length + 1 <= this.per) {
+            const nextTotal = this.total + 1;
+            const lastPage = Math.max(1, Math.ceil(nextTotal / this.per));
+            this.total = nextTotal;
+            if (this.page === lastPage && this.replyList.length < this.per) {
                 const userInfo = User.getInfo();
                 this.replyList.push({
                     ...data,
@@ -555,8 +775,7 @@ export default {
                     window.scrollTo(0, document.body.scrollHeight);
                 });
             } else {
-                this.total = this.total + 1;
-                this.page = Math.ceil((this.total + 1) / this.per);
+                this.page = lastPage;
                 this.$nextTick(() => {
                     this.getReplyList().finally(() => {
                         window.scrollTo(0, document.body.scrollHeight);
@@ -570,14 +789,23 @@ export default {
         },
         // 路由绑定
         replaceRoute: function (extend) {
+            const query = Object.assign({}, this.$route.query, extend);
+            if (this.isSameRouteQuery(query)) return Promise.resolve();
             return this.$router
-                .push({ name: this.$route.name, query: Object.assign({}, this.$route.query, extend) })
+                .push({ name: this.$route.name, query, hash: this.$route.hash })
                 .then(() => {
                     window.scrollTo(0, 0);
                 })
                 .catch((err) => {});
         },
+        isSameRouteQuery(query) {
+            return (
+                Object.keys(query).length === Object.keys(this.$route.query).length &&
+                Object.keys(query).every((key) => `${query[key]}` === `${this.$route.query[key]}`)
+            );
+        },
         handleReplyTopic() {
+            if (!this.ensureLogin()) return;
             // 展示快捷回复弹窗
             this.showComment = true;
         },
@@ -609,6 +837,15 @@ export default {
         changeTopPage(page) {
             this.page = page;
             this.getReplyList();
+        },
+        ensureLogin() {
+            if (User.isLogin()) return true;
+            this.$message.warning(this.$t("pages.community.messages.loginRequired"));
+            return false;
+        },
+        updateDocumentTitle() {
+            if (!this.post?.title) return;
+            document.title = `${this.post.title} ${this.$t("pages.common.appendTitle")}`;
         },
     },
 };

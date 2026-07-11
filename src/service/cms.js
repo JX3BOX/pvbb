@@ -2,6 +2,8 @@ import axios from "axios";
 import { $cms } from "@jx3box/jx3box-common/js/api";
 import { __cdn } from "@/utils/config";
 
+const decorationRequests = new Map();
+
 function getMenu(key) {
     return $cms().get(`/api/cms/config/menu/${key}`);
 }
@@ -21,9 +23,23 @@ const getConfigBanner = (params) => {
 
 //获取装扮
 function getDecoration(params) {
-    return $cms().get(`/api/cms/user/decoration`, {
-        params,
-    });
+    const requestKey = JSON.stringify(
+        Object.keys(params || {})
+            .sort()
+            .reduce((result, key) => {
+                result[key] = params[key];
+                return result;
+            }, {})
+    );
+    if (decorationRequests.has(requestKey)) {
+        return decorationRequests.get(requestKey);
+    }
+
+    const request = $cms()
+        .get(`/api/cms/user/decoration`, { params })
+        .finally(() => decorationRequests.delete(requestKey));
+    decorationRequests.set(requestKey, request);
+    return request;
 }
 
 function getDecorationJson() {

@@ -3,16 +3,20 @@
         <div class="m-reply-left">
             <CommentUser :uid="userInfo.id" :isMaster="isMaster" :isAnonymous="isAnonymous" />
             <div class="u-top-right u-mobile-show">
-                <div class="u-floor">{{ isMaster ? "楼主" : "#" + post.floor }}</div>
+                <div class="u-floor">
+                    {{ isMaster ? $t("pages.community.single.topicAuthor") : "#" + post.floor }}
+                </div>
                 <div class="m-reply-time">{{ showTime }}</div>
             </div>
         </div>
-        <div class="m-reply-right">
+        <div class="m-reply-right" :class="{ 'has-comment-decoration': hasCommentDecoration }">
             <slot name="header"></slot>
             <div class="m-reply-content">
                 <div class="u-reply-floor u-mobile-hidden">
                     <a :href="`#floor-${post.floor || 0}`" @click="onFloorClick">{{
-                        isMaster ? "楼主" : post.floor + "楼"
+                        isMaster
+                            ? $t("pages.community.single.topicAuthor")
+                            : $t("pages.community.single.floor", { floor: post.floor })
                     }}</a>
                     <span class="u-comment-time u-mobile-hidden">{{ post.updated_at }}</span>
                     <div class="u-reply-op">
@@ -24,20 +28,24 @@
                             icon="Edit"
                             size="small"
                             type="primary"
-                            >编辑</el-button
+                            >{{ $t("pages.community.reply.edit") }}</el-button
                         >
                     </div>
                 </div>
                 <span class="u-boxcoin" v-if="!isMaster && (isLogin || boxCoinTotal)">
                     <el-button v-if="isLogin && !isMaster" class="u-mobile-hidden" link @click="onThx" size="small">
                         <span class="u-thx">
-                            <img src="@/assets/img/community/thx.webp" alt="答谢" />
-                            答谢
+                            <img
+                                src="@/assets/img/community/thx.webp"
+                                :alt="$t('pages.community.reply.thanks')"
+                            />
+                            {{ $t("pages.community.reply.thanks") }}
                         </span>
                     </el-button>
                     <span class="u-boxcoin-total" v-if="boxCoinTotal" @click.stop="onBoxcoinClick">
                         <!-- <img class="u-boxcoin-img" src="~@/assets/img/community/like4.png" alt="" /> -->
-                        收到<span class="u-boxcoin-num">{{ boxCoinTotal }}</span
+                        {{ $t("pages.community.single.boxcoinReceived")
+                        }}<span class="u-boxcoin-num">{{ boxCoinTotal }}</span
                         ><i class="el-icon-coin"></i>
                     </span>
                 </span>
@@ -49,24 +57,28 @@
                         <el-alert type="warning" show-icon v-if="post.visible > 1 && post.visible != 3">
                             <template #title>
                                 <span>{{ nullTip }}</span>
-                                <a class="u-pwd-text" v-if="isLogin" @click="enterPwd">输入密码</a>
+                                <a class="u-pwd-text" v-if="isLogin" @click="enterPwd">{{
+                                    $t("pages.community.reply.enterPassword")
+                                }}</a>
                             </template>
                         </el-alert>
 
                         <template v-if="post.visible == 3">
                             <div class="m-pwd-box">
                                 <i class="u-pwd-icon el-icon-lock"></i>
-                                <div class="u-pwd-tip">作者设置了密码可见</div>
+                                <div class="u-pwd-tip">{{ $t("pages.community.reply.passwordProtected") }}</div>
                                 <el-input
                                     v-model="password"
-                                    placeholder="请输入密码"
+                                    :placeholder="$t('pages.community.reply.passwordPlaceholder')"
                                     show-password
                                     clearable
                                     class="u-pwd-input"
                                 >
-                                    <template #prepend>密码</template>
+                                    <template #prepend>{{ $t("pages.community.reply.passwordLabel") }}</template>
                                 </el-input>
-                                <el-button class="u-pwd-btn" type="primary" @click="enterPwd">确认</el-button>
+                                <el-button class="u-pwd-btn" type="primary" @click="enterPwd">{{
+                                    $t("pages.community.common.confirm")
+                                }}</el-button>
                             </div>
                         </template>
                     </div>
@@ -75,7 +87,11 @@
 
                     <div v-if="extraImages && extraImages.length && isMaster && isFromPhone" class="m-image-box">
                         <a class="u-item" v-for="(item, index) in extraImages" :key="index">
-                            <el-image :src="getSquareBanner(item)" fit="fill" :preview-src-list="[item]" />
+                            <el-image
+                                :src="getSquareBanner(item)"
+                                fit="fill"
+                                :preview-src-list="[resolveImagePath(item)]"
+                            />
                         </a>
                     </div>
                 </div>
@@ -94,7 +110,7 @@
                     category="community"
                     showRss
                     :author-id="post.user_id"
-                    :banner="post.banner_img"
+                    :banner="resolveImagePath(post.banner_img)"
                     :contentMetaId="post.link_content_meta_id"
                     :allowGift="Number(!isDisableBoxcoin)"
                 />
@@ -113,11 +129,15 @@
                             :class="{ 'is-disabled': isDisabledComment && isMaster }"
                             :style="styles"
                             @click="onShowReply"
-                            :disabled="isDisabledComment && isMaster"
+                            :disabled="!isLogin || isDisabledComment"
                         >
                             <div class="u-btn">
                                 <img src="@/assets/img/community/reply.svg" alt="" />
-                                <span>{{ isMaster ? "跟帖" : "回复" }}</span>
+                                <span>{{
+                                    isMaster
+                                        ? $t("pages.community.reply.followup")
+                                        : $t("pages.community.reply.reply")
+                                }}</span>
                             </div>
                         </el-button>
                         <el-button
@@ -130,7 +150,7 @@
                         >
                             <div class="u-btn">
                                 <img src="@/assets/img/community/praise.svg" alt="" />
-                                <span>赞</span>
+                                <span>{{ $t("pages.community.reply.like") }}</span>
                                 <span>{{ likeCountRender }}</span>
                             </div>
                         </el-button>
@@ -147,12 +167,12 @@
                                     </el-dropdown-item>
                                     <el-dropdown-item v-if="!isMaster && (isSuper || isFollower)">
                                         <el-button class="u-mobile-hidden" @click="onEdit" link icon="Edit"
-                                            >编辑</el-button
+                                            >{{ $t("pages.community.reply.edit") }}</el-button
                                         >
                                     </el-dropdown-item>
                                     <el-dropdown-item v-if="isLogin && !isMaster">
                                         <el-button class="u-mobile-hidden" link icon="Present" @click="onThx"
-                                            >答谢</el-button
+                                            >{{ $t("pages.community.reply.thanks") }}</el-button
                                         >
                                     </el-dropdown-item>
                                     <el-dropdown-item>
@@ -182,6 +202,8 @@
                     @hideForm="showReplyForReplyFrom = false"
                     @doReply="doReply"
                     :commentStrict="commentStrict"
+                    :current-id="post.id"
+                    :submitting="replySubmitting"
                 />
             </div>
 
@@ -189,16 +211,22 @@
             <div v-if="!isMaster && post.comments_count > 3" class="m-comment-collapse">
                 <div v-if="isCollapse" @click="onCollapseChange">
                     <img width="14" src="@/assets/img/community/collapse_1.svg" alt="" />
-                    <span>折叠评论</span>
+                    <span>{{ $t("pages.community.reply.collapseComments") }}</span>
                 </div>
                 <div v-else @click="onCollapseChange">
                     <img width="14" src="@/assets/img/community/collapse_2.svg" alt="" />
-                    <span>展开评论</span>
+                    <span>{{ $t("pages.community.reply.expandComments") }}</span>
                 </div>
             </div>
             <!-- 评论列表 -->
             <div v-if="!isMaster && commentList.length" class="m-comment-list">
-                <CommentItem v-for="item in commentList" :key="item.id" :post="item" :commonStrict="commentStrict" />
+                <CommentItem
+                    v-for="item in commentList"
+                    :key="item.id"
+                    :post="item"
+                    :comment-strict="commentStrict"
+                    @decoration-change="onCommentDecorationChange"
+                />
             </div>
 
             <!-- 分页 -->
@@ -218,7 +246,7 @@
 </template>
 
 <script>
-import { authorLink, editLink, getThumbnail } from "@jx3box/jx3box-common/js/utils";
+import { authorLink, editLink, getThumbnail, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { replyReply, getCommentList } from "@/service/community";
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
@@ -237,6 +265,7 @@ import ReplyForReply from "./ReplyForReply.vue";
 import CommentItem from "./CommentItem.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import { renderEmotionHTML } from "@/utils/jx3Emo";
+import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
 
 export default {
     name: "ReplyItem",
@@ -271,6 +300,7 @@ export default {
             renderContent: "",
             renderVersion: 0,
             commentList: [],
+            decoratedCommentIds: {},
 
             // summary
             summary: {
@@ -279,6 +309,8 @@ export default {
             },
 
             password: "",
+            replySubmitting: false,
+            commentRequestVersion: 0,
         };
     },
     computed: {
@@ -360,7 +392,10 @@ export default {
             return !!this.post?.disable_inspire_boxcoin;
         },
         isDisabledComment: function () {
-            return !!this.post?.disable_comment;
+            return !!this.getTopicData()?.disable_comment;
+        },
+        hasCommentDecoration: function () {
+            return Object.keys(this.decoratedCommentIds).length > 0;
         },
     },
     watch: {
@@ -372,11 +407,15 @@ export default {
         },
         post: {
             handler: async function () {
+                const requestVersion = ++this.commentRequestVersion;
                 this.commentList = [];
                 if (this.post.comments) {
-                    this.commentList = await this.getLikes(this.post.comments);
+                    const commentList = await this.getLikes(this.post.comments);
+                    if (requestVersion === this.commentRequestVersion) {
+                        this.commentList = commentList;
+                    }
                 }
-                if (this.post) {
+                if (!this.isMaster && this.post?.id) {
                     this.loadHomeworkBoxcoin();
                 }
             },
@@ -388,23 +427,40 @@ export default {
             },
             immediate: true,
         },
+        commentList: function (list) {
+            const visibleIds = new Set((list || []).map((item) => String(item.id)));
+            this.decoratedCommentIds = Object.fromEntries(
+                Object.entries(this.decoratedCommentIds).filter(([id]) => visibleIds.has(id))
+            );
+        },
     },
     methods: {
+        onCommentDecorationChange(commentId) {
+            if (!commentId) return;
+            this.decoratedCommentIds = {
+                ...this.decoratedCommentIds,
+                [commentId]: true,
+            };
+        },
         onCollapseChange() {
             if (this.isCollapse) {
+                ++this.commentRequestVersion;
                 this.commentList = this.post.comments;
+                this.isCollapse = false;
             } else {
                 this.page = 1;
+                this.isCollapse = true;
                 this.getList();
             }
-            this.isCollapse = !this.isCollapse;
         },
         getSquareBanner: function (val) {
-            if (val.indexOf("jx3box.com") >= 0) {
-                return getThumbnail(val, 48 * 2);
+            const image = resolveImagePath(val);
+            if (image.indexOf("jx3box.com") >= 0) {
+                return getThumbnail(image, 48 * 2);
             }
-            return val;
+            return image;
         },
+        resolveImagePath,
         authorLink,
         async formatContent(val) {
             const version = ++this.renderVersion;
@@ -412,7 +468,7 @@ export default {
             if (this.isMaster) {
                 const html = await renderEmotionHTML(val);
                 if (version === this.renderVersion) {
-                    this.renderContent = html;
+                    this.renderContent = resolveImagePath(sanitizeRichText(html));
                 }
                 return;
             }
@@ -430,10 +486,12 @@ export default {
             });
             const html = await renderEmotionHTML(val.replace(/ style="[^"]*"/gi, ""));
             if (version === this.renderVersion) {
-                this.renderContent = /<\w+[^>]*>/.test(html) ? html : html.replace(/\n/g, "<br />");
+                const rendered = /<\w+[^>]*>/.test(html) ? html : html.replace(/\n/g, "<br />");
+                this.renderContent = resolveImagePath(sanitizeRichText(rendered));
             }
         },
         onShowReply() {
+            if (!this.ensureLogin() || this.isDisabledComment) return;
             if (this.isMaster) {
                 // window.scrollTo(0, document.body.scrollHeight);
                 this.$emit("onReplyTopic");
@@ -442,21 +500,31 @@ export default {
             }
         },
         doReply({ content }) {
+            if (!this.ensureLogin() || this.replySubmitting) return;
             const id = this.$route.params.id;
             const replyId = this.post.id;
             if (id && replyId && this.userId) {
-                replyReply(id, replyId, {
+                this.replySubmitting = true;
+                return replyReply(id, replyId, {
                     content: content,
                     reply_for_user_id: this.userId,
                 })
                     .then(() => {
                         this.getList();
+                        this.showReplyForReplyFrom = false;
+                    })
+                    .catch((error) => {
+                        this.$message.error(
+                            error?.response?.data?.msg ||
+                                error?.message ||
+                                this.$t("pages.community.messages.replyFailed")
+                        );
                     })
                     .finally(() => {
-                        this.showReplyForReplyFrom = false;
+                        this.replySubmitting = false;
                     });
             } else {
-                this.$message.error("回复失败：数据不正确");
+                this.$message.error(this.$t("pages.community.messages.invalidReplyData"));
             }
         },
         changePage() {
@@ -467,23 +535,37 @@ export default {
             const id = this.id;
             const replyId = this.post.id;
             if (id && replyId) {
-                getCommentList(id, replyId, {
+                const requestVersion = ++this.commentRequestVersion;
+                return getCommentList(id, replyId, {
                     index: this.page,
                     pageSize: this.per,
                     ...postData,
-                }).then(async (res) => {
-                    var list = res.data.data.list;
+                })
+                    .then(async (res) => {
+                        if (requestVersion !== this.commentRequestVersion) return;
+                        var list = res.data.data.list;
 
-                    if (list) {
-                        this.commentList = await this.getLikes(list);
-                        this.isCollapse = true;
-                    } else {
-                        this.commentList = [];
-                    }
-                    this.page = res.data.data.page.index;
-                    this.total = res.data.data.page.total;
-                    this.current = res.data.data.page.current;
-                });
+                        if (list) {
+                            const commentList = await this.getLikes(list);
+                            if (requestVersion !== this.commentRequestVersion) return;
+                            this.commentList = commentList;
+                            this.isCollapse = true;
+                        } else {
+                            this.commentList = [];
+                        }
+                        this.page = res.data.data.page.index;
+                        this.total = res.data.data.page.total;
+                        this.current = res.data.data.page.current;
+                    })
+                    .catch((error) => {
+                        if (requestVersion !== this.commentRequestVersion) return;
+                        this.isCollapse = false;
+                        this.$message.error(
+                            error?.response?.data?.msg ||
+                                error?.message ||
+                                this.$t("pages.community.messages.repliesLoadFailed")
+                        );
+                    });
             }
         },
         // 点赞
@@ -500,6 +582,7 @@ export default {
             this.isLike = true;
         },
         async getLikes(commentList) {
+            if (!commentList.length) return commentList;
             const id = commentList.map((item) => `community_comment-${item.id}`).join(",");
             let list = [];
             const params = {
@@ -541,7 +624,7 @@ export default {
         loadHomeworkBoxcoin() {
             getHistorySummary("community_topic_reply", this.post.id).then((res) => {
                 this.summary = res.data.data;
-            });
+            }).catch(() => {});
         },
         onBoxcoinClick() {
             bus.emit("boxcoin-click", {
@@ -556,11 +639,16 @@ export default {
 
             const link = window.location.href.split("#")[0] + `#floor-${floor}`;
             navigator.clipboard.writeText(link).then(() => {
-                this.$message.success("楼层已复制到剪贴板");
+                this.$message.success(this.$t("pages.community.messages.floorCopied"));
             });
         },
         enterPwd() {
             this.$emit("enterPwd", this.password);
+        },
+        ensureLogin() {
+            if (User.isLogin()) return true;
+            this.$message.warning(this.$t("pages.community.messages.loginRequired"));
+            return false;
         },
     },
 };

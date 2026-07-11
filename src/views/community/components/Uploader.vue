@@ -20,14 +20,18 @@
             <i class="el-icon-plus"></i>
             <template #tip>
                 <div class="el-upload__tip">
-                    最多上传 {{ maxCount }} 张
-                    {{ acceptedExtensions.join(" / ").toUpperCase() }} 格式图片，单张图片不能超过
-                    {{ maxSize / 1024 / 1024 }} MB
+                    {{
+                        $t("pages.community.uploader.tip", {
+                            count: maxCount,
+                            formats: acceptedExtensions.join(" / ").toUpperCase(),
+                            size: maxSize / 1024 / 1024,
+                        })
+                    }}
                 </div>
             </template>
         </el-upload>
-        <el-dialog v-model:visible="dialogVisible">
-            <img width="60%" :src="dialogImageUrl" alt />
+        <el-dialog v-model="dialogVisible">
+            <img width="60%" :src="dialogImageUrl" :alt="$t('pages.community.uploader.previewAlt')" />
         </el-dialog>
     </div>
 </template>
@@ -44,6 +48,8 @@ export default {
             dialogVisible: false,
             fileList: [],
             successList: [],
+            activeUploadUids: [],
+            successfulUploadUids: [],
             acceptedExtensions: ["jpg", "jpeg", "png", "gif"],
             maxCount: 5,
             maxSize: 10 * 1024 * 1024,
@@ -66,7 +72,7 @@ export default {
         onExceed() {
             this.$notify({
                 title: "",
-                message: `最多上传 ${this.maxCount} 张图片！`,
+                message: this.$t("pages.community.uploader.maxCountExceeded", { count: this.maxCount }),
                 type: "error",
                 duration: 3000,
                 position: "bottom-right",
@@ -77,7 +83,9 @@ export default {
                 if (file.size > this.maxSize) {
                     this.$notify({
                         title: "",
-                        message: `单张图片大小不能超过 ${this.maxSize / 1024 / 1024} MB！`,
+                        message: this.$t("pages.community.uploader.maxSizeExceeded", {
+                            size: this.maxSize / 1024 / 1024,
+                        }),
                         type: "error",
                         duration: 3000,
                         position: "bottom-right",
@@ -90,33 +98,46 @@ export default {
         },
         upload() {
             if (this.fileList.length > 0) {
+                this.successList = [];
+                this.successfulUploadUids = [];
+                this.activeUploadUids = this.fileList.map((file) => file.uid);
                 this.$refs.upload.submit();
             } else {
                 this.$emit("onFinish", []);
             }
         },
-        onSuccess(response) {
-            this.successList = this.successList.concat(response.data);
+        onSuccess(response, file) {
+            if (!file || !this.activeUploadUids.includes(file.uid)) return;
             if (response.code === 0) {
-                if (this.successList.length == this.fileList.length) {
+                if (this.successfulUploadUids.includes(file.uid)) return;
+                this.successfulUploadUids.push(file.uid);
+                this.successList = this.successList.concat(response.data || []);
+                if (this.successfulUploadUids.length === this.activeUploadUids.length) {
                     this.$emit("onFinish", this.successList || []);
                     this.fileList = [];
                     this.successList = [];
+                    this.activeUploadUids = [];
+                    this.successfulUploadUids = [];
                 }
             } else {
-                this.onError(response.msg);
+                this.onError(response.msg, file);
             }
         },
-        onError(msg) {
+        onError(error, file) {
+            if (file && !this.activeUploadUids.includes(file.uid)) return;
+            const message = typeof error === "string" ? error : error?.message;
             this.$notify({
                 title: "",
-                message: msg || "图片上传失败!",
+                message: message || this.$t("pages.community.uploader.uploadFailed"),
                 type: "error",
                 duration: 3000,
                 position: "bottom-right",
             });
             this.$emit("onError");
             this.fileList = [];
+            this.successList = [];
+            this.activeUploadUids = [];
+            this.successfulUploadUids = [];
         },
         addFile(file) {
             this.$refs.upload.handleStart(file);

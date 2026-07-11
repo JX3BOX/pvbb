@@ -1,23 +1,39 @@
 <template>
     <div class="c-author-info">
         <div class="u-author">
-            <Avatar class="u-avatar" :uid="uid" :url="data.user_avatar" size="s" :frame="data.user_avatar_frame" />
+            <Avatar
+                class="u-avatar"
+                :uid="uid"
+                :url="resolveImagePath(data.user_avatar)"
+                size="s"
+                :frame="data.user_avatar_frame"
+            />
             <div class="u-info">
                 <div class="u-name">
-                    <el-tooltip class="item" effect="dark" content="签约作者" placement="top" v-if="isSuperAuthor">
+                    <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="$t('pages.community.single.contractedAuthor')"
+                        placement="top"
+                        v-if="isSuperAuthor"
+                    >
                         <a class="u-superauthor" href="/about/superauthor" target="_blank">
-                            <img :src="super_author_icon" alt="superauthor" />
+                            <img :src="super_author_icon" :alt="$t('pages.community.single.contractedAuthor')" />
                         </a>
                     </el-tooltip>
                     <a class="u-displayname" :href="authorLink(uid)" target="_blank" v-if="!isAnonymous">
-                        {{ data.display_name || "未知" }}
+                        {{ data.display_name || $t("pages.community.common.unknownUser") }}
                     </a>
-                    <span class="u-displayname u-anonymous" v-else>神秘侠士</span>
+                    <span class="u-displayname u-anonymous" v-else>{{
+                        $t("pages.community.single.mysteriousUser")
+                    }}</span>
                 </div>
                 <div class="u-extend">
                     <el-tooltip class="item" effect="dark" placement="top" v-if="!isAnonymous">
                         <template #content>
-                            <span class="u-tips">经验值：{{ data.experience }}</span>
+                            <span class="u-tips">{{
+                                $t("pages.community.single.experience", { value: data.experience })
+                            }}</span>
                         </template>
                         <a
                             class="u-level"
@@ -58,8 +74,8 @@
 
 <script>
 import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
-const { __server, __imgPath, __userLevel, __userLevelColor, __cdn } = jx3box;
-import { authorLink } from "@jx3box/jx3box-common/js/utils";
+const { __imgPath, __userLevelColor } = jx3box;
+import { authorLink, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { getUserInfo } from "@jx3box/jx3box-ui/service/author";
 import Avatar from "@jx3box/jx3box-ui/src/author/Avatar.vue";
@@ -89,7 +105,9 @@ export default {
             return this.data?.is_pro ? "PRO" : "PRE";
         },
         vipTypeTitle: function () {
-            return this.data?.is_pro ? "专业版会员" : "高级版会员";
+            return this.data?.is_pro
+                ? this.$t("pages.community.single.proMembership")
+                : this.$t("pages.community.single.premiumMembership");
         },
         isVip: function () {
             return this.data?.is_pro || this.data?.is_pre;
@@ -118,6 +136,7 @@ export default {
             });
         },
         authorLink,
+        resolveImagePath,
         showLevelColor: function (level) {
             return __userLevelColor[level];
         },

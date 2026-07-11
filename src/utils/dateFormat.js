@@ -1,11 +1,32 @@
 import dayjs from "dayjs";
 const relativeTime = require("dayjs/plugin/relativeTime");
 require("dayjs/locale/zh-cn");
-dayjs.locale("zh-cn");
+require("dayjs/locale/zh-tw");
+require("dayjs/locale/vi");
 dayjs.extend(relativeTime);
+
+const localeMap = {
+    "zh-cn": "zh-cn",
+    "zh-tw": "zh-tw",
+    "en-us": "en",
+    vi: "vi",
+};
+
+function getLocale() {
+    const lang = (typeof localStorage !== "undefined" && localStorage.getItem("lang")
+        ? localStorage.getItem("lang")
+        : "zh-cn"
+    ).toLowerCase();
+    return localeMap[lang] || "zh-cn";
+}
+
+function translate(t, key, fallback) {
+    return typeof t === "function" ? t(key) : fallback;
+}
 // 日期距离今日
 function getRelativeTime(dt) {
-    return dayjs().from(dayjs(dt));
+    const locale = getLocale();
+    return dayjs().locale(locale).from(dayjs(dt).locale(locale));
 }
 
 /**
@@ -28,7 +49,7 @@ function polish(val) {
     return val < 10 ? "0" + val : val;
 }
 
-function getTimeAgo(dateString) {
+function getTimeAgo(dateString, t) {
     // 使用dayjs解析传入的日期字符串
     const date = dayjs(dateString);
     const now = dayjs();
@@ -37,14 +58,17 @@ function getTimeAgo(dateString) {
     const diff = now.diff(date, "day");
     if (diff === 0) {
         if (now.diff(date, "minute") <= 60) {
-            return { text: "刚刚", icon: "el-icon-loading" };
+            return { text: translate(t, "pages.community.time.justNow", "刚刚"), icon: "el-icon-loading" };
         } else if (now.diff(date, "minute") <= 120) {
-            return { text: "2小时内", icon: "el-icon-time" };
+            return {
+                text: translate(t, "pages.community.time.withinTwoHours", "2小时内"),
+                icon: "el-icon-time",
+            };
         } else {
             return { text: date.format("HH:mm"), icon: "el-icon-time" };
         }
     } else if (diff === 1) {
-        return { text: "昨天", icon: "el-icon-time" };
+        return { text: translate(t, "pages.community.time.yesterday", "昨天"), icon: "el-icon-time" };
     } else if (diff >= 2 && diff <= 365) {
         return { text: date.format("MM-DD"), icon: "el-icon-date" };
     } else {

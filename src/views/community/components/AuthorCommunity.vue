@@ -2,7 +2,7 @@
     <div class="c-community-posts" v-if="ready">
         <div class="u-label">
             <img svg-inline src="@/assets/img/leftsidebar/post.svg" />
-            <span>最新帖子</span>
+            <span>{{ $t("pages.community.single.latestPosts") }}</span>
             <a :href="authorLink(uid)" class="u-more" target="_blank"
                 ><img svg-inline src="@/assets/img/leftsidebar/more.svg"
             /></a>
@@ -13,7 +13,10 @@
                 <a class="u-item" :href="url(item.id, 'community')" target="_blank">
                     <span class="u-title">
                         <!-- <img svg-inline src="@/assets/img/leftsidebar/arrow.svg" class="u-icon" /> -->
-                        {{ item.title || item.category + "/无标题" }}
+                        {{
+                            item.title ||
+                            $t("pages.community.single.untitledSuffix", { category: item.category })
+                        }}
                     </span>
                 </a>
             </li>

@@ -1,8 +1,13 @@
 // 回复 外包装
 .m-comment-wrapper {
-    background: #fafafa;
-    border-left: 1px solid #e8e8e8;
-    margin-bottom: 4px;
+    background: @bg-light;
+    border: 1px solid @border-hr;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    &.has-decoration {
+        border: 0;
+        background: transparent;
+    }
     .u-reply-box {
         .u-reply-list {
             padding: 12px;
@@ -17,20 +22,26 @@
     }
 }
 .m-comment-right {
+    background-color: @bg-light;
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 8px;
     display: flex;
-    gap: 16px;
-    padding: 10px;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
     .u-avatar {
         width: 48px;
         height: 48px;
         border-radius: 50%;
+        flex-shrink: 0;
     }
 }
 // 包含回复内容 、时间、操作按钮 的主要展示区域
 .m-comment-content {
     flex: 1;
+    min-width: 0;
     .u-content-top {
         display: flex;
         justify-content: space-between;
@@ -60,9 +71,9 @@
 
     // 回复的用户
     .u-answer-user {
-        .fz(14px, 28px);
-        margin: 0;
-        color: #888;
+        .fz(14px, 22px);
+        margin: 0 0 4px;
+        color: @v4tip;
     }
     // 回复的内容
     .u-content {
@@ -83,6 +94,7 @@
         align-items: center;
         column-gap: 15px;
         flex-wrap: wrap;
+        margin-top: 6px;
         // like 按钮 爱心
         .u-btn-content {
             .u-like-icon {
@@ -106,8 +118,8 @@
         }
         .el-button {
             padding: 0;
-            height: 32px;
-            color: #989cb1;
+            height: 28px;
+            color: @v4tip;
             font-weight: normal;
             &:hover {
                 color: @v4primary;

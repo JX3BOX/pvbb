@@ -1,7 +1,7 @@
 <template>
     <div class="w-filter-reply-order" :class="{ on: visible }">
         <span class="u-label" @click="toggleFilter">
-            <span class="u-current-order">排序 : {{ current }}</span>
+            <span class="u-current-order">{{ $t("pages.community.sort.label") }} : {{ current }}</span>
             <span class="u-toggle">
                 <i class="el-icon-arrow-down"></i>
                 <i class="el-icon-arrow-up"></i>
@@ -10,11 +10,11 @@
         <span class="u-options">
             <span class="u-mode" :class="{ on: order === 'reply' }" @click="filter('reply')">
                 <el-icon><ChatDotRound /></el-icon>
-                最新回复
+                {{ $t("pages.community.sort.latestReply") }}
             </span>
             <span class="u-mode" :class="{ on: order === 'publish' }" @click="filter('publish')">
                 <el-icon><Sort /></el-icon>
-                最新发布
+                {{ $t("pages.community.sort.latestPublish") }}
             </span>
         </span>
     </div>
@@ -42,7 +42,9 @@ export default {
     },
     computed: {
         current: function () {
-            return this.order === "reply" ? "最新回复" : "最新发布";
+            return this.order === "reply"
+                ? this.$t("pages.community.sort.latestReply")
+                : this.$t("pages.community.sort.latestPublish");
         },
     },
     watch: {

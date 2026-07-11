@@ -1,6 +1,23 @@
+export const DEFAULT_COMMUNITY_CLIENT = "all";
+
+const supportedCommunityClients = new Set([DEFAULT_COMMUNITY_CLIENT, "std", "origin"]);
+const explicitCommunityClients = new Set(["std", "origin"]);
+
+export function normalizeCommunityClient(value) {
+    return typeof value === "string" && supportedCommunityClients.has(value)
+        ? value
+        : DEFAULT_COMMUNITY_CLIENT;
+}
+
+export function isExplicitCommunityClient(value) {
+    return explicitCommunityClients.has(value);
+}
+
 export function escapeHtml(str) {
-    return str.replace(/[<>"']/g, function (match) {
+    return String(str || "").replace(/[&<>"']/g, function (match) {
         switch (match) {
+            case "&":
+                return "&amp;";
             case "<":
                 return "&lt;";
             case ">":
@@ -37,10 +54,18 @@ export function modifyAlpha(rgbaString, newAlpha) {
 }
 
 export function formatCategoryList(categories) {
+    const categoryValueMap = {
+        全部: "all",
+        全部内容: "all",
+        攻略心得: "guide",
+        江湖故事: "story",
+        交流分享: "discuz",
+        求助寻觅: "help",
+    };
     return categories.map((item) => {
         let color = item.color ? item.color : "rgba(64, 128, 255, 1)";
         const data = {
-            value: item.name,
+            value: item.val ?? item.value ?? item.slug ?? categoryValueMap[item.name] ?? item.name,
             name: item.name,
             icon: item.icon || "game",
             hoverColor: modifyAlpha(color, 0.1),

@@ -31,17 +31,17 @@
             <slot></slot>
 
             <div class="u-meta u-sub-block">
-                <em class="u-label">分类</em>
+                <em class="u-label">{{ $t("pages.community.single.category") }}</em>
                 <span class="u-value">{{ showPostTypeLabel(post.category) }}</span>
             </div>
 
             <div class="u-meta u-sub-block">
-                <em class="u-label">适用客户端</em>
+                <em class="u-label">{{ $t("pages.community.single.client") }}</em>
                 <span class="u-value u-client" :class="'i-client-' + client">{{ showClientLabel(client) }}</span>
             </div>
 
             <div class="u-meta u-sub-block">
-                <em class="u-label">标签</em>
+                <em class="u-label">{{ $t("pages.community.single.tags") }}</em>
                 <span class="u-value">
                     <span
                         v-for="(item, index) in tags"
@@ -55,14 +55,20 @@
             </div>
 
             <!-- 发布日期 -->
-            <span class="u-sub-block" :title="'发布日期:' + post_time">
+            <span
+                class="u-sub-block"
+                :title="$t('pages.community.single.publishedAt', { time: post_time })"
+            >
                 <i class="u-icon-podate">
                     <img svg-inline src="@jx3box/jx3box-ui/assets/img/single/podate.svg" />
                 </i>
                 <time>{{ post_date }}</time>
             </span>
 
-            <span class="u-sub-block" :title="'发布日期:' + post_time">
+            <span
+                class="u-sub-block"
+                :title="$t('pages.community.single.updatedAt', { time: update_time })"
+            >
                 <i class="u-icon-modate">
                     <img svg-inline src="@jx3box/jx3box-ui/assets/img/single/modate.svg" />
                 </i>
@@ -75,7 +81,11 @@
                 {{ views }}
             </span>
 
-            <span class="u-word-count u-sub-block" v-if="wordCount" title="累计字数">
+            <span
+                class="u-word-count u-sub-block"
+                v-if="wordCount"
+                :title="$t('pages.community.single.wordCount')"
+            >
                 <i class="el-icon-sunny"></i>
                 {{ wordCount }}
             </span>
@@ -91,30 +101,28 @@
                 @click="setOnlyAuthor(!onlyAuthor)"
             >
                 <img svg-inline v-show="!onlyAuthor" src="@/assets/img/community/only-author.svg" />
-                {{ onlyAuthor ? "取消只看楼主" : "只看楼主" }}
+                {{
+                    onlyAuthor
+                        ? $t("pages.community.single.cancelOnlyAuthor")
+                        : $t("pages.community.single.onlyAuthor")
+                }}
             </el-button>
         </div>
     </header>
 </template>
 
 <script>
-import { __Root, __clients } from "@/utils/config";
 import { showDate, showTime } from "@jx3box/jx3box-common/js/moment";
 import { editLink } from "@jx3box/jx3box-common/js/utils.js";
 import User from "@jx3box/jx3box-common/js/user.js";
 import $ from "jquery";
-import { formatCategoryList } from "@/utils/community";
-import { getTopicBucket } from "@/service/cms";
-import { tabsMap } from "@/assets/data/community_category";
 export default {
     name: "single-header",
     props: ["post", "stat"],
     inject: ["setOnlyAuthor"],
     data: function () {
         return {
-            categoryList: [],
             wordCount: 0,
-            postTypes: tabsMap,
         };
     },
     computed: {
@@ -154,7 +162,7 @@ export default {
             return this.post?.is_top || this.post?.is_category_top;
         },
         title: function () {
-            return this.post?.title || "无标题";
+            return this.post?.title || this.$t("pages.community.common.untitled");
         },
         post_date: function () {
             return showDate(new Date(this.post?.created_at));
@@ -177,31 +185,32 @@ export default {
         canEdit: function () {
             return this.post?.user_id == User.getInfo().uid || User.isEditor();
         },
-        styles: function () {
-            let item = this.categoryList.find((item) => item.value === this.post.category);
-            if (item) {
-                return item;
-            }
-            return null;
-        },
         client: function () {
             return this.post?.client || "std";
         },
     },
     watch: {
-        post: {
-            deep: true,
-            handler: function (val) {
+        "post.content": {
+            immediate: true,
+            handler: function () {
                 this.countWords();
             },
         },
     },
     methods: {
         showPostTypeLabel(type) {
-            return tabsMap[type] || type;
+            const supportedTypes = ["all", "guide", "story", "discuz", "help"];
+            return supportedTypes.includes(type) ? this.$t(`pages.community.categories.${type}`) : type;
         },
         showClientLabel: function (val) {
-            return __clients[val];
+            const clients = {
+                all: { key: "allClients", fallback: "全端" },
+                std: { key: "std", fallback: "剑三" },
+                origin: { key: "origin", fallback: "缘起" },
+                wujie: { key: "wujie", fallback: "无界" },
+            };
+            const client = clients[val];
+            return client ? this.$jx3boxT(`jx3boxUi.clientBy.${client.key}`, client.fallback) : val;
         },
         countWords: function () {
             this.$nextTick(() => {
@@ -216,17 +225,9 @@ export default {
                 this.wordCount = text?.length || 0;
             });
         },
-        getCategoryList() {
-            getTopicBucket({ type: "community", search: this.post.category }).then((res) => {
-                this.categoryList = formatCategoryList(res.data.data);
-            });
-        },
         onEditClick() {
             window.location.href = editLink("community", this.post?.id);
         },
-    },
-    mounted: function () {
-        this.getCategoryList();
     },
 };
 </script>

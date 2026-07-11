@@ -10,11 +10,17 @@
             color: #666;
         }
     }
-    .pl(122px);
+    .pl(0);
     .pr;
     .u-publish {
-        .pa;
-        .lt(0);
+        position: static;
+        min-width: 122px;
+        flex-shrink: 0;
+        margin: 0;
+    }
+    > .el-input {
+        flex: 1;
+        min-width: 0;
     }
     .el-input-group__prepend {
         .flex(y);

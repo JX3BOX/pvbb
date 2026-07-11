@@ -3,7 +3,7 @@
         <CommonHeader></CommonHeader>
         <Breadcrumb
             v-if="post"
-            name="竹林茶馆"
+            :name="$t('pages.community.common.forumName')"
             slug="community"
             :publishEnable="false"
             :adminEnable="true"
@@ -42,7 +42,7 @@ import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import Side from "@/components/bbs/single_side.vue";
-import {designTaskCategoryMap} from "@/assets/data/community_category.js"
+import { designTaskCategoryMap } from "@/assets/data/community_category.js";
 
 const postTypeMaps = {
     求助: "newbie",

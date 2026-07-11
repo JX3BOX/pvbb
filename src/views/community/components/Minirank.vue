@@ -14,7 +14,7 @@
             <li v-for="(item, k) in data" :key="k">
                 <a class="u-link" :href="postLink('dbm/pkg', item.id)">
                     <span class="u-order" :class="highlight(k)">{{ k + 1 }}</span>
-                    <Avatar class="u-avatar" :url="item.ext_user_info.avatar" :size="14"> </Avatar>
+                    <Avatar class="u-avatar" :url="resolveImagePath(item.ext_user_info.avatar)" :size="14"> </Avatar>
                     <!-- <span class="u-tag" :class="item.client">{{ item.client === "std" ? "重制" : "缘起" }}</span> -->
                     <span class="u-name"> {{ item.key }} </span>
                 </a>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { postLink } from "@jx3box/jx3box-common/js/utils";
+import { postLink, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __Root, __OriginRoot } from "@/utils/config";
 export default {
     name: "rank",
@@ -42,6 +42,7 @@ export default {
     },
     methods: {
         postLink,
+        resolveImagePath,
         handleClick() {
             this.loadData();
         },
@@ -77,9 +78,8 @@ export default {
                     ext_user_info: {
                         id: 81,
                         display_name: "kaixinyike",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2021/4/6/3830723.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2021/4/6/3830723.jpg",
                         user_avatar_frame: "",
-                        wechat_unionid: "oc6dC0ZAKE99pTq7ZD9G5pGPT-zY",
                     },
                 },
                 {
@@ -98,9 +98,8 @@ export default {
                     ext_user_info: {
                         id: 2,
                         display_name: "南宫伯",
-                        avatar: "https://oss.jx3box.com/2019/09/QQ图片20190806162038.jpg",
+                        avatar: "https://cdn.jx3box.com/2019/09/QQ图片20190806162038.jpg",
                         user_avatar_frame: "",
-                        wechat_unionid: "oc6dC0a7T7_nX-ozdV7UkFnQuSeE",
                     },
                 },
                 {
@@ -121,7 +120,6 @@ export default {
                         display_name: "PVP",
                         avatar: "https://cdn.jx3box.com/upload/avatar/2024/3/18/53684_839918.png",
                         user_avatar_frame: "",
-                        wechat_unionid: "oc6dC0eaMuzhJ1QbDLd9pRh1RE9Y",
                     },
                 },
                 {
@@ -140,9 +138,8 @@ export default {
                     ext_user_info: {
                         id: 9637,
                         display_name: "七海海",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2021/4/16/9318704.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2021/4/16/9318704.jpg",
                         user_avatar_frame: "",
-                        wechat_unionid: "",
                     },
                 },
                 {
@@ -161,9 +158,8 @@ export default {
                     ext_user_info: {
                         id: 8601,
                         display_name: "言无瑕",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2020/6/1/-6e2c4aa0b690d9d776.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2020/6/1/-6e2c4aa0b690d9d776.jpg",
                         user_avatar_frame: "leaf_1",
-                        wechat_unionid: "oc6dC0W663YpJQZkGb-vF1bQoKjs",
                     },
                 },
                 {
@@ -182,9 +178,8 @@ export default {
                     ext_user_info: {
                         id: 11166,
                         display_name: "南宮伯",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2020/6/9/1953796.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2020/6/9/1953796.jpg",
                         user_avatar_frame: "",
-                        wechat_unionid: "",
                     },
                 },
                 {
@@ -203,9 +198,8 @@ export default {
                     ext_user_info: {
                         id: 12367,
                         display_name: "任盈盈",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2020/11/8/975631.JPG",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2020/11/8/975631.JPG",
                         user_avatar_frame: "",
-                        wechat_unionid: "",
                     },
                 },
                 {
@@ -224,9 +218,8 @@ export default {
                     ext_user_info: {
                         id: 5293,
                         display_name: "星洲炒米粉",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2023/2/5/5293_1181804.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2023/2/5/5293_1181804.jpg",
                         user_avatar_frame: "",
-                        wechat_unionid: "",
                     },
                 },
                 {
@@ -247,7 +240,6 @@ export default {
                         display_name: "千山踏雪",
                         avatar: "https://cdn.jx3box.com/upload/avatar/2024/1/16/174288_5889538.jpg",
                         user_avatar_frame: "long_1",
-                        wechat_unionid: "",
                     },
                 },
                 {
@@ -266,9 +258,8 @@ export default {
                     ext_user_info: {
                         id: 55200,
                         display_name: "苏素衣",
-                        avatar: "https://oss.jx3box.com/upload/avatar/2021/5/10/55200_8465262.jpg",
+                        avatar: "https://cdn.jx3box.com/upload/avatar/2021/5/10/55200_8465262.jpg",
                         user_avatar_frame: "flower_2",
-                        wechat_unionid: "",
                     },
                 },
             ];

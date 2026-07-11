@@ -6,7 +6,7 @@
         </div>
         <!-- Banner -->
         <a class="u-banner" :href="postLink(item.id)" :target="target">
-            <img :src="getBanner(item.banner_img, item.post_subtype)" :key="item.ID" />
+            <img :src="getBanner(item.banner_img, item.post_subtype)" :key="item.id" />
         </a>
         <!-- 标题 -->
         <h2 class="u-post" :class="{ isSticky: item.sticky }">
@@ -53,7 +53,7 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
 
             <span class="u-push" v-if="hasPermission">
                 <time v-if="showPushDate" class="u-push__time" :class="{ 'is-recent': isRecent() }"
-                    >{{ pushDate }} 已推送</time
+                    >{{ $t("pages.community.list.pushedAt", { time: pushDate }) }}</time
                 >
                 <el-button
                     class="u-push__btn"
@@ -62,7 +62,7 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                     :disabled="pushing"
                     @click="onPush"
                     icon="Promotion"
-                    >推送</el-button
+                    >{{ $t("pages.community.list.push") }}</el-button
                 >
             </span>
         </h2>
@@ -70,22 +70,26 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
         <!-- 字段 -->
         <div class="u-content u-desc">
             <div class="u-metalist u-collection">
-                <strong>摘要</strong>
+                <strong>{{ $t("pages.community.list.summary") }}</strong>
                 <em>
                     <span v-html="highlightText(item.introduction)"></span>
                 </em>
             </div>
             <div class="u-metalist u-topics">
-                <strong>标签</strong>
+                <strong>{{ $t("pages.community.list.tags") }}</strong>
                 <em>
                     <a class="u-topic" :href="`/community?category=${item.category}&page=1`" target="_blank">{{
                         showCategory(item.category)
                     }}</a>
                 </em>
-                <em v-if="~~item.collection_id">
-                    <a class="u-topic u-collection" :href="`/collection/${item.collection_id}`" target="_blank"
-                        >《{{ item.collection && item.collection.title.replace(/(^《|》$)/g, "") }}》</a
-                    >
+                <em v-if="~~item.collection_id && item.collection?.title">
+                    <a class="u-topic u-collection" :href="`/collection/${item.collection_id}`" target="_blank">
+                        {{
+                            $t("pages.community.list.collectionTitle", {
+                                title: item.collection.title.replace(/(^《|》$)/g, ""),
+                            })
+                        }}
+                    </a>
                 </em>
             </div>
         </div>
@@ -101,27 +105,25 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                 <a class="u-author-name" :href="authorLink(item.user_id)" target="_blank" v-if="!item.anonymous">{{
                     showNickname(item.ext_user_info)
                 }}</a>
-                <span v-else>神秘侠士</span>
+                <span v-else>{{ $t("pages.community.common.mysteriousHero") }}</span>
             </div>
             <span class="u-date">
                 <!-- Updated on
                 <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>
                 <time v-else>{{ dateFormat(item.updated_at) }}</time> -->
 
-                Last replied on
-                <time>{{ dateFormat(item.latest_reply_at) }}</time>
+                {{ $t("pages.community.list.lastRepliedAt", { date: dateFormat(item.latest_reply_at) }) }}
             </span>
         </div>
     </li>
 </template>
 
 <script>
-import { showAvatar, authorLink, showBanner, buildTarget, postLink } from "@jx3box/jx3box-common/js/utils";
+import { showAvatar, authorLink, showBanner, buildTarget, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __cdn } from "@/utils/config";
 import markMap from "@jx3box/jx3box-common/data/mark.json";
 import { showDate } from "@jx3box/jx3box-common/js/moment.js";
 import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
-import { random } from "lodash";
 import User from "@jx3box/jx3box-common/js/user";
 import dayjs from "dayjs";
 import bus from "@/utils/bus";
@@ -129,6 +131,8 @@ import { getSkinJson } from "@/service/community";
 const appKey = "community";
 const skinKey = "community_topic_skin";
 import { tabsMap, designTaskCategoryMap } from "@/assets/data/community_category.js";
+import { escapeHtml } from "@/utils/community";
+import { getRandomCoverIndex } from "@/utils/random-cover";
 
 export default {
     name: "ListItem",
@@ -137,9 +141,6 @@ export default {
     data: function () {
         return {
             target: buildTarget(),
-
-            start: 1,
-            end: 39,
             pushing: false,
 
             skinJson: {},
@@ -199,15 +200,16 @@ export default {
     watch: {},
     methods: {
         showCategory: function (val) {
-            return tabsMap[val] || val || "未分类";
+            if (tabsMap[val]) {
+                return this.$t(`pages.community.categories.${val}`);
+            }
+            return val || this.$t("pages.community.common.uncategorized");
         },
         getBanner: function (val, subtype) {
             if (val) {
-                return showBanner(val);
+                return showBanner(resolveImagePath(val));
             } else {
-                // 从1-39中随机选一个
-                const randomNum = random(this.start, this.end);
-                return __cdn + `design/random_cover/${randomNum}.jpg`;
+                return __cdn + `design/random_cover/${getRandomCoverIndex(this.item)}.jpg`;
             }
         },
         reporterLink: function (val) {
@@ -230,7 +232,7 @@ export default {
                 post_type: "community",
                 post_title: this.item.title,
                 ID: this.item.id,
-                author: this.item?.ext_user_info?.display_name || "匿名",
+                author: this.item?.ext_user_info?.display_name || this.$t("pages.community.common.anonymous"),
                 client: this.item.client,
 
                 subtype: designTaskCategoryMap[this.item.category] || "",
@@ -248,18 +250,21 @@ export default {
             if (skinJson) {
                 this.skinJson = JSON.parse(skinJson);
             } else {
-                getSkinJson().then((res) => {
-                    this.skinJson = res.data;
-                    sessionStorage.setItem(skinKey, JSON.stringify(res.data));
-                });
+                getSkinJson()
+                    .then((res) => {
+                        this.skinJson = res.data;
+                        sessionStorage.setItem(skinKey, JSON.stringify(res.data));
+                    })
+                    .catch(() => {});
             }
         },
         // 高亮搜索关键字
         highlightText(text) {
-            if (!this.keyword) return text;
-            const regex = new RegExp(`(${this.keyword})`, "gi");
-            text = text.replace(regex, '<span style="background-color: #ffff00; color: #ff0000;">$1</span>');
-            return text;
+            const safeText = escapeHtml(text);
+            if (!this.keyword) return safeText;
+            const safeKeyword = escapeHtml(this.keyword).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regex = new RegExp(`(${safeKeyword})`, "gi");
+            return safeText.replace(regex, '<span class="u-highlight">$1</span>');
         },
         getLink(item) {
             // 往当前url上加上tag查询参数
@@ -269,7 +274,7 @@ export default {
         },
         getBg(label) {
             const item = this.tags.find((tag) => tag.label === label);
-            return (item?.icon && `${__cdn}${item.icon}`) || "";
+            return (item?.icon && resolveImagePath(`${__cdn}${item.icon}`)) || "";
         },
         getBgStyle(item) {
             return {
@@ -285,10 +290,10 @@ export default {
             return (markMap.cms && markMap.cms[val]) || val;
         },
         showAvatar: function (userinfo) {
-            return showAvatar(userinfo?.avatar);
+            return resolveImagePath(showAvatar(userinfo?.avatar));
         },
         showNickname: function (userinfo) {
-            return userinfo?.display_name || "匿名";
+            return userinfo?.display_name || this.$t("pages.community.common.anonymous");
         },
         dateFormat: function (gmt) {
             return showDate(new Date(gmt));
@@ -301,6 +306,10 @@ export default {
 </script>
 
 <style lang="less">
+.u-community-item .u-highlight {
+    background-color: #ffff00;
+    color: #ff0000;
+}
 .u-community-item {
     .pr;
     overflow: hidden;

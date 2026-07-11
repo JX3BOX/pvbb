@@ -1,7 +1,9 @@
 <template>
     <div class="m-jx3dat-rank-mini m-jx3dat-rank">
         <h3 class="c-sidebar-right-title">
-            <img class="u-icon" svg-inline src="@/assets/img/common/rank.svg" />剑三年度大事件
+            <img class="u-icon" svg-inline src="@/assets/img/common/rank.svg" />{{
+                $t("pages.community.sidebar.annualEvents")
+            }}
             <!-- <span class="u-more" @click="viewRank">查看更多 &raquo;</span> -->
         </h3>
         <el-tabs v-model="active" @tab-change="handleClick">
@@ -18,7 +20,7 @@
                     </a>
                 </li>
             </template>
-            <el-alert v-else title="暂无事件" type="info" show-icon></el-alert>
+            <el-alert v-else :title="$t('pages.community.sidebar.noEvents')" type="info" show-icon></el-alert>
         </ul>
     </div>
 </template>
@@ -36,6 +38,7 @@ export default {
             active: "bbs_rank_2026",
 
             tabs: ["2026","2025", "2024", "2023", "2022"],
+            requestVersion: 0,
         };
     },
     computed: {
@@ -62,13 +65,18 @@ export default {
             }
         },
         loadData() {
+            const requestVersion = ++this.requestVersion;
             this.loading = true;
             getMenu(this.active)
                 .then((res) => {
-                    this.data = res;
+                    if (requestVersion === this.requestVersion) {
+                        this.data = res;
+                    }
                 })
                 .finally(() => {
-                    this.loading = false;
+                    if (requestVersion === this.requestVersion) {
+                        this.loading = false;
+                    }
                 });
         },
     },
