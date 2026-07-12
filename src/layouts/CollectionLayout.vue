@@ -22,7 +22,7 @@
         </LeftSidebar>
         <Main :withoutRight="!hasRight">
             <slot></slot>
-            <RightSidebar>
+            <RightSidebar v-if="hasRight">
                 <Side :id="id" class="m-extend" />
             </RightSidebar>
             <Footer></Footer>

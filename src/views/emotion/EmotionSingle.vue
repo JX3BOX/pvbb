@@ -20,7 +20,14 @@
                 </a>
             </div>
         </div>
-        <emotion-item v-if="emotion?.id" :emotion="emotion" mode="single" />
+        <el-alert
+            v-if="loadError"
+            :title="loadError"
+            type="error"
+            show-icon
+            :closable="false"
+        />
+        <emotion-item v-else-if="emotion?.id" :emotion="emotion" mode="single" />
     </div>
 </template>
 
@@ -46,6 +53,7 @@ export default {
         return {
             loading: false,
             emotion: {},
+            loadError: "",
             starLoading: false,
         };
     },
@@ -71,15 +79,23 @@ export default {
     methods: {
         editLink,
         goBack() {
-            this.$router.push("/emotion");
+            this.$router.push({ name: "emotion", query: this.$route.query });
         },
         loadSingle() {
             if (!this.id) return;
 
             this.loading = true;
+            this.loadError = "";
+            this.emotion = {};
             getEmotion(this.id)
                 .then((res) => {
                     this.emotion = res?.data?.data || {};
+                    if (!this.emotion.id) {
+                        this.loadError = "该趣图不存在或已被删除";
+                    }
+                })
+                .catch(() => {
+                    this.loadError = "该趣图不存在、已被删除或暂时无法加载";
                 })
                 .finally(() => {
                     this.loading = false;

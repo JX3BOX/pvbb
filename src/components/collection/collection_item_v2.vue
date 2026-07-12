@@ -7,7 +7,6 @@
                 </template>
             </el-image>
             <img class="u-img u-mark" :ref="`mark${data.id}`" :src="`${imgPath}light.png`" />
-            <img />
             <el-image class="u-img u-box" :src="`${imgPath}box.svg`" fit="fill"> </el-image>
         </div>
 

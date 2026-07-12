@@ -1,16 +1,16 @@
 <template>
     <CollectionLayout :has-right="false" :post="collection || {}">
-        <div class="m-collection-single">
+        <div class="m-collection-single" v-loading="loading">
             <el-alert
-                v-if="!collection"
-                title="该剑三小册不存在或已被删除"
-                type="info"
+                v-if="loadError"
+                :title="loadErrorTitle"
+                :type="loadError === 'not-found' ? 'info' : 'error'"
                 center
                 show-icon
                 :closable="false"
             ></el-alert>
 
-            <template v-else>
+            <template v-else-if="collection">
                 <div class="m-collection-detail-content">
                     <div class="m-collection-detail-header">
                         <header class="m-single-header">
@@ -134,7 +134,7 @@
                 </ul>
             </div>-->
 
-                <Thx
+                <CollectionThx
                     class="m-thx"
                     :postId="id"
                     postType="collection"
@@ -144,6 +144,7 @@
                     :adminBoxcoinEnable="false"
                     :userBoxcoinEnable="true"
                     client="all"
+                    @stat-loaded="updateStat"
                 />
 
                 <div class="m-comments" v-if="id">
@@ -173,30 +174,36 @@ import {
     resolveImagePath,
 } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user.js";
-import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
+import { postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { __imgPath } from "@/utils/config";
+import { getCollectionLoadError } from "@/utils/collection";
 
 import CollectionLayout from "@/layouts/CollectionLayout.vue";
 import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
+import CollectionThx from "./collection_thx.vue";
 export default {
     name: "CollectionSingle",
     props: [],
     components: {
         CollectionLayout,
         CommonComment,
+        CollectionThx,
     },
     data: function () {
         return {
-            collection: "",
+            collection: null,
             publish: CollectionPublish,
             url: location.href,
             views: 0,
             loading: false,
+            loadError: "",
+            requestId: 0,
+            updateCollectionHandler: null,
         };
     },
     computed: {
         edit_link: function () {
-            return editLink("collection", this.collection.id);
+            return editLink("collection", this.collection?.id);
         },
         id: function () {
             return this.collection?.id;
@@ -208,7 +215,12 @@ export default {
             return this.author_id == User.getInfo().uid || User.isEditor();
         },
         title: function () {
-            return this.collection.title;
+            return this.collection?.title || "";
+        },
+        loadErrorTitle() {
+            return this.loadError === "not-found"
+                ? "该剑三小册不存在或已被删除"
+                : "小册加载失败，请稍后重试";
         },
     },
     watch: {
@@ -247,10 +259,20 @@ export default {
             });
         },
         loadData: function (id) {
+            const requestId = ++this.requestId;
             this.loading = true;
+            this.collection = null;
+            this.loadError = "";
+            this.$store.state.user_id = 0;
             getCollection(id)
                 .then((res) => {
-                    this.collection = res?.data?.data || {};
+                    if (requestId !== this.requestId) return;
+                    const collection = res?.data?.data;
+                    if (!collection) {
+                        this.loadError = "not-found";
+                        return;
+                    }
+                    this.collection = collection;
                     this.$store.state.user_id = this.collection.user_id;
 
                     document.title = this.title + this.$t("pages.common.appendTitle");
@@ -263,15 +285,20 @@ export default {
                             title: this.title,
                         });
                 })
+                .catch((error) => {
+                    if (requestId !== this.requestId) return;
+                    this.loadError = getCollectionLoadError(error);
+                })
                 .finally(() => {
+                    if (requestId !== this.requestId) return;
                     this.loading = false;
                 });
         },
         execStat: function (id) {
             postStat("collection", id);
-            getStat("collection", id).then((res) => {
-                this.views = res.data.views || 0;
-            });
+        },
+        updateStat(stat) {
+            this.views = stat?.views || 0;
         },
         formatDate(date) {
             return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
@@ -284,9 +311,15 @@ export default {
     },
     created: function () {},
     mounted: function () {
-        Bus.$on("updateCollection", () => {
+        this.updateCollectionHandler = () => {
             location.reload();
-        });
+        };
+        Bus.$on("updateCollection", this.updateCollectionHandler);
+    },
+    beforeUnmount() {
+        if (this.updateCollectionHandler) {
+            Bus.$off("updateCollection", this.updateCollectionHandler);
+        }
     },
 };
 </script>
@@ -295,5 +328,8 @@ export default {
 @import "~@/assets/css/collection/collection.less";
 .m-single-header {
     padding-top: 0;
+}
+.m-collection-single {
+    min-height: 200px;
 }
 </style>

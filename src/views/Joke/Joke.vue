@@ -9,26 +9,38 @@
                         <i class="el-icon-info"></i>游戏内获取或发布骚话
                     </a>
                 </div>
-                <el-row class="m-joke-list" :gutter="20">
-                    <el-col :span="24">
-                        <joke-item :joke="joke" mode="single" @update="handleJokeUpdate" />
-                    </el-col>
-                </el-row>
-                <Thx
-                    class="m-thx"
-                    :postId="~~id"
-                    postType="joke"
-                    :postTitle="title"
-                    :userId="user_id"
-                    :author-id="user_id"
-                    :adminBoxcoinEnable="true"
-                    :userBoxcoinEnable="true"
-                    client="all"
-                />
-                <div class="m-single-comment">
-                    <el-divider content-position="left">评论</el-divider>
-                    <CommonComment :id="id" category="joke" />
-                </div>
+                <template v-if="joke?.id">
+                    <el-row class="m-joke-list" :gutter="20">
+                        <el-col :span="24">
+                            <joke-item :joke="joke" mode="single" @update="handleJokeUpdate" />
+                        </el-col>
+                    </el-row>
+                    <Thx
+                        class="m-thx"
+                        :postId="~~id"
+                        postType="joke"
+                        :postTitle="title"
+                        :userId="user_id"
+                        :author-id="user_id"
+                        :adminBoxcoinEnable="true"
+                        :userBoxcoinEnable="true"
+                        client="all"
+                    />
+                    <div class="m-single-comment">
+                        <el-divider content-position="left">评论</el-divider>
+                        <CommonComment :id="id" category="joke" />
+                    </div>
+                </template>
+                <el-result
+                    v-else-if="singleError"
+                    icon="warning"
+                    title="骚话不存在或已被删除"
+                    :sub-title="singleError"
+                >
+                    <template #extra>
+                        <el-button type="primary" @click="goBack">返回骚话列表</el-button>
+                    </template>
+                </el-result>
             </div>
 
             <!-- 列表 -->
@@ -68,13 +80,14 @@
                             <div :span="24" v-for="joke in jokes" :key="joke.id">
                                 <joke-item
                                     :joke="joke"
-                                    :jokeRewardArr="jokeRewardArr"
-                                    @doReward="doReward"
+                                    :selected-ids="selectedJokeIds"
+                                    @selection-change="toggleSelection"
                                     @update="handleJokeUpdate"
                                 />
                             </div>
                         </div>
                         <!-- 空 -->
+                        <el-alert v-else-if="listError" :title="listError" type="error" show-icon></el-alert>
                         <el-alert v-else title="没有找到相关条目" type="info" show-icon></el-alert>
                         <div class="m-joke-footer">
                             <el-pagination
@@ -91,19 +104,17 @@
                             ></el-pagination>
                             <!--  -->
                             <div class="m-joke-reward" v-if="isEditor">
-                                <el-button class="m-joke-all" type="primary" size="small" @click="rewardAll"
-                                    >{{ this.rewardAllType ? "取消" : "" }} 全选</el-button
+                                <el-button class="m-joke-all" type="primary" size="small" @click="toggleSelectAll"
+                                    >{{ allSelected ? "取消全选" : "全选" }}</el-button
                                 >
-                                <!-- <Thx
-                                    type="batchReward"
-                                    postType="joke"
-                                    :postId="jokeRewardArr"
-                                    :adminBoxcoinEnable="true"
-                                    :userBoxcoinEnable="true"
-                                    client="all"
-                                /> -->
-                                <!-- TODO: 实装 -->
-                                <el-button type="primary" size="small">设为精选</el-button>
+                                <el-button
+                                    type="primary"
+                                    size="small"
+                                    :loading="batchStarLoading"
+                                    :disabled="!selectedJokeIds.length || batchStarLoading"
+                                    @click="starSelectedJokes"
+                                    >设为精选</el-button
+                                >
                             </div>
                         </div>
                         <!-- 分页 -->
@@ -121,19 +132,15 @@ import joke_post from "@/components/joke/joke_post.vue";
 import ListLayout from "@/layouts/ListLayout.vue";
 import LeftTab from "@/components/left-tab.vue";
 
-// 分类
-import schoolmap from "@jx3box/jx3box-data/data/xf/schoolid.json";
-import { __imgPath } from "@/utils/config";
-
 // 数据
-import { getJokes, getJoke } from "@/service/joke";
+import { getJokes, getJoke, starJoke, unstarJoke } from "@/service/joke";
 import { getLikes } from "@/service/next";
 
 // 其他
-import emotion from "@jx3box/jx3box-emotion/data/default.json";
-import { publishLink } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import CommonComment from "@jx3box/jx3box-ui/src/single/Comment.vue";
+import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
+import { buildJokeDocumentTitle, isJokeListHistoryEntry } from "@/utils/joke";
 
 export default {
     name: "Joke",
@@ -147,10 +154,8 @@ export default {
     data: function () {
         return {
             loading: false,
-            schoolmap,
-
-            // 快捷发布
-            sortedEmotions: [],
+            listError: "",
+            singleError: "",
 
             type: "all",
             star: 0,
@@ -160,24 +165,15 @@ export default {
             total: 0,
             jokes: [],
 
-            joke: "",
+            joke: {},
 
-            windowWidth: document.documentElement.clientWidth,
-            jokeRewardArr: [], //打赏选中
+            selectedJokeIds: [],
+            batchStarLoading: false,
         };
     },
     computed: {
-        isNotSelf: function () {
-            return (id) => {
-                return id != User.getInfo().uid;
-            };
-        },
         isEditor: function () {
             return User.isEditor();
-        },
-        // 发布按钮链接
-        publish_link: function () {
-            return publishLink("joke");
         },
         id: function () {
             return this.$route.params.id;
@@ -200,15 +196,15 @@ export default {
         title: function () {
             return this.joke?.content;
         },
-        //全选状态
-        rewardAllType: function () {
-            return this.jokeRewardArr.length === this.jokes.filter((item) => item.user_id).length;
+        selectedJokes: function () {
+            const selectedIds = new Set(this.selectedJokeIds.map(String));
+            return this.jokes.filter((item) => selectedIds.has(String(item.id)));
+        },
+        allSelected: function () {
+            return !!this.jokes.length && this.jokes.every((item) => this.selectedJokeIds.includes(String(item.id)));
         },
     },
     methods: {
-        showSchoolIcon: function (val) {
-            return __imgPath + "image/school/" + val + ".png";
-        },
         setType(type) {
             this.type = type;
         },
@@ -216,35 +212,27 @@ export default {
         handleSizeChange(val) {
             this.per = val;
             this.page = 1;
-            this.jokeRewardArr = [];
+            this.selectedJokeIds = [];
             if (!this.updatePaginationQuery({ page: 1, per: val })) {
                 this.loadList();
             }
         },
-        // 表情排序
-        sortEmotion() {
-            const keys = Object.keys(emotion);
-            keys.sort((item1, item2) => {
-                return item1.localeCompare(item2);
-            });
-            keys.forEach((key) => {
-                const obj = {
-                    key,
-                    value: emotion[key],
-                };
-                this.sortedEmotions.push(obj);
-            });
-        },
         loadList(extraParams = {}) {
             this.loading = true;
-            getJokes({
+            this.listError = "";
+            return getJokes({
                 ...this.params,
                 ...extraParams,
             })
                 .then((res) => {
-                    this.jokes = res?.data?.data?.list;
-                    this.total = res?.data?.data?.total;
+                    this.jokes = res?.data?.data?.list || [];
+                    this.total = res?.data?.data?.total || 0;
                     this.loadLike();
+                })
+                .catch((error) => {
+                    this.jokes = [];
+                    this.total = 0;
+                    this.listError = this.getRequestErrorMessage(error, "骚话列表加载失败，请稍后重试");
                 })
                 .finally(() => {
                     this.loading = false;
@@ -252,9 +240,20 @@ export default {
         },
         loadSingle() {
             this.loading = true;
-            getJoke(this.id)
+            this.joke = {};
+            this.singleError = "";
+            return getJoke(this.id)
                 .then((res) => {
-                    this.joke = res?.data?.data;
+                    const joke = res?.data?.data;
+                    if (!joke?.id) throw new Error("骚话不存在或已被删除");
+                    this.joke = joke;
+                    document.title = buildJokeDocumentTitle(
+                        joke.content,
+                        this.$t("pages.common.appendTitle")
+                    );
+                })
+                .catch((error) => {
+                    this.singleError = this.getRequestErrorMessage(error, "请返回列表后重新选择一条骚话");
                 })
                 .finally(() => {
                     this.loading = false;
@@ -307,6 +306,11 @@ export default {
 
         // 杂项
         goBack: function () {
+            const back = window.history.state?.back;
+            if (isJokeListHistoryEntry(back)) {
+                this.$router.back();
+                return;
+            }
             this.$router.push("/joke");
         },
         skipTop: function () {
@@ -314,7 +318,7 @@ export default {
         },
         handleCurrentChange(page) {
             this.page = page;
-            this.jokeRewardArr = [];
+            this.selectedJokeIds = [];
             this.skipTop();
             if (!this.updatePaginationQuery({ page, per: this.per })) {
                 this.loadList();
@@ -330,40 +334,86 @@ export default {
                     post_action: "likes",
                     id: id,
                 };
-                getLikes(params).then((res) => {
-                    const likes = res.data.data;
-                    if (Object.keys(likes).length) {
-                        this.jokes.forEach((d) => {
-                            d.count = likes?.["joke-" + d.id]?.likes;
-                        });
-                    }
-                });
+                return getLikes(params)
+                    .then((res) => {
+                        const likes = res.data.data;
+                        if (Object.keys(likes).length) {
+                            this.jokes.forEach((d) => {
+                                d.count = likes?.["joke-" + d.id]?.likes;
+                            });
+                        }
+                    })
+                    .catch(() => {});
             }
         },
-        //取消/选中打赏文章
-        doReward(data) {
-            const list = this.jokeRewardArr.filter((item) => item.article_id == data.id);
-            list.length
-                ? (this.jokeRewardArr = this.jokeRewardArr.filter((item) => item.article_id != data.id))
-                : this.jokeRewardArr.push({
-                      user_id: data.user_id,
-                      article_id: data.id.toString(),
-                      article_type: "joke",
-                  });
+        toggleSelection(joke) {
+            const id = String(joke.id);
+            this.selectedJokeIds = this.selectedJokeIds.includes(id)
+                ? this.selectedJokeIds.filter((item) => item !== id)
+                : [...this.selectedJokeIds, id];
         },
-        //取消/全选打赏文章
-        rewardAll() {
-            let arr = [];
-            this.jokes.map((item) => {
-                if (item.user_id && this.isNotSelf(item.user_id)) {
-                    arr.push({
-                        user_id: item.user_id,
-                        article_id: item.id.toString(),
-                        article_type: "joke",
-                    });
+        toggleSelectAll() {
+            this.selectedJokeIds = this.allSelected ? [] : this.jokes.map((item) => String(item.id));
+        },
+        async starSelectedJokes() {
+            if (this.batchStarLoading) return;
+
+            const pending = this.selectedJokes.filter((item) => !item.star);
+            if (!pending.length) {
+                this.$notify({ title: "提示", message: "选中的骚话已经全部是精选", type: "info" });
+                return;
+            }
+
+            try {
+                await this.$confirm(`确定将选中的 ${pending.length} 条骚话设为精选吗？`, "批量精选", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                });
+            } catch (_) {
+                return;
+            }
+
+            this.batchStarLoading = true;
+            try {
+                const results = await Promise.allSettled(
+                    pending.map((item) =>
+                        toggleStarWithAutoAppraise({
+                            postType: "joke",
+                            articleId: item.id,
+                            userId: item.user_id,
+                            isStar: false,
+                            starRequest: starJoke,
+                            unstarRequest: unstarJoke,
+                        })
+                    )
+                );
+                const failedCount = results.filter((item) => item.status === "rejected").length;
+                const successCount = results.length - failedCount;
+
+                if (successCount) {
+                    this.selectedJokeIds = [];
+                    await this.loadList({ _no_cache: 1 });
                 }
-            });
-            this.jokeRewardArr = this.rewardAllType ? [] : arr;
+
+                this.$notify({
+                    title: failedCount ? "部分失败" : "成功",
+                    message: failedCount
+                        ? `成功设置 ${successCount} 条，失败 ${failedCount} 条，请稍后重试`
+                        : `已将 ${successCount} 条骚话设为精选`,
+                    type: failedCount ? "warning" : "success",
+                });
+            } finally {
+                this.batchStarLoading = false;
+            }
+        },
+        getRequestErrorMessage(error, fallback) {
+            const message =
+                error?.response?.data?.msg ||
+                error?.response?.data?.message ||
+                error?.data?.msg ||
+                error?.message;
+            return typeof message === "string" && message.trim() ? message : fallback;
         },
         onSearch: function () {
             if (this.page !== 1) {
@@ -379,7 +429,7 @@ export default {
         keys: {
             deep: true,
             handler() {
-                this.jokeRewardArr = [];
+                this.selectedJokeIds = [];
                 if (this.page !== 1) {
                     this.page = 1;
                     if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
@@ -392,30 +442,18 @@ export default {
         page: {
             deep: true,
             handler: function () {
-                this.jokeRewardArr = [];
+                this.selectedJokeIds = [];
             },
         },
-        id: {
+        "$route.fullPath": {
             immediate: true,
-            handler: function (val, oldVal) {
-                if (val) {
-                    this.init();
+            handler: function () {
+                if (this.id) {
+                    this.loadSingle();
                     return;
                 }
-                if (!oldVal) return;
 
-                const { page, per } = this.getPaginationFromQuery();
-                this.page = page;
-                this.per = per;
-                this.init();
-            },
-        },
-        "$route.query": {
-            deep: true,
-            immediate: true,
-            handler: function (query) {
-                if (this.id) return;
-
+                const query = this.$route.query;
                 const { page, per } = this.getPaginationFromQuery(query);
                 this.page = page;
                 this.per = per;
@@ -428,15 +466,6 @@ export default {
                 this.init();
             },
         },
-    },
-    mounted: function () {
-        const that = this;
-        window.onresize = () => {
-            that.windowWidth = document.documentElement.clientWidth;
-        };
-    },
-    created: function () {
-        this.sortEmotion();
     },
 };
 </script>

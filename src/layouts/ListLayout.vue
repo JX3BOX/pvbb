@@ -1,6 +1,7 @@
 <template>
-    <CommonHeader></CommonHeader>
+    <CommonHeader :key="$route.path"></CommonHeader>
     <Breadcrumb
+        :key="$route.path"
         name="竹林茶馆"
         slug="bbs"
         :publishEnable="false"

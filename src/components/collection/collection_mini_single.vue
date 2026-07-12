@@ -1,15 +1,15 @@
 <template>
-    <div class="m-collection-mini-single">
+    <div class="m-collection-mini-single" v-loading="loading">
         <el-alert
-            v-if="!collection"
-            title="该剑三小册不存在或已被删除"
-            type="info"
+            v-if="loadError"
+            :title="loadErrorTitle"
+            :type="loadError === 'not-found' ? 'info' : 'error'"
             center
             show-icon
             :closable="false"
         ></el-alert>
 
-        <template v-else>
+        <template v-else-if="collection">
             <div class="m-collection-mini-single-content">
                 <div class="m-header">
                     <div class="m-author">
@@ -75,8 +75,9 @@ import {
     resolveImagePath,
 } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user.js";
-import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
+import { postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
 import { __imgPath } from "@/utils/config";
+import { getCollectionLoadError } from "@/utils/collection";
 import CommonAuthor from "@/components/CommonAuthor.vue";
 
 export default {
@@ -87,16 +88,18 @@ export default {
     },
     data: function () {
         return {
-            collection: "",
+            collection: null,
             publish: CollectionPublish,
             url: location.href,
-            views: 0,
             loading: false,
+            loadError: "",
+            requestId: 0,
+            updateCollectionHandler: null,
         };
     },
     computed: {
         edit_link: function () {
-            return editLink("collection", this.collection.id);
+            return editLink("collection", this.collection?.id);
         },
         id: function () {
             return this.collection?.id;
@@ -108,10 +111,15 @@ export default {
             return true;
         },
         title: function () {
-            return this.collection.title;
+            return this.collection?.title || "";
         },
         authorDate() {
             return this.collection?.created ? `发布于 ${dateFormat(new Date(this.collection.created * 1000))}` : "";
+        },
+        loadErrorTitle() {
+            return this.loadError === "not-found"
+                ? "该剑三小册不存在或已被删除"
+                : "小册加载失败，请稍后重试";
         },
     },
     watch: {
@@ -147,10 +155,20 @@ export default {
             });
         },
         loadData: function (id) {
+            const requestId = ++this.requestId;
             this.loading = true;
+            this.collection = null;
+            this.loadError = "";
+            this.$store.state.user_id = 0;
             getCollection(id)
                 .then((res) => {
-                    this.collection = res?.data?.data || {};
+                    if (requestId !== this.requestId) return;
+                    const collection = res?.data?.data;
+                    if (!collection) {
+                        this.loadError = "not-found";
+                        return;
+                    }
+                    this.collection = collection;
                     this.$store.state.user_id = this.collection.user_id;
 
                     User.isLogin() &&
@@ -161,15 +179,17 @@ export default {
                             title: this.title,
                         });
                 })
+                .catch((error) => {
+                    if (requestId !== this.requestId) return;
+                    this.loadError = getCollectionLoadError(error);
+                })
                 .finally(() => {
+                    if (requestId !== this.requestId) return;
                     this.loading = false;
                 });
         },
         execStat: function (id) {
             postStat("collection", id);
-            getStat("collection", id).then((res) => {
-                this.views = res.data.views || 0;
-            });
         },
         iconUrl: function (icon) {
             const key = icon.replace("_", "/");
@@ -179,9 +199,15 @@ export default {
     },
     created: function () {},
     mounted: function () {
-        Bus.$on("updateCollection", () => {
+        this.updateCollectionHandler = () => {
             location.reload();
-        });
+        };
+        Bus.$on("updateCollection", this.updateCollectionHandler);
+    },
+    beforeUnmount() {
+        if (this.updateCollectionHandler) {
+            Bus.$off("updateCollection", this.updateCollectionHandler);
+        }
     },
 };
 </script>
@@ -194,6 +220,7 @@ export default {
 @black100: #1c1c1c;
 @black100-dark: #fff;
 .m-collection-mini-single {
+    min-height: 200px;
     padding: 1.11rem 0.75rem;
     .m-collection-mini-single-content {
         .m-header {

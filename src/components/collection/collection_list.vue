@@ -28,7 +28,20 @@
             </template>
         </div>
         <!-- 空 -->
-        <el-alert class="m-collection-null" v-else title="没有找到相关条目" type="info" show-icon></el-alert>
+        <el-alert
+            class="m-collection-null"
+            v-else-if="loadError"
+            title="小册列表加载失败，请稍后重试"
+            type="error"
+            show-icon
+        ></el-alert>
+        <el-alert
+            class="m-collection-null"
+            v-else-if="!loading"
+            title="没有找到相关条目"
+            type="info"
+            show-icon
+        ></el-alert>
         <!-- 分页 -->
         <el-pagination
             class="m-collection-pagination"
@@ -66,6 +79,8 @@ export default {
             pages: 1, //总页数
             per: 18, //每页条目
             search: "",
+            loadError: false,
+            requestId: 0,
 
             count: 0,
         };
@@ -90,17 +105,27 @@ export default {
             window.scrollTo(0, 0);
         },
         loadData: function () {
+            const requestId = ++this.requestId;
             this.loading = true;
+            this.loadError = false;
             const params = {
                 ...this.params,
                 keyword: this.search,
             };
             getCollections(params)
                 .then((res) => {
-                    this.data = res?.data?.data?.list;
-                    this.total = res?.data?.data?.total;
+                    if (requestId !== this.requestId) return;
+                    this.data = res?.data?.data?.list || [];
+                    this.total = res?.data?.data?.total || 0;
+                })
+                .catch(() => {
+                    if (requestId !== this.requestId) return;
+                    this.data = [];
+                    this.total = 0;
+                    this.loadError = true;
                 })
                 .finally(() => {
+                    if (requestId !== this.requestId) return;
                     this.loading = false;
                 });
         },
@@ -114,20 +139,17 @@ export default {
         showCount() {
             const listWidth = this.$refs.listRef?.clientWidth;
             this.count = Math.floor(listWidth / 260);
-            this.per = this.isPhone ? 12 : this.count * 4;
+            this.per = this.isPhone ? 12 : Math.max(this.count, 1) * 4;
         },
     },
     watch: {
-        params: {
-            immediate: true,
-            deep: true,
-            handler: function () {
-                this.loadData();
-            },
+        page: function () {
+            this.loadData();
         },
     },
     mounted() {
         this.showCount();
+        this.loadData();
     },
 };
 </script>

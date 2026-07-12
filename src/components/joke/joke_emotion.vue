@@ -1,5 +1,13 @@
 <template>
-    <el-popover popper-class="m-joke-popover" placement="top" width="500" :offset="-200" v-model:visible="showPop">
+    <el-popover
+        popper-class="m-joke-popover"
+        placement="top"
+        trigger="click"
+        width="500"
+        :offset="-200"
+        :persistent="false"
+        v-model:visible="showPop"
+    >
         <Emotion class="m-publish-joke-emotion" @selected="handleEmotionSelect" />
 
         <template #reference>

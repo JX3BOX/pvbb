@@ -93,7 +93,7 @@ export default {
             return getRelativeTime(new Date(gmt));
         },
         showUserName(emotion) {
-            return emotion?.user_info?.display_name.slice(0, 12) || "匿名";
+            return emotion?.user_info?.display_name?.slice(0, 12) || "匿名";
         },
         preview() {
             if (this.mode !== "single") {

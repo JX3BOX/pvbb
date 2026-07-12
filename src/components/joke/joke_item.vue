@@ -14,7 +14,7 @@
                 </span>
                 <!-- 复制 -->
                 <el-link type="primary" class="u-copy" :disabled="disabled" @click="handleCopy(joke.content)">
-                    <i class="el-icon-document-copy"></i> 复制
+                    <i class="el-icon-document-copy"></i> {{ copyLabel }}
                 </el-link>
                 <!-- 点赞 -->
                 <a class="u-like" :class="{ on: isLike }" title="赞" @click="addLike">
@@ -43,12 +43,11 @@
                     <a class="u-op-item u-op-delete el-link el-link--primary" @click="handleDelete">
                         <i class="el-icon-delete"></i> 删除
                     </a>
-                    <!-- 打赏 -->
+                    <!-- 批量精选选择 -->
                     <el-checkbox
                         v-if="mode !== 'single'"
-                        :disabled="!joke.user_id || isSelf"
                         v-model="checked"
-                        @change="doReward"
+                        @change="toggleSelection"
                         class="u-op-item u-op-gift"
                         >选中</el-checkbox
                     >
@@ -71,14 +70,30 @@ import { starJoke, removeJoke, unstarJoke } from "@/service/joke";
 import User from "@jx3box/jx3box-common/js/user";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
+import { isJokeListHistoryEntry } from "@/utils/joke";
 
 export default {
     name: "joke_item",
-    props: ["joke", "mode", "jokeRewardArr"],
-    emits: ["update", "doReward"], // Vue 3 需要声明 emits
+    props: {
+        joke: {
+            type: Object,
+            default: () => ({}),
+        },
+        mode: {
+            type: String,
+            default: "list",
+        },
+        selectedIds: {
+            type: Array,
+            default: () => [],
+        },
+    },
+    emits: ["update", "selection-change"],
     data() {
         return {
             disabled: false,
+            copyLabel: "复制",
+            copyResetTimer: null,
 
             // 加星
             isStar: !!this.joke?.star,
@@ -93,12 +108,6 @@ export default {
         };
     },
     computed: {
-        isSelf: function () {
-            return this.joke.user_id == User.getInfo().uid;
-        },
-        isListPage: function () {
-            return this.mode !== "single";
-        },
         isEditor: function () {
             return User.isEditor();
         },
@@ -125,9 +134,9 @@ export default {
             deep: true,
             immediate: true,
         },
-        jokeRewardArr: {
+        selectedIds: {
             handler: function (val) {
-                this.checked = !!val?.filter((item) => item.article_id == this.joke.id).length;
+                this.checked = val.map(String).includes(String(this.joke.id));
             },
             deep: true,
             immediate: true,
@@ -147,16 +156,25 @@ export default {
             this.content = result;
         },
         // 复制
-        handleCopy(str) {
+        async handleCopy(str) {
+            if (this.disabled) return;
             this.disabled = true;
-            navigator.clipboard.writeText(str).then(() => {
+            try {
+                await navigator.clipboard.writeText(str);
                 this.copyLabel = "已复制";
-
-                setTimeout(() => {
+                this.copyResetTimer = window.setTimeout(() => {
                     this.copyLabel = "复制";
                     this.disabled = false;
                 }, 3000);
-            });
+            } catch (_) {
+                this.copyLabel = "复制";
+                this.disabled = false;
+                this.$notify({
+                    title: "复制失败",
+                    message: "浏览器未允许访问剪贴板，请手动复制内容",
+                    type: "warning",
+                });
+            }
         },
         // 编辑
         editLink,
@@ -221,32 +239,45 @@ export default {
         },
         // 删除
         handleDelete() {
-            this.$confirm("此操作将会删除该表情，是否继续？", "提示", {
+            this.$confirm("此操作将会删除该条骚话，是否继续？", "提示", {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
                 type: "warning",
-            }).then(() => {
-                removeJoke(this.joke.id).then(() => {
-                    this.$notify({
-                        title: "成功",
-                        message: "删除成功",
-                        type: "success",
+            })
+                .then(() => {
+                    return removeJoke(this.joke.id).then(() => {
+                        this.$notify({
+                            title: "成功",
+                            message: "删除成功",
+                            type: "success",
+                        });
+                        if (this.mode === "single") {
+                            const back = window.history.state?.back;
+                            isJokeListHistoryEntry(back) ? this.$router.back() : this.$router.push("/joke");
+                        } else {
+                            this.$emit("update");
+                        }
                     });
-                    if (this.mode === "single") {
-                        this.$router.go(-1);
-                    } else {
-                        this.$emit("update");
-                    }
+                })
+                .catch((error) => {
+                    if (error === "cancel" || error === "close") return;
+                    this.$notify({
+                        title: "删除失败",
+                        message: "该条骚话暂时无法删除，请稍后重试",
+                        type: "error",
+                    });
                 });
-            });
         },
         handleContent: function () {
+            if (this.mode === "single" || !this.joke?.id) return;
             this.$router.push(`/joke/${this.joke.id}`);
         },
-        //确认批量打赏
-        doReward() {
-            this.$emit("doReward", this.joke);
+        toggleSelection() {
+            this.$emit("selection-change", this.joke);
         },
+    },
+    beforeUnmount() {
+        if (this.copyResetTimer) window.clearTimeout(this.copyResetTimer);
     },
 };
 </script>

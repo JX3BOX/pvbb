@@ -30,6 +30,15 @@
             <div class="m-emotion-content">
                 <emotion-post @success="handlePublishSuccess" />
 
+                <el-alert
+                    v-if="loadError"
+                    class="m-emotion-load-error"
+                    :title="loadError"
+                    type="error"
+                    show-icon
+                    :closable="false"
+                />
+
                 <ul class="m-emotion-list" v-if="list.length">
                     <waterfall
                         ref="waterfall"
@@ -100,7 +109,7 @@
                     </waterfall>
                 </ul>
 
-                <el-alert v-else title="没有找到相关条目" type="info" show-icon />
+                <el-alert v-else-if="!loading && !loadError" title="没有找到相关条目" type="info" show-icon />
 
                 <div class="m-emotion-footer">
                     <el-pagination
@@ -168,6 +177,7 @@ export default {
             total: 0,
             emotions: [],
             list: [],
+            loadError: "",
             waterfallOptions: {
                 autoResize: true,
                 fillBox: true,
@@ -176,6 +186,7 @@ export default {
             },
             resizeHandler: null,
             starLoadingObj: {},
+            syncingRouteState: false,
         };
     },
     computed: {
@@ -200,6 +211,8 @@ export default {
         keys: {
             deep: true,
             handler() {
+                if (this.syncingRouteState) return;
+
                 if (this.page !== 1) {
                     this.page = 1;
                     if (this.updatePaginationQuery({ page: 1, per: this.per })) return;
@@ -214,8 +227,19 @@ export default {
             immediate: true,
             handler(query) {
                 const { page, per } = this.getPaginationFromQuery(query);
+                const routeState = this.getListStateFromQuery(query);
+
+                this.syncingRouteState = true;
                 this.page = page;
                 this.per = per;
+                this.type = routeState.type;
+                this.star = routeState.star;
+                this.original = routeState.original;
+                this.search = routeState.search;
+
+                this.$nextTick(() => {
+                    this.syncingRouteState = false;
+                });
 
                 if (this.shouldReplacePaginationQuery(query, page, per)) {
                     this.updatePaginationQuery({ page, per }, true);
@@ -338,6 +362,7 @@ export default {
         },
         loadList(appendMode = false, extraParams = {}) {
             this.loading = true;
+            this.loadError = "";
             const params = {
                 ...this.params,
                 page: appendMode ? this.page + 1 : this.page,
@@ -380,6 +405,9 @@ export default {
                         };
                     });
                 })
+                .catch(() => {
+                    this.loadError = "趣图列表加载失败，请稍后重试";
+                })
                 .finally(() => {
                     this.loading = false;
                 });
@@ -398,19 +426,54 @@ export default {
                 per: this.normalizePositiveInteger(query.per, this.per),
             };
         },
+        getQueryString(value, fallback = "") {
+            const rawValue = Array.isArray(value) ? value[0] : value;
+            return typeof rawValue === "string" ? rawValue : fallback;
+        },
+        getListStateFromQuery(query = this.$route.query) {
+            return {
+                type: this.getQueryString(query.type, "all") || "all",
+                star: this.getQueryString(query.star) === "1" ? 1 : 0,
+                original: this.getQueryString(query.original) === "1" ? 1 : 0,
+                search: this.getQueryString(query.search),
+            };
+        },
         shouldReplacePaginationQuery(query = this.$route.query, page = this.page, per = this.per) {
             const hasPage = Object.prototype.hasOwnProperty.call(query, "page");
             const hasPer = Object.prototype.hasOwnProperty.call(query, "per");
             return (hasPage && String(query.page) !== String(page)) || (hasPer && String(query.per) !== String(per));
         },
-        updatePaginationQuery({ page = this.page, per = this.per } = {}, replace = false) {
+        buildListQuery({ page = this.page, per = this.per } = {}) {
             const query = {
                 ...this.$route.query,
                 page: String(page),
                 per: String(per),
             };
 
-            if (String(this.$route.query.page) === query.page && String(this.$route.query.per) === query.per) {
+            if (this.type && this.type !== "all") query.type = this.type;
+            else delete query.type;
+
+            if (this.star) query.star = "1";
+            else delete query.star;
+
+            if (this.original) query.original = "1";
+            else delete query.original;
+
+            if (this.search) query.search = this.search;
+            else delete query.search;
+
+            return query;
+        },
+        updatePaginationQuery({ page = this.page, per = this.per } = {}, replace = false) {
+            const query = this.buildListQuery({ page, per });
+
+            const currentKeys = Object.keys(this.$route.query);
+            const nextKeys = Object.keys(query);
+            const isSameQuery =
+                currentKeys.length === nextKeys.length &&
+                nextKeys.every((key) => String(this.$route.query[key]) === String(query[key]));
+
+            if (isSameQuery) {
                 return false;
             }
 
@@ -463,7 +526,7 @@ export default {
             window.addEventListener("resize", this.resizeHandler);
         },
         handlePreview(data) {
-            this.$router.push({ name: "emotion", params: { id: data.id } });
+            this.$router.push({ name: "emotion", params: { id: data.id }, query: this.buildListQuery() });
         },
         showEmotion(url) {
             return this.checkIsGif(url) ? resolveImagePath(url) : getThumbnail(url, "emotion_thumbnail");
@@ -476,7 +539,7 @@ export default {
 
             return {
                 time: getRelativeTime(new Date(gmt)) || "",
-                username: emotion?.user_info?.display_name.slice(0, 12) || "匿名",
+                username: emotion?.user_info?.display_name?.slice(0, 12) || "匿名",
                 userLink: authorLink(emotion?.user_id) || "",
                 userAvatar: showAvatar(emotion?.user_info?.user_avatar) || "",
             };
