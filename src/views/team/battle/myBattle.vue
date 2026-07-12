@@ -14,7 +14,7 @@
             <div class="m-mybattle-list" v-else>
                 <BattleItem v-for="(item, i) in list" :key="i" :item="item" @uploadBattle="uploadBattle"></BattleItem>
                 <el-pagination
-                    class="m-archive-pages justify-center!"
+                    class="m-archive-pages"
                     background
                     layout="total, prev, pager, next,jumper"
                     :hide-on-single-page="true"

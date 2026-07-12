@@ -1,5 +1,11 @@
 <template>
-    <div ref="main" class="main" id="main" :style="{ height: maxH + 'px' }">
+    <div
+        ref="main"
+        class="main"
+        :class="{ 'is-overflow-visible': allowOverflow }"
+        id="main"
+        :style="{ height: maxH + 'px' }"
+    >
         <div
             class="item"
             :class="[moveMode, styleArr[i] && styleArr[i].showClass]"
@@ -56,6 +62,11 @@ export default {
         moveTransitionDuration: {
             type: Number,
             default: 0.4,
+        },
+        // 卡片阴影等视觉效果需要越过瀑布流容器时显式开启
+        allowOverflow: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -341,6 +352,9 @@ export default {
     height: 100%;
     overflow: hidden;
     transition-property: height;
+}
+.main.is-overflow-visible {
+    overflow: visible;
 }
 .main > .item {
     position: absolute;

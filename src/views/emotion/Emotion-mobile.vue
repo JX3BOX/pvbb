@@ -10,7 +10,7 @@
                         </div>
                         <div class="m-content">
                             <div class="m-header">
-                                <span class="u-author">{{ item.user_info?.display_name || "匿名" }}</span>
+                                <span class="u-author">{{ item.user_info?.display_name || $t("pages.emotion.anonymous") }}</span>
                             </div>
                             <div class="m-body">
                                 <el-image class="u-img" :src="item.url" :preview-src-list="[item.url]"> </el-image>
@@ -30,11 +30,11 @@
             >
                 <template v-if="type == 'all'">
                     <img class="u-icon" svg-inline src="@/assets/img/emotion/filter_icon.svg" />
-                    <div class="u-tip">筛选骚图</div>
+                    <div class="u-tip">{{ $t("pages.emotion.filter") }}</div>
                 </template>
                 <template v-else>
                     <img class="u-icon" svg-inline :src="showSchoolIcon(type)" />
-                    <div class="u-tip">仅查看{{ schoolmap[type] }}</div>
+                    <div class="u-tip">{{ $t("pages.emotion.viewOnly", { school: schoolmap[type] }) }}</div>
                 </template>
             </div>
         </div>
@@ -48,7 +48,7 @@
             :modal-append-to-body="false"
             append-to-body
         >
-            <div class="m-filter-all" @click="drawerType = 'all'" :class="{ active: drawerType == 'all' }">全部</div>
+            <div class="m-filter-all" @click="drawerType = 'all'" :class="{ active: drawerType == 'all' }">{{ $t("pages.emotion.all") }}</div>
             <div class="m-filter-group">
                 <div
                     class="m-filter-item"
@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="m-filter-btn">
-                <div class="m-filter-btn-reset" @click="drawerType = 'all'">重置</div>
+                <div class="m-filter-btn-reset" @click="drawerType = 'all'">{{ $t("pages.emotion.reset") }}</div>
                 <div
                     class="m-filter-btn-confirm"
                     @click="
@@ -72,7 +72,7 @@
                         scrollToBottomFlag = true;
                     "
                 >
-                    确定
+                    {{ $t("pages.emotion.confirm") }}
                 </div>
             </div>
         </el-drawer>

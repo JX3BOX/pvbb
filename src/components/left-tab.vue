@@ -1,7 +1,7 @@
 <template>
     <div class="m-left-tab">
         <el-tabs v-model="type" :tab-position="windowWidth < 900 ? 'top' : 'left'">
-            <el-tab-pane name="all" label="全部">
+            <el-tab-pane name="all" :label="$t('pages.emotion.all')">
                 <template #label>
                     <i class="u-icon el-icon-menu" style="vertical-align: 0"></i>
                 </template>
@@ -20,15 +20,28 @@ import schoolmap from "@jx3box/jx3box-data/data/xf/schoolid.json";
 import { __imgPath } from "@/utils/config";
 export default {
     name: "LeftTab",
+    props: {
+        modelValue: {
+            type: [String, Number],
+            default: "all",
+        },
+    },
+    emits: ["update:modelValue", "setType"],
     data() {
         return {
-            type: "all",
+            type: this.modelValue,
             windowWidth: document.documentElement.clientWidth,
             schoolmap,
         };
     },
     watch: {
+        modelValue(type) {
+            if (type !== this.type) {
+                this.type = type;
+            }
+        },
         type(type) {
+            this.$emit("update:modelValue", type);
             this.$emit("setType", type);
         },
     },
@@ -36,12 +49,15 @@ export default {
         showSchoolIcon: function (val) {
             return __imgPath + "image/school/" + val + ".png";
         },
+        updateWindowWidth() {
+            this.windowWidth = document.documentElement.clientWidth;
+        },
     },
-    mounted: function () {
-        const that = this;
-        window.onresize = () => {
-            that.windowWidth = document.documentElement.clientWidth;
-        };
+    mounted() {
+        window.addEventListener("resize", this.updateWindowWidth);
+    },
+    beforeUnmount() {
+        window.removeEventListener("resize", this.updateWindowWidth);
     },
 };
 </script>

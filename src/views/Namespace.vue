@@ -1,85 +1,94 @@
 <template>
     <ListLayout>
-        <!-- 搜索 -->
-        <div class="m-archive-search m-namespace-search" key="namespace-search">
-            <el-input
-                placeholder="请输入搜索内容"
-                v-model.trim="search"
-                clearable
-                @clear="onSearch"
-                @keydown.enter="onSearch"
-                class="input-with-select"
-                size="large"
-            >
-                <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
-                <template #append>
-                    <el-button class="u-btn" @click="onSearch">
-                        <i class="el-icon-position"></i>
-                    </el-button>
-                </template>
-            </el-input>
-        </div>
-        <div class="v-namespace" v-loading="loading">
-            <!-- tab切换 -->
-            <el-tabs class="m-namespace-tab" v-model="type">
-                <el-tab-pane label="全部" name="all"></el-tab-pane>
-                <el-tab-pane
-                    v-for="item in types"
-                    :label="item.label"
-                    :key="item.value"
-                    :name="item.value"
-                ></el-tab-pane>
-            </el-tabs>
-            <el-alert v-if="query" type="warning" show-icon class="m-namespace-warning">
-                <template #title>
-                    <b>{{ query }}</b> 铭牌不存在或正在审核中
-                </template>
-            </el-alert>
-            <!-- 过滤 -->
-            <div class="m-namespace-filter">
-                <div class="m-namespace-add">
-                    <a
-                        :href="publish_link"
-                        class="u-publish u-namespace-add el-button el-button--primary el-button--small"
-                        >+ 注册铭牌</a
-                    >
-                    <a
-                        href="/publish/#/bucket/namespace"
-                        class="u-publish el-button el-button--primary el-button--small"
-                    >
-                        <span class="el-icon-receiving"></span>&nbsp;我的铭牌
-                    </a>
-                    <div class="m-namespace-total">
-                        当前共
-                        <b>{{ total }}</b
-                        >个铭牌
+        <div class="m-namespace-box">
+            <section class="m-namespace-hero">
+                <div class="u-hero-copy">
+                    <span class="u-eyebrow">JX3BOX NAMESPACE</span>
+                    <h1>剑三铭牌</h1>
+                    <p>为常用页面设置一个简短、好记的专属访问地址。</p>
+                </div>
+                <div class="u-hero-action">
+                    <div class="u-action-list">
+                        <a
+                            :href="publish_link"
+                            class="u-publish u-namespace-create el-button el-button--large el-button--primary"
+                        >
+                            <i class="el-icon-plus"></i><span>注册铭牌</span>
+                        </a>
+                        <a
+                            href="/publish/#/bucket/namespace"
+                            class="u-publish u-namespace-mine el-button el-button--large"
+                        >
+                            <i class="el-icon-receiving"></i><span>我的铭牌</span>
+                        </a>
+                    </div>
+                    <span class="u-total">已收录 {{ total }} 个铭牌</span>
+                </div>
+            </section>
+
+            <!-- 搜索 -->
+            <div class="m-archive-search m-namespace-search" key="namespace-search">
+                <el-input
+                    placeholder="请输入搜索内容"
+                    v-model.trim="search"
+                    clearable
+                    @clear="onSearch"
+                    @keydown.enter="onSearch"
+                    class="input-with-select"
+                    size="large"
+                >
+                    <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
+                    <template #append>
+                        <el-button class="u-btn" @click="onSearch">
+                            <i class="el-icon-position"></i>
+                        </el-button>
+                    </template>
+                </el-input>
+            </div>
+            <div class="v-namespace" v-loading="loading">
+                <!-- tab切换 -->
+                <el-tabs class="m-namespace-tab" v-model="type">
+                    <el-tab-pane label="全部" name="all"></el-tab-pane>
+                    <el-tab-pane
+                        v-for="item in types"
+                        :label="item.label"
+                        :key="item.value"
+                        :name="item.value"
+                    ></el-tab-pane>
+                </el-tabs>
+                <el-alert v-if="query" type="warning" show-icon class="m-namespace-warning">
+                    <template #title>
+                        <b>{{ query }}</b> 铭牌不存在或正在审核中
+                    </template>
+                </el-alert>
+                <!-- 过滤 -->
+                <div class="m-namespace-filter">
+                    <div class="m-namespace-order">
+                        <orderBy class="u-item" @filter="changeOrder"></orderBy>
                     </div>
                 </div>
-                <div class="m-namespace-order">
-                    <orderBy class="u-item" @filter="changeOrder"></orderBy>
-                </div>
-            </div>
 
-            <!-- 列表内容 -->
-            <div class="m-namespace-list" v-if="list">
-                <div class="u-namespace" v-for="item in list" :key="item.ID">
-                    <namespace-item :data="item" />
+                <!-- 列表内容 -->
+                <div class="m-namespace-list" v-if="list">
+                    <div class="u-namespace" v-for="item in list" :key="item.ID">
+                        <namespace-item :data="item" />
+                    </div>
                 </div>
+                <!-- 无数据 -->
+                <div class="m-namespace-null" v-else>
+                    <el-alert title="没有相关条目" type="info" show-icon></el-alert>
+                </div>
+                <!-- 分页 -->
+                <el-pagination
+                    class="m-namespace-pages"
+                    background
+                    layout="total, prev, pager, next,jumper"
+                    :hide-on-single-page="true"
+                    :page-size="per"
+                    :total="total"
+                    v-model:current-page="page"
+                ></el-pagination>
             </div>
-            <!-- 无数据 -->
-            <div class="m-namespace-null" v-else>
-                <el-alert title="没有相关条目" type="info" show-icon></el-alert>
-            </div>
-            <!-- 分页 -->
-            <el-pagination
-                class="m-namespace-pages"
-                background
-                layout="total, prev, pager, next,jumper"
-                :hide-on-single-page="true"
-                :page-size="per"
-                :total="total"
-                v-model:current-page="page"
-            ></el-pagination>
         </div>
     </ListLayout>
 </template>

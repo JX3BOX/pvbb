@@ -1,34 +1,24 @@
 <template>
-    <div class="m-emotion-list-container" v-loading="loading">
-        <div class="m-archive-search m-emotion-search">
-            <el-input
-                v-model.trim="search"
-                placeholder="请输入搜索内容"
-                clearable
-                size="large"
-                @keydown.enter="onSearch"
-                @clear="onSearch"
-            >
-                <template #prepend>
-                    <i class="el-icon-search"></i>
-                    <span class="u-search">关键词</span>
-                </template>
-                <template #append>
-                    <el-switch
-                        v-model="star"
-                        class="u-star"
-                        :inactive-value="0"
-                        :active-value="1"
-                        inactive-text="只看精选"
-                    />
-                </template>
-            </el-input>
-        </div>
+    <ContentListShell
+        class="m-emotion-list-container"
+        :title="$t('pages.emotion.title')"
+        :description="$t('pages.emotion.heroDescription')"
+        icon="el-icon-picture-outline"
+        :loading="loading"
+        :type="type"
+        @set-type="setType"
+    >
+        <template #publish>
+            <emotion-post @success="handlePublishSuccess" />
+        </template>
 
-        <div class="m-emotion-main">
-            <left-tab class="m-emotion-types" @setType="setType" />
-            <div class="m-emotion-content">
-                <emotion-post @success="handlePublishSuccess" />
+        <ContentSearchBar
+            v-model:keyword="search"
+            v-model:star="star"
+            :placeholder="$t('pages.emotion.searchPlaceholder')"
+            :featured-label="$t('pages.emotion.featured')"
+            @search="onSearch"
+        />
 
                 <el-alert
                     v-if="loadError"
@@ -42,6 +32,7 @@
                 <ul class="m-emotion-list" v-if="list.length">
                     <waterfall
                         ref="waterfall"
+                        allow-overflow
                         :autoResize="waterfallOptions.autoResize"
                         :moveTransitionDuration="0.4"
                         :fillBox="waterfallOptions.fillBox"
@@ -51,65 +42,21 @@
                         :col="waterfallOptions.col"
                     >
                         <template #default="item">
-                            <div class="u-item waterfall-item m-emotion-item" :class="{ fadeIn: item.state == 'show' }">
-                                <div class="u-emotion">
-                                    <img
-                                        class="u-pic u-emotion-pic waterfall-img"
-                                        :src="showEmotion(item.data.url)"
-                                        :alt="item.data.desc"
-                                        :key="item.data.url"
-                                        @click="handlePreview(item.data)"
-                                    />
-                                    <i class="u-star" v-if="item.data.star">
-                                        <i class="el-icon-star-off"></i>
-                                        <i class="u-original" v-if="item.data.original">原创</i>
-                                    </i>
-                                </div>
-                                <div class="u-item-bottom">
-                                    <div class="u-info-user">
-                                        <a
-                                            class="u-user-name"
-                                            :href="doEmotionUser(item.data).userLink"
-                                            target="_blank"
-                                        >
-                                            <img
-                                                class="u-user-avatar waterfall-img"
-                                                :src="doEmotionUser(item.data).userAvatar"
-                                                :key="doEmotionUser(item.data).userAvatar"
-                                            />
-                                            {{ doEmotionUser(item.data).username }}
-                                        </a>
-                                    </div>
-                                    <div class="u-info-misc">
-                                        <time class="u-time">{{ doEmotionUser(item.data).time }}</time>
-                                        <span
-                                            v-if="isEditor"
-                                            class="u-op-item u-op-star el-link el-link--primary"
-                                            :class="{ 'is-disabled': starLoadingObj[item.data.id],'on': item.data.star }"
-                                            @click="handleStar(item.data)"
-                                        >
-                                            <i :class="item.data.star ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
-                                            {{ item.data.star ? "取消精选" : "设为精选" }}
-                                        </span>
-                                        <a
-                                            v-else
-                                            class="u-like"
-                                            :class="{ on: item.data.isLike }"
-                                            title="赞"
-                                            @click="addLike(item.data)"
-                                        >
-                                            <i class="like-icon">{{ item.data.isLike ? "♥ " : "♡ " }}</i>
-                                            <span class="like-text">Like</span>
-                                            <span class="like-count" v-if="item.data.count">{{ item.data.count }}</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <EmotionItem
+                                class="u-item waterfall-item"
+                                :class="{ fadeIn: item.state === 'show' }"
+                                :emotion="item.data"
+                                :is-editor="isEditor"
+                                :star-loading="!!starLoadingObj[item.data.id]"
+                                @preview="handlePreview"
+                                @star="handleStar"
+                                @like="addLike"
+                            />
                         </template>
                     </waterfall>
                 </ul>
 
-                <el-alert v-else-if="!loading && !loadError" title="没有找到相关条目" type="info" show-icon />
+                <el-alert v-else-if="!loading && !loadError" :title="$t('pages.emotion.noEntries')" type="info" show-icon />
 
                 <div class="m-emotion-footer">
                     <el-pagination
@@ -134,34 +81,34 @@
                         :disabled="loading"
                         @click="loadMore"
                     >
-                        加载更多
+                        {{ $t("pages.emotion.loadMore") }}
                     </el-button>
                 </div>
-            </div>
-        </div>
-
-    </div>
+    </ContentListShell>
 </template>
 
 <script>
 import cloneDeep from "lodash/cloneDeep";
 import debounce from "lodash/debounce";
+import ContentListShell from "@/components/common/ContentListShell.vue";
+import ContentSearchBar from "@/components/common/ContentSearchBar.vue";
 import WaterfallRapid from "@/components/WaterfallRapid.vue";
-import LeftTab from "@/components/left-tab.vue";
+import EmotionItem from "@/components/emotion/emotion_item.vue";
 import emotion_post from "@/components/emotion/emotion_post";
-import { resolveImagePath, getThumbnail, authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
-import { getRelativeTime } from "@/utils/dateFormat.js";
 import { getEmotions, starEmotion, unstarEmotion } from "@/service/emotion";
 import { getLikes } from "@/service/next";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
+import { getPaginationFromQuery, isSameRouteQuery, shouldReplacePaginationQuery } from "@/utils/listQuery";
 
 export default {
     name: "EmotionList",
     components: {
+        ContentListShell,
+        ContentSearchBar,
+        EmotionItem,
         waterfall: WaterfallRapid,
-        LeftTab,
         "emotion-post": emotion_post,
     },
     data() {
@@ -226,7 +173,7 @@ export default {
             deep: true,
             immediate: true,
             handler(query) {
-                const { page, per } = this.getPaginationFromQuery(query);
+                const { page, per } = getPaginationFromQuery(query, this.per);
                 const routeState = this.getListStateFromQuery(query);
 
                 this.syncingRouteState = true;
@@ -241,7 +188,7 @@ export default {
                     this.syncingRouteState = false;
                 });
 
-                if (this.shouldReplacePaginationQuery(query, page, per)) {
+                if (shouldReplacePaginationQuery(query, page, per)) {
                     this.updatePaginationQuery({ page, per }, true);
                     return;
                 }
@@ -304,15 +251,15 @@ export default {
                     if (target) target.star = nextStar;
 
                     this.$notify({
-                        title: "成功",
-                        message: isStar ? "取消加精成功" : "加精成功",
+                        title: this.$t("pages.emotion.success"),
+                        message: this.$t(isStar ? "pages.emotion.cancelFeaturedSuccess" : "pages.emotion.setFeaturedSuccess"),
                         type: "success",
                     });
 
                     if (skippedAutoAppraise) {
                         this.$notify({
-                            title: "提示",
-                            message: "该作品无作者ID，未执行自动品鉴",
+                            title: this.$t("pages.emotion.notice"),
+                            message: this.$t("pages.emotion.autoAppraiseSkipped"),
                             type: "warning",
                         });
                     }
@@ -322,12 +269,12 @@ export default {
                 .catch((error) => {
                     const rollbackFailed = !!error?.rollbackError;
                     this.$notify({
-                        title: "失败",
+                        title: this.$t("pages.emotion.failure"),
                         message: rollbackFailed
-                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            ? this.$t("pages.emotion.autoAppraiseRollbackFailed")
                             : isStar
-                              ? "自动取消品鉴失败，已回滚精选状态"
-                              : "自动品鉴失败，已回滚精选状态",
+                              ? this.$t("pages.emotion.cancelAutoAppraiseFailed")
+                              : this.$t("pages.emotion.autoAppraiseFailed"),
                         type: "error",
                     });
                 })
@@ -406,7 +353,7 @@ export default {
                     });
                 })
                 .catch(() => {
-                    this.loadError = "趣图列表加载失败，请稍后重试";
+                    this.loadError = this.$t("pages.emotion.loadError");
                 })
                 .finally(() => {
                     this.loading = false;
@@ -414,17 +361,6 @@ export default {
         },
         loadMore() {
             this.loadList(true);
-        },
-        normalizePositiveInteger(value, fallback) {
-            const rawValue = Array.isArray(value) ? value[0] : value;
-            const number = parseInt(rawValue, 10);
-            return number > 0 ? number : fallback;
-        },
-        getPaginationFromQuery(query = this.$route.query) {
-            return {
-                page: this.normalizePositiveInteger(query.page, 1),
-                per: this.normalizePositiveInteger(query.per, this.per),
-            };
         },
         getQueryString(value, fallback = "") {
             const rawValue = Array.isArray(value) ? value[0] : value;
@@ -437,11 +373,6 @@ export default {
                 original: this.getQueryString(query.original) === "1" ? 1 : 0,
                 search: this.getQueryString(query.search),
             };
-        },
-        shouldReplacePaginationQuery(query = this.$route.query, page = this.page, per = this.per) {
-            const hasPage = Object.prototype.hasOwnProperty.call(query, "page");
-            const hasPer = Object.prototype.hasOwnProperty.call(query, "per");
-            return (hasPage && String(query.page) !== String(page)) || (hasPer && String(query.per) !== String(per));
         },
         buildListQuery({ page = this.page, per = this.per } = {}) {
             const query = {
@@ -467,13 +398,7 @@ export default {
         updatePaginationQuery({ page = this.page, per = this.per } = {}, replace = false) {
             const query = this.buildListQuery({ page, per });
 
-            const currentKeys = Object.keys(this.$route.query);
-            const nextKeys = Object.keys(query);
-            const isSameQuery =
-                currentKeys.length === nextKeys.length &&
-                nextKeys.every((key) => String(this.$route.query[key]) === String(query[key]));
-
-            if (isSameQuery) {
+            if (isSameRouteQuery(this.$route.query, query)) {
                 return false;
             }
 
@@ -527,22 +452,6 @@ export default {
         },
         handlePreview(data) {
             this.$router.push({ name: "emotion", params: { id: data.id }, query: this.buildListQuery() });
-        },
-        showEmotion(url) {
-            return this.checkIsGif(url) ? resolveImagePath(url) : getThumbnail(url, "emotion_thumbnail");
-        },
-        checkIsGif(url) {
-            return url?.split(".").pop().toLowerCase() == "gif";
-        },
-        doEmotionUser(emotion) {
-            const gmt = emotion?.updated_at;
-
-            return {
-                time: getRelativeTime(new Date(gmt)) || "",
-                username: emotion?.user_info?.display_name?.slice(0, 12) || "匿名",
-                userLink: authorLink(emotion?.user_id) || "",
-                userAvatar: showAvatar(emotion?.user_info?.user_avatar) || "",
-            };
         },
         addLike(item) {
             if (item.isLike) return;

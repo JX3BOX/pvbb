@@ -17,7 +17,7 @@
                             <!-- 标题 -->
                             <div class="m-single-title">
                                 <span class="u-title u-sub-block" :href="url" :title="collection.title">
-                                    <i class="u-private el-icon-lock" v-if="!collection.public" title="仅自己可见"></i>
+                                    <i class="u-private el-icon-lock" v-if="!collection.public" :title="$t('pages.collection.detail.private')"></i>
                                     <span class="u-title-text">{{ collection.title }}</span>
                                 </span>
                             </div>
@@ -35,13 +35,13 @@
                                 </div>
 
                                 <!-- 发布日期 -->
-                                <span class="u-podate u-sub-block" title="发布日期">
+                                <span class="u-podate u-sub-block" :title="$t('pages.collection.detail.publishedAt')">
                                     <i class="u-icon el-icon-date"></i>
                                     <time>{{ dateFormat(collection.created) }}</time>
                                 </span>
 
                                 <!-- 最后更新 -->
-                                <span class="u-modate u-sub-block" title="最后更新">
+                                <span class="u-modate u-sub-block" :title="$t('pages.collection.detail.updatedAt')">
                                     <i class="u-icon el-icon-refresh"></i>
                                     <time>{{ dateFormat(collection.updated) }}</time>
                                 </span>
@@ -55,7 +55,7 @@
                                 <!-- 编辑 -->
                                 <a class="u-edit u-sub-block" :href="edit_link" v-if="canEdit">
                                     <i class="u-icon-edit el-icon-edit-outline"></i>
-                                    <span>编辑</span>
+                                    <span>{{ $t("pages.common.edit") }}</span>
                                 </a>
 
                                 <!-- 删除 -->
@@ -66,7 +66,7 @@
                                     v-if="canEdit"
                                 >
                                     <i class="u-icon-remove el-icon-delete"></i>
-                                    <span>删除</span>
+                                    <span>{{ $t("pages.common.delete") }}</span>
                                 </a>
                             </div>
                         </header>
@@ -75,7 +75,7 @@
                     <template v-if="collection.description">
                         <el-divider content-position="left">
                             <i class="el-icon-collection"></i>
-                            小册简介
+                            {{ $t("pages.collection.detail.introduction") }}
                         </el-divider>
                         <div class="u-description">
                             <p v-html="resolveImagePath(collection.description)"></p>
@@ -85,14 +85,14 @@
                     <template v-if="collection.posts && collection.posts.length">
                         <el-divider content-position="left">
                             <i class="el-icon-folder"></i>
-                            小册文章
+                            {{ $t("pages.collection.detail.articles") }}
                         </el-divider>
                         <ul class="u-list">
                             <li class="u-item" v-for="(post, key) in collection.posts" :key="key">
                                 <span class="u-item-order">{{ key + 1 }}.</span>
                                 <img class="u-item-icon" :src="iconUrl(post.icon)" v-if="post.icon" />
                                 <span class="u-item-link" v-if="post.type === 'custom'">
-                                    <i class="el-icon-link"></i>站外链接
+                                    <i class="el-icon-link"></i>{{ $t("pages.collection.detail.externalLink") }}
                                 </span>
                                 <a
                                     class="u-item-author"
@@ -117,7 +117,7 @@
                                 <time
                                     class="u-updated"
                                     v-if="post.updated"
-                                    v-text="'最后更新于 ' + formatDate(post.updated)"
+                                    v-text="$t('pages.collection.detail.lastUpdated', { time: formatDate(post.updated) })"
                                 ></time>
                             </li>
                         </ul>
@@ -149,7 +149,7 @@
 
                 <div class="m-comments" v-if="id">
                     <el-divider content-position="left">
-                        <span style="color: #999999"> <i class="el-icon-chat-line-square"></i> 讨论 </span>
+                        <span style="color: #999999"> <i class="el-icon-chat-line-square"></i> {{ $t("pages.collection.detail.discussion") }} </span>
                     </el-divider>
                     <CommonComment :id="id" category="collection" />
                 </div>
@@ -219,8 +219,8 @@ export default {
         },
         loadErrorTitle() {
             return this.loadError === "not-found"
-                ? "该剑三小册不存在或已被删除"
-                : "小册加载失败，请稍后重试";
+                ? this.$t("pages.collection.detail.notFound")
+                : this.$t("pages.collection.detail.loadFailed");
         },
     },
     watch: {
@@ -247,13 +247,13 @@ export default {
         },
         delete_handle($event, collection_id) {
             $event.preventDefault();
-            this.$confirm("确认是否删除该剑三小册？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("pages.collection.detail.deleteConfirm"), this.$t("pages.common.promptTitle"), {
+                confirmButtonText: this.$t("pages.common.confirm"),
+                cancelButtonText: this.$t("pages.common.cancel"),
                 type: "warning",
             }).then(() => {
                 removeCollection(collection_id).then((data) => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.collection.detail.deleted"));
                     this.$router.push({ name: "collection" });
                 });
             });

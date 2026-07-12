@@ -1,44 +1,60 @@
 <template>
     <div class="m-collection-box" v-loading="loading" ref="listRef">
+        <section class="m-collection-hero">
+            <div class="u-hero-copy">
+                <span class="u-eyebrow">JX3BOX COLLECTION</span>
+                <h1>{{ $t("pages.collection.list.heroTitle") }}</h1>
+                <p>{{ $t("pages.collection.list.heroDescription") }}</p>
+            </div>
+            <div class="u-hero-action">
+                <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">
+                    <i class="el-icon-plus"></i> {{ $t("pages.collection.list.create") }}
+                </a>
+                <span v-if="total" class="u-total">{{ $t("pages.collection.list.total", { count: total }) }}</span>
+            </div>
+        </section>
+
         <!-- 搜索 -->
         <div class="m-archive-search m-collection-search">
-            <a :href="publish_link" class="u-publish el-button el-button--large el-button--primary">+ 创建小册</a>
+            <i class="el-icon-search u-search-icon"></i>
             <el-input
-                placeholder="请输入搜索内容"
+                :placeholder="$t('pages.collection.list.searchPlaceholder')"
                 v-model.trim="search"
-                class="input-with-select"
                 clearable
                 @clear="onSearch"
                 size="large"
                 @keydown.enter="onSearch"
-            >
-                <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
-                <template #append>
-                    <el-button class="u-btn" @click="onSearch">
-                        <i class="el-icon-position"></i>
-                    </el-button>
-                </template>
-            </el-input>
+            />
+            <el-button class="u-btn" @click="onSearch">{{ $t("pages.collection.list.search") }}</el-button>
         </div>
         <Banner :subtype="'collection'"></Banner>
         <!-- 列表 -->
-        <div class="m-collection-list" v-if="data && data.length">
-            <template v-for="(item, i) in data" :key="i">
-                <collection-item :data="item" />
-            </template>
-        </div>
+        <section class="m-collection-shelf" v-if="data && data.length">
+            <div class="m-collection-shelf-head">
+                <div>
+                    <span class="u-title">{{ $t("pages.collection.list.all") }}</span>
+                    <span class="u-desc">{{ $t("pages.collection.list.discover") }}</span>
+                </div>
+                <span class="u-page">{{ $t("pages.collection.list.page", { page }) }}</span>
+            </div>
+            <div class="m-collection-list">
+                <template v-for="(item, i) in data" :key="i">
+                    <collection-item :data="item" />
+                </template>
+            </div>
+        </section>
         <!-- 空 -->
         <el-alert
             class="m-collection-null"
             v-else-if="loadError"
-            title="小册列表加载失败，请稍后重试"
+            :title="$t('pages.collection.list.loadFailed')"
             type="error"
             show-icon
         ></el-alert>
         <el-alert
             class="m-collection-null"
             v-else-if="!loading"
-            title="没有找到相关条目"
+            :title="$t('pages.collection.list.empty')"
             type="info"
             show-icon
         ></el-alert>
@@ -155,14 +171,184 @@ export default {
 </script>
 <style lang="less">
 .m-collection-box {
-    .m-collection-list {
-        gap: 0;
-        justify-content: flex-start;
-    }
-    .m-collection-search{
-        .u-search{
-            margin-left:3px;
+    padding: 0;
+    min-height: calc(100vh - 180px);
+    box-sizing: border-box;
+    background:
+        radial-gradient(circle at 92% 0, rgba(97, 86, 225, 0.1), transparent 260px),
+        #fff;
+
+    .m-collection-hero {
+        margin-top:10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 28px 30px;
+        margin-bottom: 22px;
+        border: 1px solid #ebeaff;
+        border-radius: 14px;
+        color: #fff;
+        overflow: hidden;
+        background: linear-gradient(120deg, #26213f 0%, #42377c 56%, #6558ce 100%);
+        box-shadow: 0 12px 30px rgba(60, 49, 128, 0.14);
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: -54px;
+            bottom: -110px;
+            width: 270px;
+            height: 270px;
+            border: 42px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
         }
+    }
+    .u-hero-copy,
+    .u-hero-action {
+        position: relative;
+        z-index: 1;
+    }
+    .u-eyebrow {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.62);
+    }
+    h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        line-height: 1.2;
+        color: #fff;
+    }
+    .u-hero-copy p {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.78);
+    }
+    .u-hero-action {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 14px;
+    }
+    .u-publish {
+        margin: 0;
+        border: 0;
+        color: #4a3dac;
+        background: #fff;
+        box-shadow: 0 5px 14px rgba(20, 15, 57, 0.18);
+        &:hover,
+        &:focus {
+            color: #33268b;
+            background: #f5f3ff;
+        }
+    }
+    .u-total {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.72);
+    }
+    .m-collection-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+        justify-content: initial;
+    }
+    .m-collection-shelf {
+        margin-top: 26px;
+        padding: 20px;
+        border: 1px solid #ecebf3;
+        border-radius: 16px;
+        background: #fafafe;
+    }
+    .m-collection-shelf-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 0 2px 14px;
+        border-bottom: 1px solid #e9e8f0;
+        .u-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #2f2b43;
+        }
+        .u-desc {
+            margin-left: 10px;
+            font-size: 12px;
+            color: #9a97a9;
+        }
+        .u-page {
+            font-size: 12px;
+            color: #8c87a0;
+        }
+    }
+    .m-collection-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 6px;
+        border: 1px solid #e8e8ee;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 5px 16px rgba(32, 31, 49, 0.04);
+        .u-search-icon {
+            flex: 0 0 auto;
+            padding-left: 12px;
+            color: #8c8a9a;
+        }
+        .el-input {
+            flex: 1;
+        }
+        .el-input__wrapper {
+            box-shadow: none !important;
+        }
+        .u-btn {
+            flex: 0 0 auto;
+            height: 34px;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 7px;
+            color: #fff;
+            background: #5b4ed3;
+            &:hover { background: #493cbc; }
+        }
+    }
+    .m-banner {
+        margin-top: 18px;
+    }
+}
+
+@media screen and (max-width: @ipad) {
+    .m-collection-box {
+        .m-collection-list { grid-template-columns: repeat(4, 1fr); }
+    }
+}
+@media screen and (max-width: 1400px) {
+    .m-collection-box .m-collection-hero {
+        display: block;
+        .u-hero-action { margin-top: 18px; }
+    }
+}
+@media screen and (max-width: @phone) {
+    .m-collection-box {
+        .m-collection-hero {
+            display: block;
+            padding: 22px;
+        }
+        h1 { font-size: 24px; }
+        .u-hero-copy p { line-height: 1.7; }
+        .u-hero-action { margin-top: 18px; }
+        .m-collection-shelf { padding: 14px 10px 10px; }
+        .m-collection-shelf-head {
+            padding: 0 4px 12px;
+            .u-desc, .u-page { display: none; }
+        }
+        .m-collection-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
     }
 }
 </style>

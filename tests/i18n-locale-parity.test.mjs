@@ -58,7 +58,7 @@ test("all application locales keep identical keys and placeholders", async () =>
     }
 });
 
-test("static pages.community usages resolve in every locale", async () => {
+test("static community, joke, and emotion i18n usages resolve in every locale", async () => {
     const messages = Object.fromEntries(
         await Promise.all(locales.map(async (locale) => [locale, flatten(await loadMessages(locale))]))
     );
@@ -67,7 +67,7 @@ test("static pages.community usages resolve in every locale", async () => {
 
     for (const file of sourceFiles) {
         const source = await readFile(file, "utf8");
-        for (const match of source.matchAll(/\$t\(\s*["'](pages\.community\.[^"']+)["']/g)) {
+        for (const match of source.matchAll(/\$t\(\s*["'](pages\.(?:community|joke|emotion)\.[^"']+)["']/g)) {
             usedKeys.add(match[1].replace(/^pages\./, ""));
         }
     }

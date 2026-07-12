@@ -1,52 +1,5 @@
-.u-info-comment {
-    position: absolute;
-    right: 30px;
-    top: 0;
-    .u-op {
-        margin-top: 0;
-    }
-}
-
 // 列表页
 // =======================
-.m-emotion-types {
-    position: sticky;
-    top: @header-height + @bread-height;
-    margin-bottom: 10px;
-    background-color: #fff;
-    z-index: 100;
-    .u-icon {
-        .size(24px);
-        .y(-6px);
-    }
-}
-
-@media screen and (max-width: @phone) {
-    .wechat-miniprogram {
-        .m-emotion-types {
-            position: relative;
-            top: 0;
-        }
-        .m-emotion-publish {
-            .none;
-        }
-    }
-}
-
-.m-emotion-content {
-    .w(100%);
-}
-.m-emotion-search {
-    .el-switch__label {
-        color: @color;
-    }
-    .u-original {
-        .ml(10px);
-    }
-    .u-search {
-        .ml(5px);
-    }
-}
 .u-item-bottom {
     // .flex;
     // justify-content: space-between;
@@ -87,104 +40,6 @@
         align-items: center;
     }
 }
-@media screen and (min-width: 900px) {
-    .m-emotion-main {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-    }
-}
-@media screen and (max-width: @phone) {
-    .m-emotion-search {
-        .el-input-group__append {
-            .none;
-        }
-    }
-}
-
-.m-emotion-publish {
-    .mb(20px);
-    background-color: @bg-light;
-    padding: 10px;
-    border: 1px solid #eee;
-    .r(4px);
-    .pr;
-    .u-title {
-        .pa;
-        .lt(0);
-        .fz(14px);
-        background-color: @v4primary;
-        color: #fff;
-        border-bottom-right-radius: 5px;
-        padding: 5px 10px;
-        i {
-            .mr(5px);
-        }
-    }
-    .el-switch__label.is-active {
-        color: #909399;
-    }
-    .u-extend {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 10px;
-        gap: 10px;
-
-        &-form {
-            display: flex;
-            align-items: center;
-        }
-
-        .u-original {
-            // width: 100px;
-            margin-right: 10px;
-            white-space: nowrap;
-        }
-
-        .u-author {
-            max-width: 300px;
-            margin-right: 10px;
-        }
-
-        .u-action-btn {
-            float: right;
-            display: inline;
-        }
-
-        .u-bulk {
-            .dbi;
-            border: 1px solid #3585de;
-            .r(3px);
-            .fz(14px, 26px);
-            background-color: #f3f9ff;
-            box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-            // .w(90px);
-            .x;
-            .mr(10px);
-            padding: 0 10px;
-            white-space: nowrap;
-        }
-    }
-}
-@media screen and (max-width: @ipad-y) {
-    .m-emotion-publish {
-        // .none;
-        .m-emotion-upload {
-            .u-upload {
-                .size(80px);
-                line-height: 80px;
-            }
-        }
-        .u-emotion-form {
-            flex: 1;
-        }
-        .u-extend-form {
-            .none;
-        }
-    }
-}
-
 @keyframes fadeIn {
     from {
         .tm(0);
@@ -194,7 +49,7 @@
     }
 }
 .m-emotion-list {
-    margin: 0;
+    margin: 18px 0 0;
     padding: 0;
     display: flex;
     .u-item {
@@ -397,6 +252,78 @@
         justify-content: center;
     }
 }
+
+// 趣图瀑布流卡片：让图片成为视觉主体，元信息保持紧凑易读
+.m-emotion-list .m-emotion-item {
+    overflow: hidden;
+    padding: 12px;
+    border: 1px solid #ebeef3;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(31, 35, 48, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        background: #fff;
+        border-color: rgba(79, 70, 229, 0.3);
+        box-shadow: 0 10px 24px rgba(39, 36, 85, 0.12);
+        transform: translateY(-3px);
+    }
+
+    .u-emotion {
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f5f6f8;
+    }
+    .u-emotion-pic {
+        display: block;
+        width: 100%;
+        min-height: 132px;
+        object-fit: contain;
+        transition: transform 0.25s ease;
+    }
+    &:hover .u-emotion-pic {
+        transform: scale(1.02);
+    }
+    .u-item-bottom {
+        margin-top: 10px;
+    }
+    .u-info-user {
+        min-width: 0;
+    }
+    .u-user-avatar {
+        width: 22px;
+        height: 22px;
+    }
+    .u-user-name {
+        color: #4b5162;
+        font-weight: 500;
+    }
+    .u-info-misc {
+        min-height: 26px;
+        margin-top: 3px;
+    }
+    .u-time {
+        color: #9aa0ad;
+        line-height: 26px;
+    }
+    .u-op-star {
+        padding: 5px 7px;
+        border-radius: 6px;
+        background: #f4f2ff;
+        color: #6255d9;
+        font-weight: 500;
+
+        &:hover {
+            color: #4f46e5;
+            background: #ece9ff;
+        }
+        &.on {
+            color: #8b91a0;
+            background: #f4f5f7;
+        }
+    }
+}
 @media screen and (max-width: @phone) {
     .m-emotion-item {
         .u-like .like-text {
@@ -409,10 +336,6 @@
 }
 
 .m-emotion-goback {
-    .mb(10px);
-    .flex;
-    justify-content: space-between;
-
     .u-op{
         .flex(y);
         .gap(10px);
@@ -423,23 +346,29 @@
         }
     }
 }
-.m-emotion-item.list {
-    .u-info-meta {
-        .mt(20px);
-    }
-}
 .m-emotion-item.single {
     .x;
-    .mb(20px);
+    margin-bottom: 0;
 
-    .u-info-meta {
-        .mt(20px);
-        max-width: 800px;
-        .auto(x);
+    .u-emotion {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 280px;
+        padding: 24px;
+        background: linear-gradient(135deg, #fff 0%, #fcfbff 100%);
+        border: 1px solid #dcd3f2;
+        border-radius: 10px;
+        box-shadow: 0 10px 26px rgba(68, 48, 126, 0.08);
     }
-    .u-extend {
-        .mt(20px);
+    .u-img {
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 14px rgba(32, 25, 57, 0.12);
     }
+
     .u-info-user-left {
         .flex;
         align-items: center;
@@ -447,88 +376,20 @@
     .u-time{
         margin-left:10px;
     }
-}
 
-.m-emotion-item.preview {
-    //弹窗预览
-    display: flex;
-    justify-content: space-between;
-    text-align: center;
-    .u-img {
-        img {
-            max-width: 600px;
-            // height: 50vh;
-        }
-    }
-    .u-info {
-        margin-left: 20px;
-        width: 320px;
-        .u-info-meta {
-            .u-desc {
-                .fz(22px);
-            }
-        }
-        .u-info-user {
-            line-height: 35px;
-            justify-content: center;
-            .fz(14px);
-            .u-user-avatar {
-                .size(20px);
-                .r(100%);
-                .y;
-                .mr(5px);
-            }
-            .u-user-name {
-                color: #666;
-                &:hover {
-                    color: @v4primary;
-                }
-            }
-        }
-    }
-    // .u-comment-editor{
-    //     text-align: center;
-    // }
-    .u-info-thx {
-        max-width: 600px;
-    }
-
-    .m-thx {
-        .w-thx-records,
-        .w-thx-copyright {
-            .none;
-        }
+    .u-info-user {
+        margin: 14px 4px 0;
+        padding: 0 10px;
     }
 }
 .u-info-thx {
     margin-top: 20px;
     text-align: left;
 }
-// 图片预览
-.he-img-view {
-    max-width: 1200px !important;
-}
-
-.m-emotion-publish {
-    margin-bottom: 16px;
-}
-
 .m-emotion-footer {
     .flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    .m-emotion-reward {
-        .flex;
-        justify-content: flex-end;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-}
-
-@media screen and (max-width: @phone) {
-    .v-emotion {
-        padding-top: 10px;
-    }
 }

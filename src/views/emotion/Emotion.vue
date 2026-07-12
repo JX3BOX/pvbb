@@ -1,6 +1,6 @@
 <template>
     <ListLayout>
-        <div class="v-emotion">
+        <div class="v-emotion v-content-page">
             <EmotionSingle v-if="id" :id="id" />
             <EmotionList v-else />
         </div>
@@ -28,6 +28,6 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/assets/css/app.less";
+@import "~@/assets/css/common/content-list.less";
 @import "~@/assets/css/emotion/emotion.less";
 </style>

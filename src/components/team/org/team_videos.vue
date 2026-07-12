@@ -23,7 +23,7 @@
         </div>
         <el-alert v-else center="" title="暂无赛季视频" type="info" show-icon> </el-alert>
         <el-pagination
-            class="m-archive-pages justify-center!"
+            class="m-archive-pages"
             background
             layout="total, prev, pager, next,jumper"
             :hide-on-single-page="true"

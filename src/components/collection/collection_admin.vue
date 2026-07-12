@@ -1,7 +1,7 @@
 <template>
     <el-drawer
         class="c-admin"
-        title="管理面板"
+        :title="$t('pages.collection.admin.panelTitle')"
         :visible="modelValue"
         :before-close="close"
         :append-to-body="true"
@@ -9,24 +9,24 @@
         :withHeader="false"
     >
         <div class="c-admin-wrapper">
-            <el-divider content-position="left">可见性变更</el-divider>
+            <el-divider content-position="left">{{ $t("pages.collection.admin.visibility") }}</el-divider>
             <el-radio-group v-model="visible" size="small" class="c-admin-status">
                 <el-radio-button v-for="(option, key) in visible_options" :label="key" :key="key">{{
                     option
                 }}</el-radio-button>
             </el-radio-group>
-            <el-divider content-position="left">精选</el-divider>
+            <el-divider content-position="left">{{ $t("pages.collection.admin.featured") }}</el-divider>
             <el-switch v-model="star" :active-value="1" :inactive-value="0"></el-switch>
 
-            <el-divider content-position="left">元信息</el-divider>
+            <el-divider content-position="left">{{ $t("pages.collection.admin.metadata") }}</el-divider>
 
             <div class="c-admin-title">
-                <el-input v-model="title" placeholder="请输入小册标题" class="input-author drawer-item-content">
-                    <template #prepend>标题</template>
+                <el-input v-model="title" :placeholder="$t('pages.collection.admin.titlePlaceholder')" class="input-author drawer-item-content">
+                    <template #prepend>{{ $t("pages.collection.admin.formTitle") }}</template>
                 </el-input>
             </div>
 
-            <el-divider content-position="left">封面海报</el-divider>
+            <el-divider content-position="left">{{ $t("pages.collection.admin.cover") }}</el-divider>
             <div class="c-admin-banner">
                 <el-upload
                     class="c-admin-upload el-upload--picture-card"
@@ -40,30 +40,30 @@
                     <i class="el-icon-plus" v-else></i>
                 </el-upload>
                 <el-input class="u-banner" v-model="image">
-                    <template #prepend>海报地址</template>
+                    <template #prepend>{{ $t("pages.collection.admin.coverAddress") }}</template>
                     <template #append>
-                        <span class="u-btn" @click="removeBanner"> <i class="el-icon-circle-close"></i> 移除海报 </span>
+                        <span class="u-btn" @click="removeBanner"> <i class="el-icon-circle-close"></i> {{ $t("pages.collection.admin.removeCover") }} </span>
                     </template>
                 </el-input>
             </div>
 
-            <el-divider content-position="left">其他</el-divider>
+            <el-divider content-position="left">{{ $t("pages.collection.admin.other") }}</el-divider>
 
             <div class="c-admin-info">
                 <div class="c-admin-author">
                     <el-input
                         v-model="post_author"
-                        placeholder="请输入作者uid"
+                        :placeholder="$t('pages.collection.admin.authorPlaceholder')"
                         class="input-author drawer-item-content"
                     >
-                        <template #prepend>作者</template>
+                        <template #prepend>{{ $t("pages.collection.admin.author") }}</template>
                     </el-input>
                 </div>
             </div>
 
             <div class="c-admin-buttons">
-                <el-button type="primary" @click="submit" :loading="pushing">提交</el-button>
-                <el-button type="plain" @click="close">取消</el-button>
+                <el-button type="primary" @click="submit" :loading="pushing">{{ $t("pages.common.submit") }}</el-button>
+                <el-button type="plain" @click="close">{{ $t("pages.common.cancel") }}</el-button>
             </div>
         </div>
     </el-drawer>
@@ -106,8 +106,8 @@ export default {
     computed: {
         visible_options() {
             return {
-                0: "私有",
-                1: "公开",
+                0: this.$t("pages.collection.admin.private"),
+                1: this.$t("pages.collection.admin.public"),
             };
         },
         id() {
@@ -163,7 +163,7 @@ export default {
             })
                 .then(() => {
                     this.$message({
-                        message: "更新成功",
+                        message: this.$t("pages.collection.admin.updated"),
                         type: "success",
                     });
                     Bus.$emit("updateCollection");
@@ -178,7 +178,7 @@ export default {
             this.image = res.data[0];
         },
         uploadFail: function (err, file, fileList) {
-            this.$message.error("上传失败");
+            this.$message.error(this.$t("pages.collection.admin.uploadFailed"));
             console.log(err);
         },
         removeBanner: function () {

@@ -2,22 +2,22 @@
     <div class="c-admin-drop">
         <el-dropdown trigger="click" @command="handleCommand">
             <el-button type="primary" class="c-admin-button c-admin-drop__button" :size="buttonSize"
-                ><i class="el-icon-setting"></i> 管理<i class="el-icon-arrow-down el-icon--right"></i>
+                ><i class="el-icon-setting"></i> {{ $t("pages.collection.admin.manage") }}<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item v-if="hasPermission('update_post')" command="toggleAdminPanel" icon="Setting">
-                        <span>设置</span>
+                        <span>{{ $t("pages.collection.admin.settings") }}</span>
                     </el-dropdown-item>
                     <el-dropdown-item
                         v-if="hasPermission('create_system_message')"
                         command="directMessage"
                         icon="Message"
                     >
-                        <span>私信</span>
+                        <span>{{ $t("pages.collection.admin.message") }}</span>
                     </el-dropdown-item>
                     <el-dropdown-item icon="Upload" command="designTask" v-if="hasPermission('push_banner')">
-                        <span>推送</span>
+                        <span>{{ $t("pages.collection.admin.push") }}</span>
                     </el-dropdown-item>
                 </el-dropdown-menu>
             </template>
@@ -87,13 +87,13 @@ export default {
             this.showDrawer = true;
         },
         directMessage() {
-            this.$prompt("请输入私信内容", "管理私信", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                inputPlaceholder: "请输入私信内容",
+            this.$prompt(this.$t("pages.collection.admin.messagePlaceholder"), this.$t("pages.collection.admin.messageTitle"), {
+                confirmButtonText: this.$t("pages.common.confirm"),
+                cancelButtonText: this.$t("pages.common.cancel"),
+                inputPlaceholder: this.$t("pages.collection.admin.messagePlaceholder"),
                 inputValidator: (value) => {
                     if (!value) {
-                        return "请输入私信内容";
+                        return this.$t("pages.collection.admin.messagePlaceholder");
                     }
                 },
                 beforeClose: (action, instance, done) => {
@@ -102,12 +102,12 @@ export default {
                             source_id: String(this.sourceId),
                             source_type: this.sourceType,
                             user_id: this.userId,
-                            content: "运营通知：" + instance.inputValue,
+                            content: this.$t("pages.collection.admin.notificationPrefix") + instance.inputValue,
                             type: "system",
                             subtype: "admin_message",
                         };
                         sendMessage(data).then(() => {
-                            this.$message.success("私信成功");
+                            this.$message.success(this.$t("pages.collection.admin.messageSent"));
                             done();
                         });
                     } else {

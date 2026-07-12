@@ -4,54 +4,54 @@
         :width="isPhone ? '95%' : '600px'"
         :visible="modelValue"
         @close="close"
-        title="快捷推送"
+        :title="$t('pages.collection.admin.quickPush')"
         append-to-body
     >
         <el-form :model="form" ref="form" :rules="rules" :label-position="isPhone ? 'top' : 'left'" label-width="80px">
-            <el-form-item label="标题" prop="title">
-                <el-input v-model="form.title" placeholder="请输入标题"></el-input>
+            <el-form-item :label="$t('pages.collection.admin.formTitle')" prop="title">
+                <el-input v-model="form.title" :placeholder="$t('pages.collection.admin.titlePlaceholder')"></el-input>
             </el-form-item>
-            <el-form-item label="类型" prop="type">
-                <el-select v-model="form.type" placeholder="请选择类型" style="width: 100%" filterable>
+            <el-form-item :label="$t('pages.collection.admin.type')" prop="type">
+                <el-select v-model="form.type" :placeholder="$t('pages.collection.admin.typePlaceholder')" style="width: 100%" filterable>
                     <el-option v-for="item in config" :key="item.id" :label="item.label" :value="item.name"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="版本">
+            <el-form-item :label="$t('pages.collection.admin.version')">
                 <el-radio-group v-model="form.version">
                     <el-radio-button v-for="(label, key) in versions" :key="key" :label="key">{{
                         label
                     }}</el-radio-button>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="备注">
-                <el-input v-model="form.remark" placeholder="请输入备注"></el-input>
+            <el-form-item :label="$t('pages.collection.admin.remark')">
+                <el-input v-model="form.remark" :placeholder="$t('pages.collection.admin.remarkPlaceholder')"></el-input>
             </el-form-item>
-            <el-form-item label="星级" class="m-star-line">
+            <el-form-item :label="$t('pages.collection.admin.rating')" class="m-star-line">
                 <el-rate v-model="form.star" :colors="colors"></el-rate>
             </el-form-item>
         </el-form>
 
-        <el-divider content-position="left"> 近期推送 </el-divider>
+        <el-divider content-position="left"> {{ $t("pages.collection.admin.recentPushes") }} </el-divider>
         <template v-if="logs && logs.length">
             <el-table :data="logs" border size="small" max-height="300px">
-                <el-table-column label="推送时间" prop="push_at" align="center">
+                <el-table-column :label="$t('pages.collection.admin.pushedAt')" prop="push_at" align="center">
                     <template #default="{ row }">
                         {{ formatTime(row.push_at) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="推送人" prop="pusher.display_name" align="center"></el-table-column>
-                <el-table-column label="星级" prop="star" align="center">
+                <el-table-column :label="$t('pages.collection.admin.pusher')" prop="pusher.display_name" align="center"></el-table-column>
+                <el-table-column :label="$t('pages.collection.admin.rating')" prop="star" align="center">
                     <template #default="{ row }">
                         <el-rate v-model="row.star" disabled :colors="colors"></el-rate>
                     </template>
                 </el-table-column>
-                <el-table-column label="备注" prop="remark" align="center"></el-table-column>
+                <el-table-column :label="$t('pages.collection.admin.remark')" prop="remark" align="center"></el-table-column>
             </el-table>
         </template>
-        <el-alert v-else title="当前文章暂无历史推送" type="info" show-icon :closable="false"></el-alert>
+        <el-alert v-else :title="$t('pages.collection.admin.noPushHistory')" type="info" show-icon :closable="false"></el-alert>
         <template #footer>
-            <el-button @click="close">取 消</el-button>
-            <el-button type="primary" @click="onConfirm">确 定</el-button>
+            <el-button @click="close">{{ $t("pages.common.cancel") }}</el-button>
+            <el-button type="primary" @click="onConfirm">{{ $t("pages.common.confirm") }}</el-button>
         </template>
     </el-dialog>
 </template>
@@ -97,15 +97,15 @@ export default {
             isEditor: User.isEditor(),
 
             versions: {
-                std: "旗舰",
-                origin: "缘起",
-                wujie: "无界",
-                test: "体服",
+                std: this.$t("pages.collection.admin.flagship"),
+                origin: this.$t("pages.collection.admin.origin"),
+                wujie: this.$t("pages.collection.admin.wujie"),
+                test: this.$t("pages.collection.admin.test"),
             },
 
             rules: {
-                title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-                type: [{ required: true, message: "请选择类型", trigger: "change" }],
+                title: [{ required: true, message: this.$t("pages.collection.admin.titlePlaceholder"), trigger: "blur" }],
+                type: [{ required: true, message: this.$t("pages.collection.admin.typePlaceholder"), trigger: "change" }],
             },
         };
     },
@@ -167,7 +167,7 @@ export default {
                     data.link = `/collection/${this.post?.ID}`;
                     data.flow = 0;
                     createDesignTask(data).then(() => {
-                        this.$message.success("提交成功");
+                        this.$message.success(this.$t("pages.collection.admin.submitted"));
                         this.close();
                     });
                 } else {

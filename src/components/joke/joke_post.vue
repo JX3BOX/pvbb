@@ -1,10 +1,10 @@
 <template>
-    <div class="m-joke-publish">
+    <div class="m-joke-publish m-content-publish">
         <el-input
             v-model="content"
             type="textarea"
             :rows="4"
-            placeholder="快速发布一条骚话"
+            :placeholder="$t('pages.joke.publishPlaceholder')"
             id="textarea"
             :minlength="1"
             show-word-limit
@@ -12,7 +12,7 @@
         <div class="u-actions">
             <div class="u-left">
                 <joke-emotion @emotion="insertVariable"></joke-emotion>
-                <el-select class="u-type" v-model="type" size="small" placeholder="选择门派">
+                <el-select class="u-type" v-model="type" size="small" :placeholder="$t('pages.joke.selectSchool')">
                     <el-option v-for="(school, i) in schoolmap" :key="i" :value="i" :label="school">
                         <div style="display: flex; align-items: center">
                             <img
@@ -28,8 +28,8 @@
                     </el-option>
                 </el-select>
             </div>
-            <el-button type="primary" @click="publish" icon="Position" :loading="processing" :disabled="processing"
-                >提交</el-button
+            <el-button class="u-submit" type="primary" @click="publish" icon="Position" :loading="processing" :disabled="processing"
+                >{{ $t("pages.joke.submit") }}</el-button
             >
         </div>
     </div>
@@ -103,7 +103,7 @@ export default {
                     .then((res) => {
                         let data = res?.data?.data;
                         this.$message({
-                            message: "发布成功,请等待审核",
+                            message: this.$t("pages.joke.publishSuccess"),
                             type: "success",
                         });
                         this.content = "";
@@ -127,8 +127,8 @@ export default {
 
             if (!str.length) {
                 this.$notify({
-                    title: "错误",
-                    message: "内容不能为空",
+                    title: this.$t("pages.joke.error"),
+                    message: this.$t("pages.joke.contentRequired"),
                     type: "error",
                 });
                 return false;
@@ -168,8 +168,8 @@ export default {
 
             if (emotionLength > 10) {
                 this.$notify({
-                    title: "错误",
-                    message: "表情个数不能超过10个",
+                    title: this.$t("pages.joke.error"),
+                    message: this.$t("pages.joke.emotionLimit"),
                     type: "error",
                 });
                 return false;
@@ -189,22 +189,22 @@ export default {
             // 否则，中文字符不能超过64个（相当于总长度不超过128）
             if ((isPureDigit || isPureAlpha) && str.length > 128) {
                 this.$notify({
-                    title: "提示",
-                    message: "纯数字或纯字母内容长度不能超过128个字符",
+                    title: this.$t("pages.joke.notice"),
+                    message: this.$t("pages.joke.digitAlphaLimit"),
                     type: "warning",
                 });
                 return false;
             } else if (!isPureDigit && !isPureAlpha && chineseLength > 64) {
                 this.$notify({
-                    title: "提示",
-                    message: "中文字符不能超过64个",
+                    title: this.$t("pages.joke.notice"),
+                    message: this.$t("pages.joke.chineseLimit"),
                     type: "warning",
                 });
                 return false;
             } else if (!isPureDigit && !isPureAlpha && totalLength > 128) {
                 this.$notify({
-                    title: "提示",
-                    message: "内容长度不能超过128个字符",
+                    title: this.$t("pages.joke.notice"),
+                    message: this.$t("pages.joke.contentLimit"),
                     type: "warning",
                 });
                 return false;
@@ -215,3 +215,35 @@ export default {
     },
 };
 </script>
+
+<style lang="less">
+.m-joke-publish {
+    .u-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+
+        .u-left {
+            display: flex;
+            align-items: center;
+
+            .u-type {
+                width: 215px;
+                height: 32px;
+                margin-left: 10px;
+
+                .el-select__wrapper {
+                    height: 100%;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-joke-publish .u-type {
+        display: none;
+    }
+}
+</style>

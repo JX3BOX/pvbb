@@ -21,7 +21,7 @@
                         />
                     </div>
                     <div class="u-title">
-                        <i class="u-private el-icon-lock" v-if="!collection.public" title="仅自己可见"></i>
+                        <i class="u-private el-icon-lock" v-if="!collection.public" :title="$t('pages.collection.detail.private')"></i>
                         {{ collection.title }}
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                 <div class="m-description" v-if="collection.description">
                     <el-divider content-position="left">
                         <i class="el-icon-collection"></i>
-                        小册简介
+                        {{ $t("pages.collection.detail.introduction") }}
                     </el-divider>
                     <div class="u-description">
                         <p v-html="resolveImagePath(collection.description)"></p>
@@ -39,7 +39,7 @@
                 <template v-if="collection.posts && collection.posts.length">
                     <el-divider content-position="left">
                         <i class="el-icon-folder"></i>
-                        小册文章
+                        {{ $t("pages.collection.detail.articles") }}
                     </el-divider>
                     <ul class="m-list">
                         <li class="u-item" v-for="(post, key) in collection.posts" :key="key">
@@ -114,12 +114,14 @@ export default {
             return this.collection?.title || "";
         },
         authorDate() {
-            return this.collection?.created ? `发布于 ${dateFormat(new Date(this.collection.created * 1000))}` : "";
+            return this.collection?.created
+                ? this.$t("pages.collection.detail.publishedOn", { time: dateFormat(new Date(this.collection.created * 1000)) })
+                : "";
         },
         loadErrorTitle() {
             return this.loadError === "not-found"
-                ? "该剑三小册不存在或已被删除"
-                : "小册加载失败，请稍后重试";
+                ? this.$t("pages.collection.detail.notFound")
+                : this.$t("pages.collection.detail.loadFailed");
         },
     },
     watch: {
@@ -143,13 +145,13 @@ export default {
         resolveImagePath,
         delete_handle($event, collection_id) {
             $event.preventDefault();
-            this.$confirm("确认是否删除该剑三小册？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("pages.collection.detail.deleteConfirm"), this.$t("pages.common.promptTitle"), {
+                confirmButtonText: this.$t("pages.common.confirm"),
+                cancelButtonText: this.$t("pages.common.cancel"),
                 type: "warning",
             }).then(() => {
                 removeCollection(collection_id).then((data) => {
-                    this.$message.success("删除成功");
+                    this.$message.success(this.$t("pages.collection.detail.deleted"));
                     this.$router.push({ name: "collection" });
                 });
             });

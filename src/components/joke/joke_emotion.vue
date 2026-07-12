@@ -11,7 +11,11 @@
         <Emotion class="m-publish-joke-emotion" @selected="handleEmotionSelect" />
 
         <template #reference>
-            <span class="m-publish-joke-button" style="cursor: pointer" title="选择表情">😀插入表情</span>
+            <span
+                class="m-publish-joke-button"
+                style="cursor: pointer"
+                :title="$t('pages.joke.selectEmotion')"
+            >😀{{ $t("pages.joke.insertEmotion") }}</span>
         </template>
     </el-popover>
 </template>
@@ -47,12 +51,18 @@ export default {
     }
 }
 .m-publish-joke-button {
-    border: 1px solid #3585de;
-    .r(3px);
+    border: 1px solid #cfc2f0;
+    .r(7px);
     padding: 5px 10px;
     .fz(14px);
-    background-color: #f3f9ff;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+    color: #6543bb;
+    background-color: #faf8ff;
+    box-shadow: 0 2px 6px rgba(86, 65, 153, 0.08);
     white-space: nowrap;
+
+    &:hover {
+        border-color: #9b83dd;
+        background-color: #f3efff;
+    }
 }
 </style>

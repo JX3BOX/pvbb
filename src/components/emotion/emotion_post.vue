@@ -1,12 +1,12 @@
 <template>
-    <div class="m-emotion-publish">
+    <div class="m-emotion-publish m-content-publish">
         <!-- <div class="u-title"><i class="el-icon-upload"></i>快速发布</div> -->
         <div class="m-emotion-upload">
             <div v-if="list && list.length && list[0] && list[0].url" class="u-emotion">
                 <img :src="list[0].url" />
                 <i class="u-emotion-mask"></i>
-                <i class="u-emotion-delete el-icon-delete" title="移除" @click="handleRemove"></i>
-                <span class="u-num">+ {{ list.length }} 张</span>
+                <i class="u-emotion-delete el-icon-delete" :title="$t('pages.emotion.remove')" @click="handleRemove"></i>
+                <span class="u-num">+ {{ list.length }} {{ $t("pages.emotion.images") }}</span>
             </div>
             <div v-else class="u-upload el-upload el-upload--picture-card" @click="select">
                 <i class="el-icon-plus"></i>
@@ -21,7 +21,7 @@
                 :maxlength="128"
                 id="textarea"
                 show-word-limit
-                placeholder="快速发布一张表情，再配句骚话？"
+                :placeholder="$t('pages.emotion.postPlaceholder')"
             ></el-input>
             <!-- 按钮 -->
             <div class="u-extend">
@@ -30,11 +30,13 @@
                     <el-switch
                         class="u-original"
                         v-model.number="data.original"
-                        inactive-text="原创"
                         :active-value="1"
                         :inactive-value="0"
+                        inline-prompt
+                        :active-text="$t('pages.emotion.original')"
+                        :inactive-text="$t('pages.emotion.original')"
                     ></el-switch>
-                    <el-select v-model="type" size="small" placeholder="选择门派">
+                    <el-select v-model="type" size="small" :placeholder="$t('pages.emotion.selectSchool')">
                         <el-option v-for="(school, i) in schoolmap" :key="i" :value="i" :label="school">
                             <div style="display: flex; align-items: center">
                                 <img
@@ -48,12 +50,12 @@
                                 {{ school }}
                             </div>
                         </el-option> </el-select
-                    ><el-tooltip effect="dark" content="图片可选择批量上传，描述每次换行对应其中一条。" placement="top">
+                    ><el-tooltip effect="dark" :content="$t('pages.emotion.uploadHint')" placement="top">
                         <i class="el-icon-info"></i>
                     </el-tooltip>
                 </div>
-                <el-button type="primary" @click="post" :disabled="loading" :loading="loading" icon="Position"
-                    >提交</el-button
+                <el-button class="u-submit" type="primary" @click="post" :disabled="loading" :loading="loading" icon="Position"
+                    >{{ $t("pages.emotion.submit") }}</el-button
                 >
             </div>
         </div>
@@ -155,11 +157,11 @@ export default {
                     const data = {
                         ...this.data,
                         url: __cdn + res.data.data[0],
-                        desc: file?.name || "无描述",
+                        desc: file?.name || this.$t("pages.emotion.untitled"),
                     };
                     this.list.push(data);
                     this.$message({
-                        message: "上传成功",
+                        message: this.$t("pages.emotion.uploadSuccess"),
                         type: "success",
                     });
                 });
@@ -192,7 +194,7 @@ export default {
                     Promise.all(promises).then(() => {
                         this.$message({
                             type: "success",
-                            message: "表情发布成功",
+                            message: this.$t("pages.emotion.publishSuccess"),
                         });
                         this.fileInput.value = "";
                         this.list = [];
@@ -209,6 +211,7 @@ export default {
 <style lang="less">
 .m-emotion-publish {
     display: flex;
+    position: relative;
 
     .u-emotion-form {
         margin-left: 12px;
@@ -224,7 +227,9 @@ export default {
         .u-emotion-desc {
             margin-bottom: 10px;
         }
+
     }
+
     .u-extend-form {
         .flex;
         gap: 10px;
@@ -240,11 +245,34 @@ export default {
             cursor: pointer;
         }
     }
+
+    .u-extend {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        gap: 10px;
+
+    }
 }
 .m-emotion-upload {
+    .u-upload {
+        border-color: #bda9ed;
+        border-radius: 8px;
+        background: #faf8ff;
+        color: #7656d4;
+
+        &:hover {
+            border-color: #9b83dd;
+            background: #f3efff;
+        }
+    }
+
     .u-emotion {
         .pr;
         .size(148px);
+        border-radius: 8px;
+        overflow: hidden;
         .u-num {
             position: absolute;
             right: 0;
@@ -291,6 +319,29 @@ export default {
 
     .u-upload-input {
         .none;
+    }
+}
+
+@media screen and (max-width: @ipad-y) {
+    .m-emotion-publish {
+        .m-emotion-upload .u-upload {
+            .size(80px);
+            line-height: 80px;
+        }
+
+        .u-emotion-form {
+            flex: 1;
+        }
+
+        .u-extend-form {
+            display: none;
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .wechat-miniprogram .m-emotion-publish {
+        display: none;
     }
 }
 </style>

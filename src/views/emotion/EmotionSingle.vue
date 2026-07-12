@@ -1,14 +1,14 @@
 <template>
     <div class="m-emotion-single-container" v-loading="loading">
-        <div class="m-emotion-goback">
-            <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+        <div class="m-emotion-goback m-content-goback">
+            <el-button class="u-back" size="default" icon="ArrowLeft" @click="goBack">{{ $t("pages.emotion.backToList") }}</el-button>
             <div class="u-op" v-if="emotion?.id">
                 <span v-if="isEditor" class="u-star el-link el-link--primary" @click="handleStar">
                     <i :class="isStar ? 'el-icon-star-off' : 'el-icon-star-on'"></i>
-                    {{ isStar ? "取消精选" : "设为精选" }}
+                    {{ isStar ? $t("pages.emotion.cancelFeatured") : $t("pages.emotion.setFeatured") }}
                 </span>
                 <span v-if="isAuthor || isEditor" class="u-delete el-link el-link--primary" @click="handleDelete">
-                    <i class="el-icon-delete"></i>&nbsp;删除
+                    <i class="el-icon-delete"></i>&nbsp;{{ $t("pages.emotion.delete") }}
                 </span>
                 <a
                     v-if="isAuthor || isEditor"
@@ -16,7 +16,7 @@
                     :href="editLink('emotion', emotion.id)"
                     target="_blank"
                 >
-                    <i class="el-icon-edit-outline"></i>&nbsp;编辑
+                    <i class="el-icon-edit-outline"></i>&nbsp;{{ $t("pages.emotion.edit") }}
                 </a>
             </div>
         </div>
@@ -91,11 +91,11 @@ export default {
                 .then((res) => {
                     this.emotion = res?.data?.data || {};
                     if (!this.emotion.id) {
-                        this.loadError = "该趣图不存在或已被删除";
+                        this.loadError = this.$t("pages.emotion.notFound");
                     }
                 })
                 .catch(() => {
-                    this.loadError = "该趣图不存在、已被删除或暂时无法加载";
+                    this.loadError = this.$t("pages.emotion.unavailable");
                 })
                 .finally(() => {
                     this.loading = false;
@@ -121,15 +121,15 @@ export default {
                         star: nextStar,
                     };
                     this.$notify({
-                        title: "成功",
-                        message: isStar ? "取消加精成功" : "加精成功",
+                        title: this.$t("pages.emotion.success"),
+                        message: this.$t(isStar ? "pages.emotion.cancelFeaturedSuccess" : "pages.emotion.setFeaturedSuccess"),
                         type: "success",
                     });
 
                     if (skippedAutoAppraise) {
                         this.$notify({
-                            title: "提示",
-                            message: "该作品无作者ID，未执行自动品鉴",
+                            title: this.$t("pages.emotion.notice"),
+                            message: this.$t("pages.emotion.autoAppraiseSkipped"),
                             type: "warning",
                         });
                     }
@@ -137,12 +137,12 @@ export default {
                 .catch((error) => {
                     const rollbackFailed = !!error?.rollbackError;
                     this.$notify({
-                        title: "失败",
+                        title: this.$t("pages.emotion.failure"),
                         message: rollbackFailed
-                            ? "自动品鉴失败，且回滚失败，请稍后重试"
+                            ? this.$t("pages.emotion.autoAppraiseRollbackFailed")
                             : isStar
-                              ? "自动取消品鉴失败，已回滚精选状态"
-                              : "自动品鉴失败，已回滚精选状态",
+                              ? this.$t("pages.emotion.cancelAutoAppraiseFailed")
+                              : this.$t("pages.emotion.autoAppraiseFailed"),
                         type: "error",
                     });
                 })
@@ -151,16 +151,16 @@ export default {
                 });
         },
         handleDelete() {
-            this.$confirm("此操作将会删除该表情，是否继续？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("pages.emotion.deleteConfirm"), this.$t("pages.emotion.notice"), {
+                confirmButtonText: this.$t("pages.emotion.confirm"),
+                cancelButtonText: this.$t("pages.emotion.cancel"),
                 type: "warning",
             })
                 .then(() => {
                     removeEmotion(this.emotion.id).then(() => {
                         this.$notify({
-                            title: "成功",
-                            message: "删除成功",
+                            title: this.$t("pages.emotion.success"),
+                            message: this.$t("pages.emotion.deleteSuccess"),
                             type: "success",
                         });
                         this.goBack();

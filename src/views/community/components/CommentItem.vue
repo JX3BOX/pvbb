@@ -40,9 +40,9 @@
                 }}</p>
                 <p class="u-content" v-html="renderContent"></p>
                 <div class="u-comment-toolbar">
-                    <div class="flex items-center">
+                    <div class="u-comment-actions">
                         <el-button link size="small" type="primary" @click="addLike" class="">
-                            <div class="u-btn-content flex items-center">
+                            <div class="u-btn-content">
                                 <i :class="`u-like-icon ${isLike && 'is-like'}`"
                                     ><img
                                         v-if="!isLike"

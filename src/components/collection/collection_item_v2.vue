@@ -63,15 +63,18 @@ export default {
 <style lang="less">
 .m-collection-item_v2 {
     .flex;
-    .mb(20px);
-    .size(250px, 350px);
-    min-width: 128px;
+    .size(auto, 292px);
+    min-width: 0;
     flex-direction: column;
     background-color: #fff;
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 14px 12px;
+    border: 1px solid #e8e7ef;
+    border-radius: 10px;
+    box-shadow: 0 2px 7px rgba(31, 29, 54, 0.035);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     .u-content {
         .db;
         .w(100%);
@@ -109,31 +112,31 @@ export default {
 
     .u-title {
         .nobreak;
-        .bold;
         .db;
         .x;
         .w(100%);
-        .fz(14px, 1.8);
-        color: #000;
+        .fz(15px, 1.6);
+        font-weight: 600;
+        color: #2b2935;
     }
 
     .u-info {
         .flex;
-        .mt(5px);
+        .mt(4px);
         .clearfix;
         flex-direction: column;
     }
 
     .u-user {
         .flex;
-        .fz(14px);
+        .fz(13px);
         .auto(x);
         gap: 5px;
         align-items: center;
-        color: #666;
+        color: #7c7988;
     }
     .u-avatar {
-        .size(18px);
+        .size(17px);
         .r(100%);
     }
     .u-time {
@@ -141,11 +144,14 @@ export default {
     }
 
     &:hover {
-        background-color: @bg-light;
+        border-color: rgba(91, 78, 211, 0.34);
+        background-color: #fff;
+        box-shadow: 0 10px 22px rgba(53, 43, 125, 0.12);
+        transform: translateY(-5px);
         .u-image {
-            transform: rotate(-14deg) translateY(-10px);
-            box-shadow: 0 60px 30px rgba(36, 41, 46, 0.3);
-            top: -10px;
+            transform: rotate(-8deg) translateY(-7px);
+            box-shadow: 0 28px 20px rgba(36, 41, 46, 0.22);
+            top: -7px;
             .u-mark {
                 .db;
                 .size(228px, 290px);
@@ -166,6 +172,10 @@ export default {
 @media screen and (max-width: @phone) {
     .m-collection-item_v2 {
         .w(100%);
+        .h(280px);
+        padding: 14px 8px;
+        .u-image { transform: scale(0.9); }
+        &:hover .u-image { transform: scale(0.9) rotate(-5deg) translateY(-5px); }
     }
 }
 </style>

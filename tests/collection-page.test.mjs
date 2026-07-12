@@ -12,6 +12,15 @@ async function loadCollectionHelpers() {
     return Function(`${executable}\nreturn { getCollectionLoadError };`)();
 }
 
+async function loadCollectionLocale(locale) {
+    const source = await read(`../src/locale/${locale}/pages.js`);
+    return Function(source.replace("export default", "return"))();
+}
+
+function getMessage(messages, key) {
+    return key.split(".").reduce((value, segment) => value?.[segment], messages);
+}
+
 test("collection errors distinguish missing content from request failures", async () => {
     const { getCollectionLoadError } = await loadCollectionHelpers();
 
@@ -28,7 +37,29 @@ test("collection list loads once after sizing and ignores stale responses", asyn
     assert.match(source, /mounted\(\)\s*\{\s*this\.showCount\(\);\s*this\.loadData\(\);/);
     assert.match(source, /const requestId = \+\+this\.requestId/);
     assert.match(source, /if \(requestId !== this\.requestId\) return/);
-    assert.match(source, /小册列表加载失败，请稍后重试/);
+    assert.match(source, /pages\.collection\.list\.loadFailed/);
+});
+
+test("collection static copy is backed by every locale", async () => {
+    const sourceFiles = [
+        "../src/layouts/CollectionLayout.vue",
+        "../src/components/collection/collection_list.vue",
+        "../src/components/collection/collection_mini_list.vue",
+        "../src/components/collection/collection_single.vue",
+        "../src/components/collection/collection_mini_single.vue",
+        "../src/components/collection/collection_admin.vue",
+        "../src/components/collection/collection_admin_drop.vue",
+        "../src/components/collection/collection_design_task.vue",
+    ];
+    const sources = await Promise.all(sourceFiles.map(read));
+    const keys = [...new Set(sources.flatMap((source) => [...source.matchAll(/pages\.(collection\.[\w.]+)/g)].map((match) => match[1])))];
+
+    for (const locale of ["zh-CN", "en-US", "zh-TW", "vi"]) {
+        const messages = await loadCollectionLocale(locale);
+        for (const key of keys) {
+            assert.equal(typeof getMessage(messages, key), "string", `${locale} is missing ${key}`);
+        }
+    }
 });
 
 test("collection detail gates content by loading result and cleans the bus listener", async () => {
@@ -67,6 +98,8 @@ test("collection skips hidden side content and empty image nodes", async () => {
         read("../src/components/collection/collection_item_v2.vue"),
     ]);
 
+    assert.match(layout, /<LeftSidebar>/);
+    assert.doesNotMatch(layout, /<LeftSidebar[^>]*:uid=/);
     assert.match(layout, /<RightSidebar v-if="hasRight">/);
     assert.doesNotMatch(item, /<img\s*\/>/);
 });

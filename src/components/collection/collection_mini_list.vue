@@ -21,7 +21,7 @@
                 </router-link>
             </wc-waterfall>
             <div class="m-empty" v-else>
-                <el-empty description="暂无小册" :image-size="100"></el-empty>
+                <el-empty :description="$t('pages.collection.list.emptyMobile')" :image-size="100"></el-empty>
             </div>
         </div>
 
@@ -29,15 +29,15 @@
             <template #default>
                 <div class="m-suspend-search" @click="showSearchForm = true">
                     <img class="u-icon" src="@/assets/img/collection/search.svg" alt="" />
-                    <span class="u-text">搜索</span>
+                    <span class="u-text">{{ $t("pages.collection.list.search") }}</span>
                 </div>
             </template>
         </SuspendCommon>
 
         <el-drawer v-model="showSearchForm" direction="btt" class="p-drawer-search" :with-header="false">
-            <div class="u-drawer-title">搜索</div>
+            <div class="u-drawer-title">{{ $t("pages.collection.list.search") }}</div>
             <div class="m-search-input">
-                <input type="text" class="u-input" placeholder="请输入搜索内容" @input="onMiniSearch" />
+                <input type="text" class="u-input" :placeholder="$t('pages.collection.list.searchContentPlaceholder')" @input="onMiniSearch" />
             </div>
         </el-drawer>
     </div>

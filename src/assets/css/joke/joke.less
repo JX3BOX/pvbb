@@ -1,53 +1,12 @@
 // 列表页
 // =======================
-.m-joke-types {
-    position: sticky;
-    top: @header-height + @bread-height;
-    margin-bottom: 10px;
-    background-color: #fff;
-    z-index: 100;
-    .u-icon {
-        .size(24px);
-        .y(-6px);
-    }
-}
-@media screen and (max-width: @phone) {
-    .wechat-miniprogram {
-        .m-joke-types {
-            position: relative;
-            top: 0;
-        }
-    }
-}
-.m-joke-search {
-    .el-switch__label {
-        color: @color;
-    }
-}
 .m-joke-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     .mt(40px);
 }
-.m-joke-main {
-    .m-joke-content {
-        .w(100%);
-    }
-}
-@media screen and (min-width: 900px) {
-    .m-joke-main {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-    }
-}
 @media screen and (max-width: @phone) {
-    .m-joke-search {
-        .el-input-group__append {
-            .none;
-        }
-    }
     .m-joke-footer {
         flex-direction: column;
     }
@@ -62,45 +21,13 @@
     display: flex;
     align-items: flex-end;
 }
-@media screen and (max-width:@ipad){
-    .m-joke-reward{
+@media screen and (max-width: @ipad) {
+    .m-joke-reward {
         .none;
     }
 }
-.m-joke-publish {
-    background-color: @bg-light;
-    padding: 10px;
-    border: 1px solid #eee;
-    .r(4px);
-    .mb(20px);
-    .u-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
-        .u-left {
-            display: flex;
-            .u-type {
-                margin-left: 10px;
-                width: 215px;
-                height: 32px;
-                .el-select__wrapper {
-                    height: 100%;
-                }
-            }
-        }
-    }
-}
-@media screen and (max-width: @phone) {
-    .m-joke-publish {
-        .u-type {
-            .none;
-        }
-    }
-}
-
 .m-joke-item {
-    .mb(30px);
+    .mb(18px);
 }
 @media screen and (max-width: @phone) {
     .m-joke-pagination {
@@ -112,11 +39,6 @@
 // 详情页
 // =======================
 .m-joke-goback {
-    .mb(10px);
-
-    .flex;
-    justify-content: space-between;
-    align-items: center;
     .u-doc {
         .fr;
         .fz(12px);
@@ -125,34 +47,36 @@
         }
         color: #555;
         &:hover {
-            color: @pink;
+            color: #6f42c1;
         }
     }
 }
-.m-joke-tags {
-    .mt(10px);
-    color: #666;
-    .mb(30px);
-    padding: 5px 10px;
-    i {
-        .y;
-        .mr(5px);
-    }
-    .u-tag {
-        .fz(12px);
+.m-joke-single-container {
+    .m-joke-item {
+        margin-bottom: 0;
 
-        &:after {
-            content: "、";
-        }
+        .u-content {
+            min-height: 94px;
+            padding: 24px 26px;
+            background: linear-gradient(135deg, #fff 0%, #fcfbff 100%);
+            border-color: #dcd3f2;
+            box-shadow: 0 10px 26px rgba(68, 48, 126, 0.08);
 
-        &:last-child {
-            &::after {
-                .none;
+            &.on {
+                transform: none;
+                cursor: default;
             }
         }
+        .u-sentence {
+            font-size: 17px;
+            line-height: 1.85;
+        }
+        .u-misc {
+            padding: 0 10px;
+            margin-top: 15px;
+        }
     }
 }
-
 // 骚话单项
 // =======================
 .m-joke-item {
@@ -192,20 +116,23 @@
         // margin-bottom: 8px;
         .fz(15px);
 
-        background: #fafbfc;
-        padding: 20px 14px;
-        border-radius: 4px;
-        border: 1px solid @border-hr;
+        background: #fff;
+        padding: 18px 20px;
+        border-radius: 10px;
+        border: 1px solid #ebeaf0;
+        box-shadow: 0 5px 16px rgba(35, 29, 63, 0.035);
         .pr;
 
-        .arrows(b, 10px, #fafbfc, 1px, @border-hr, @x:20px);
+        .arrows(b, 10px, #fff, 1px, #ebeaf0, @x:26px);
         .pointer;
 
         transition: 0.1s ease-in-out;
         &:hover,
         &.on {
-            border-color: @v4primary;
-            .arrows(b, 10px, #f3f9ff, 1px, @v4primary, @x:20px);
+            border-color: #9b83dd;
+            box-shadow: 0 9px 22px rgba(86, 65, 153, 0.1);
+            transform: translateY(-1px);
+            .arrows(b, 10px, #fff, 1px, #9b83dd, @x:26px);
         }
 
         &.on {
@@ -213,7 +140,9 @@
         }
     }
     .u-sentence {
-        line-height: 24px;
+        color: #292534;
+        font-size: 16px;
+        line-height: 1.75;
 
         div {
             display: inline;
@@ -244,7 +173,8 @@
     .u-misc {
         .clearfix;
         .fz(12px, 20px);
-        .mt(15px);
+        .mt(12px);
+        padding: 0 4px;
     }
     .u-op {
         .fl;
@@ -256,10 +186,10 @@
     .u-user {
         display: inline-flex;
         align-items: center;
-        margin-right: 20px;
+        margin-right: 18px;
         img {
             margin-right: 8px;
-            .size(20px);
+            .size(22px);
             .y;
             .r(2px);
             .mr(5px);
@@ -273,7 +203,7 @@
     }
     .el-link,
     .u-like {
-        .mr(20px);
+        .mr(18px);
         .fz(12px);
         color: @v4primary;
         text-decoration: none;
@@ -315,7 +245,7 @@
         .fr;
         display: flex;
         font-size: 12px;
-        color: #999;
+        color: #a09aa9;
         align-items: center;
         justify-content: space-between;
 
@@ -351,17 +281,5 @@
         .u-star {
             .none !important;
         }
-    }
-}
-
-// 其它
-// =======================
-.m-thx {
-    .mt(20px);
-}
-
-@media screen and (max-width: @phone) {
-    .v-joke {
-        padding-top: 10px;
     }
 }

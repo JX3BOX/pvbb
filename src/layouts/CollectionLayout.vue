@@ -2,7 +2,7 @@
     <div class="p-collection-layout">
         <CommonHeader></CommonHeader>
         <Breadcrumb
-            name="剑三小册"
+            :name="$t('pages.collection.list.heroTitle')"
             slug="collection"
             root="/collection"
             :publishEnable="true"
@@ -17,7 +17,7 @@
                 <img svg-inline :src="logo" />
             </template>
         </Breadcrumb>
-        <LeftSidebar :uid="user_id">
+        <LeftSidebar>
             <Nav :id="id" class="m-nav" />
         </LeftSidebar>
         <Main :withoutRight="!hasRight">
@@ -94,9 +94,6 @@ export default {
 @import "~@/assets/css/collection/list.less";
 
 .p-collection-layout {
-    .c-sidebar-left {
-        padding: 15px;
-    }
     .c-admin-drop {
         margin-right: 0;
     }
