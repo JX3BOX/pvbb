@@ -37,13 +37,13 @@
                                 <!-- 发布日期 -->
                                 <span class="u-podate u-sub-block" :title="$t('pages.collection.detail.publishedAt')">
                                     <i class="u-icon el-icon-date"></i>
-                                    <time>{{ dateFormat(collection.created) }}</time>
+                                    <time>{{ formatDate(collection.created) }}</time>
                                 </span>
 
                                 <!-- 最后更新 -->
                                 <span class="u-modate u-sub-block" :title="$t('pages.collection.detail.updatedAt')">
                                     <i class="u-icon el-icon-refresh"></i>
-                                    <time>{{ dateFormat(collection.updated) }}</time>
+                                    <time>{{ formatDate(collection.updated) }}</time>
                                 </span>
 
                                 <!-- 查看次数 -->
@@ -55,7 +55,7 @@
                                 <!-- 编辑 -->
                                 <a class="u-edit u-sub-block" :href="edit_link" v-if="canEdit">
                                     <i class="u-icon-edit el-icon-edit-outline"></i>
-                                    <span>{{ $t("pages.common.edit") }}</span>
+                                    <span>{{ $t("pages.collection.detail.edit") }}</span>
                                 </a>
 
                                 <!-- 删除 -->
@@ -66,7 +66,7 @@
                                     v-if="canEdit"
                                 >
                                     <i class="u-icon-remove el-icon-delete"></i>
-                                    <span>{{ $t("pages.common.delete") }}</span>
+                                    <span>{{ $t("pages.collection.detail.delete") }}</span>
                                 </a>
                             </div>
                         </header>
@@ -161,7 +161,6 @@
 <script>
 import CollectionPublish from "@jx3box/jx3box-editor/src/service/enum/CollectionPublic";
 import { getCollection, removeCollection } from "@/service/collection";
-import { dateFormat } from "@/utils/dateFormat";
 import dayjs from "dayjs";
 import Bus from "@/store/bus";
 import {
@@ -242,9 +241,6 @@ export default {
         getTypeLabel,
         showAvatar,
         resolveImagePath,
-        dateFormat: function (timestamp) {
-            return dateFormat(new Date(timestamp * 1000));
-        },
         delete_handle($event, collection_id) {
             $event.preventDefault();
             this.$confirm(this.$t("pages.collection.detail.deleteConfirm"), this.$t("pages.common.promptTitle"), {
@@ -301,7 +297,13 @@ export default {
             this.views = stat?.views || 0;
         },
         formatDate(date) {
-            return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+            const value = /^\d{10}$/.test(String(date)) ? dayjs.unix(Number(date)) : dayjs(date);
+            if (!value.isValid()) return "";
+
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                dateStyle: "medium",
+                timeStyle: "medium",
+            }).format(value.toDate());
         },
         iconUrl: function (icon) {
             const key = icon.replace("_", "/");

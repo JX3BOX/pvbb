@@ -3,7 +3,7 @@
         <div class="m-list" @scroll="handleScroll">
             <wc-waterfall ref="waterfall" gap="20" :cols="2" v-if="list.length">
                 <router-link v-for="item in list" :key="item.id" class="m-item" :to="`/collection/${item.id}`">
-                    <div class="u-time">{{ dateFormat(item.updated) }}</div>
+                    <div class="u-time">{{ formatDate(item.updated) }}</div>
                     <div class="m-img-box">
                         <el-image class="u-img" :src="resolveImagePath(item.image)" fit="cover">
                             <template #error>
@@ -46,7 +46,7 @@
 <script>
 import { showAvatar, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __imgPath } from "@/utils/config";
-import { dateFormat } from "@/utils/dateFormat.js";
+import dayjs from "dayjs";
 import { getCollections } from "@/service/collection.js";
 import SuspendCommon from "@jx3box/jx3box-ui/src/SuspendCommon.vue";
 import "wc-waterfall";
@@ -121,8 +121,13 @@ export default {
                     this.loading = false;
                 });
         },
-        dateFormat: function (timestamp) {
-            return dateFormat(new Date(timestamp * 1000));
+        formatDate(timestamp) {
+            const value = dayjs.unix(timestamp);
+            if (!value.isValid()) return "";
+
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                dateStyle: "medium",
+            }).format(value.toDate());
         },
         handleScroll(event) {
             const { target } = event;

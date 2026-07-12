@@ -302,7 +302,7 @@ export default {
             loadFailed: "小冊列表載入失敗，請稍後再試", empty: "沒有找到相關條目", emptyMobile: "暫無小冊", searchContentPlaceholder: "請輸入搜尋內容",
         },
         detail: {
-            private: "僅自己可見", publishedAt: "發布日期", updatedAt: "最後更新", introduction: "小冊簡介", articles: "小冊文章", externalLink: "站外連結",
+            private: "僅自己可見", publishedAt: "發布日期", updatedAt: "最後更新", introduction: "小冊簡介", articles: "小冊文章", externalLink: "站外連結", edit: "編輯", delete: "刪除",
             lastUpdated: "最後更新於 {time}", discussion: "討論", notFound: "該劍三小冊不存在或已被刪除", loadFailed: "小冊載入失敗，請稍後再試",
             deleteConfirm: "確認是否刪除該劍三小冊？", deleted: "刪除成功", publishedOn: "發布於 {time}",
         },

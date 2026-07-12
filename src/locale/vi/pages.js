@@ -302,7 +302,7 @@ export default {
             loadFailed: "Không thể tải danh sách sổ tay. Vui lòng thử lại sau.", empty: "Không tìm thấy mục phù hợp", emptyMobile: "Chưa có sổ tay", searchContentPlaceholder: "Nhập nội dung tìm kiếm",
         },
         detail: {
-            private: "Chỉ bạn có thể xem", publishedAt: "Ngày đăng", updatedAt: "Cập nhật lần cuối", introduction: "Giới thiệu sổ tay", articles: "Bài viết trong sổ tay", externalLink: "Liên kết ngoài",
+            private: "Chỉ bạn có thể xem", publishedAt: "Ngày đăng", updatedAt: "Cập nhật lần cuối", introduction: "Giới thiệu sổ tay", articles: "Bài viết trong sổ tay", externalLink: "Liên kết ngoài", edit: "Chỉnh sửa", delete: "Xóa",
             lastUpdated: "Cập nhật lần cuối vào {time}", discussion: "Thảo luận", notFound: "Sổ tay JX3 này không tồn tại hoặc đã bị xóa", loadFailed: "Không thể tải sổ tay. Vui lòng thử lại sau.",
             deleteConfirm: "Bạn có chắc muốn xóa sổ tay JX3 này?", deleted: "Đã xóa", publishedOn: "Đăng vào {time}",
         },

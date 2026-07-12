@@ -373,6 +373,8 @@ export default {
             introduction: "小册简介",
             articles: "小册文章",
             externalLink: "站外链接",
+            edit: "编辑",
+            delete: "删除",
             lastUpdated: "最后更新于 {time}",
             discussion: "讨论",
             notFound: "该剑三小册不存在或已被删除",

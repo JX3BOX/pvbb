@@ -318,6 +318,8 @@ export default {
             introduction: "About this booklet",
             articles: "Booklet articles",
             externalLink: "External link",
+            edit: "Edit",
+            delete: "Delete",
             lastUpdated: "Last updated on {time}",
             discussion: "Discussion",
             notFound: "This JX3 booklet does not exist or has been deleted",

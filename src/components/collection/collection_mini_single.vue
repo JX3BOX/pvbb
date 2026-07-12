@@ -63,7 +63,7 @@
 <script>
 import CollectionPublish from "@jx3box/jx3box-editor/src/service/enum/CollectionPublic";
 import { getCollection, removeCollection } from "@/service/collection";
-import { dateFormat } from "@/utils/dateFormat";
+import dayjs from "dayjs";
 import Bus from "@/store/bus";
 import {
     getThumbnail,
@@ -115,7 +115,7 @@ export default {
         },
         authorDate() {
             return this.collection?.created
-                ? this.$t("pages.collection.detail.publishedOn", { time: dateFormat(new Date(this.collection.created * 1000)) })
+                ? this.$t("pages.collection.detail.publishedOn", { time: this.formatDate(this.collection.created) })
                 : "";
         },
         loadErrorTitle() {
@@ -143,6 +143,14 @@ export default {
         getTypeLabel,
         showAvatar,
         resolveImagePath,
+        formatDate(timestamp) {
+            const value = dayjs.unix(timestamp);
+            if (!value.isValid()) return "";
+
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                dateStyle: "medium",
+            }).format(value.toDate());
+        },
         delete_handle($event, collection_id) {
             $event.preventDefault();
             this.$confirm(this.$t("pages.collection.detail.deleteConfirm"), this.$t("pages.common.promptTitle"), {

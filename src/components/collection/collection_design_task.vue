@@ -192,7 +192,13 @@ export default {
             });
         },
         formatTime(time) {
-            return dayjs(time).format("YYYY-MM-DD HH:mm:ss");
+            const value = dayjs(time);
+            if (!value.isValid()) return "";
+
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                dateStyle: "medium",
+                timeStyle: "medium",
+            }).format(value.toDate());
         },
     },
 };

@@ -134,5 +134,9 @@ export default {
 }
 .c-admin-drop__button {
     padding: 8px 18px !important;
+
+    .el-icon-setting {
+        margin-right: 8px;
+    }
 }
 </style>
