@@ -429,6 +429,22 @@ export default {
         title: "铭牌",
         keywords: "玩法心得,同人影音,玩家故事,回忆录,交流讨论",
         description: "剑三玩法心得交流,同人影音分享,玩家原创回忆录",
+        list: {
+            heroTitle: "剑三铭牌",
+            heroDescription: "为常用页面设置一个简短、好记的专属访问地址。",
+            create: "注册铭牌",
+            mine: "我的铭牌",
+            total: "已收录 {count} 个铭牌",
+            searchPlaceholder: "请输入搜索内容",
+            search: "搜索",
+            all: "全部铭牌",
+            discover: "发现简短好记的专属访问地址",
+            page: "第 {page} 页",
+            notFound: "{query} 铭牌不存在或正在审核中",
+            empty: "没有相关条目",
+            types: { player: "玩家", team: "团队", system: "系统", custom: "自定义" },
+        },
+        item: { unknown: "未知", mine: "由我创建的", anonymous: "匿名" },
     },
 
     team: {

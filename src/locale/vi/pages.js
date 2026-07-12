@@ -319,6 +319,22 @@ export default {
         title: "Bảng Tên",
         keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
         description: "Chia sẻ kinh nghiệm JX3, video đồng nhân và hồi ức do người chơi sáng tác.",
+        list: {
+            heroTitle: "Bảng Tên JX3",
+            heroDescription: "Tạo địa chỉ ngắn gọn, dễ nhớ cho các trang bạn thường dùng.",
+            create: "Tạo Bảng Tên",
+            mine: "Bảng Tên Của Tôi",
+            total: "Đã có {count} bảng tên",
+            searchPlaceholder: "Nhập nội dung tìm kiếm",
+            search: "Tìm kiếm",
+            all: "Tất Cả Bảng Tên",
+            discover: "Khám phá các địa chỉ riêng ngắn gọn, dễ nhớ",
+            page: "Trang {page}",
+            notFound: "Bảng tên {query} không tồn tại hoặc đang được xét duyệt.",
+            empty: "Không có mục phù hợp",
+            types: { player: "Người Chơi", team: "Đội", system: "Hệ Thống", custom: "Tùy Chỉnh" },
+        },
+        item: { unknown: "Không rõ", mine: "Do tôi tạo", anonymous: "Ẩn danh" },
     },
 
     team: {

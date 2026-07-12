@@ -342,6 +342,22 @@ export default {
         title: "Nameplate",
         keywords: "gameplay tips,fan videos,player stories,memoirs,discussion",
         description: "Share JX3 gameplay tips, fan-made videos, and original player memoirs.",
+        list: {
+            heroTitle: "JX3 Nameplates",
+            heroDescription: "Create a short, memorable address for your frequently used pages.",
+            create: "Create Nameplate",
+            mine: "My Nameplates",
+            total: "{count} nameplates collected",
+            searchPlaceholder: "Search nameplates",
+            search: "Search",
+            all: "All Nameplates",
+            discover: "Discover short, memorable custom addresses",
+            page: "Page {page}",
+            notFound: "The nameplate {query} does not exist or is under review.",
+            empty: "No matching entries",
+            types: { player: "Player", team: "Team", system: "System", custom: "Custom" },
+        },
+        item: { unknown: "Unknown", mine: "Created by me", anonymous: "Anonymous" },
     },
 
     team: {

@@ -319,6 +319,22 @@ export default {
         title: "銘牌",
         keywords: "玩法心得,同人影音,玩家故事,回憶錄,交流討論",
         description: "劍三玩法心得交流,同人影音分享,玩家原創回憶錄",
+        list: {
+            heroTitle: "劍三銘牌",
+            heroDescription: "為常用頁面設定一個簡短、好記的專屬存取位址。",
+            create: "註冊銘牌",
+            mine: "我的銘牌",
+            total: "已收錄 {count} 個銘牌",
+            searchPlaceholder: "請輸入搜尋內容",
+            search: "搜尋",
+            all: "全部銘牌",
+            discover: "探索簡短好記的專屬存取位址",
+            page: "第 {page} 頁",
+            notFound: "銘牌 {query} 不存在或正在審核中",
+            empty: "沒有相關條目",
+            types: { player: "玩家", team: "團隊", system: "系統", custom: "自訂" },
+        },
+        item: { unknown: "未知", mine: "由我建立", anonymous: "匿名" },
     },
 
     team: {

@@ -4,8 +4,8 @@
             <section class="m-namespace-hero">
                 <div class="u-hero-copy">
                     <span class="u-eyebrow">JX3BOX NAMESPACE</span>
-                    <h1>剑三铭牌</h1>
-                    <p>为常用页面设置一个简短、好记的专属访问地址。</p>
+                    <h1>{{ $t("pages.namespace.list.heroTitle") }}</h1>
+                    <p>{{ $t("pages.namespace.list.heroDescription") }}</p>
                 </div>
                 <div class="u-hero-action">
                     <div class="u-action-list">
@@ -13,61 +13,62 @@
                             :href="publish_link"
                             class="u-publish u-namespace-create el-button el-button--large el-button--primary"
                         >
-                            <i class="el-icon-plus"></i><span>注册铭牌</span>
+                            <i class="el-icon-plus"></i><span>{{ $t("pages.namespace.list.create") }}</span>
                         </a>
                         <a
                             href="/publish/#/bucket/namespace"
                             class="u-publish u-namespace-mine el-button el-button--large"
                         >
-                            <i class="el-icon-receiving"></i><span>我的铭牌</span>
+                            <i class="el-icon-receiving"></i><span>{{ $t("pages.namespace.list.mine") }}</span>
                         </a>
                     </div>
-                    <span class="u-total">已收录 {{ total }} 个铭牌</span>
+                    <span class="u-total">{{ $t("pages.namespace.list.total", { count: total }) }}</span>
                 </div>
             </section>
 
             <!-- 搜索 -->
             <div class="m-archive-search m-namespace-search" key="namespace-search">
+                <i class="el-icon-search u-search-icon"></i>
                 <el-input
-                    placeholder="请输入搜索内容"
+                    :placeholder="$t('pages.namespace.list.searchPlaceholder')"
                     v-model.trim="search"
                     clearable
                     @clear="onSearch"
                     @keydown.enter="onSearch"
                     class="input-with-select"
                     size="large"
-                >
-                    <template #prepend><i class="el-icon-search"></i> <span class="u-search">关键词</span></template>
-                    <template #append>
-                        <el-button class="u-btn" @click="onSearch">
-                            <i class="el-icon-position"></i>
-                        </el-button>
-                    </template>
-                </el-input>
+                ></el-input>
+                <el-button class="u-btn" @click="onSearch">{{ $t("pages.namespace.list.search") }}</el-button>
             </div>
-            <div class="v-namespace" v-loading="loading">
-                <!-- tab切换 -->
-                <el-tabs class="m-namespace-tab" v-model="type">
-                    <el-tab-pane label="全部" name="all"></el-tab-pane>
-                    <el-tab-pane
-                        v-for="item in types"
-                        :label="item.label"
-                        :key="item.value"
-                        :name="item.value"
-                    ></el-tab-pane>
-                </el-tabs>
-                <el-alert v-if="query" type="warning" show-icon class="m-namespace-warning">
-                    <template #title>
-                        <b>{{ query }}</b> 铭牌不存在或正在审核中
-                    </template>
-                </el-alert>
-                <!-- 过滤 -->
-                <div class="m-namespace-filter">
+            <section class="v-namespace m-namespace-shelf" v-loading="loading">
+                <div class="m-namespace-shelf-head">
+                    <div>
+                        <span class="u-title">{{ $t("pages.namespace.list.all") }}</span>
+                        <span class="u-desc">{{ $t("pages.namespace.list.discover") }}</span>
+                    </div>
+                    <span class="u-page">{{ $t("pages.namespace.list.page", { page }) }}</span>
+                </div>
+                <div class="m-namespace-toolbar">
+                    <!-- tab切换 -->
+                    <el-tabs class="m-namespace-tab" v-model="type">
+                        <el-tab-pane :label="$t('pages.namespace.list.all')" name="all"></el-tab-pane>
+                        <el-tab-pane
+                            v-for="item in types"
+                            :label="$t(item.labelKey)"
+                            :key="item.value"
+                            :name="item.value"
+                        ></el-tab-pane>
+                    </el-tabs>
+                    <!-- 排序 -->
                     <div class="m-namespace-order">
                         <orderBy class="u-item" @filter="changeOrder"></orderBy>
                     </div>
                 </div>
-
+                <el-alert v-if="query" type="warning" show-icon class="m-namespace-warning">
+                    <template #title>
+                        {{ $t("pages.namespace.list.notFound", { query }) }}
+                    </template>
+                </el-alert>
                 <!-- 列表内容 -->
                 <div class="m-namespace-list" v-if="list">
                     <div class="u-namespace" v-for="item in list" :key="item.ID">
@@ -76,7 +77,7 @@
                 </div>
                 <!-- 无数据 -->
                 <div class="m-namespace-null" v-else>
-                    <el-alert title="没有相关条目" type="info" show-icon></el-alert>
+                    <el-alert :title="$t('pages.namespace.list.empty')" type="info" show-icon></el-alert>
                 </div>
                 <!-- 分页 -->
                 <el-pagination
@@ -88,7 +89,7 @@
                     :total="total"
                     v-model:current-page="page"
                 ></el-pagination>
-            </div>
+            </section>
         </div>
     </ListLayout>
 </template>
@@ -106,10 +107,10 @@ export default {
         return {
             type: "all",
             types: [
-                { label: "玩家", value: "player" },
-                { label: "团队", value: "team" },
-                { label: "系统", value: "system" },
-                { label: "自定义", value: "custom" },
+                { labelKey: "pages.namespace.list.types.player", value: "player" },
+                { labelKey: "pages.namespace.list.types.team", value: "team" },
+                { labelKey: "pages.namespace.list.types.system", value: "system" },
+                { labelKey: "pages.namespace.list.types.custom", value: "custom" },
             ],
             list: "",
             per: 24,

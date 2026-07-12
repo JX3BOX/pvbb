@@ -2,12 +2,12 @@
     <div class="m-namespace-item" @click="goNamespace(namespace.link)">
         <h5 class="u-title">
             <a :href="namespace.link" target="_blank" @click.stop
-                ><i class="u-icon el-icon-postcard"></i>{{ namespace.key || "未知" }}
+                ><i class="u-icon el-icon-postcard"></i>{{ namespace.key || $t("pages.namespace.item.unknown") }}
                 <span class="u-preview">剑网3.com/{{ namespace.key }}</span>
             </a>
-            <i class="u-my" v-if="isMyNamespace(namespace.uid)">由我创建的</i>
+            <i class="u-my" v-if="isMyNamespace(namespace.uid)">{{ $t("pages.namespace.item.mine") }}</i>
         </h5>
-        <p class="u-desc">{{ namespace.desc || namespace.key || "未知" }}</p>
+        <p class="u-desc">{{ namespace.desc || namespace.key || $t("pages.namespace.item.unknown") }}</p>
         <div class="u-misc">
             <span class="u-author">
                 <i class="el-icon-user"></i>&nbsp;<a
@@ -16,7 +16,7 @@
                     target="_blank"
                     @click.stop
                 >
-                    {{ (namespace.creator && namespace.creator.display_name) || "匿名" }}</a
+                    {{ (namespace.creator && namespace.creator.display_name) || $t("pages.namespace.item.anonymous") }}</a
                 >
             </span>
             <time class="u-time"><i class="el-icon-date"></i> {{ dataFormat(namespace.created) }}</time>
