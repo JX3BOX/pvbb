@@ -40,7 +40,7 @@
         "@imengyu/vue3-context-menu": "^1.5.4",
         "@jx3box/jx3box-common": "^9.2.9",
         "@jx3box/jx3box-data": "^3.9.6",
-        "@jx3box/jx3box-editor": "^3.2.9",
+        "@jx3box/jx3box-editor": "^3.2.10",
         "@jx3box/jx3box-emotion": "^1.2.14",
         "@jx3box/jx3box-facedat": "^2.7.3",
         "@jx3box/jx3box-fe-proxy": "^1.0.1",
