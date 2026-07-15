@@ -789,7 +789,7 @@ export default {
         },
         // 路由绑定
         replaceRoute: function (extend) {
-            const query = Object.assign({}, this.$route.query, extend);
+            const query = this.buildRouteQuery(extend);
             if (this.isSameRouteQuery(query)) return Promise.resolve();
             return this.$router
                 .push({ name: this.$route.name, query, hash: this.$route.hash })
@@ -797,6 +797,19 @@ export default {
                     window.scrollTo(0, 0);
                 })
                 .catch((err) => {});
+        },
+        buildRouteQuery(extend = {}) {
+            const query = Object.assign({}, this.$route.query);
+            // 默认第一页、非“只看楼主”无需出现在分享链接中。
+            delete query.page;
+            delete query.onlyAuthor;
+
+            const page = Math.max(1, Number(extend.page ?? this.page) || 1);
+            const onlyAuthor = extend.onlyAuthor ?? this.onlyAuthor;
+            if (page > 1) query.page = page;
+            if (onlyAuthor === true || onlyAuthor === "true") query.onlyAuthor = true;
+
+            return query;
         },
         isSameRouteQuery(query) {
             return (
