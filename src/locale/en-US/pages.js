@@ -42,6 +42,7 @@ export default {
             tags: "Tags",
             pushedAt: "Pushed on {time}",
             push: "Push",
+            lastUpdatedAt: "Last updated on {date}",
             lastRepliedAt: "Last replied on {date}",
             collectionTitle: "{title}",
             loadMore: "Load More",
@@ -50,8 +51,9 @@ export default {
         },
         sort: {
             label: "Sort",
+            default: "Default",
             latestReply: "Latest Reply",
-            latestPublish: "Latest Published",
+            latestUpdate: "Recently Updated",
         },
         single: {
             title: "Bamboo Teahouse",

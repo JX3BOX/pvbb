@@ -8,13 +8,17 @@
             </span>
         </span>
         <span class="u-options">
+            <span class="u-mode" :class="{ on: order === 'default' }" @click="filter('default')">
+                <el-icon><Sort /></el-icon>
+                {{ $t("pages.community.sort.default") }}
+            </span>
             <span class="u-mode" :class="{ on: order === 'reply' }" @click="filter('reply')">
                 <el-icon><ChatDotRound /></el-icon>
                 {{ $t("pages.community.sort.latestReply") }}
             </span>
             <span class="u-mode" :class="{ on: order === 'publish' }" @click="filter('publish')">
-                <el-icon><Sort /></el-icon>
-                {{ $t("pages.community.sort.latestPublish") }}
+                <el-icon><Edit /></el-icon>
+                {{ $t("pages.community.sort.latestUpdate") }}
             </span>
         </span>
     </div>
@@ -22,7 +26,9 @@
 
 <script>
 const resolveOrder = (type) => {
-    return type == 1 ? "reply" : "publish";
+    if (Number(type) === 1) return "reply";
+    if (Number(type) === 0) return "publish";
+    return "default";
 };
 
 export default {
@@ -31,7 +37,7 @@ export default {
     props: {
         type: {
             type: [String, Number],
-            default: "",
+            default: -1,
         },
     },
     data: function () {
@@ -42,9 +48,12 @@ export default {
     },
     computed: {
         current: function () {
-            return this.order === "reply"
-                ? this.$t("pages.community.sort.latestReply")
-                : this.$t("pages.community.sort.latestPublish");
+            const labels = {
+                default: "default",
+                reply: "latestReply",
+                publish: "latestUpdate",
+            };
+            return this.$t(`pages.community.sort.${labels[this.order]}`);
         },
     },
     watch: {
@@ -60,7 +69,7 @@ export default {
             this.order = key;
             this.$emit("filter", {
                 type: "order_by_last_reply",
-                val: key === "reply" ? 1 : "",
+                val: key === "reply" ? 1 : key === "publish" ? 0 : -1,
             });
             this.visible = false;
         },

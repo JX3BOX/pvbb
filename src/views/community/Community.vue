@@ -78,8 +78,15 @@
                                 :keyword="title"
                                 v-if="topTopicData"
                                 :item="topTopicData"
+                                :order="order_by_last_reply"
                             />
-                            <ListItem v-for="item in list" :keyword="title" :key="item.id" :item="item" />
+                            <ListItem
+                                v-for="item in list"
+                                :keyword="title"
+                                :key="item.id"
+                                :item="item"
+                                :order="order_by_last_reply"
+                            />
                         </ul>
                     </div>
                 </template>
@@ -156,7 +163,7 @@ export default {
             isSearch: false,
             client: DEFAULT_COMMUNITY_CLIENT,
             is_star: 0, // 只看精选，0否1是
-            order_by_last_reply: 1, // 最新回复排序，1是，空为最新发布
+            order_by_last_reply: -1, // -1默认，1最后回复优先，0最新更新或发布优先
             tag: "",
 
             view: 2, // 列表视图，1卡片，2列表
@@ -253,7 +260,8 @@ export default {
                 this.category = query.category || "all";
                 this.client = normalizeCommunityClient(query.client);
                 this.is_star = Number(query.is_star) === 1 ? 1 : 0;
-                this.order_by_last_reply = query.order_by_last_reply == null ? 1 : Number(query.order_by_last_reply);
+                const order = Number(query.order_by_last_reply);
+                this.order_by_last_reply = query.order_by_last_reply == null || ![0, 1].includes(order) ? -1 : order;
                 this.title = query.title || "";
                 this.tag = query.tag || "";
                 this.$nextTick(() => {
@@ -456,7 +464,9 @@ export default {
             if (this.per !== 20) query.per = this.per;
             if (isExplicitCommunityClient(this.client)) query.client = this.client;
             if (this.is_star) query.is_star = 1;
-            if (!this.order_by_last_reply) query.order_by_last_reply = 0;
+            if ([0, 1].includes(this.order_by_last_reply)) {
+                query.order_by_last_reply = this.order_by_last_reply;
+            }
             if (this.title) query.title = this.title;
             if (this.tag) query.tag = this.tag;
             return query;
@@ -494,8 +504,8 @@ export default {
             if (this.tag) {
                 _query.tag = this.tag;
             }
-            if (this.order_by_last_reply) {
-                _query.order_by_last_reply = 1;
+            if ([0, 1].includes(this.order_by_last_reply)) {
+                _query.order_by_last_reply = this.order_by_last_reply;
             }
 
             return _query;

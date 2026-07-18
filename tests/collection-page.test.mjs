@@ -92,6 +92,24 @@ test("collection shares one stat request between its header and like control", a
     assert.match(like, /onCollectionStatLoaded\?\.\(res\.data\)/);
 });
 
+test("collection thx uses the dedicated collection subscription endpoints", async () => {
+    const [single, thx, rss, service] = await Promise.all([
+        read("../src/components/collection/collection_single.vue"),
+        read("../src/components/collection/collection_thx.vue"),
+        read("../src/components/collection/collection_rss.vue"),
+        read("../src/service/rss.js"),
+    ]);
+
+    assert.match(single, /:showRss="true"/);
+    assert.match(thx, /Rss:\s*CollectionRss/);
+    assert.match(rss, /getRssFn\(\)[\s\S]*return getCollectionRss/);
+    assert.match(rss, /subscribeFn\(\)[\s\S]*return subscribeCollection/);
+    assert.match(rss, /unsubscribeFn\(\)[\s\S]*return unsubscribeCollection/);
+    assert.match(service, /overview\/post-collection\/\$\{id\}/);
+    assert.match(service, /post\(`\/api\/next2\/rss\/subscribe\/post-collection\/\$\{id\}`/);
+    assert.match(service, /delete\(`\/api\/next2\/rss\/subscribe\/post-collection\/\$\{id\}`/);
+});
+
 test("collection skips hidden side content and empty image nodes", async () => {
     const [layout, item] = await Promise.all([
         read("../src/layouts/CollectionLayout.vue"),

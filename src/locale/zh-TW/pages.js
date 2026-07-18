@@ -42,6 +42,7 @@ export default {
             tags: "標籤",
             pushedAt: "{time} 已推送",
             push: "推送",
+            lastUpdatedAt: "最後更新於 {date}",
             lastRepliedAt: "最後回覆於 {date}",
             collectionTitle: "《{title}》",
             loadMore: "載入更多",
@@ -50,8 +51,9 @@ export default {
         },
         sort: {
             label: "排序",
+            default: "預設",
             latestReply: "最新回覆",
-            latestPublish: "最新發布",
+            latestUpdate: "最近更新",
         },
         single: {
             title: "竹林茶館",

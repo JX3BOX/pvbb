@@ -143,6 +143,7 @@
                     :author-id="author_id"
                     :adminBoxcoinEnable="false"
                     :userBoxcoinEnable="true"
+                    :showRss="true"
                     client="all"
                     @stat-loaded="updateStat"
                 />

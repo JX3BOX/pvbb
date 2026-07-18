@@ -108,11 +108,7 @@ showMark(<i v-for="mark in item.mark" class="u-mark" :key="mark">{{ mark) }}</i>
                 <span v-else>{{ $t("pages.community.common.mysteriousHero") }}</span>
             </div>
             <span class="u-date">
-                <!-- Updated on
-                <time v-if="order == 'update'">{{ dateFormat(item.post_modified) }}</time>
-                <time v-else>{{ dateFormat(item.updated_at) }}</time> -->
-
-                {{ $t("pages.community.list.lastRepliedAt", { date: dateFormat(item.latest_reply_at) }) }}
+                {{ $t(`pages.community.list.${displayTimeKey}`, { date: dateFormat(displayTime) }) }}
             </span>
         </div>
     </li>
@@ -159,6 +155,20 @@ export default {
         },
         showPushDate() {
             return Boolean(this.item?.log?.push_at);
+        },
+        displayTimeType() {
+            if (Number(this.order) === 0) return "updated";
+            if (Number(this.order) === 1) return "replied";
+
+            const updatedAt = new Date(this.item?.updated_at).getTime() || 0;
+            const repliedAt = new Date(this.item?.latest_reply_at).getTime() || 0;
+            return updatedAt >= repliedAt ? "updated" : "replied";
+        },
+        displayTime() {
+            return this.displayTimeType === "updated" ? this.item?.updated_at : this.item?.latest_reply_at;
+        },
+        displayTimeKey() {
+            return this.displayTimeType === "updated" ? "lastUpdatedAt" : "lastRepliedAt";
         },
         isTop: function () {
             return this.item.is_top || this.item.is_category_top;

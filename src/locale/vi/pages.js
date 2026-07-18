@@ -42,6 +42,7 @@ export default {
             tags: "Thẻ",
             pushedAt: "Đã đẩy lúc {time}",
             push: "Đẩy",
+            lastUpdatedAt: "Cập nhật gần nhất vào {date}",
             lastRepliedAt: "Phản hồi gần nhất vào {date}",
             collectionTitle: "{title}",
             loadMore: "Tải Thêm",
@@ -50,8 +51,9 @@ export default {
         },
         sort: {
             label: "Sắp xếp",
+            default: "Mặc định",
             latestReply: "Phản hồi mới nhất",
-            latestPublish: "Đăng mới nhất",
+            latestUpdate: "Cập nhật gần đây",
         },
         single: {
             title: "Trà Quán Trúc Lâm",

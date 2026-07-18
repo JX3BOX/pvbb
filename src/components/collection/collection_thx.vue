@@ -1,6 +1,7 @@
 <script>
 import Thx from "@jx3box/jx3box-ui/src/single/Thx.vue";
 import CollectionLike from "./collection_like.vue";
+import CollectionRss from "./collection_rss.vue";
 
 export default {
     name: "CollectionThx",
@@ -9,6 +10,7 @@ export default {
     components: {
         ...Thx.components,
         Like: CollectionLike,
+        Rss: CollectionRss,
     },
     provide() {
         return {
