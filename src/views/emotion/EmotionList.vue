@@ -4,7 +4,7 @@
         :title="$t('pages.emotion.title')"
         :description="$t('pages.emotion.heroDescription')"
         icon="el-icon-picture-outline"
-        :loading="loading"
+        :loading="loading && !!list.length"
         :type="type"
         @set-type="setType"
     >
@@ -29,7 +29,23 @@
                     :closable="false"
                 />
 
-                <ul class="m-emotion-list" v-if="list.length">
+                <div v-if="loading && !list.length" class="m-emotion-skeleton" aria-hidden="true">
+                    <div v-for="item in skeletonItems" :key="item" class="m-emotion-skeleton-item">
+                        <el-skeleton animated>
+                            <template #template>
+                                <el-skeleton-item variant="image" class="u-skeleton-image" />
+                                <el-skeleton-item variant="text" class="u-skeleton-description" />
+                                <div class="u-skeleton-meta">
+                                    <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                                    <el-skeleton-item variant="text" class="u-skeleton-name" />
+                                    <el-skeleton-item variant="text" class="u-skeleton-action" />
+                                </div>
+                            </template>
+                        </el-skeleton>
+                    </div>
+                </div>
+
+                <ul class="m-emotion-list" v-else-if="list.length">
                     <waterfall
                         ref="waterfall"
                         allow-overflow
@@ -152,6 +168,9 @@ export default {
         },
         isEditor() {
             return User.isEditor();
+        },
+        skeletonItems() {
+            return Math.min(Math.max(Number(this.per) || 10, 5), 10);
         },
     },
     watch: {

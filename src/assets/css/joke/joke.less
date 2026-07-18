@@ -1,5 +1,51 @@
 // 列表页
 // =======================
+.m-joke-skeleton {
+    .el-skeleton {
+        margin-bottom: 18px;
+    }
+    .el-skeleton__item {
+        display: block;
+    }
+    .u-skeleton-content {
+        min-height: 72px;
+        padding: 18px 20px;
+        box-sizing: border-box;
+        border: 1px solid #ebeaf0;
+        border-radius: 10px;
+        background: #fff;
+    }
+    .u-skeleton-line {
+        height: 16px;
+
+        &.is-long {
+            width: 82%;
+        }
+        &.is-short {
+            width: 58%;
+            margin-top: 14px;
+        }
+    }
+    .u-skeleton-meta {
+        display: flex;
+        align-items: center;
+        height: 34px;
+        padding: 0 4px;
+    }
+    .u-skeleton-avatar {
+        width: 22px;
+        height: 22px;
+        margin-right: 8px;
+    }
+    .u-skeleton-name {
+        width: 72px;
+        margin-right: 20px;
+    }
+    .u-skeleton-action {
+        width: 46px;
+        margin-right: 18px;
+    }
+}
 .m-joke-footer {
     display: flex;
     align-items: center;

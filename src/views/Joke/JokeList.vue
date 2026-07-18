@@ -4,7 +4,6 @@
         :title="$t('pages.joke.title')"
         :description="$t('pages.joke.heroDescription')"
         icon="el-icon-chat-dot-round"
-        :loading="loading"
         :type="type"
         @set-type="setType"
     >
@@ -20,7 +19,24 @@
             @search="onSearch"
         />
 
-        <div class="m-joke-list" v-if="jokes.length">
+        <div v-if="loading" class="m-joke-skeleton" aria-hidden="true">
+            <el-skeleton v-for="index in 5" :key="index" animated>
+                <template #template>
+                    <div class="u-skeleton-content">
+                        <el-skeleton-item variant="text" class="u-skeleton-line is-long" />
+                        <el-skeleton-item variant="text" class="u-skeleton-line is-short" />
+                    </div>
+                    <div class="u-skeleton-meta">
+                        <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                        <el-skeleton-item variant="text" class="u-skeleton-name" />
+                        <el-skeleton-item variant="text" class="u-skeleton-action" />
+                        <el-skeleton-item variant="text" class="u-skeleton-action" />
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+
+        <div class="m-joke-list" v-else-if="jokes.length">
             <joke-item
                 v-for="joke in jokes"
                 :key="joke.id"
@@ -34,7 +50,7 @@
         <el-alert v-else-if="listError" :title="listError" type="error" show-icon />
         <el-alert v-else :title="$t('pages.joke.noResults')" type="info" show-icon />
 
-        <div class="m-joke-footer">
+        <div v-if="!loading" class="m-joke-footer">
             <el-pagination
                 v-model:current-page="page"
                 class="m-joke-pagination"

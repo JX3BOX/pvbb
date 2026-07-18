@@ -1,5 +1,5 @@
 <template>
-    <div class="m-collection-box" v-loading="loading" ref="listRef">
+    <div class="m-collection-box" ref="listRef">
         <section class="m-collection-hero">
             <div class="u-hero-copy">
                 <span class="u-eyebrow">JX3BOX COLLECTION</span>
@@ -41,6 +41,28 @@
                 <template v-for="(item, i) in data" :key="i">
                     <collection-item :data="item" />
                 </template>
+            </div>
+        </section>
+        <!-- 骨架屏 -->
+        <section class="m-collection-shelf m-collection-skeleton" v-else-if="loading" aria-hidden="true">
+            <div class="m-collection-shelf-head">
+                <div>
+                    <el-skeleton-item variant="text" class="u-skeleton-heading" />
+                    <el-skeleton-item variant="text" class="u-skeleton-desc" />
+                </div>
+                <el-skeleton-item variant="text" class="u-skeleton-page" />
+            </div>
+            <div class="m-collection-list">
+                <el-skeleton v-for="item in 12" :key="item" animated class="m-collection-skeleton-item">
+                    <template #template>
+                        <el-skeleton-item variant="image" class="u-skeleton-cover" />
+                        <el-skeleton-item variant="text" class="u-skeleton-title" />
+                        <div class="u-skeleton-user">
+                            <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                            <el-skeleton-item variant="text" class="u-skeleton-name" />
+                        </div>
+                    </template>
+                </el-skeleton>
             </div>
         </section>
         <!-- 空 -->
@@ -286,6 +308,55 @@ export default {
             color: #8c87a0;
         }
     }
+    .m-collection-skeleton {
+        .u-skeleton-heading,
+        .u-skeleton-desc,
+        .u-skeleton-page {
+            display: inline-block;
+            width: 88px;
+            vertical-align: middle;
+        }
+        .u-skeleton-desc {
+            width: 130px;
+            margin-left: 10px;
+        }
+        .u-skeleton-page { width: 54px; }
+    }
+    .m-collection-skeleton-item {
+        height: 292px;
+        box-sizing: border-box;
+        padding: 14px 12px;
+        border: 1px solid #e8e7ef;
+        border-radius: 10px;
+        background: #fff;
+        .el-skeleton__template {
+            display: flex;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+        .u-skeleton-cover {
+            width: 111px;
+            height: 161px;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+        .u-skeleton-title {
+            width: 72%;
+            margin-top: 20px;
+        }
+        .u-skeleton-user {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .u-skeleton-avatar {
+            width: 17px;
+            height: 17px;
+        }
+        .u-skeleton-name { width: 58px; }
+    }
     .m-collection-search {
         display: flex;
         align-items: center;
@@ -349,6 +420,19 @@ export default {
             .u-desc, .u-page { display: none; }
         }
         .m-collection-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+        .m-collection-skeleton {
+            .u-skeleton-desc,
+            .u-skeleton-page { display: none; }
+        }
+        .m-collection-skeleton-item {
+            height: 280px;
+            padding: 14px 8px;
+            .u-skeleton-cover {
+                width: 100px;
+                height: 145px;
+                margin-top: 15px;
+            }
+        }
     }
 }
 </style>

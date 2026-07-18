@@ -40,7 +40,7 @@
                 ></el-input>
                 <el-button class="u-btn" @click="onSearch">{{ $t("pages.namespace.list.search") }}</el-button>
             </div>
-            <section class="v-namespace m-namespace-shelf" v-loading="loading">
+            <section class="v-namespace m-namespace-shelf">
                 <div class="m-namespace-shelf-head">
                     <div>
                         <span class="u-title">{{ $t("pages.namespace.list.all") }}</span>
@@ -70,7 +70,21 @@
                     </template>
                 </el-alert>
                 <!-- 列表内容 -->
-                <div class="m-namespace-list" v-if="list">
+                <div v-if="loading" class="m-namespace-list m-namespace-skeleton" aria-hidden="true">
+                    <el-skeleton v-for="index in 6" :key="index" animated>
+                        <template #template>
+                            <div class="m-namespace-item">
+                                <el-skeleton-item variant="text" class="u-skeleton-title" />
+                                <el-skeleton-item variant="text" class="u-skeleton-desc" />
+                                <div class="u-skeleton-meta">
+                                    <el-skeleton-item variant="text" class="u-skeleton-author" />
+                                    <el-skeleton-item variant="text" class="u-skeleton-time" />
+                                </div>
+                            </div>
+                        </template>
+                    </el-skeleton>
+                </div>
+                <div class="m-namespace-list" v-else-if="list && list.length">
                     <div class="u-namespace" v-for="item in list" :key="item.ID">
                         <namespace-item :data="item" />
                     </div>
@@ -81,6 +95,7 @@
                 </div>
                 <!-- 分页 -->
                 <el-pagination
+                    v-if="!loading"
                     class="m-namespace-pages"
                     background
                     layout="total, prev, pager, next,jumper"
