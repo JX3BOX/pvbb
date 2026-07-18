@@ -13,6 +13,20 @@ export function isExplicitCommunityClient(value) {
     return explicitCommunityClients.has(value);
 }
 
+export function getCommunityReplyPageByFloor(floor, pageSize = 10) {
+    const normalizedFloor = Math.max(2, Number(floor) || 2);
+    const normalizedPageSize = Math.max(1, Number(pageSize) || 10);
+    // 主楼为 1 楼，接口回帖从 2 楼开始，因此页码要先扣除主楼。
+    return Math.ceil((normalizedFloor - 1) / normalizedPageSize);
+}
+
+export function enableLazyImages(html) {
+    return String(html || "").replace(/<img\b[^>]*>/gi, (tag) => {
+        const normalized = tag.replace(/\sloading\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+        return normalized.replace(/^<img\b/i, '<img loading="lazy"');
+    });
+}
+
 export function escapeHtml(str) {
     return String(str || "").replace(/[&<>"']/g, function (match) {
         switch (match) {

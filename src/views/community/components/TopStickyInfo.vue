@@ -89,11 +89,7 @@ export default {
             const dom = document.getElementsByClassName("m-single-header");
             if (dom.length) {
                 const rect = dom[0].getBoundingClientRect();
-                if (document.documentElement.scrollTop > rect.y + rect.height) {
-                    this.show = true;
-                } else {
-                    this.show = false;
-                }
+                this.show = rect.bottom <= 64;
             }
         },
     },

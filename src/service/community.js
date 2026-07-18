@@ -33,8 +33,8 @@ function getTopicReplyList(id, params) {
 }
 
 // 回复主贴
-function replyTopic(id, data) {
-    return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply`, data);
+function replyTopic(id, data, params) {
+    return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply`, data, { params });
 }
 //  删除我的帖子的回帖
 function delReplyToMyTopic(id, replyId) {
@@ -52,8 +52,10 @@ function delMyComment(id) {
 }
 
 // 主贴回帖的评论
-function replyReply(id, replyId, data) {
-    return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply/item/${replyId}/comments`, data);
+function replyReply(id, replyId, data, params) {
+    return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply/item/${replyId}/comments`, data, {
+        params,
+    });
 }
 
 /**

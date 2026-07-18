@@ -42,6 +42,12 @@ function getDecoration(params) {
     return request;
 }
 
+function getUserSkin(user_id) {
+    return $cms().get(`/api/cms/user/skin`, {
+        params: { user_id },
+    });
+}
+
 function getDecorationJson() {
     let url = __cdn + "design/decoration/index.json";
     return axios.get(url);
@@ -49,4 +55,4 @@ function getDecorationJson() {
 
 const getUserList = (params) => $cms().get(`/api/cms/user/list`, { params });
 
-export { getMenu, getAuthorInfo, getTopicBucket, getConfigBanner, getUserList, getDecoration, getDecorationJson };
+export { getMenu, getAuthorInfo, getTopicBucket, getConfigBanner, getUserList, getDecoration, getUserSkin, getDecorationJson };

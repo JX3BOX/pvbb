@@ -3,10 +3,10 @@
         <div class="u-author">
             <Avatar
                 class="u-avatar"
-                :uid="uid"
-                :url="resolveImagePath(data.user_avatar)"
+                :uid="anonymous ? 0 : uid"
+                :url="anonymous ? anonymousAvatar : resolveImagePath(data.user_avatar)"
                 size="s"
-                :frame="data.user_avatar_frame"
+                :frame="anonymous ? '' : data.user_avatar_frame"
             />
             <div class="u-info">
                 <div class="u-name">
@@ -15,21 +15,21 @@
                         effect="dark"
                         :content="$t('pages.community.single.contractedAuthor')"
                         placement="top"
-                        v-if="isSuperAuthor"
+                        v-if="!anonymous && isSuperAuthor"
                     >
                         <a class="u-superauthor" href="/about/superauthor" target="_blank">
                             <img :src="super_author_icon" :alt="$t('pages.community.single.contractedAuthor')" />
                         </a>
                     </el-tooltip>
-                    <a class="u-displayname" :href="authorLink(uid)" target="_blank" v-if="!isAnonymous">
+                    <a class="u-displayname" :href="authorLink(uid)" target="_blank" v-if="!anonymous">
                         {{ data.display_name || $t("pages.community.common.unknownUser") }}
                     </a>
                     <span class="u-displayname u-anonymous" v-else>{{
                         $t("pages.community.single.mysteriousUser")
                     }}</span>
                 </div>
-                <div class="u-extend">
-                    <el-tooltip class="item" effect="dark" placement="top" v-if="!isAnonymous">
+                <div class="u-extend" v-if="!anonymous">
+                    <el-tooltip class="item" effect="dark" placement="top">
                         <template #content>
                             <span class="u-tips">{{
                                 $t("pages.community.single.experience", { value: data.experience })
@@ -44,21 +44,12 @@
                             >Lv.{{ level }}</a
                         >
                     </el-tooltip>
-                    <a
-                        v-else
-                        class="u-level"
-                        :class="'lv-' + level"
-                        :style="{ backgroundColor: showLevelColor(level) }"
-                        href="/about/incentives"
-                        target="_blank"
-                        >Lv.{{ level }}</a
-                    >
                     <el-tooltip
                         class="item"
                         effect="dark"
                         :content="vipTypeTitle"
                         placement="top"
-                        v-if="isVip && !isAnonymous"
+                        v-if="isVip"
                     >
                         <a class="u-vip" href="/vip/premium?from=sidebar_author" target="_blank">
                             <i class="i-icon-vip on">{{ vipType }}</i>
@@ -67,22 +58,29 @@
                 </div>
             </div>
         </div>
-        <Honor :uid="uid"></Honor>
-        <div class="u-bio">{{ data.user_bio }}</div>
+        <Honor v-if="!anonymous && honor" :honor="honor"></Honor>
+        <div class="u-bio" v-if="!anonymous && data.user_bio">{{ data.user_bio }}</div>
     </div>
 </template>
 
 <script>
 import jx3box from "@jx3box/jx3box-common/data/jx3box.json";
-const { __imgPath, __userLevelColor } = jx3box;
+const { __imgPath, __userLevelColor, default_avatar: DEFAULT_AVATAR } = jx3box;
 import { authorLink, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
-import { getUserInfo } from "@jx3box/jx3box-ui/service/author";
+import { getCommunityUserInfo } from "@/service/community-author";
 import Avatar from "@jx3box/jx3box-ui/src/author/Avatar.vue";
 import Honor from "@jx3box/jx3box-ui/src/author/AuthorHonor.vue";
 export default {
     name: "AuthorInfo",
-    props: ["uid", "isAnonymous"],
+    props: {
+        uid: [Number, String],
+        isAnonymous: [Boolean, Number, String],
+        honor: {
+            type: Object,
+            default: null,
+        },
+    },
     components: {
         Avatar,
         Honor,
@@ -92,12 +90,23 @@ export default {
             data: {},
             isVIP: false,
             super_author_icon: __imgPath + "image/user/" + "superauthor.svg",
+            anonymousAvatar: DEFAULT_AVATAR,
+            userRequestVersion: 0,
         };
     },
     computed: {
+        anonymous: function () {
+            if (typeof this.isAnonymous === "string") {
+                return !["", "0", "false", "null", "undefined"].includes(this.isAnonymous.toLowerCase());
+            }
+            return Boolean(this.isAnonymous);
+        },
+        identityKey: function () {
+            return `${this.uid || 0}:${this.anonymous ? 1 : 0}`;
+        },
         // level
         level: function () {
-            return this.isAnonymous ? -1 : User.getLevel(this.data?.experience);
+            return User.getLevel(this.data?.experience);
         },
 
         // vip
@@ -115,25 +124,38 @@ export default {
 
         // sign
         isSuperAuthor: function () {
-            return this.data?.sign;
+            return !this.anonymous && this.data?.sign;
         },
     },
     watch: {
-        uid: {
+        identityKey: {
             immediate: true,
-            handler: function (val) {
-                val && this.loadData();
+            handler: function () {
+                this.loadData();
             },
         },
     },
     methods: {
         loadData: function () {
-            return getUserInfo(this.uid).then((data) => {
-                if (data) {
-                    this.data = data;
-                    this.$emit("ready", this.data);
-                }
-            });
+            const requestVersion = ++this.userRequestVersion;
+            const uid = this.uid;
+            this.data = {};
+            if (!uid || this.anonymous) return Promise.resolve();
+
+            return getCommunityUserInfo(uid)
+                .then((data) => {
+                    if (
+                        requestVersion !== this.userRequestVersion ||
+                        this.anonymous ||
+                        String(uid) !== String(this.uid)
+                    )
+                        return;
+                    if (data) {
+                        this.data = data;
+                        this.$emit("ready", this.data);
+                    }
+                })
+                .catch(() => {});
         },
         authorLink,
         resolveImagePath,

@@ -3,15 +3,19 @@
         <div class="m-comment-right" :style="decorationStyles">
             <img
                 class="u-avatar"
-                :src="showAvatar(userInfo.avatar)"
+                :src="showAvatar(isAnonymous ? '' : userInfo.avatar)"
                 :alt="$t('pages.community.common.avatarAlt')"
             />
             <div class="m-comment-content">
                 <div class="u-content-top">
                     <div class="u-name">
-                        <a :href="authorLink(userInfo.id)" :alt="$t('pages.community.common.usernameAlt')">{{
-                            userInfo.display_name
-                        }}</a>
+                        <a
+                            v-if="!isAnonymous"
+                            :href="authorLink(userInfo.id)"
+                            :alt="$t('pages.community.common.usernameAlt')"
+                            >{{ displayName }}</a
+                        >
+                        <span v-else>{{ displayName }}</span>
                         <span class="m-comment-time u-mobile-show">{{ post.updated_at }}</span>
                     </div>
                     <div>
@@ -36,7 +40,7 @@
                     </div>
                 </div>
                 <p class="u-answer-user">{{
-                    $t("pages.community.reply.replyTo", { name: replyUserInfo.display_name })
+                    $t("pages.community.reply.replyTo", { name: replyTargetName })
                 }}</p>
                 <p class="u-content" v-html="renderContent"></p>
                 <div class="u-comment-toolbar">
@@ -79,8 +83,8 @@
                 </div>
                 <ReplyForReply
                     v-if="showReplyForReplyFrom"
-                    :username="userInfo.display_name"
-                    :user-href="authorLink(userInfo.id)"
+                    :username="displayName"
+                    :user-href="isAnonymous ? '' : authorLink(userInfo.id)"
                     @hideForm="showReplyForReplyFrom = false"
                     @doReply="doReply"
                     :commentStrict="commentStrict"
@@ -98,22 +102,21 @@ import User from "@jx3box/jx3box-common/js/user";
 import JX3_EMOTION from "@jx3box/jx3box-emotion";
 import { replyReply } from "@/service/community";
 import { postStat } from "@jx3box/jx3box-common/js/stat";
-import { getDecoration } from "@/service/cms";
+import { getCommunityUserSkin } from "@/service/community-author";
 import { __cdn } from "@/utils/config";
+import { enableLazyImages } from "@/utils/community";
 
 import ReplyForReply from "./ReplyForReply.vue";
 import AddBlockButton from "./AddBlockButton.vue";
 import ComplaintButton from "./ComplaintButton.vue";
 import DeleteButton from "./DeleteButton.vue";
-import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
-
-const DECORATION_KEY = "decoration_comment_";
+import sanitizeCommunityReplyHtml from "@/utils/community-rich-text";
 
 export default {
     name: "CommentItem",
     emits: ["decoration-change"],
     props: ["post", "commentStrict"],
-    inject: ["getTopicData", "getReplyData", "getCommentList"],
+    inject: ["getTopicData", "getTopicPassword", "getReplyData", "getCommentList"],
     components: {
         ReplyForReply,
         AddBlockButton,
@@ -124,12 +127,14 @@ export default {
     data() {
         return {
             decoration: "",
+            decorationPosition: "",
             isLike: false,
             likeCount: 0,
             renderContent: "",
             showReplyForReplyFrom: false,
             commentList: [],
             replySubmitting: false,
+            renderVersion: 0,
         };
     },
     watch: {
@@ -148,7 +153,7 @@ export default {
     },
     computed: {
         uid() {
-            return this.post.user_info.id;
+            return this.userInfo?.id || 0;
         },
         // 是否登录
         likeCountRender: function () {
@@ -161,10 +166,27 @@ export default {
             }
         },
         userInfo: function () {
-            return this.post.user_info;
+            return this.post?.user_info || this.post?.ext_user_info || {};
         },
         replyUserInfo: function () {
-            return this.post.reply_for_user_info;
+            return this.post?.reply_for_user_info || {};
+        },
+        isAnonymous() {
+            return !!this.getTopicData()?.anonymous && Number(this.post?.user_id || 0) === 0;
+        },
+        displayName() {
+            return this.isAnonymous
+                ? this.$t("pages.community.single.mysteriousUser")
+                : this.userInfo.display_name || this.$t("pages.community.common.unknownUser");
+        },
+        replyTargetName() {
+            const anonymousTarget =
+                !!this.getTopicData()?.anonymous &&
+                Number(this.post?.reply_for_user_id || 0) === 0 &&
+                !this.replyUserInfo.id;
+            return anonymousTarget
+                ? this.$t("pages.community.single.mysteriousUser")
+                : this.replyUserInfo.display_name || this.$t("pages.community.common.unknownUser");
         },
         comments: function () {
             return this.post.comments;
@@ -185,6 +207,7 @@ export default {
             return this.decoration
                 ? {
                       backgroundImage: `url(${this.decoration})`,
+                      backgroundPosition: this.decorationPosition,
                       borderRadius: "8px",
                   }
                 : null;
@@ -194,36 +217,28 @@ export default {
         this.getDecoration();
     },
     methods: {
-        setDecoration(decoration) {
-            this.decoration = __cdn + `design/decoration/images/${decoration.val}/comment.png`;
+        setDecoration(detail) {
+            const image = String(detail?.image || "").trim();
+            if (!image) return;
+            this.decoration = /^(https?:)?\/\//.test(image) ? image : __cdn + image.replace(/^\/+/, "");
+            this.decorationPosition = detail.position || "";
             this.$emit("decoration-change", this.post.id);
         },
         getDecoration() {
-            if (!this.uid) return;
-            let decoration_local = sessionStorage.getItem(DECORATION_KEY + this.uid);
-            if (decoration_local === "no") return;
-            if (decoration_local) {
-                //解析本地缓存
-                let decoration_parse = JSON.parse(decoration_local);
-                if (decoration_parse) {
-                    this.setDecoration(decoration_parse);
-                    return;
-                }
-            }
-            getDecoration({ using: 1, user_id: this.uid, type: "comment" }).then((res) => {
-                let decorationList = res.data.data;
-                //筛选个人装扮
-                let decoration = decorationList.find((item) => item.type == "comment");
-                if (decoration) {
-                    this.setDecoration(decoration);
-                    sessionStorage.setItem(DECORATION_KEY + this.uid, JSON.stringify(decoration));
-                    return;
-                }
-                sessionStorage.setItem(DECORATION_KEY + this.uid, "no");
-            }).catch(() => {});
+            if (!this.uid || this.isAnonymous) return;
+            getCommunityUserSkin(this.uid)
+                .then((res) => {
+                    const records = res.data.data || [];
+                    const detail = records
+                        .flatMap((record) => (Array.isArray(record?.skins) ? record.skins : []))
+                        .find((item) => item?.subtype === "pc_comment" && item.image);
+                    if (detail) this.setDecoration(detail);
+                })
+                .catch(() => {});
         },
         authorLink,
         async formatContent(val) {
+            const version = ++this.renderVersion;
             val = String(val || "");
             const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])(?![^<>]*>)/gi;
             val = val.replace(urlPattern, (match, url) => {
@@ -238,7 +253,10 @@ export default {
                 return `<a href="${url}" target="_blank">${url}</a>`;
             });
             const ins = new JX3_EMOTION(val);
-            this.renderContent = resolveImagePath(sanitizeRichText(await ins._renderHTML()));
+            const html = await ins._renderHTML();
+            if (version === this.renderVersion) {
+                this.renderContent = enableLazyImages(resolveImagePath(sanitizeCommunityReplyHtml(html)));
+            }
         },
         onShowReply() {
             if (!this.ensureLogin() || this.isDisabledComment) return;
@@ -249,12 +267,17 @@ export default {
             const id = this.$route.params.id;
             const replyId = this.post.topic_reply_id;
             const userId = this.userInfo.id;
-            if (id && replyId && userId) {
+            if (id && replyId) {
                 this.replySubmitting = true;
-                return replyReply(id, replyId, {
-                    content: content,
-                    reply_for_user_id: userId,
-                })
+                return replyReply(
+                    id,
+                    replyId,
+                    {
+                        content: content,
+                        reply_for_user_id: Number(userId) || 0,
+                    },
+                    this.getTopicPassword() ? { password: this.getTopicPassword() } : undefined
+                )
                     .then(() => {
                         this.getCommentList();
                         this.showReplyForReplyFrom = false;

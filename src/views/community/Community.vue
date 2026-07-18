@@ -46,7 +46,7 @@
                 </el-radio-group> -->
             </div>
 
-            <div class="m-community-content" v-loading="loading">
+            <div class="m-community-content" v-loading="loading && list.length > 0">
                 <template v-if="view == 1">
                     <!-- 置顶文章 -->
                     <TopicTop :key="topTopicData.id" v-if="topTopicData" :data="topTopicData" />
@@ -70,8 +70,27 @@
                     </div>
                 </template>
                 <template v-else>
+                    <div v-if="loading && !list.length" class="m-community-skeleton" aria-hidden="true">
+                        <el-skeleton v-for="index in 6" :key="index" animated>
+                            <template #template>
+                                <div class="m-community-skeleton__item">
+                                    <el-skeleton-item variant="image" class="u-skeleton-banner" />
+                                    <div class="u-skeleton-content">
+                                        <el-skeleton-item variant="text" class="u-skeleton-title" />
+                                        <el-skeleton-item variant="text" class="u-skeleton-line" />
+                                        <el-skeleton-item variant="text" class="u-skeleton-line is-short" />
+                                        <div class="u-skeleton-meta">
+                                            <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                                            <el-skeleton-item variant="text" class="u-skeleton-name" />
+                                            <el-skeleton-item variant="text" class="u-skeleton-date" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-skeleton>
+                    </div>
                     <!-- 列表 -->
-                    <div class="m-archive-list m-topic-list">
+                    <div v-else class="m-archive-list m-topic-list">
                         <ul class="u-list">
                             <ListItem
                                 :key="topTopicData.id"
@@ -92,6 +111,7 @@
                 </template>
                 <!-- 分页 -->
                 <CommunityPagination
+                    v-if="list.length || !loading"
                     ref="paginationRef"
                     :total="total"
                     :per="per"
@@ -459,8 +479,10 @@ export default {
             const query = Object.assign({}, this.$route.query);
             knownKeys.forEach((key) => delete query[key]);
 
-            query.category = extend.category ?? this.category;
-            query.page = extend.page ?? this.page;
+            const category = extend.category ?? this.category;
+            const page = extend.page ?? this.page;
+            if (category && category !== "all") query.category = category;
+            if (Number(page) > 1) query.page = page;
             if (this.per !== 20) query.per = this.per;
             if (isExplicitCommunityClient(this.client)) query.client = this.client;
             if (this.is_star) query.is_star = 1;
@@ -636,6 +658,87 @@ export default {
         //     color: @v4primary;
         //     background:none;
         // }
+    }
+    .m-community-skeleton {
+        padding: 0 30px;
+
+        .el-skeleton {
+            border-bottom: 1px solid #eee;
+        }
+    }
+    .m-community-skeleton__item {
+        display: flex;
+        gap: 20px;
+        padding: 20px 0;
+
+        .u-skeleton-banner {
+            flex: 0 0 180px;
+            width: 180px;
+            height: 100px;
+        }
+        .u-skeleton-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .u-skeleton-title {
+            width: 52%;
+            height: 20px;
+            margin-bottom: 18px;
+        }
+        .u-skeleton-line {
+            display: block;
+            width: 86%;
+            margin-bottom: 10px;
+
+            &.is-short {
+                width: 58%;
+            }
+        }
+        .u-skeleton-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .u-skeleton-avatar {
+            width: 24px;
+            height: 24px;
+        }
+        .u-skeleton-name {
+            width: 72px;
+        }
+        .u-skeleton-date {
+            width: 110px;
+            margin-left: auto;
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .p-community-v2 {
+        .m-community-skeleton {
+            padding: 0 15px;
+        }
+        .m-community-skeleton__item {
+            gap: 12px;
+
+            .u-skeleton-banner {
+                flex-basis: 96px;
+                width: 96px;
+                height: 72px;
+            }
+            .u-skeleton-title {
+                width: 78%;
+                margin-bottom: 12px;
+            }
+            .u-skeleton-line.is-short,
+            .u-skeleton-date {
+                display: none;
+            }
+            .u-skeleton-meta {
+                margin-top: 10px;
+            }
+        }
     }
 }
 </style>

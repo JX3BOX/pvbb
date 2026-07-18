@@ -22,6 +22,7 @@
                                             :hide-on-single-page="true"
                                             :page-size="per"
                                             :total="total"
+                                            :current-page="page"
                                             @current-change="changeTopPage"
                                             size="small"
                                             class="m-pageheader-pagination"
@@ -44,7 +45,7 @@
                 </div>
 
                 <!-- 帖子回复 -->
-                <div class="m-reply-box">
+                <div v-if="canViewTopic" class="m-reply-box">
                     <ReplyItem
                         v-for="(item, i) in replyList"
                         :key="item.id"
@@ -60,7 +61,7 @@
 
             <!-- 分页 -->
 
-            <div class="m-community-footer">
+            <div v-if="canViewTopic" class="m-community-footer">
                 <el-button
                     class="u-more-buttom"
                     :style="{ fontSize: hasNextPage ? '14px' : '12px' }"
@@ -89,18 +90,19 @@
                         @current-change="changePage"
                     ></el-pagination>
                 </div>
-                <div class="u-editor">
+                <div class="u-editor" ref="footerEditorContainer">
                     <el-divider content-position="left">{{ $t("pages.community.single.replySection") }}</el-divider>
                     <CommentEditor
                         ref="footerEditor"
                         @submit="onReplyTopic"
-                        v-if="!isDisabledComment"
+                        v-if="footerEditorReady && !isDisabledComment"
                         :class="{ 'c-comment-mask': comment_strict }"
                         :submitting="replySubmitting"
                         :is-login="isLogin"
                         :initial-content="replyDraftContent"
                         :initial-mentions="replyDraftMentions"
                     />
+                    <div v-else-if="!isDisabledComment" class="m-editor-placeholder" aria-hidden="true"></div>
                     <el-alert :show-close="false" center v-else class="m-disabled-comment-tip"
                         >{{ $t("pages.community.single.commentsClosed") }}</el-alert
                     >
@@ -173,6 +175,7 @@ import Author from "@jx3box/jx3box-editor/src/components/Author.vue";
 import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
 import { getConfig } from "@jx3box/jx3box-common/js/system";
 import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
+import { getCommunityReplyPageByFloor } from "@/utils/community";
 
 const appKey = "community";
 const siteClient = location.hostname.split(".").includes("origin") ? "origin" : "std";
@@ -203,6 +206,7 @@ export default {
         return {
             getTopicData: () => this.post,
             getReplyList: this.getReplyList,
+            getTopicPassword: () => this.password,
             setOnlyAuthor: this.setOnlyAuthor,
             onReplyTopic: this.onReplyTopic,
             onSearch: this.onSearch,
@@ -224,6 +228,8 @@ export default {
             currentReplyRequestKey: "",
             replyRequestVersion: 0,
             detailRequestVersion: 0,
+            lastSuccessfulPage: 1,
+            lastSuccessfulOnlyAuthor: false,
             routeReady: false,
             componentActive: true,
             replySubmitting: false,
@@ -264,6 +270,8 @@ export default {
             password: "",
             thxHandler: null,
             boxcoinHandler: null,
+            footerEditorReady: false,
+            footerEditorObserver: null,
         };
     },
     computed: {
@@ -324,6 +332,10 @@ export default {
         visible: function () {
             return !!this.post?.visible_validate;
         },
+        canViewTopic() {
+            if (!this.post?.id) return false;
+            return this.isSuper || Number(this.post.visible || 0) === 0 || this.post.visible_validate === true;
+        },
         isDisabledComment: function () {
             return !!this.post?.disable_comment;
         },
@@ -333,16 +345,8 @@ export default {
         this.restoreReplyDraft();
     },
     mounted() {
-        if (!this.id) return this.$message.error(this.$t("pages.community.messages.missingTopicId"));
         this.routeReady = true;
-        Promise.resolve(this.getDetails())
-            .then(() => (this.componentActive ? this.getReplyList() : null))
-            .then(() => {
-                if (!this.componentActive) return;
-                this.$nextTick(() => {
-                    renderJx3Element(this);
-                });
-            });
+        this.loadTopic();
 
         getConfig({
             key: "comment_strict",
@@ -362,6 +366,7 @@ export default {
             this.postType = data.postType;
             this.postId = data.postId;
             this.postUserId = data.postUserId;
+            this.postClient = data.client || this.post?.client || "std";
             this.showHomeWork = true;
         };
         bus.on("onThx", this.thxHandler);
@@ -369,9 +374,11 @@ export default {
         this.boxcoinHandler = (data) => {
             this.postType = data.postType;
             this.postId = data.postId;
+            this.postClient = data.client || this.post?.client || "std";
             this.showBoxCoin = true;
         };
         bus.on("boxcoin-click", this.boxcoinHandler);
+
     },
     beforeUnmount() {
         this.componentActive = false;
@@ -381,8 +388,14 @@ export default {
         this.currentReplyRequestKey = "";
         if (this.thxHandler) bus.off("onThx", this.thxHandler);
         if (this.boxcoinHandler) bus.off("boxcoin-click", this.boxcoinHandler);
+        this.footerEditorObserver?.disconnect();
+        this.footerEditorObserver = null;
     },
     watch: {
+        "$route.params.id": function (nextId, previousId) {
+            if (!this.routeReady || String(nextId || "") === String(previousId || "")) return;
+            this.loadTopic();
+        },
         // 加载路由参数
         "$route.query": {
             deep: true,
@@ -394,12 +407,65 @@ export default {
                 this.page = nextPage;
                 this.onlyAuthor = nextOnlyAuthor;
                 if (this.routeReady && shouldReload) {
-                    this.getReplyList();
+                    // 路由切帖时参数 watcher 会负责完整重载；此处避免用旧帖数据请求新帖回复。
+                    if (String(this.post?.id || "") === String(this.id || "") && this.canViewTopic) {
+                        this.getReplyList();
+                    }
                 }
             },
         },
     },
     methods: {
+        resetTopicState() {
+            ++this.detailRequestVersion;
+            ++this.replyRequestVersion;
+            this.currentReplyRequest = null;
+            this.currentReplyRequestKey = "";
+            this.post = {};
+            this.stat = "";
+            this.replyList = [];
+            this.total = 0;
+            this.pageTotal = 0;
+            this.loading = false;
+            this.password = "";
+            this.showComment = false;
+            this.replySubmitting = false;
+            this.footerEditorObserver?.disconnect();
+            this.footerEditorObserver = null;
+            this.footerEditorReady = false;
+
+            const query = this.$route.query || {};
+            this.page = Math.min(100000, Math.max(1, Number(query.page) || 1));
+            this.onlyAuthor = query.onlyAuthor === true || query.onlyAuthor === "true";
+            this.floor = 0;
+            this.getJumpFloor();
+            this.lastSuccessfulPage = 1;
+            this.lastSuccessfulOnlyAuthor = false;
+            this.replyDraftContent = "";
+            this.replyDraftMentions = [];
+            this.restoreReplyDraft();
+        },
+        async loadTopic() {
+            const topicId = String(this.id || "");
+            if (!topicId) {
+                this.resetTopicState();
+                this.$message.error(this.$t("pages.community.messages.missingTopicId"));
+                return;
+            }
+
+            this.resetTopicState();
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            const post = await this.getDetails(topicId);
+            if (!post || !this.componentActive || String(this.id || "") !== topicId) return;
+            if (this.canViewTopic) {
+                await this.getReplyList(false, topicId);
+            }
+            if (!this.componentActive || String(this.id || "") !== topicId) return;
+            this.$nextTick(() => {
+                renderJx3Element(this);
+                if (this.canViewTopic) this.setupFooterEditorObserver();
+            });
+        },
         getErrorMessage(error, fallback) {
             return (
                 error?.response?.data?.msg ||
@@ -416,7 +482,7 @@ export default {
             const floor = this.getHashFloor();
             if (floor) {
                 this.floor = floor;
-                this.page = Math.ceil(floor / this.per);
+                this.page = getCommunityReplyPageByFloor(floor, this.per);
             }
         },
         getHashFloor() {
@@ -490,6 +556,9 @@ export default {
                 pageSize: this.per,
                 order_created_at: 0,
             };
+            if (this.password) {
+                _query.password = this.password;
+            }
             if (this.onlyAuthor && (this.onlyAuthor == true || this.onlyAuthor == "true")) {
                 _query.user_id = this.post.user_id;
                 _query.only_author = 1;
@@ -500,7 +569,9 @@ export default {
         getTopicData: function () {
             return this.post;
         },
-        getDetails: function () {
+        getDetails: function (topicId = this.id) {
+            const requestTopicId = String(topicId || "");
+            if (!requestTopicId) return Promise.resolve(null);
             const requestVersion = ++this.detailRequestVersion;
             let fun = getTopicDetails;
             if (this.isAdminMode) {
@@ -510,23 +581,36 @@ export default {
             if (this.password) {
                 params.password = this.password;
             }
-            return fun(this.id, params)
+            return fun(requestTopicId, params)
                 .then((res) => {
-                    if (requestVersion !== this.detailRequestVersion) return null;
+                    if (
+                        requestVersion !== this.detailRequestVersion ||
+                        String(this.id || "") !== requestTopicId
+                    ) {
+                        return null;
+                    }
                     this.post = res.data.data;
 
                     this.updateDocumentTitle();
 
-                    getStat(appKey, this.id).then((res) => {
-                        this.stat = res.data;
-                        this.post.likes = this.stat.likes || 0;
-                    });
-                    postStat(appKey, this.id);
+                    getStat(appKey, requestTopicId)
+                        .then((res) => {
+                            if (
+                                requestVersion !== this.detailRequestVersion ||
+                                String(this.id || "") !== requestTopicId
+                            ) {
+                                return;
+                            }
+                            this.stat = res.data;
+                            this.post.likes = this.stat.likes || 0;
+                        })
+                        .catch(() => {});
+                    postStat(appKey, requestTopicId);
 
                     if (User.isLogin()) {
                         postHistory({
                             source_type: "community",
-                            source_id: ~~this.id,
+                            source_id: ~~requestTopicId,
                             link: location.href,
                             title: this.post.title,
                             author_id: this.post.user_id,
@@ -537,7 +621,7 @@ export default {
                         this.post.visible > 1 &&
                             this.post.visible_validate &&
                             postReadHistory({
-                                id: this.id,
+                                id: requestTopicId,
                                 category: "communicate",
                                 subcategory: "default",
                                 visible_type: ~~this.post.visible,
@@ -546,9 +630,13 @@ export default {
                                 contentMetaId: this.post.link_content_meta_id,
                             });
                     }
+                    return this.post;
                 })
                 .catch((error) => {
-                    if (requestVersion === this.detailRequestVersion) {
+                    if (
+                        requestVersion === this.detailRequestVersion &&
+                        String(this.id || "") === requestTopicId
+                    ) {
                         this.$message.error(
                             this.getErrorMessage(error, this.$t("pages.community.messages.topicLoadFailed"))
                         );
@@ -556,13 +644,22 @@ export default {
                     return null;
                 });
         },
-        getReplyList: function (appendMode) {
-            const previousPage = this.page;
+        getReplyList: function (appendMode, topicId = this.id) {
+            const requestTopicId = String(topicId || "");
+            if (
+                !requestTopicId ||
+                String(this.post?.id || "") !== requestTopicId ||
+                !this.canViewTopic
+            ) {
+                return Promise.resolve(null);
+            }
+            const fallbackPage = this.lastSuccessfulPage;
+            const fallbackOnlyAuthor = this.lastSuccessfulOnlyAuthor;
             if (appendMode) {
                 this.page += 1;
             }
             const params = this.buildQuery();
-            const requestKey = JSON.stringify(params);
+            const requestKey = `${requestTopicId}:${JSON.stringify(params)}`;
             if (this.currentReplyRequestKey === requestKey && this.currentReplyRequest) {
                 return this.currentReplyRequest;
             }
@@ -570,9 +667,14 @@ export default {
             const requestVersion = ++this.replyRequestVersion;
             this.loading = true;
             this.currentReplyRequestKey = requestKey;
-            const request = getTopicReplyList(this.id, params)
+            const request = getTopicReplyList(requestTopicId, params)
                 .then(async (res) => {
-                    if (requestVersion !== this.replyRequestVersion) return;
+                    if (
+                        requestVersion !== this.replyRequestVersion ||
+                        String(this.id || "") !== requestTopicId
+                    ) {
+                        return;
+                    }
                     var list = res.data.data.list;
                     const page = res.data.data.page;
                     if (list == null) {
@@ -580,7 +682,13 @@ export default {
                     } else {
                         // 把点赞数量请求过来填充进去
                         list = await this.getLikes(list);
-                        if (requestVersion !== this.replyRequestVersion) return;
+                        list = await this.getCommentLikes(list);
+                        if (
+                            requestVersion !== this.replyRequestVersion ||
+                            String(this.id || "") !== requestTopicId
+                        ) {
+                            return;
+                        }
                         this.replyList = list;
                         // 如果有楼层参数 跳转到指定楼层
                         const hashFloor = this.getHashFloor();
@@ -590,15 +698,18 @@ export default {
                     }
                     this.total = page.total;
                     this.pageTotal = page.pageTotal;
-                    this.$nextTick(() => {
-                        this.page = page.index;
-                    });
+                    this.page = page.index;
+                    this.lastSuccessfulPage = page.index;
+                    this.lastSuccessfulOnlyAuthor = this.onlyAuthor;
                 })
                 .catch((error) => {
-                    if (appendMode && requestVersion === this.replyRequestVersion) {
-                        this.page = previousPage;
-                    }
-                    if (requestVersion === this.replyRequestVersion) {
+                    if (
+                        requestVersion === this.replyRequestVersion &&
+                        String(this.id || "") === requestTopicId
+                    ) {
+                        this.page = fallbackPage;
+                        this.onlyAuthor = fallbackOnlyAuthor;
+                        this.replaceRoute({ page: fallbackPage, onlyAuthor: fallbackOnlyAuthor });
                         this.$message.error(
                             this.getErrorMessage(error, this.$t("pages.community.messages.repliesLoadFailed"))
                         );
@@ -609,6 +720,7 @@ export default {
                     if (requestVersion === this.replyRequestVersion) {
                         this.loading = false;
                         this.currentReplyRequest = null;
+                        this.currentReplyRequestKey = "";
                     }
                 });
             this.currentReplyRequest = request;
@@ -635,9 +747,49 @@ export default {
                 });
             return list;
         },
+        async getCommentLikes(replyList) {
+            const comments = replyList.flatMap((item) => (Array.isArray(item.comments) ? item.comments : []));
+            if (!comments.length) return replyList;
+
+            const id = comments.map((item) => `community_comment-${item.id}`).join(",");
+            try {
+                const res = await getLikes({
+                    post_type: "community_comment",
+                    post_action: "likes",
+                    id,
+                });
+                comments.forEach((item) => {
+                    item.likes = res.data.data[`community_comment-${item.id}`]?.likes || 0;
+                });
+            } catch (_) {
+                // 点赞统计失败不应阻断回帖正文展示。
+            }
+            return replyList;
+        },
+        setupFooterEditorObserver() {
+            const container = this.$refs.footerEditorContainer;
+            if (!container || this.footerEditorReady) return;
+            if (typeof window.IntersectionObserver !== "function") {
+                this.footerEditorReady = true;
+                return;
+            }
+            this.footerEditorObserver = new window.IntersectionObserver(
+                (entries) => {
+                    if (!entries.some((entry) => entry.isIntersecting)) return;
+                    this.footerEditorReady = true;
+                    this.footerEditorObserver?.disconnect();
+                    this.footerEditorObserver = null;
+                },
+                { rootMargin: "800px 0px" }
+            );
+            this.footerEditorObserver.observe(container);
+        },
         /** 回帖 */
         onReplyTopic(payload = {}) {
             if (this.replySubmitting) return;
+            if (!this.canViewTopic) {
+                return this.$message.warning(this.null_tip);
+            }
             if (this.isDisabledComment) {
                 return this.$message.warning(this.$t("pages.community.single.commentsClosed"));
             }
@@ -662,10 +814,14 @@ export default {
                 content += imageTags;
             }
             this.replySubmitting = true;
-            return replyTopic(this.id, {
-                client: this.replyClient,
-                content: content,
-            })
+            return replyTopic(
+                this.id,
+                {
+                    client: this.replyClient,
+                    content: content,
+                },
+                this.password ? { password: this.password } : undefined
+            )
                 .then((res) => {
                     this.onReplyTopicSuccess(res.data.data);
                     this.showComment = false;
@@ -758,6 +914,8 @@ export default {
          * 如果当前的回复条数已经超过一页，可以直接跳转到最后一页
          */
         onReplyTopicSuccess(data) {
+            // “只看楼主”时，非楼主自己的新回复不属于当前筛选结果。
+            if (this.onlyAuthor && !this.isAuthor) return;
             const nextTotal = this.total + 1;
             const lastPage = Math.max(1, Math.ceil(nextTotal / this.per));
             this.total = nextTotal;
@@ -827,12 +985,6 @@ export default {
             const targetIndex = this.replyList.findIndex((item) => Number(item.id) === targetPostId);
 
             if (targetIndex === -1) return;
-
-            // 替换一遍对象，确保子组件能感知到这条 reply 的最新状态
-            this.replyList.splice(targetIndex, 1, {
-                ...this.replyList[targetIndex],
-            });
-
             this.$nextTick(() => {
                 const replyRef = this.$refs[`reply${targetIndex}`];
                 const replyItem = Array.isArray(replyRef) ? replyRef[0] : replyRef;
@@ -845,7 +997,12 @@ export default {
 
         enterPwd(value) {
             this.password = value;
-            this.getDetails();
+            this.getDetails(this.id).then((post) => {
+                if (!post || !this.canViewTopic) return;
+                this.getReplyList(false, this.id).then(() => {
+                    this.$nextTick(() => this.setupFooterEditorObserver());
+                });
+            });
         },
         changeTopPage(page) {
             this.page = page;
@@ -875,6 +1032,9 @@ export default {
 }
 .m-single-collection {
     margin-bottom: 20px;
+}
+.m-editor-placeholder {
+    min-height: 240px;
 }
 
 .c-comment-mask {

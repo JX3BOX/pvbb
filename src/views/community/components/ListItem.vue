@@ -1,8 +1,8 @@
 <template>
     <li class="u-item u-community-item" :class="{ hasMoka: skin.background }">
-        <div v-if="skin.background" class="u-bg-art">
+        <div v-if="skin.background" class="u-bg-art" :class="`is-fade-${skin.fade}`">
             <i class="u-bg-mask"></i>
-            <img class="u-bg-image" :src="skin.background" alt="" />
+            <img class="u-bg-image" :src="skin.background" :style="skin.imageStyle" alt="" />
         </div>
         <!-- Banner -->
         <a class="u-banner" :href="postLink(item.id)" :target="target">
@@ -126,6 +126,16 @@ import bus from "@/utils/bus";
 import { getSkinJson } from "@/service/community";
 const appKey = "community";
 const skinKey = "community_topic_skin";
+const positionMap = {
+    lt: "left top",
+    rt: "right top",
+    rb: "right bottom",
+    lb: "left bottom",
+    ct: "center center",
+    centop: "center top",
+    cb: "center bottom",
+    o: "right center",
+};
 import { tabsMap, designTaskCategoryMap } from "@/assets/data/community_category.js";
 import { escapeHtml } from "@/utils/community";
 import { getRandomCoverIndex } from "@/utils/random-cover";
@@ -184,15 +194,25 @@ export default {
         },
         // 卡片皮肤
         skin() {
-            if (this.item.decoration_id && this.item.decoration.val) {
+            if (this.item.decoration_id && this.item.decoration?.val) {
                 const skinJson = this.skinJson;
                 const val = this.item.decoration.val;
                 if (skinJson[val]) {
+                    const config = skinJson[val];
+                    const fit = ["cover", "contain", "fill"].includes(config.fit) ? config.fit : "cover";
+                    const opacity = Math.min(1, Math.max(0, Number(config.opacity ?? 1)));
+                    const fade = ["none", "light", "soft", "strong"].includes(config.fade) ? config.fade : "soft";
                     return {
                         background: __cdn + `design/decoration/palu/${val}.png`,
-                        titleColor: skinJson[val].titleColor,
-                        titleHoverColor: skinJson[val].titleHoverColor,
-                        borderHoverColor: skinJson[val].borderHoverColor,
+                        titleColor: config.titleColor,
+                        titleHoverColor: config.titleHoverColor,
+                        borderHoverColor: config.borderHoverColor,
+                        fade,
+                        imageStyle: {
+                            objectPosition: positionMap[config.position] || positionMap.rt,
+                            objectFit: fit,
+                            opacity,
+                        },
                     };
                 }
             }
@@ -201,6 +221,8 @@ export default {
                 titleColor: "#0366d6",
                 titleHoverColor: "rgba(255, 64, 128, 1)",
                 borderHoverColor: "#0366d6",
+                fade: "soft",
+                imageStyle: {},
             };
         },
         tags: function () {
@@ -355,6 +377,31 @@ export default {
             );
         }
 
+        &.is-fade-none .u-bg-mask {
+            display: none;
+        }
+
+        &.is-fade-light .u-bg-mask {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.38) 0%,
+                rgba(255, 255, 255, 0.2) 28%,
+                rgba(255, 255, 255, 0.06) 55%,
+                rgba(255, 255, 255, 0) 78%
+            );
+        }
+
+        &.is-fade-strong .u-bg-mask {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 255, 0.96) 28%,
+                rgba(255, 255, 255, 0.82) 52%,
+                rgba(255, 255, 255, 0.48) 74%,
+                rgba(255, 255, 255, 0) 100%
+            );
+        }
+
         .u-bg-image {
             width: 100%;
             height: 100%;
@@ -371,15 +418,17 @@ export default {
             // );
         }
 
-        &::after {
+        &.is-fade-strong::after {
             content: "";
             position: absolute;
             inset: 0;
-
-            background: white;
-            mask-image: linear-gradient(to right, black, transparent);
-            filter: blur(30px);
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.78);
+            mask-image: linear-gradient(90deg, black 0%, black 38%, rgba(0, 0, 0, 0.7) 68%, transparent 100%);
+            filter: blur(18px);
+            transform: scale(1.06);
         }
+
     }
 
     // &:hover {

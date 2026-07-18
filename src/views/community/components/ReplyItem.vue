@@ -1,5 +1,10 @@
 <template>
-    <div class="m-reply-wrapper" :class="{ 'is-master': isMaster }" :id="`floor-${post.floor || 0}`">
+    <div
+        ref="replyRoot"
+        class="m-reply-wrapper"
+        :class="{ 'is-master': isMaster }"
+        :id="`floor-${post.floor || 0}`"
+    >
         <div class="m-reply-left">
             <CommentUser :uid="userInfo.id" :isMaster="isMaster" :isAnonymous="isAnonymous" />
             <div class="u-top-right u-mobile-show">
@@ -33,7 +38,13 @@
                     </div>
                 </div>
                 <span class="u-boxcoin" v-if="!isMaster && (isLogin || boxCoinTotal)">
-                    <el-button v-if="isLogin && !isMaster" class="u-mobile-hidden" link @click="onThx" size="small">
+                    <el-button
+                        v-if="isLogin && !isMaster && !isAnonymous"
+                        class="u-mobile-hidden"
+                        link
+                        @click="onThx"
+                        size="small"
+                    >
                         <span class="u-thx">
                             <img
                                 src="@/assets/img/community/thx.webp"
@@ -54,12 +65,9 @@
                         <Article v-if="isMaster" :content="renderContent" />
                     </template>
                     <div class="m-single-null" v-else-if="isMaster">
-                        <el-alert type="warning" show-icon v-if="post.visible > 1 && post.visible != 3">
+                        <el-alert type="warning" show-icon v-if="post.visible != 3">
                             <template #title>
                                 <span>{{ nullTip }}</span>
-                                <a class="u-pwd-text" v-if="isLogin" @click="enterPwd">{{
-                                    $t("pages.community.reply.enterPassword")
-                                }}</a>
                             </template>
                         </el-alert>
 
@@ -97,7 +105,7 @@
                 </div>
                 <!-- 打赏 只有主楼有打赏-->
                 <Thx
-                    v-if="isMaster"
+                    v-if="isMaster && (visible || isSuper)"
                     class="m-single-thx"
                     :class="{ 'is-disabled-boxcoin': isDisableBoxcoin }"
                     :postId="~~id"
@@ -170,7 +178,7 @@
                                             >{{ $t("pages.community.reply.edit") }}</el-button
                                         >
                                     </el-dropdown-item>
-                                    <el-dropdown-item v-if="isLogin && !isMaster">
+                                    <el-dropdown-item v-if="isLogin && !isMaster && !isAnonymous">
                                         <el-button class="u-mobile-hidden" link icon="Present" @click="onThx"
                                             >{{ $t("pages.community.reply.thanks") }}</el-button
                                         >
@@ -197,8 +205,8 @@
                 <!-- 回复的输入框 ，判断主楼不需要展示主楼是跟帖 -->
                 <ReplyForReply
                     v-if="showReplyForReplyFrom"
-                    :username="userInfo.display_name"
-                    :user-href="authorLink(userId)"
+                    :username="replyTargetName"
+                    :user-href="isAnonymous ? '' : authorLink(userId)"
                     @hideForm="showReplyForReplyFrom = false"
                     @doReply="doReply"
                     :commentStrict="commentStrict"
@@ -266,10 +274,12 @@ import CommentItem from "./CommentItem.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import { renderEmotionHTML } from "@/utils/jx3Emo";
 import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
+import sanitizeCommunityReplyHtml from "@/utils/community-rich-text";
+import { enableLazyImages } from "@/utils/community";
 
 export default {
     name: "ReplyItem",
-    inject: ["getTopicData", "getReplyList", "onReplyTopic"],
+    inject: ["getTopicData", "getTopicPassword", "getReplyList", "onReplyTopic"],
     props: ["isMaster", "post", "isAuthor", "nullTip", "commentStrict"],
     components: {
         DeleteButton,
@@ -311,6 +321,8 @@ export default {
             password: "",
             replySubmitting: false,
             commentRequestVersion: 0,
+            summaryObserver: null,
+            summaryLoaded: false,
         };
     },
     computed: {
@@ -385,14 +397,22 @@ export default {
         },
         // 是否匿名
         isAnonymous: function () {
-            return !!this.post?.anonymous;
+            return (
+                !!this.post?.anonymous ||
+                (!!this.getTopicData()?.anonymous && Number(this.post?.user_id || 0) === 0)
+            );
+        },
+        replyTargetName() {
+            return this.isAnonymous
+                ? this.$t("pages.community.single.mysteriousUser")
+                : this.userInfo.display_name || this.$t("pages.community.common.unknownUser");
         },
         // 是否禁止投币
         isDisableBoxcoin: function () {
             return !!this.post?.disable_inspire_boxcoin;
         },
         isDisabledComment: function () {
-            return !!this.getTopicData()?.disable_comment;
+            return !!this.getTopicData()?.disable_comment || (this.isMaster && !this.visible && !this.isSuper);
         },
         hasCommentDecoration: function () {
             return Object.keys(this.decoratedCommentIds).length > 0;
@@ -415,9 +435,9 @@ export default {
                         this.commentList = commentList;
                     }
                 }
-                if (!this.isMaster && this.post?.id) {
-                    this.loadHomeworkBoxcoin();
-                }
+                this.summary = { fromManager: 0, fromUser: 0 };
+                this.summaryLoaded = false;
+                this.$nextTick(() => this.observeHomeworkBoxcoin());
             },
             immediate: true,
         },
@@ -434,7 +454,37 @@ export default {
             );
         },
     },
+    mounted() {
+        this.observeHomeworkBoxcoin();
+    },
+    beforeUnmount() {
+        this.summaryObserver?.disconnect();
+        this.summaryObserver = null;
+        ++this.commentRequestVersion;
+        ++this.renderVersion;
+    },
     methods: {
+        observeHomeworkBoxcoin() {
+            this.summaryObserver?.disconnect();
+            this.summaryObserver = null;
+            if (this.isMaster || !this.post?.id || this.summaryLoaded) return;
+            const root = this.$refs.replyRoot;
+            if (!root) return;
+            if (typeof window.IntersectionObserver !== "function") {
+                this.loadHomeworkBoxcoin();
+                return;
+            }
+            this.summaryObserver = new window.IntersectionObserver(
+                (entries) => {
+                    if (!entries.some((entry) => entry.isIntersecting)) return;
+                    this.summaryObserver?.disconnect();
+                    this.summaryObserver = null;
+                    this.loadHomeworkBoxcoin();
+                },
+                { rootMargin: "600px 0px" }
+            );
+            this.summaryObserver.observe(root);
+        },
         onCommentDecorationChange(commentId) {
             if (!commentId) return;
             this.decoratedCommentIds = {
@@ -468,7 +518,7 @@ export default {
             if (this.isMaster) {
                 const html = await renderEmotionHTML(val);
                 if (version === this.renderVersion) {
-                    this.renderContent = resolveImagePath(sanitizeRichText(html));
+                    this.renderContent = enableLazyImages(resolveImagePath(sanitizeRichText(html)));
                 }
                 return;
             }
@@ -487,7 +537,7 @@ export default {
             const html = await renderEmotionHTML(val.replace(/ style="[^"]*"/gi, ""));
             if (version === this.renderVersion) {
                 const rendered = /<\w+[^>]*>/.test(html) ? html : html.replace(/\n/g, "<br />");
-                this.renderContent = resolveImagePath(sanitizeRichText(rendered));
+                this.renderContent = enableLazyImages(resolveImagePath(sanitizeCommunityReplyHtml(rendered)));
             }
         },
         onShowReply() {
@@ -503,12 +553,17 @@ export default {
             if (!this.ensureLogin() || this.replySubmitting) return;
             const id = this.$route.params.id;
             const replyId = this.post.id;
-            if (id && replyId && this.userId) {
+            if (id && replyId) {
                 this.replySubmitting = true;
-                return replyReply(id, replyId, {
-                    content: content,
-                    reply_for_user_id: this.userId,
-                })
+                return replyReply(
+                    id,
+                    replyId,
+                    {
+                        content: content,
+                        reply_for_user_id: Number(this.userId) || 0,
+                    },
+                    this.getTopicPassword() ? { password: this.getTopicPassword() } : undefined
+                )
                     .then(() => {
                         this.getList();
                         this.showReplyForReplyFrom = false;
@@ -539,6 +594,7 @@ export default {
                 return getCommentList(id, replyId, {
                     index: this.page,
                     pageSize: this.per,
+                    password: this.getTopicPassword() || undefined,
                     ...postData,
                 })
                     .then(async (res) => {
@@ -583,6 +639,9 @@ export default {
         },
         async getLikes(commentList) {
             if (!commentList.length) return commentList;
+            if (commentList.every((item) => Object.prototype.hasOwnProperty.call(item, "likes"))) {
+                return commentList;
+            }
             const id = commentList.map((item) => `community_comment-${item.id}`).join(",");
             let list = [];
             const params = {
@@ -618,19 +677,24 @@ export default {
                 postType: "community_topic_reply",
                 postId: this.post.id,
                 postUserId: this.userId,
-                client: "std",
+                client: this.getTopicData()?.client || this.post?.client || "std",
             });
         },
         loadHomeworkBoxcoin() {
-            getHistorySummary("community_topic_reply", this.post.id).then((res) => {
-                this.summary = res.data.data;
-            }).catch(() => {});
+            if (!this.post?.id) return Promise.resolve();
+            this.summaryLoaded = true;
+            return getHistorySummary("community_topic_reply", this.post.id)
+                .then((res) => {
+                    this.summary = res.data.data;
+                })
+                .catch(() => {});
         },
         onBoxcoinClick() {
             bus.emit("boxcoin-click", {
                 postType: "community_topic_reply",
                 postId: this.post.id,
                 postUserId: this.userId,
+                client: this.getTopicData()?.client || this.post?.client || "std",
             });
         },
         onFloorClick() {

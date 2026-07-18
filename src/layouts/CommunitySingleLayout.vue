@@ -38,7 +38,7 @@
 <script>
 import TopStickyInfo from "@/views/community/components/TopStickyInfo.vue";
 import publishGate from "@/components/common/PublishGate.vue";
-import { getAppIcon, getAppID } from "@jx3box/jx3box-common/js/utils";
+import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import Side from "@/components/bbs/single_side.vue";
@@ -60,12 +60,10 @@ const postTypeMaps = {
 export default {
     name: "CommunitySingleLayout",
     props: ["post"],
-    data: function () {
-        return {
-            id: getAppID(),
-        };
-    },
     computed: {
+        id() {
+            return this.$route.params.id;
+        },
         isTeammate() {
             return User.isTeammate();
         },

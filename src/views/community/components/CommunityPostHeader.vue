@@ -35,12 +35,7 @@
                 <span class="u-value">{{ showPostTypeLabel(post.category) }}</span>
             </div>
 
-            <div class="u-meta u-sub-block">
-                <em class="u-label">{{ $t("pages.community.single.client") }}</em>
-                <span class="u-value u-client" :class="'i-client-' + client">{{ showClientLabel(client) }}</span>
-            </div>
-
-            <div class="u-meta u-sub-block">
+            <div class="u-meta u-sub-block" v-if="tags.length">
                 <em class="u-label">{{ $t("pages.community.single.tags") }}</em>
                 <span class="u-value">
                     <span
@@ -185,9 +180,6 @@ export default {
         canEdit: function () {
             return this.post?.user_id == User.getInfo().uid || User.isEditor();
         },
-        client: function () {
-            return this.post?.client || "std";
-        },
     },
     watch: {
         "post.content": {
@@ -201,16 +193,6 @@ export default {
         showPostTypeLabel(type) {
             const supportedTypes = ["all", "guide", "story", "discuz", "help"];
             return supportedTypes.includes(type) ? this.$t(`pages.community.categories.${type}`) : type;
-        },
-        showClientLabel: function (val) {
-            const clients = {
-                all: { key: "allClients", fallback: "全端" },
-                std: { key: "std", fallback: "剑三" },
-                origin: { key: "origin", fallback: "缘起" },
-                wujie: { key: "wujie", fallback: "无界" },
-            };
-            const client = clients[val];
-            return client ? this.$jx3boxT(`jx3boxUi.clientBy.${client.key}`, client.fallback) : val;
         },
         countWords: function () {
             this.$nextTick(() => {
@@ -233,23 +215,6 @@ export default {
 </script>
 
 <style lang="less">
-.i-client-all {
-    border: 1px solid #a26ef7;
-    color: #a26ef7;
-}
-.i-client-std {
-    border: 1px solid #f0b400;
-    color: #f0b400;
-}
-.i-client-origin {
-    border: 1px solid #0eb7ce;
-    color: #0eb7ce;
-}
-.i-client-wujie {
-    border: 1px solid #fc79bf;
-    color: #fc79bf;
-}
-
 .m-single-header {
     padding-top: 20px;
     padding-bottom: 20px;
