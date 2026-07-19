@@ -2,12 +2,6 @@
     <div>
         <div
             class="m-topic-hot m-topic-box"
-            :class="skin.style"
-            :style="{
-                '--title-color': skin.titleColor,
-                '--title-hover-color': skin.titleHoverColor,
-                '--border-hover-color': skin.borderHoverColor,
-            }"
         >
             <div class="m-topic-top">
                 <div class="m-topic-top__time">
@@ -115,8 +109,7 @@ import TopicItem from "./TopicItem.vue";
 import { getTimeAgo } from "@/utils/dateFormat";
 import { __cdn } from "@/utils/config";
 import { showAvatar, authorLink, getThumbnail, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
-import { getSkinJson } from "@/service/community";
-const skinKey = "community_topic_skin";
+import { resolveCommunitySkin } from "@/utils/community-skin";
 import { tabsMap } from "@/assets/data/community_category";
 import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
 import { getRandomCoverIndex } from "@/utils/random-cover";
@@ -124,35 +117,20 @@ import { getRandomCoverIndex } from "@/utils/random-cover";
 export default {
     props: ["data"],
     inject: ["getCategoryStyle", "onCategoryChange"],
-    data() {
-        return {
-            skinJson: {},
-        };
-    },
     components: {
         TopicItem,
     },
     computed: {
         // 卡片皮肤
         skin() {
-            if (this.data.decoration_id && this.data.decoration.val) {
-                const skinJson = this.skinJson;
-                const val = this.data.decoration.val;
-                if (skinJson[val]) {
-                    return {
-                        background: __cdn + `design/decoration/palu/${val}.png`,
-                        titleColor: skinJson[val].titleColor,
-                        titleHoverColor: skinJson[val].titleHoverColor,
-                        borderHoverColor: skinJson[val].borderHoverColor,
-                        style: skinJson[val].style,
-                    };
-                }
+            const config = resolveCommunitySkin(this.data.decoration_skin);
+            if (config) {
+                return {
+                    background: __cdn + `design/decoration/palu/${config.name}.png`,
+                };
             }
-            // 默认值 未设置返回默认值 实装要判断
             return {
-                titleColor: "#0366d6",
-                titleHoverColor: "rgba(255, 64, 128, 1)",
-                borderHoverColor: "#0366d6",
+                background: "",
             };
         },
         hightStyle: function () {
@@ -188,23 +166,7 @@ export default {
             return resolveImagePath(showAvatar(this.data?.ext_user_info?.avatar));
         },
     },
-    mounted() {
-        this.getSkinJson();
-    },
     methods: {
-        getSkinJson() {
-            const skinJson = sessionStorage.getItem(skinKey);
-            if (skinJson) {
-                this.skinJson = JSON.parse(skinJson);
-            } else {
-                getSkinJson()
-                    .then((res) => {
-                        this.skinJson = res.data;
-                        sessionStorage.setItem(skinKey, JSON.stringify(res.data));
-                    })
-                    .catch(() => {});
-            }
-        },
         getTimeAgo(date) {
             return getTimeAgo(date, (key) => this.$t(key));
         },
@@ -274,7 +236,7 @@ export default {
             font-size: 22px;
             cursor: pointer;
             line-height: 32px;
-            color: var(--title-color);
+            color: @v4primary;
             font-weight: bold;
             // &:hover {
             //     color: rgba(255, 64, 128, 1);
@@ -325,31 +287,6 @@ export default {
             text-overflow: ellipsis;
             flex: 1;
             color: var(--desc-color);
-        }
-    }
-    &.dark {
-        .m-topic-collection {
-            a {
-                border: 1px solid #fff;
-            }
-            .u-value {
-                color: #fff;
-            }
-        }
-        .m-topic-hot__right {
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-sizing: border-box;
-            background-color: rgba(0, 0, 0, 0.6);
-            .u-title {
-                .color(#fff,#fff);
-            }
-        }
-        .m-topic-userInfo {
-            .m-topic-userInfo__name {
-                .color(#fff,#fff);
-            }
         }
     }
 }

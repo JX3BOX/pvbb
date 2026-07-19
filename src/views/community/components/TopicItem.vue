@@ -1,12 +1,5 @@
 <template>
-    <div
-        class="m-topic-box"
-        :style="{
-            '--title-color': skin.titleColor,
-            '--title-hover-color': skin.titleHoverColor,
-            '--border-hover-color': skin.borderHoverColor,
-        }"
-    >
+    <div class="m-topic-box">
         <div class="m-topic-top">
             <div class="m-topic-top__time">
                 <i :class="getTimeAgo(data.latest_reply_at || data.updated_at).icon"></i>
@@ -38,7 +31,7 @@
         </div>
         <div
             class="u-box m-topic-box__content"
-            :class="[{ withSkin: skin.background }, skin.style]"
+            :class="{ withSkin: skin.background }"
             :style="{
                 backgroundImage: `url(${skin.background})`,
             }"
@@ -120,8 +113,7 @@
 import { showAvatar, authorLink, getThumbnail, resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { __cdn } from "@/utils/config";
 import { getTimeAgo } from "@/utils/dateFormat";
-import { getSkinJson } from "@/service/community";
-const skinKey = "community_topic_skin";
+import { resolveCommunitySkin } from "@/utils/community-skin";
 import { tabsMap } from "@/assets/data/community_category";
 import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
 import { getRandomCoverIndex } from "@/utils/random-cover";
@@ -129,33 +121,17 @@ import { getRandomCoverIndex } from "@/utils/random-cover";
 export default {
     props: ["data"],
     inject: ["getCategoryStyle", "onCategoryChange"],
-    data() {
-        return {
-            skinJson: {},
-        };
-    },
     computed: {
         // 卡片皮肤
         skin() {
-            if (this.data.decoration_id && this.data.decoration.val) {
-                const skinJson = this.skinJson;
-                const val = this.data.decoration.val;
-                if (skinJson[val]) {
-                    return {
-                        background: __cdn + `design/decoration/palu/${val}.png`,
-                        titleColor: skinJson[val].titleColor,
-                        titleHoverColor: skinJson[val].titleHoverColor,
-                        borderHoverColor: skinJson[val].borderHoverColor,
-                        style: skinJson[val].style || "",
-                    };
-                }
+            const config = resolveCommunitySkin(this.data.decoration_skin);
+            if (config) {
+                return {
+                    background: __cdn + `design/decoration/palu/${config.name}.png`,
+                };
             }
-            // 默认值 未设置返回默认值 实装要判断
             return {
-                titleColor: "#0366d6",
-                titleHoverColor: "rgba(255, 64, 128, 1)",
-                borderHoverColor: "#0366d6",
-                style: "",
+                background: "",
             };
         },
         hightStyle: function () {
@@ -197,23 +173,7 @@ export default {
             return this.$store.state.tags;
         },
     },
-    mounted() {
-        this.getSkinJson();
-    },
     methods: {
-        getSkinJson() {
-            const skinJson = sessionStorage.getItem(skinKey);
-            if (skinJson) {
-                this.skinJson = JSON.parse(skinJson);
-            } else {
-                getSkinJson()
-                    .then((res) => {
-                        this.skinJson = res.data;
-                        sessionStorage.setItem(skinKey, JSON.stringify(res.data));
-                    })
-                    .catch(() => {});
-            }
-        },
         getTimeAgo(date) {
             return getTimeAgo(date, (key) => this.$t(key));
         },

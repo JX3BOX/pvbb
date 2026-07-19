@@ -123,9 +123,8 @@ import _bbsSubtypes from "@/assets/data/bbs_subtypes.json";
 import User from "@jx3box/jx3box-common/js/user";
 import dayjs from "dayjs";
 import bus from "@/utils/bus";
-import { getSkinJson } from "@/service/community";
+import { resolveCommunitySkin } from "@/utils/community-skin";
 const appKey = "community";
-const skinKey = "community_topic_skin";
 const positionMap = {
     lt: "left top",
     rt: "right top",
@@ -148,8 +147,6 @@ export default {
         return {
             target: buildTarget(),
             pushing: false,
-
-            skinJson: {},
         };
     },
     computed: {
@@ -194,33 +191,23 @@ export default {
         },
         // 卡片皮肤
         skin() {
-            if (this.item.decoration_id && this.item.decoration?.val) {
-                const skinJson = this.skinJson;
-                const val = this.item.decoration.val;
-                if (skinJson[val]) {
-                    const config = skinJson[val];
-                    const fit = ["cover", "contain", "fill"].includes(config.fit) ? config.fit : "cover";
-                    const opacity = Math.min(1, Math.max(0, Number(config.opacity ?? 1)));
-                    const fade = ["none", "light", "soft", "strong"].includes(config.fade) ? config.fade : "soft";
-                    return {
-                        background: __cdn + `design/decoration/palu/${val}.png`,
-                        titleColor: config.titleColor,
-                        titleHoverColor: config.titleHoverColor,
-                        borderHoverColor: config.borderHoverColor,
-                        fade,
-                        imageStyle: {
-                            objectPosition: positionMap[config.position] || positionMap.rt,
-                            objectFit: fit,
-                            opacity,
-                        },
-                    };
-                }
+            const config = resolveCommunitySkin(this.item.decoration_skin);
+            if (config) {
+                const fit = ["cover", "contain", "fill"].includes(config.fit) ? config.fit : "cover";
+                const opacity = Math.min(1, Math.max(0, Number(config.opacity ?? 1)));
+                const fade = ["none", "light", "soft", "strong"].includes(config.fade) ? config.fade : "soft";
+                return {
+                    background: __cdn + `design/decoration/palu/${config.name}.png`,
+                    fade,
+                    imageStyle: {
+                        objectPosition: positionMap[config.position] || positionMap.rt,
+                        objectFit: fit,
+                        opacity,
+                    },
+                };
             }
             // 默认值 未设置返回默认值 实装要判断
             return {
-                titleColor: "#0366d6",
-                titleHoverColor: "rgba(255, 64, 128, 1)",
-                borderHoverColor: "#0366d6",
                 fade: "soft",
                 imageStyle: {},
             };
@@ -277,19 +264,6 @@ export default {
         postLink: function (val) {
             return location.origin + `/${appKey}/` + val;
         },
-        getSkinJson() {
-            const skinJson = sessionStorage.getItem(skinKey);
-            if (skinJson) {
-                this.skinJson = JSON.parse(skinJson);
-            } else {
-                getSkinJson()
-                    .then((res) => {
-                        this.skinJson = res.data;
-                        sessionStorage.setItem(skinKey, JSON.stringify(res.data));
-                    })
-                    .catch(() => {});
-            }
-        },
         // 高亮搜索关键字
         highlightText(text) {
             const safeText = escapeHtml(text);
@@ -330,9 +304,6 @@ export default {
         dateFormat: function (gmt) {
             return showDate(new Date(gmt));
         },
-    },
-    mounted: function () {
-        this.getSkinJson();
     },
 };
 </script>

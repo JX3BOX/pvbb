@@ -14,7 +14,21 @@
                     >
                         <template #header>
                             <!-- 头部 -->
-                            <div class="m-community-header">
+                            <div class="m-community-header" :class="{ 'has-community-skin': topicSkin.background }">
+                                <div
+                                    v-if="topicSkin.background"
+                                    class="m-community-header__skin"
+                                    :class="`is-fade-${topicSkin.fade}`"
+                                    aria-hidden="true"
+                                >
+                                    <i class="u-skin-mask"></i>
+                                    <img
+                                        class="u-skin-image"
+                                        :src="topicSkin.background"
+                                        :style="topicSkin.imageStyle"
+                                        alt=""
+                                    />
+                                </div>
                                 <CommunityPostHeader :post="post" :stat="stat">
                                     <template #append>
                                         <el-pagination
@@ -176,6 +190,8 @@ import { postReadHistory } from "@jx3box/jx3box-common/js/stat";
 import { getConfig } from "@jx3box/jx3box-common/js/system";
 import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getCommunityReplyPageByFloor } from "@/utils/community";
+import { resolveCommunitySkin } from "@/utils/community-skin";
+import { __cdn } from "@/utils/config";
 
 const appKey = "community";
 const siteClient = location.hostname.split(".").includes("origin") ? "origin" : "std";
@@ -275,6 +291,40 @@ export default {
         };
     },
     computed: {
+        topicSkin() {
+            const config = resolveCommunitySkin(this.post?.decoration_skin);
+            if (!config) {
+                return {
+                    background: "",
+                    fade: "soft",
+                    imageStyle: {},
+                };
+            }
+
+            const positionMap = {
+                lt: "left top",
+                rt: "right top",
+                rb: "right bottom",
+                lb: "left bottom",
+                ct: "center center",
+                centop: "center top",
+                cb: "center bottom",
+                o: "right center",
+            };
+            const fit = ["cover", "contain", "fill"].includes(config.fit) ? config.fit : "cover";
+            const opacity = Math.min(1, Math.max(0, Number(config.opacity ?? 1)));
+            const fade = ["none", "light", "soft", "strong"].includes(config.fade) ? config.fade : "soft";
+
+            return {
+                background: __cdn + `design/decoration/palu/${config.name}.png`,
+                fade,
+                imageStyle: {
+                    objectPosition: positionMap[config.position] || positionMap.rt,
+                    objectFit: fit,
+                    opacity,
+                },
+            };
+        },
         styles: function () {
             let item = this.categoryList.find((item) => item.value === this.post.category);
             if (item) {
@@ -1023,6 +1073,92 @@ export default {
 
 <style lang="less">
 @import "~@/assets/css/community/community-single.less";
+.m-community-header {
+    .pr;
+
+    > *:not(.m-community-header__skin) {
+        .pr;
+        z-index: 1;
+    }
+}
+.m-community-header__skin {
+    .pa;
+    top: 0;
+    right: -30px;
+    bottom: 20px;
+    left: -30px;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    .u-skin-mask,
+    .u-skin-image {
+        .pa;
+        inset: 0;
+    }
+
+    .u-skin-mask {
+        z-index: 1;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.9) 0%,
+            rgba(255, 255, 255, 0.82) 18%,
+            rgba(255, 255, 255, 0.6) 40%,
+            rgba(255, 255, 255, 0.3) 62%,
+            rgba(255, 255, 255, 0.08) 82%,
+            rgba(255, 255, 255, 0) 100%
+        );
+    }
+
+    &.is-fade-none .u-skin-mask {
+        display: none;
+    }
+
+    &.is-fade-light .u-skin-mask {
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.38) 0%,
+            rgba(255, 255, 255, 0.2) 28%,
+            rgba(255, 255, 255, 0.06) 55%,
+            rgba(255, 255, 255, 0) 78%
+        );
+    }
+
+    &.is-fade-strong .u-skin-mask {
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.96) 28%,
+            rgba(255, 255, 255, 0.82) 52%,
+            rgba(255, 255, 255, 0.48) 74%,
+            rgba(255, 255, 255, 0) 100%
+        );
+    }
+
+    .u-skin-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: right top;
+    }
+
+    &.is-fade-strong::after {
+        content: "";
+        .pa;
+        inset: 0;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.78);
+        mask-image: linear-gradient(90deg, black 0%, black 38%, rgba(0, 0, 0, 0.7) 68%, transparent 100%);
+        filter: blur(18px);
+        transform: scale(1.06);
+    }
+}
+@media screen and (max-width: @ipad) {
+    .m-community-header__skin {
+        right: 0;
+        left: 0;
+    }
+}
 .m-community-header__divider {
     margin: 10px 0 20px 0;
 }
@@ -1045,6 +1181,9 @@ export default {
 }
 
 @media screen and (max-width: @phone) {
+    .m-community-header__skin {
+        display: none;
+    }
     .m-single-thx {
         zoom: 0.8;
     }

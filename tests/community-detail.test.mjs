@@ -87,6 +87,18 @@ test("community detail omits client meta and defers expensive per-floor widgets"
     assert.match(reply, /rootMargin: "600px 0px"/);
 });
 
+test("community detail header renders decoration_skin with the four image settings", async () => {
+    const page = await readFile(new URL("../src/views/community/CommunitySingle.vue", import.meta.url), "utf8");
+
+    assert.match(page, /resolveCommunitySkin\(this\.post\?\.decoration_skin\)/);
+    assert.match(page, /config\.position/);
+    assert.match(page, /config\.fit/);
+    assert.match(page, /config\.opacity/);
+    assert.match(page, /config\.fade/);
+    assert.match(page, /m-community-header__skin/);
+    assert.doesNotMatch(page, /community_skin\.json|community_topic_skin/);
+});
+
 test("community detail reloads safely across topic routes and gates restricted discussions", async () => {
     const page = await readFile(new URL("../src/views/community/CommunitySingle.vue", import.meta.url), "utf8");
     const service = await readFile(new URL("../src/service/community.js", import.meta.url), "utf8");

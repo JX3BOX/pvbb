@@ -89,37 +89,6 @@
             border-color: rgba(255, 255, 255, 0.6);
         }
     }
-    .m-topic-box .withSkin.dark {
-        .u-box-content {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 15px;
-            .m-topic-title,
-            a {
-                color: #fff;
-            }
-        }
-
-        .u-content-aside {
-            .m-topic-title {
-                color: #fff;
-            }
-            .u-cover {
-                box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.8);
-            }
-            border-color: rgba(0, 0, 0, 0.6);
-        }
-        .m-topic-collection {
-            > a {
-                .u-value {
-                    color: #fff;
-                }
-                border: 1px solid #fff;
-            }
-        }
-        .m-topic-userInfo .m-topic-userInfo__name {
-            color: #fff;
-        }
-    }
 }
 
 .m-search-right {
@@ -186,9 +155,6 @@
             bottom: -1px;
             z-index: -1;
 
-            // path:nth-of-type(2) {
-            // fill: var(--border-hover-color);
-            // }
         }
     }
 }
@@ -207,16 +173,7 @@
         border: 1px solid rgba(232, 232, 232, 1);
 
         &:hover {
-            border-color: var(--border-hover-color);
-            // .m-topic-title {
-            //     color: var(--title-hover-color) !important;
-            // }
-            // // 置顶贴的标题
-            // .m-topic-hot__right {
-            //     .u-title {
-            //         color: var(--title-hover-color) !important;
-            //     }
-            // }
+            border-color: @v4primary;
         }
         .m-topic-userInfo {
             .mt(5px);
@@ -235,7 +192,6 @@
     font-size: 14px;
     line-height: 28px;
     color: @v4primary;
-    color: var(--title-color);
     margin: 0;
     text-decoration: none;
     .break(2);
