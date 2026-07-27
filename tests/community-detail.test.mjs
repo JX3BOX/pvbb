@@ -87,6 +87,15 @@ test("community detail omits client meta and defers expensive per-floor widgets"
     assert.match(reply, /rootMargin: "600px 0px"/);
 });
 
+test("nested comment decorations do not remove the floor sidebar divider", async () => {
+    const reply = await readFile(new URL("../src/views/community/components/ReplyItem.vue", import.meta.url), "utf8");
+    const styles = await readFile(new URL("../src/assets/css/community/reply_item.less", import.meta.url), "utf8");
+
+    assert.match(styles, /\.m-reply-right\s*\{[\s\S]*?border-left:\s*1px solid/);
+    assert.doesNotMatch(reply, /has-comment-decoration/);
+    assert.doesNotMatch(styles, /has-comment-decoration/);
+});
+
 test("community detail header renders decoration_skin with the four image settings", async () => {
     const page = await readFile(new URL("../src/views/community/CommunitySingle.vue", import.meta.url), "utf8");
 

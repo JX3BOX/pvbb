@@ -14,7 +14,7 @@
                 <div class="m-reply-time">{{ showTime }}</div>
             </div>
         </div>
-        <div class="m-reply-right" :class="{ 'has-comment-decoration': hasCommentDecoration }">
+        <div class="m-reply-right">
             <slot name="header"></slot>
             <div class="m-reply-content">
                 <div class="u-reply-floor u-mobile-hidden">
@@ -233,7 +233,6 @@
                     :key="item.id"
                     :post="item"
                     :comment-strict="commentStrict"
-                    @decoration-change="onCommentDecorationChange"
                 />
             </div>
 
@@ -310,7 +309,6 @@ export default {
             renderContent: "",
             renderVersion: 0,
             commentList: [],
-            decoratedCommentIds: {},
 
             // summary
             summary: {
@@ -414,9 +412,6 @@ export default {
         isDisabledComment: function () {
             return !!this.getTopicData()?.disable_comment || (this.isMaster && !this.visible && !this.isSuper);
         },
-        hasCommentDecoration: function () {
-            return Object.keys(this.decoratedCommentIds).length > 0;
-        },
     },
     watch: {
         "post.content": {
@@ -446,12 +441,6 @@ export default {
                 this.likeCount = val;
             },
             immediate: true,
-        },
-        commentList: function (list) {
-            const visibleIds = new Set((list || []).map((item) => String(item.id)));
-            this.decoratedCommentIds = Object.fromEntries(
-                Object.entries(this.decoratedCommentIds).filter(([id]) => visibleIds.has(id))
-            );
         },
     },
     mounted() {
@@ -484,13 +473,6 @@ export default {
                 { rootMargin: "600px 0px" }
             );
             this.summaryObserver.observe(root);
-        },
-        onCommentDecorationChange(commentId) {
-            if (!commentId) return;
-            this.decoratedCommentIds = {
-                ...this.decoratedCommentIds,
-                [commentId]: true,
-            };
         },
         onCollapseChange() {
             if (this.isCollapse) {

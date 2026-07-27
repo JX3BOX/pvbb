@@ -114,7 +114,6 @@ import sanitizeCommunityReplyHtml from "@/utils/community-rich-text";
 
 export default {
     name: "CommentItem",
-    emits: ["decoration-change"],
     props: ["post", "commentStrict"],
     inject: ["getTopicData", "getTopicPassword", "getReplyData", "getCommentList"],
     components: {
@@ -222,7 +221,6 @@ export default {
             if (!image) return;
             this.decoration = /^(https?:)?\/\//.test(image) ? image : __cdn + image.replace(/^\/+/, "");
             this.decorationPosition = detail.position || "";
-            this.$emit("decoration-change", this.post.id);
         },
         getDecoration() {
             if (!this.uid || this.isAnonymous) return;
