@@ -1,10 +1,26 @@
 <template>
-    <div class="m-team-list" v-loading="loading" :class="{ isIndex }">
+    <div class="m-team-list" :class="{ isIndex }" :aria-busy="loading">
         <div class="m-team-list-header">
             <div class="m-filter">
                 <router-link to="/org/add" class="el-button el-button--primary el-button--large"
                     ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
                 >
+                <el-select
+                    v-if="homeMode"
+                    class="u-home-server u-filter"
+                    v-model="server"
+                    placeholder="选择服务器"
+                    filterable
+                    @change="changeServer"
+                >
+                    <el-option key="all" label="全部服务器" value=""></el-option>
+                    <el-option
+                        v-for="(item, i) in serversWithClient"
+                        :key="item + i"
+                        :label="item"
+                        :value="item"
+                    ></el-option>
+                </el-select>
                 <el-input
                     class="u-name u-filter"
                     v-model="name"
@@ -13,7 +29,7 @@
                     @change="searchTeam"
                     style="width: 100%"
                 >
-                    <template #prepend>
+                    <template #prepend v-if="!homeMode">
                         <el-select
                             style="width: 120px"
                             v-model="server"
@@ -37,17 +53,18 @@
             </div>
             <div class="m-filter__sub">
                 <template v-if="!isIndex">
-                    <el-switch
+                    <el-checkbox
                         class="u-isVerified u-filter"
                         v-model="isVerified"
-                        active-color="@v4primary"
-                        inactive-color="#ddd"
-                        active-text="只看认证"
                     >
-                    </el-switch>
+                        只看认证
+                    </el-checkbox>
                     <el-checkbox-group v-model="tag">
                         <el-checkbox v-for="item in tags" :key="item" :label="item" :value="item"></el-checkbox>
                     </el-checkbox-group>
+                    <button v-if="hasActiveFilters" class="u-filter-clear" type="button" @click="clearFilters">
+                        清空
+                    </button>
                 </template>
                 <router-link
                     class="u-more el-button el-button--primary is-plain el-button--mini"
@@ -57,14 +74,38 @@
                 >
             </div>
         </div>
-        <div class="u-list" v-if="data && data.length">
-            <router-link class="u-item" :to="'/org/' + item.ID" v-for="item in data" :key="item.ID" target="_blank">
+        <div v-if="loading" class="u-list m-team-list-skeleton" aria-label="团队列表加载中">
+            <div class="u-item u-skeleton-item" v-for="index in skeletonCount" :key="index" aria-hidden="true">
+                <span class="u-skeleton-block u-skeleton-logo"></span>
+                <span class="u-skeleton-content">
+                    <span class="u-skeleton-block u-skeleton-title"></span>
+                    <span class="u-skeleton-meta">
+                        <span class="u-skeleton-block"></span>
+                        <span class="u-skeleton-block"></span>
+                        <span class="u-skeleton-block"></span>
+                    </span>
+                    <span class="u-skeleton-notice">
+                        <span class="u-skeleton-block u-skeleton-label"></span>
+                        <span class="u-skeleton-block u-skeleton-text"></span>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="u-list" v-else-if="data && data.length">
+            <router-link
+                class="u-item"
+                :to="'/org/' + item.ID"
+                v-for="item in data"
+                :key="item.ID"
+                :aria-label="'查看团队：' + item.name"
+                target="_blank"
+            >
                 <span class="u-pic">
-                    <img :src="showLogo(item.logo)" v-if="item.logo" />
+                    <img :src="showLogo(item.logo)" v-if="item.logo" @error="useDefaultLogo" />
                     <img src="@/assets/img/team/team_logo_null.svg" v-else />
                 </span>
                 <span class="u-name">
-                    {{ item.name }}
+                    <span class="u-name-text">{{ item.name }}</span>
                     <i class="u-status" v-if="item.status == 1" title="已认证">
                         <img svg-inline src="@/assets/img/team/verify.svg" />
                     </i>
@@ -110,14 +151,27 @@
                 <span class="u-recruit u-meta">
                     <div class="u-meta-item">
                         <em>公告</em>
-                        <span>{{ item.recruit || item.desc || "-" }}</span>
+                        <span :title="item.recruit || item.desc || '-'">{{ item.recruit || item.desc || "-" }}</span>
                     </div>
                 </span>
             </router-link>
         </div>
         <el-alert v-else class="m-team-list-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
+        <div
+            v-if="!isIndex && loading"
+            class="m-team-pagination-skeleton"
+            aria-hidden="true"
+        >
+            <span class="u-skeleton-page u-skeleton-page-total"></span>
+            <span class="u-skeleton-page u-skeleton-page-button"></span>
+            <span class="u-skeleton-page u-skeleton-page-button is-active"></span>
+            <span class="u-skeleton-page u-skeleton-page-button"></span>
+            <span class="u-skeleton-page u-skeleton-page-button"></span>
+            <span class="u-skeleton-page u-skeleton-page-button"></span>
+            <span class="u-skeleton-page u-skeleton-page-jump"></span>
+        </div>
         <el-pagination
-            v-if="!isIndex"
+            v-if="!isIndex && !loading"
             class="m-team-list-pages"
             background
             layout="total, prev, pager, next,jumper"
@@ -142,7 +196,7 @@ import { getTeams } from "@/service/team/team.js";
 import { uniq } from "lodash";
 export default {
     name: "TeamList",
-    props: ["limit", "isIndex"],
+    props: ["limit", "isIndex", "homeMode"],
     components: {},
     data: function () {
         return {
@@ -150,34 +204,8 @@ export default {
             page: 1,
             total: 1,
             pages: 1,
-            data: [
-                {
-                    ID: 13,
-                    status: 1,
-                    super: 6314,
-                    admin: "",
-                    server: "服务器名",
-                    name: "团队名字",
-                    desc: "",
-                    logo: "",
-                    recruit: "招2个七秀",
-                    found: "",
-                    time: "",
-                    contact: "",
-                    tv: "",
-                    created_at: "2020-10-06T16:29:17+08:00",
-                    updated_at: "2020-10-06T16:29:17+08:00",
-                    deleted_at: "0001-01-01T00:00:00Z",
-                    medals: [
-                        {
-                            icon: "dmd",
-                            name: "达摩洞百强团队",
-                        },
-                    ],
-                    tags: ["可教学", "固定团"],
-                },
-            ],
-            loading: false,
+            data: [],
+            loading: true,
             name: "",
             server: "",
             servers,
@@ -208,6 +236,12 @@ export default {
         serversWithClient: function () {
             return uniq(this.client == "std" ? server_std : server_origin);
         },
+        skeletonCount: function () {
+            return Math.min(this.per, this.isIndex ? 8 : 10);
+        },
+        hasActiveFilters: function () {
+            return this.isVerified || this.tag.length > 0;
+        },
     },
     methods: {
         showAvatar,
@@ -232,8 +266,20 @@ export default {
             this.page = 1;
         },
         searchTeam: function () {},
+        clearFilters: function () {
+            this.isVerified = false;
+            this.tag = [];
+            this.page = 1;
+        },
         showLogo: function (val) {
             return getThumbnail(val, 204, true);
+        },
+        useDefaultLogo: function (event) {
+            const image = event.currentTarget;
+            if (image.dataset.fallbackApplied) return;
+
+            image.dataset.fallbackApplied = "true";
+            image.src = require("@/assets/img/team/team_logo_null.svg");
         },
         showTeamMedal: function (val) {
             return __cdn + "design/medals/team/" + val + ".webp";

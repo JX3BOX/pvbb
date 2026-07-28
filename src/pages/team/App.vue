@@ -9,21 +9,27 @@
             :adminEnable="false"
             :feedbackEnable="true"
             :crumbEnable="true"
-            v-if="!isCreateTeam"
+            v-if="!isCreateTeam && !isTeamHome"
         >
             <template #logo>
                 <img :src="logo" />
             </template>
         </Breadcrumb>
-        <LeftSidebar v-if="!isCreateTeam">
+        <LeftSidebar v-if="!isCreateTeam && !isTeamHome">
             <Nav />
         </LeftSidebar>
-        <Main :withoutRight="true" v-if="!isCreateTeam">
-            <div class="m-main" :style="{ minHeight: keepHeight }">
+        <Main
+            :withoutRight="true"
+            :withoutLeft="isTeamHome"
+            :withoutBread="isTeamHome"
+            :class="{ 'is-team-home-main': isTeamHome }"
+            v-if="!isCreateTeam"
+        >
+            <div class="m-main" :class="{ 'is-team-home-content': isTeamHome }" :style="{ minHeight: keepHeight }">
                 <router-view v-if="isPublic || isLogin" />
                 <el-alert v-else title="请先登录" type="warning" description="使用本功能请先登录" show-icon> </el-alert>
             </div>
-            <Footer></Footer>
+            <CommonFooter></CommonFooter>
         </Main>
         <template v-if="isCreateTeam">
             <div class="m-create-team">
@@ -54,6 +60,9 @@ export default {
         },
         isCreateTeam: function () {
             return this.$route.meta.isCreateTeam;
+        },
+        isTeamHome: function () {
+            return this.$route.name === "index";
         },
     },
     methods: {},

@@ -1,33 +1,52 @@
 <template>
-    <div class="v-org-list">
-        <!-- <h1 class="m-title">
-            <span class="u-title">
-                <img class="u-logo" :src="getAppIcon('team')" />
-                <span class="u-txt">查找团队</span>
-            </span>
-            <div class="u-op">
-                <router-link to="/org/add" class="el-button el-button--primary el-button--mini"
-                    ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
-                >
-            </div>
-        </h1> -->
-        <team-list @changePage="changePage" />
+    <div class="v-org-list" :class="{ 'p-team-home': isTeamHome }">
+        <section v-if="isTeamHome" class="m-team-home__hero" aria-labelledby="team-home-title">
+            <header class="m-team-home__header">
+                <div class="m-team-home__intro">
+                    <span class="u-team-home-icon" aria-hidden="true">
+                        <el-icon><UserFilled /></el-icon>
+                    </span>
+                    <div class="m-team-home__heading">
+                        <h1 id="team-home-title">团队平台</h1>
+                        <p>查找团队、管理角色，与志同道合的伙伴并肩江湖</p>
+                    </div>
+                </div>
+                <nav class="m-team-home__actions" aria-label="团队快捷入口">
+                    <router-link class="u-team-home-action" to="/role/manage">
+                        <el-icon><User /></el-icon>
+                        <span>我的角色</span>
+                    </router-link>
+                    <router-link class="u-team-home-action" to="/role/group">
+                        <el-icon><OfficeBuilding /></el-icon>
+                        <span>我的团队</span>
+                    </router-link>
+                </nav>
+            </header>
+        </section>
+        <team-list :home-mode="isTeamHome" @changePage="changePage" />
     </div>
 </template>
 
 <script>
 import TeamList from "@/components/team/org/team_list.vue";
-import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
+import { OfficeBuilding, User, UserFilled } from "@element-plus/icons-vue";
 export default {
     name: "ListOrg",
     props: [],
     components: {
         "team-list": TeamList,
+        OfficeBuilding,
+        User,
+        UserFilled,
     },
     data: function () {
         return {};
     },
-    computed: {},
+    computed: {
+        isTeamHome: function () {
+            return this.$route.name === "index";
+        },
+    },
     methods: {
         goBack: function () {
             this.$router.push("/");
@@ -35,7 +54,6 @@ export default {
         changePage: function () {
             window.scrollTo(0, 0);
         },
-        getAppIcon,
     },
     filters: {},
     created: function () {},
@@ -44,26 +62,5 @@ export default {
 </script>
 
 <style lang="less">
-.v-org-list {
-    .m-title {
-        .u-title {
-            .flex;
-            align-items: center;
-        }
-        .u-logo {
-            .size(32px);
-        }
-    }
-}
-// @media screen and (max-width: @phone) {
-//     .v-org-list {
-//         .m-team-list-header {
-//             border-bottom: 1px dashed @border-hr;
-//             .u-title {
-//                 .none;
-//             }
-//         }
-
-//     }
-// }
+@import "@/assets/css/team/modules/home-theme.less";
 </style>

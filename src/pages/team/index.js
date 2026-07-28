@@ -97,4 +97,7 @@ import { copyText } from "@/utils/common";
 app.config.globalProperties.$copyText = copyText;
 
 // Final.Mount DOM
-app.mount("#app");
+// 等待首个路由完成解析，避免刷新团队首页时短暂按普通内页布局渲染。
+router.isReady().then(() => {
+    app.mount("#app");
+});

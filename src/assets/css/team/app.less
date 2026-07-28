@@ -1,17 +1,34 @@
-.p-team .c-main{
-    padding:0;
+.p-team .c-main {
+    padding: 0;
 }
-.m-main {
+.p-team .m-main {
     padding: 20px 30px;
 }
+
+.p-team .c-main.is-team-home-main {
+    background: #f6f8fa;
+}
+
+.p-team .m-main.is-team-home-content {
+    padding: 32px;
+}
+
 @media screen and (max-width: @ipad) {
-    .m-main {
+    .p-team .m-main {
         padding: 10px 20px;
+    }
+
+    .p-team .m-main.is-team-home-content {
+        padding: 24px;
     }
 }
 @media screen and (max-width: @phone) {
-    .m-main {
+    .p-team .m-main {
         padding: 10px 15px;
+    }
+
+    .p-team .m-main.is-team-home-content {
+        padding: 20px 16px;
     }
 
     .wechat-miniprogram {
