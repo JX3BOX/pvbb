@@ -1,42 +1,255 @@
-.m-dkp-my-tabs{
-    .u-org-logo{
-        .size(24px);
-        .y;
-        .mr(5px);
-        .r(2px);
+@import (reference) "../design-system/_tokens.less";
+
+.v-dkp-history {
+    --el-color-primary: @team-primary;
+    color: @team-text-primary;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .m-dkp-page-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: @team-space-4;
+        padding: @team-space-5;
+        border: 1px solid fade(@team-border, 60%);
+        border-radius: @team-radius-control;
+        background:
+            radial-gradient(circle at 92% 12%, rgba(91, 92, 245, 0.1), transparent 28%),
+            @team-surface;
+        box-shadow: @team-shadow-xs;
+        gap: @team-space-3;
+
+        h1 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 30px;
+        }
+
+        p {
+            margin: 2px 0 0;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 20px;
+        }
+    }
+
+    .u-dkp-page-icon {
+        display: inline-flex;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 14px;
+        background: linear-gradient(145deg, @team-surface-dark, #1e293b);
+        color: @team-accent-yellow;
+        font-size: 23px;
+    }
+
+    .m-dkp-my-tabs {
+        margin-bottom: @team-space-4;
+
+        > .el-tabs__header {
+            margin: 0;
+            border-bottom-color: @team-border;
+        }
+
+        .el-tabs__item {
+            height: 44px;
+            border-color: @team-border;
+            background: @team-surface-muted;
+            color: @team-text-secondary;
+            font-weight: 600;
+
+            &:hover,
+            &.is-active {
+                color: @team-primary;
+            }
+
+            &.is-active {
+                background: @team-surface;
+            }
+        }
+
+        .u-org-logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+            border-radius: 7px;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+    }
+
+    .m-dkp-my-overview {
+        display: grid;
+        min-height: 128px;
+        padding: @team-space-3;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-control;
+        background: @team-surface-muted;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(170px, 0.72fr);
+        gap: @team-space-2;
+    }
+
+    .u-dkp-stat {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        padding: @team-space-3;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        box-shadow: @team-shadow-xs;
+        gap: @team-space-3;
+    }
+
+    .u-stat-icon {
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border-radius: 12px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 20px;
+
+        &.is-rank {
+            background: rgba(245, 158, 11, 0.12);
+            color: @team-accent-yellow;
+        }
+
+        &.is-total {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+    }
+
+    .u-stat-content {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 5px;
+
+        b {
+            color: @team-text-primary;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 32px;
+        }
+
+        b.isNegative {
+            color: #ef4444;
+        }
+    }
+
+    .u-stat-label {
+        color: @team-text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 18px;
+    }
+
+    .u-all-score {
+        display: flex;
+        min-height: 84px;
+        align-items: center;
+        justify-content: center;
+        padding: @team-space-3;
+        border: 1px solid fade(@team-primary, 24%);
+        border-radius: @team-radius-small;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+            border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard,
+            color @team-duration-fast @team-ease-standard;
+        gap: 6px;
+
+        &:hover {
+            border-color: @team-primary;
+            background: @team-primary;
+            color: @team-text-inverse;
+        }
+    }
+
+    .m-dkp-my-history {
+        margin-top: @team-space-4;
+    }
+
+    .m-dkp-section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: @team-space-3;
+
+        h3 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 24px;
+        }
+
+        p {
+            margin: 2px 0 0;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 18px;
+        }
     }
 }
 
-.m-dkp-my-overview {
-    background-color:@bg-light;
-    border:1px solid @v4primary;
-    padding:20px;
-    .r(4px);
+@media screen and (max-width: 960px) {
+    .v-dkp-history .m-dkp-my-overview {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
 
-    .u-block{
-        .x;
-        .fz(13px);
-
-        b{
-            .fz(32px,1.8);
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        }
-
-        &.isNegative{
-            color:#f00;
-        }
-    }
-
-}
-
-@media screen and (max-width:@phone){
-    .m-dkp-my-overview{
-        .u-all{
-            .w(100%);
+        .u-all-score {
+            min-height: 44px;
+            grid-column: 1 / -1;
         }
     }
 }
 
-.m-dkp-my-history{
-    .mt(10px);
+@media screen and (max-width: 700px) {
+    .v-dkp-history {
+        .m-dkp-my-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .u-all-score {
+            grid-column: auto;
+        }
+
+        .u-dkp-stat {
+            min-height: 76px;
+        }
+    }
+}
+
+@media screen and (max-width: 620px) {
+    .v-dkp-history {
+        .m-dkp-page-header {
+            padding: @team-space-3;
+        }
+
+        .m-dkp-my-overview {
+            padding: @team-space-2;
+        }
+
+        .m-dkp-section-heading p {
+            display: none;
+        }
+    }
 }

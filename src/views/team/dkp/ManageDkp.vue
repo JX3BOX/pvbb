@@ -1,9 +1,14 @@
 <template>
     <div class="v-dkp-list">
         <!-- 头部 -->
-        <h1 class="m-title m-select-org-dkp">
-            <i class="el-icon-coin"></i>
-            <span class="u-txt">DKP管理</span>
+        <header v-if="!teamId" class="m-dkp-page-header m-select-org-dkp">
+            <span class="u-dkp-page-icon" aria-hidden="true">
+                <el-icon><Coin /></el-icon>
+            </span>
+            <div class="u-dkp-page-heading">
+                <h1>DKP管理</h1>
+                <p>维护团队当前分值、历史记录与快照关联。</p>
+            </div>
             <el-select
                 class="m-select-org"
                 v-model.number="org"
@@ -30,9 +35,27 @@
                     >全部重置</el-button
                 >
             </div>
-        </h1>
+        </header>
+        <header v-else class="m-dkp-embedded-header">
+            <div>
+                <h2>DKP管理</h2>
+                <p>查看团队分值与变更历史，可进行加分、扣分、物品分配和批量调整。</p>
+            </div>
+            <div class="u-dkp-actions">
+                <a href="/tool/23786" target="_blank">帮助文档</a>
+                <el-button
+                    type="warning"
+                    plain
+                    icon="RefreshLeft"
+                    :disabled="!isSuperLeader"
+                    @click="resetAllDkp"
+                >
+                    全部重置
+                </el-button>
+            </div>
+        </header>
         <div v-if="org" class="m-dkp-box">
-            <el-tabs type="card" v-model="activeTab">
+            <el-tabs type="card" v-model="activeTab" class="m-dkp-manage-tabs">
                 <el-tab-pane label="当前分值" name="score">
                     <template #label> <i class="el-icon-tickets"></i> 当前分值 </template>
                 </el-tab-pane>
@@ -68,9 +91,16 @@ import snapshot_list from "@/components/team/snapshot/snapshotList.vue";
 import { getTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user";
 import { resetDkp } from "@/service/team/dkp.js";
+import { Coin } from "@element-plus/icons-vue";
+import bus from "@/store/bus";
 export default {
     name: "ManageDkp",
-    props: [],
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: 0,
+        },
+    },
     data: function () {
         return {
             // 团队
@@ -99,6 +129,10 @@ export default {
     methods: {
         // 加载我参与管理DKP的团队、并设置默认团队
         init() {
+            if (~~this.teamId) {
+                this.org = ~~this.teamId;
+                return;
+            }
             getMyPowerTeams("r_dkp").then((res) => {
                 this.orgs = res.data.data.list || [];
                 this.org = this.orgs.length && this.orgs[0]["ID"];
@@ -122,7 +156,7 @@ export default {
                 callback: (action) => {
                     if (action == "confirm") {
                         resetDkp(this.org).then(() => {
-                            this.$bus.$emit("resetAllDkp");
+                            bus.$emit("resetAllDkp");
                             this.$message({
                                 message: "重置成功",
                                 type: "success",
@@ -140,6 +174,11 @@ export default {
         this.init();
     },
     watch: {
+        teamId: {
+            handler: function (val) {
+                if (~~val) this.org = ~~val;
+            },
+        },
         org: {
             immediate: true,
             handler: function (val) {
@@ -154,6 +193,7 @@ export default {
         "dkp-list": dkp_list,
         "dkp-logs": dkp_logs,
         "snapshot-list": snapshot_list,
+        Coin,
     },
 };
 </script>

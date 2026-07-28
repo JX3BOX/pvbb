@@ -1,7 +1,7 @@
 <template>
     <div class="m-dkp-logs" v-loading="loading">
         <div class="m-dkp-logs-filters">
-            <el-form :form="form" inline>
+            <el-form :model="form" inline>
                 <el-form-item label="人员" v-if="!user_id">
                     <el-select placeholder="选择人员进行筛选" v-model="form.user_id" size="small" clearable>
                         <el-option
@@ -68,7 +68,7 @@
             </el-form>
         </div>
         <div class="m-dkp-logs-container">
-            <el-table class="m-dkp-logs-table" :data="logs" size="small">
+            <el-table class="m-dkp-logs-table" :data="logs" size="small" border empty-text="暂无分值变更记录">
                 <el-table-column label="人员" v-if="!user_id">
                     <template #default="scope">
                         <a :href="authorLink(scope.row.user_id)" target="_blank">
@@ -97,12 +97,14 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="drop" label="关联物品">
-                    <template #default="scope" v-if="scope.row.drop_item_id">
+                    <template #default="scope">
                         <drop-item
+                            v-if="scope.row.drop_item_id"
                             :id="scope.row.drop_item_id"
                             :icon="scope.row.drop_item_icon"
                             :name="scope.row.drop_item_name"
                         />
+                        <span v-else>-</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="分数变动">
@@ -203,9 +205,10 @@ export default {
             let matched = this.myRoles.filter((item) => {
                 return item.team_info.ID == this.org;
             });
-            let list = matched[0]?.roles.map((item) => {
-                return item.info;
-            });
+            let list =
+                matched[0]?.roles?.map((item) => {
+                    return item.info;
+                }) || [];
             return list;
         },
     },

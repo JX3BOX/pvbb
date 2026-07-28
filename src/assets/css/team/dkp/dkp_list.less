@@ -1,40 +1,87 @@
+@import (reference) "../design-system/_tokens.less";
+
+.m-dkp-list {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: @team-radius-small;
+}
+
 .m-dkp-table {
-    .mb(10px);
+    min-width: 760px;
+    margin-bottom: @team-space-2;
+    overflow: hidden;
+    border-radius: @team-radius-small;
+    color: @team-text-regular;
+    --el-color-primary: @team-primary;
+    --el-table-border-color: @team-border;
+    --el-table-header-bg-color: @team-surface-muted;
+    --el-table-row-hover-bg-color: #fafbff;
+
+    th.el-table__cell {
+        height: 44px;
+        padding: 0;
+        background: @team-surface-muted;
+        color: @team-text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    td.el-table__cell {
+        height: 58px;
+        padding: 6px 0;
+    }
 
     .u-character-logo {
-        .size(28px, 28px);
-    }
-    .u-user-name {
-        &:hover {
-            color: @pink;
-        }
-    }
-    .u-user-avatar{
-        .size(24px);
-        .y;
-        .mr(3px);
-        .r(2px);
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
     }
 
-    .u-role-list{
+    .u-user-name {
+        color: @team-text-regular;
+
+        &:hover {
+            color: @team-primary;
+        }
+    }
+
+    .u-user-avatar {
+        width: 28px;
+        height: 28px;
+        margin-right: 6px;
+        border-radius: 8px;
+        object-fit: cover;
+        vertical-align: middle;
+    }
+
+    .u-role-list {
         display: flex;
         align-items: center;
-        a{
+        flex-wrap: wrap;
+        gap: 4px;
+
+        a {
             display: flex;
             align-items: center;
         }
     }
 
+    .el-button {
+        min-height: 34px;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+
     :deep(.el-table__header-wrapper .el-checkbox__input::after) {
-        content: '全选';
         position: absolute;
         margin-left: 5px;
-        color:#909399;
-        .fz(12px);
-        .bold;
+        color: @team-text-muted;
+        content: "全选";
+        font-size: 12px;
+        font-weight: 600;
     }
 }
 
-.m-dkp-list-footer{
-    .mt(15px);
+.m-dkp-list-footer {
+    margin-top: @team-space-3;
 }

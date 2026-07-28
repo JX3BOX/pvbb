@@ -6,6 +6,7 @@
             tooltip-effect="dark"
             class="m-dkp-table"
             size="small"
+            border
             ref="dkpTable"
             :default-sort="defaultSort"
             @selection-change="handleSelectionChange"
@@ -68,6 +69,7 @@ import character from "@/components/team/dkp/Character.vue";
 import { showAvatar } from "@jx3box/jx3box-common/js/utils";
 import dkp_dialog from "@/components/team/dkp/dkp_dialog.vue";
 import { showSchoolIcon, authorLink } from "@/utils/filters";
+import bus from "@/store/bus";
 export default {
     name: "dkpList",
     components: {
@@ -112,13 +114,12 @@ export default {
     },
     mounted() {
         this.init();
-        this.$bus.$on("resetAllDkp", this.handleRestAllDkp);
+        bus.$on("resetAllDkp", this.handleRestAllDkp);
     },
     beforeUnmount() {
-        this.$bus.$off("resetAllDkp");
+        bus.$off("resetAllDkp", this.handleRestAllDkp);
     },
     methods: {
-        showBodyType,
         showSchoolIcon,
         authorLink,
         // ===================数据获取=====================
