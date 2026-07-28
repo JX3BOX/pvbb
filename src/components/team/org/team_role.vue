@@ -34,7 +34,11 @@
                                 ></el-switch>
                             </td>
                             <td>
-                                <el-button type="info" size="small" plain @click="quitTeam(role.info.ID, data, i)"
+                                <el-button
+                                    type="info"
+                                    size="small"
+                                    plain
+                                    @click="confirmQuitTeam(role.info.ID, role.info.name, data, i)"
                                     >退出</el-button
                                 >
                             </td>
@@ -48,7 +52,7 @@
 </template>
 
 <script>
-import { getMyJoinedTeams, changeRolePublic, quitTeam } from "@/service/team/member.js";
+import { getMyJoinedTeams, changeRolePublic, quitTeam as quitTeamRequest } from "@/service/team/member.js";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { showSchoolIcon, showSchoolName, showBodyType, showTime } from "@/utils/filters";
@@ -101,8 +105,23 @@ export default {
                 });
             });
         },
-        quitTeam: function (role_id, list, i) {
-            quitTeam(this.team_id, role_id).then((res) => {
+        confirmQuitTeam: async function (role_id, roleName, list, i) {
+            try {
+                await this.$confirm(
+                    `确定要让角色「${roleName || "未命名角色"}」退出当前团队吗？退出后需要重新申请才能再次加入。`,
+                    "退出团队",
+                    {
+                        confirmButtonText: "确认退出",
+                        cancelButtonText: "取消",
+                        type: "warning",
+                        distinguishCancelAndClose: true,
+                    }
+                );
+            } catch {
+                return;
+            }
+
+            quitTeamRequest(this.team_id, role_id).then(() => {
                 this.$notify({
                     title: "退出成功",
                     message: "角色成功退出队伍",

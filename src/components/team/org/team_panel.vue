@@ -30,11 +30,13 @@
         </div>
 
         <div class="u-panel">
-            <el-button type="primary" icon="Right" size="small" @click="openPop">加入团队</el-button>
+            <el-button v-if="showJoinAction" type="primary" icon="Right" size="small" @click="openPop">
+                加入团队
+            </el-button>
             <template v-if="!isRaid">
-                <el-button v-if="isLeader || isSuperAdmin" type="primary" icon="Edit" size="small" @click="editTeam"
-                    >编辑团队</el-button
-                >
+                <el-button v-if="showEditAction" type="primary" plain icon="Edit" size="small" @click="editTeam">
+                    编辑团队
+                </el-button>
             </template>
         </div>
 
@@ -56,7 +58,24 @@ import { getUserInfo } from "@/service/team/server.js";
 
 export default {
     name: "team_panel",
-    props: ["team", "isRaid", "team_id"],
+    props: {
+        team: {
+            type: Object,
+            default: () => ({}),
+        },
+        isRaid: {
+            type: Boolean,
+            default: false,
+        },
+        team_id: {
+            type: [Number, String],
+            default: 0,
+        },
+        isMine: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data: function () {
         return {
             isAdmin: User.isAdmin(),
@@ -80,6 +99,12 @@ export default {
         },
         isLeader: function () {
             return this.data.super == this.uid;
+        },
+        showJoinAction: function () {
+            return !this.isMine && !this.isLeader;
+        },
+        showEditAction: function () {
+            return this.isLeader || this.isSuperAdmin;
         },
         status: function () {
             return !!this.data.status;

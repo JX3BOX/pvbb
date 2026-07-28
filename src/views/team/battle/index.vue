@@ -1,15 +1,15 @@
 <template>
     <div>
         <el-alert
-            style="margin-bottom: 10px"
-            title="本数据将同时会展示在秘境百强榜，请勿关联非正确数据"
+            class="m-battle-notice"
+            :title="$t('pages.team.battle.teamNotice')"
             type="warning"
             show-icon
         ></el-alert>
 
         <div class="m-battle-index" v-loading="loading">
             <div class="m-battle-list_null" v-if="list.length == 0">
-                <el-alert title="暂无团队成绩" type="info" show-icon></el-alert>
+                <el-alert :title="$t('pages.team.battle.noTeamRecords')" type="info" show-icon></el-alert>
             </div>
             <div v-else>
                 <div v-for="(item, i) in list" :key="i" class="u-team-collapse">

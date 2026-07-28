@@ -1,18 +1,23 @@
 <template>
     <div class="v-battle">
         <el-alert
-            style="margin-bottom: 10px"
-            title="本数据可能会展示在天梯榜，请勿关联非正确数据"
+            class="m-battle-notice"
+            :title="$t('pages.team.battle.myNotice')"
             type="warning"
             show-icon
         ></el-alert>
 
         <div class="m-battle-index" v-loading="loading">
             <div class="m-battle-list_null" v-if="list.length == 0">
-                <el-alert title="暂无成绩" type="info" show-icon></el-alert>
+                <el-alert :title="$t('pages.team.battle.noRecords')" type="info" show-icon></el-alert>
             </div>
             <div class="m-mybattle-list" v-else>
-                <BattleItem v-for="(item, i) in list" :key="i" :item="item" @uploadBattle="uploadBattle"></BattleItem>
+                <BattleItem
+                    v-for="item in list"
+                    :key="item.ID || item.id || item.created"
+                    :item="item"
+                    @uploadBattle="uploadBattle"
+                ></BattleItem>
                 <el-pagination
                     class="m-archive-pages"
                     background

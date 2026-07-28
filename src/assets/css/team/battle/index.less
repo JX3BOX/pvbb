@@ -1,6 +1,36 @@
+@import (reference) "../design-system/_tokens.less";
+
+.v-battle,
+.m-team-view {
+    .m-battle-notice {
+        margin-bottom: @team-space-3;
+        border: 1px solid #fde7b0;
+        border-radius: @team-radius-small;
+        background: #fffbeb;
+
+        .el-alert__title {
+            color: #a16207;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .el-alert__icon {
+            color: #f59e0b;
+        }
+    }
+}
+
 .m-battle-index {
+    min-height: 120px;
+
+    .m-mybattle-list {
+        display: grid;
+        gap: @team-space-2;
+    }
+
     .u-team-collapse {
-        .mb(10px);
+        margin-bottom: @team-space-2;
+
         .u-team-title {
             cursor: pointer;
         }
@@ -8,5 +38,11 @@
             // height: 0;
             // transition: height 0.4s;
         }
+    }
+
+    .m-archive-pages {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: @team-space-4;
     }
 }

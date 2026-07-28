@@ -85,7 +85,13 @@
             </span>
         </div>
 
-        <team-panel v-if="!isTeamSuper" :team="info" :isRaid="isRaid" :team_id="id" />
+        <team-panel
+            v-if="!isRaid || !isTeamSuper"
+            :team="info"
+            :isRaid="isRaid"
+            :team_id="id"
+            :isMine="isMine"
+        />
     </div>
 </template>
 

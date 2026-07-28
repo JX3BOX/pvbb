@@ -12,10 +12,15 @@
                     </div>
                 </div>
                 <nav class="m-team-home__actions" aria-label="团队快捷入口">
-                    <router-link class="u-team-home-action" to="/role/manage">
+                    <a
+                        class="u-team-home-action"
+                        :href="dashboardRoleUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         <el-icon><User /></el-icon>
                         <span>我的角色</span>
-                    </router-link>
+                    </a>
                     <router-link class="u-team-home-action" to="/role/group">
                         <el-icon><OfficeBuilding /></el-icon>
                         <span>我的团队</span>
@@ -30,6 +35,7 @@
 <script>
 import TeamList from "@/components/team/org/team_list.vue";
 import { OfficeBuilding, User, UserFilled } from "@element-plus/icons-vue";
+import { __OriginRoot, __Root } from "@/utils/config";
 export default {
     name: "ListOrg",
     props: [],
@@ -45,6 +51,9 @@ export default {
     computed: {
         isTeamHome: function () {
             return this.$route.name === "index";
+        },
+        dashboardRoleUrl: function () {
+            return `/dashboard/role`;
         },
     },
     methods: {

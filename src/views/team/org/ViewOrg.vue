@@ -24,10 +24,10 @@
                 <span slot="label"> <i class="el-icon-camera"></i> 团队快照 </span>
                 <ViewSnapshot :v="data.v_activity" :super="data.super" :authority="authority" v-if="done" />
             </el-tab-pane> -->
-            <!-- <el-tab-pane label="DKP记录" name="dkp" lazy>
-                <span slot="label"> <i class="el-icon-coin"></i> DKP记录 </span>
+            <el-tab-pane label="DKP记录" name="dkp" lazy>
+                <template #label> <i class="el-icon-coin"></i> DKP记录 </template>
                 <ViewDkp :v="data.v_dkp" :super="data.super" :authority="authority" v-if="done" />
-            </el-tab-pane> -->
+            </el-tab-pane>
             <el-tab-pane label="通关视频" name="video" lazy>
                 <template #label> <i class="el-icon-video-play"></i> 通关视频 </template>
                 <ViewVideo :super="data.super" v-if="done" />
@@ -50,6 +50,7 @@ import team_recruit from "@/components/team/org/team_recruit.vue";
 import ViewMember from "@/views/team/member/ViewMember.vue";
 import ViewComment from "@/views/team/org/ViewComment.vue";
 import ViewVideo from "@/views/team/org/ViewVideo.vue";
+import ViewDkp from "@/views/team/dkp/ViewDkp.vue";
 
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
@@ -164,7 +165,7 @@ export default {
 
         ViewMember,
         // ViewSnapshot,
-        // ViewDkp,
+        ViewDkp,
         ViewComment,
         ViewVideo,
     },

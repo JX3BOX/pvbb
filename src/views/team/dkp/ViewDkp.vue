@@ -3,7 +3,7 @@
         <el-divider content-position="left">
             <i class="el-icon-data-line"></i> DKP制度
         </el-divider>
-        <div class="m-dkp-rule">{{rule || '无'}}</div>
+        <div class="m-dkp-rule">{{ rule || "无" }}</div>
         <el-divider content-position="left">
             <i class="el-icon-coin"></i> DKP记录
         </el-divider>
@@ -32,10 +32,10 @@
 </template>
 
 <script>
-import { getDkpRule,getTeamDkpList } from "@/service/team/dkp.js";
+import { getDkpRule, getTeamDkpList } from "@/service/team/dkp.js";
 import { getMyTeamUsersNoPager } from "@/service/team/member.js";
 import dkp_list from "@/components/team/dkp/dkp_list.vue";
-import dkp_logs from '@/components/team/dkp/dkp_logs.vue'
+import dkp_logs from "@/components/team/dkp/dkp_logs.vue";
 export default {
     name: "ViewDkp",
     props: ["v", "super", "authority"],
@@ -85,8 +85,16 @@ export default {
             })
         },
     },
-    mounted: function () {
-        this.init();
+    watch: {
+        hasRight: {
+            immediate: true,
+            handler: function (value) {
+                if (value) this.init();
+            },
+        },
+        id: function () {
+            if (this.hasRight) this.init();
+        },
     },
     components: {
         "dkp-list": dkp_list,

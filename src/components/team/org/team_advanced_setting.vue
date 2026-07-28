@@ -51,7 +51,7 @@ import { delTeam, transformTeam, updateTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user.js";
 export default {
     name: "AdvancedSetting",
-    props: ["data"],
+    props: ["data", "initialActive"],
     components: {
         VerifyOrg,
         EditPermission,
@@ -61,7 +61,7 @@ export default {
     },
     data() {
         return {
-            active: "team_info",
+            active: this.initialActive || "team_info",
 
             to_uid: "",
             openTransformDialog: false,
