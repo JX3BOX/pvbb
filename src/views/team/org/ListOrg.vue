@@ -1,59 +1,68 @@
 <template>
     <div class="v-org-list" :class="{ 'p-team-home': isTeamHome }">
-        <section v-if="isTeamHome" class="m-team-home__hero" aria-labelledby="team-home-title">
-            <header class="m-team-home__header">
-                <div class="m-team-home__intro">
-                    <span class="u-team-home-icon" aria-hidden="true">
-                        <el-icon><UserFilled /></el-icon>
-                    </span>
-                    <div class="m-team-home__heading">
-                        <h1 id="team-home-title">团队平台</h1>
-                        <p>查找团队、管理角色，与志同道合的伙伴并肩江湖</p>
+        <template v-if="isTeamHome">
+            <section class="m-team-home__hero" aria-labelledby="team-home-title">
+                <header class="m-team-home__header">
+                    <div class="m-team-home__intro">
+                        <span class="u-team-home-icon" aria-hidden="true">
+                            <el-icon><UserFilled /></el-icon>
+                        </span>
+                        <div class="m-team-home__heading">
+                            <h1 id="team-home-title">团队平台</h1>
+                            <p>查找团队、管理角色，与志同道合的伙伴并肩江湖</p>
+                        </div>
                     </div>
-                </div>
-                <nav class="m-team-home__actions" aria-label="团队快捷入口">
-                    <a
-                        class="u-team-home-action"
-                        :href="dashboardRoleUrl"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <div
+                        class="m-team-home__summary"
+                        :class="{ 'is-loading': teamTotal === null }"
+                        :aria-busy="teamTotal === null"
+                        aria-live="polite"
                     >
-                        <el-icon><User /></el-icon>
-                        <span>我的角色</span>
-                    </a>
-                    <router-link class="u-team-home-action" to="/role/group">
-                        <el-icon><OfficeBuilding /></el-icon>
-                        <span>我的团队</span>
-                    </router-link>
-                </nav>
-            </header>
-        </section>
-        <team-list :home-mode="isTeamHome" @changePage="changePage" />
+                        <span>团队广场</span>
+                        <strong>{{ teamTotal === null ? "—" : formattedTeamTotal }}</strong>
+                        <small>支团队可供浏览</small>
+                    </div>
+                    <nav class="m-team-home__actions" aria-label="团队快捷入口">
+                        <a class="u-team-home-action" href="/tool/21789" target="_blank" rel="noopener noreferrer">
+                            <el-icon><QuestionFilled /></el-icon>
+                            <span>使用指南</span>
+                        </a>
+                        <router-link class="u-team-home-action is-primary" to="/org/add">
+                            <el-icon><Plus /></el-icon>
+                            <span>创建团队</span>
+                        </router-link>
+                    </nav>
+                </header>
+            </section>
+            <team-list :home-mode="true" @changePage="changePage" @total-change="updateTeamTotal" />
+        </template>
+        <team-list v-else @changePage="changePage" />
     </div>
 </template>
 
 <script>
 import TeamList from "@/components/team/org/team_list.vue";
-import { OfficeBuilding, User, UserFilled } from "@element-plus/icons-vue";
-import { __OriginRoot, __Root } from "@/utils/config";
+import { Plus, QuestionFilled, UserFilled } from "@element-plus/icons-vue";
 export default {
     name: "ListOrg",
     props: [],
     components: {
         "team-list": TeamList,
-        OfficeBuilding,
-        User,
+        Plus,
+        QuestionFilled,
         UserFilled,
     },
     data: function () {
-        return {};
+        return {
+            teamTotal: null,
+        };
     },
     computed: {
         isTeamHome: function () {
             return this.$route.name === "index";
         },
-        dashboardRoleUrl: function () {
-            return `/dashboard/role`;
+        formattedTeamTotal: function () {
+            return Number(this.teamTotal || 0).toLocaleString("zh-CN");
         },
     },
     methods: {
@@ -63,13 +72,12 @@ export default {
         changePage: function () {
             window.scrollTo(0, 0);
         },
+        updateTeamTotal: function (total) {
+            this.teamTotal = total;
+        },
     },
     filters: {},
     created: function () {},
     mounted: function () {},
 };
 </script>
-
-<style lang="less">
-@import "@/assets/css/team/modules/home-theme.less";
-</style>

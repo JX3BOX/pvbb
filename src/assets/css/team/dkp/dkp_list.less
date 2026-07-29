@@ -2,18 +2,18 @@
 
 .m-dkp-list {
     width: 100%;
+    margin-bottom: @team-space-2;
     overflow-x: auto;
-    border-radius: @team-radius-small;
+    border: 1px solid @team-border-light;
+    border-radius: 12px;
+    background: @team-surface;
 }
 
 .m-dkp-table {
     min-width: 760px;
-    margin-bottom: @team-space-2;
-    overflow: hidden;
-    border-radius: @team-radius-small;
     color: @team-text-regular;
     --el-color-primary: @team-primary;
-    --el-table-border-color: @team-border;
+    --el-table-border-color: @team-border-light;
     --el-table-header-bg-color: @team-surface-muted;
     --el-table-row-hover-bg-color: #fafbff;
 
@@ -24,6 +24,7 @@
         color: @team-text-secondary;
         font-size: 12px;
         font-weight: 600;
+        text-align: left;
     }
 
     td.el-table__cell {
@@ -35,6 +36,12 @@
         width: 28px;
         height: 28px;
         border-radius: 7px;
+    }
+
+    .u-user {
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
     }
 
     .u-user-name {
@@ -72,14 +79,6 @@
         font-weight: 600;
     }
 
-    :deep(.el-table__header-wrapper .el-checkbox__input::after) {
-        position: absolute;
-        margin-left: 5px;
-        color: @team-text-muted;
-        content: "全选";
-        font-size: 12px;
-        font-weight: 600;
-    }
 }
 
 .m-dkp-list-footer {

@@ -94,26 +94,56 @@
         }
     }
 
-    .m-dkp-manage-tabs {
-        > .el-tabs__header {
-            margin: 0 0 @team-space-4;
-            border-bottom-color: @team-border;
+    .m-dkp-manage-nav {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        margin-bottom: @team-space-4;
+        padding: 4px;
+        overflow-x: auto;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        gap: 4px;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
         }
 
-        .el-tabs__item {
-            height: 42px;
-            border-color: @team-border;
-            background: @team-surface-muted;
+        button {
+            display: inline-flex;
+            min-width: max-content;
+            min-height: 34px;
+            align-items: center;
+            padding: 0 @team-space-3;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
             color: @team-text-secondary;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
             font-weight: 600;
+            gap: 5px;
+            transition:
+                color @team-duration-fast @team-ease-standard,
+                background-color @team-duration-fast @team-ease-standard,
+                box-shadow @team-duration-fast @team-ease-standard;
 
-            &:hover,
-            &.is-active {
+            &:hover {
                 color: @team-primary;
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: @team-shadow-focus;
             }
 
             &.is-active {
                 background: @team-surface;
+                color: @team-primary;
+                box-shadow: @team-shadow-xs;
             }
         }
     }

@@ -74,15 +74,15 @@
     .m-dkp-logs-container {
         width: 100%;
         overflow-x: auto;
-        border-radius: @team-radius-small;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface;
     }
 
     .m-dkp-logs-table {
         min-width: 900px;
-        overflow: hidden;
-        border-radius: @team-radius-small;
         color: @team-text-regular;
-        --el-table-border-color: @team-border;
+        --el-table-border-color: @team-border-light;
         --el-table-header-bg-color: @team-surface-muted;
         --el-table-row-hover-bg-color: #fafbff;
 
@@ -93,6 +93,7 @@
             color: @team-text-secondary;
             font-size: 12px;
             font-weight: 600;
+            text-align: left;
         }
 
         td.el-table__cell {

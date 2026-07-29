@@ -88,11 +88,6 @@
 
     .m-dkp-my-overview {
         display: grid;
-        min-height: 128px;
-        padding: @team-space-3;
-        border: 1px solid @team-border;
-        border-radius: @team-radius-control;
-        background: @team-surface-muted;
         grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(170px, 0.72fr);
         gap: @team-space-2;
     }
@@ -168,6 +163,8 @@
         border-radius: @team-radius-small;
         background: @team-primary-soft;
         color: @team-primary;
+        cursor: pointer;
+        font-family: inherit;
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
@@ -181,6 +178,56 @@
             border-color: @team-primary;
             background: @team-primary;
             color: @team-text-inverse;
+        }
+    }
+
+    .m-dkp-all-scores {
+        margin-top: @team-space-3;
+    }
+
+    .m-dkp-all-scores__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: @team-space-3;
+        gap: @team-space-3;
+
+        h3 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 24px;
+        }
+
+        p {
+            margin: 2px 0 0;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    .u-back-my-dkp {
+        display: inline-flex;
+        min-height: 36px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        padding: 0 @team-space-3;
+        border: 1px solid @team-border;
+        border-radius: 9px;
+        background: @team-surface;
+        color: @team-text-secondary;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        gap: 5px;
+
+        &:hover {
+            border-color: @team-primary;
+            color: @team-primary;
         }
     }
 
@@ -244,12 +291,13 @@
             padding: @team-space-3;
         }
 
-        .m-dkp-my-overview {
-            padding: @team-space-2;
-        }
-
         .m-dkp-section-heading p {
             display: none;
+        }
+
+        .m-dkp-all-scores__header {
+            align-items: flex-start;
+            flex-direction: column;
         }
     }
 }

@@ -1,3 +1,5 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-permission-header {
     .u-btn-add {
         .mt(10px);
@@ -76,7 +78,270 @@
     .bold;
 }
 
+.m-permission-panel.is-archive {
+    min-width: 0;
+
+    > .m-permission-box {
+        overflow: visible;
+    }
+
+    .m-permission-header {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: @team-space-3;
+        gap: @team-space-3;
+
+        .m-permission-heading {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .u-heading-mark {
+            width: 3px;
+            height: 15px;
+            flex: none;
+            border-radius: 999px;
+            background: @team-primary;
+        }
+
+        h2 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 20px;
+        }
+
+        .u-admin-count {
+            display: inline-flex;
+            min-height: 22px;
+            align-items: center;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: @team-primary-soft;
+            color: @team-primary;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .u-btn-add {
+            min-height: 38px;
+            margin-top: 0;
+            padding: 0 @team-space-3;
+            border-radius: 10px;
+            font-weight: 600;
+
+            .u-limit {
+                display: none;
+            }
+        }
+    }
+
+    .m-permission-table {
+        overflow-x: auto;
+        border: 1px solid @team-border-light;
+        border-radius: 14px;
+        background: @team-surface;
+        scrollbar-color: @team-border transparent;
+        scrollbar-width: thin;
+    }
+
+    .m-permission-list {
+        min-width: 1120px;
+        width: 100%;
+        margin-top: 0;
+
+        .el-row {
+            min-height: 54px;
+            align-items: center;
+            margin: 0 !important;
+            padding: 0 @team-space-2;
+            border-bottom: 1px solid @team-border-light;
+            transition: background-color @team-duration-fast @team-ease-standard;
+
+            &:last-child {
+                border-bottom: 0;
+            }
+        }
+
+        .el-row:not(.m-permission-list-header):hover {
+            background: @team-surface-muted;
+        }
+
+        .el-col {
+            display: flex;
+            min-width: 82px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px !important;
+            color: @team-text-secondary;
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        .u-leader {
+            position: sticky;
+            z-index: 2;
+            left: 0;
+            min-width: 190px;
+            justify-content: flex-start;
+            background: @team-surface;
+            box-shadow: 12px 0 18px -18px rgba(15, 23, 42, 0.35);
+        }
+
+        .el-row:not(.m-permission-list-header):hover .u-leader {
+            background: @team-surface-muted;
+        }
+
+        .u-leader-link {
+            width: 100%;
+            min-width: 0;
+            align-items: center;
+            color: @team-text-regular;
+            gap: 8px;
+
+            &:hover {
+                color: @team-primary;
+            }
+        }
+
+        .u-leader > div {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .u-leader-img {
+            width: 30px;
+            height: 30px;
+            flex: none;
+            border: 1px solid @team-border-light;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .u-leader-name {
+            min-width: 0;
+            overflow: hidden;
+            padding: 0;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .u-leader-role {
+            flex: none;
+            padding: 1px 5px;
+            border-radius: 5px;
+            background: @team-surface-muted;
+            color: @team-text-muted;
+            font-size: 10px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 16px;
+        }
+
+        .el-checkbox__inner {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+        }
+
+        .el-checkbox__inner::after {
+            width: 4px;
+            height: 8px;
+        }
+
+        .el-checkbox__input.is-checked .el-checkbox__inner {
+            border-color: @team-primary;
+            background: @team-primary;
+        }
+
+        .el-checkbox.is-disabled,
+        .el-checkbox__input.is-disabled {
+            cursor: not-allowed;
+        }
+
+        .el-checkbox__input.is-disabled .el-checkbox__inner {
+            border-color: #cbd5e1;
+            background: @team-border-light;
+        }
+
+        .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
+            border-color: #cbd5e1;
+            background: #cbd5e1;
+        }
+
+        .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
+            border-color: @team-surface;
+        }
+
+        .u-delete {
+            min-height: 30px;
+            border-radius: 8px;
+            color: @team-text-secondary;
+
+            &:hover {
+                border-color: fade(#ef4444, 35%);
+                background: fade(#ef4444, 6%);
+                color: #dc2626;
+            }
+        }
+    }
+
+    .m-permission-list-header {
+        position: sticky;
+        z-index: 3;
+        top: 0;
+        min-height: 48px;
+        background: @team-surface-muted;
+
+        .el-col {
+            color: @team-text-secondary;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .u-leader {
+            z-index: 4;
+            background: @team-surface-muted;
+            color: @team-text-secondary;
+        }
+    }
+
+    .u-super.is-founder {
+        background: fade(@team-primary, 2%);
+
+        .u-leader {
+            background: mix(@team-primary, @team-surface, 2%);
+        }
+
+        .u-leader-role {
+            background: @team-primary-soft;
+            color: @team-primary;
+        }
+    }
+}
+
 @media screen and (max-width: @phone) {
+    .m-permission-panel.is-archive {
+        .m-permission-header {
+            align-items: stretch;
+            flex-direction: column;
+
+            .u-btn-add {
+                width: 100%;
+            }
+        }
+
+        .m-permission-list {
+            min-width: 1080px;
+        }
+    }
+
     .m-team-leader-dialog {
         .el-dialog {
             min-width: auto;

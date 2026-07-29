@@ -133,7 +133,7 @@ const routes = [
     },
     {
         name: "view_my_org",
-        path: "/my/org/:id",
+        path: "/my/org/:id?",
         meta: {
             isPublic: false,
             i18n: {

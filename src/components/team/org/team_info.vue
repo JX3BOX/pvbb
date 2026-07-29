@@ -27,7 +27,7 @@
                 </i>
                 <template v-else>
                     <router-link
-                        v-if="isTeamSuper"
+                        v-if="isTeamSuper && showManageAction !== false"
                         class="u-status isNotVerified"
                         title="前往认证"
                         :to="'/org/verify/' + id"
@@ -67,19 +67,11 @@
                     {{ tvmap[data.tv_type] + "·" + data.tv }}
                 </a>
             </span>
-            <span
-                class="u-meta-item u-meta-yy"
-                @click="handleCopy(data.yy_channel)"
-                v-if="data.yy_channel"
-            >
+            <span class="u-meta-item u-meta-yy" @click="handleCopy(data.yy_channel)" v-if="data.yy_channel">
                 <em><i class="el-icon-document-copy"></i> YY频道</em>
                 {{ data.yy_channel }}
             </span>
-            <span
-                class="u-meta-item u-meta-qq"
-                @click="handleCopy(data.qq_group)"
-                v-if="data.qq_group"
-            >
+            <span class="u-meta-item u-meta-qq" @click="handleCopy(data.qq_group)" v-if="data.qq_group">
                 <em><i class="el-icon-document-copy"></i> QQ群</em>
                 {{ data.qq_group }}
             </span>
@@ -91,6 +83,7 @@
             :isRaid="isRaid"
             :team_id="id"
             :isMine="isMine"
+            :showManageAction="showManageAction !== false"
         />
     </div>
 </template>
@@ -109,7 +102,7 @@ import User from "@jx3box/jx3box-common/js/user";
 
 export default {
     name: "team_info",
-    props: ["info", "isRaid", "team_id", "isMine"],
+    props: ["info", "isRaid", "team_id", "isMine", "showManageAction"],
     data: function () {
         return {
             tvmap,

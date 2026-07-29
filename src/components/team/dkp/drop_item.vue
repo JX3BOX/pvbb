@@ -29,10 +29,13 @@ export default {
 
 <style scoped lang="less">
 .w-drop-item-link {
-    .db;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
 }
 .w-drop-item-img {
     .size(28px);
+    flex: none;
     .y;
     .mr(5px);
     .r(2px);

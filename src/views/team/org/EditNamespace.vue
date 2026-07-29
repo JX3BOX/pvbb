@@ -1,9 +1,20 @@
 <template>
-    <div class="m-team-namespace">
-        <el-divider content-position="left"> <i class="el-icon-postcard"></i> 绑定铭牌 </el-divider>
+    <section class="m-team-namespace" :class="{ 'is-archive': variant === 'archive' }">
+        <template v-if="variant === 'archive'">
+            <header class="m-team-form-section">
+                <h2>团队铭牌</h2>
+            </header>
+            <div class="m-archive-field-label">主页快捷地址</div>
+        </template>
+        <el-divider v-else content-position="left"> <i class="el-icon-postcard"></i> 绑定铭牌 </el-divider>
         <el-alert v-if="!isVerified" type="warning" show-icon class="u-warning"
             ><template #title>
-                注册命名空间请先进行<router-link :to="'/org/verify/' + team_id">团队认证</router-link>
+                <template v-if="variant === 'archive'">
+                    绑定团队铭牌前请先完成<router-link :to="verifyLink">团队认证</router-link>
+                </template>
+                <template v-else>
+                    注册命名空间请先进行<router-link :to="verifyLink">团队认证</router-link>
+                </template>
             </template></el-alert
         >
         <el-alert
@@ -15,7 +26,9 @@
         >
         </el-alert>
         <div class="m-team-other-block" :class="{ disabled: !isVerified }">
-            <div class="u-desc">团队主页的中文快捷链接，请尽量与团队名称保持一致</div>
+            <div v-if="variant !== 'archive'" class="u-desc">
+                团队主页的中文快捷链接，请尽量与团队名称保持一致
+            </div>
             <div class="u-input">
                 <el-input
                     placeholder="请输入唯一名称"
@@ -41,7 +54,7 @@
                 </span>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
@@ -60,7 +73,12 @@ const default_form = {
 
 export default {
     name: "EditNamespace",
-    props: [],
+    props: {
+        variant: {
+            type: String,
+            default: "default",
+        },
+    },
     data: function () {
         return {
             form: cloneDeep(default_form),
@@ -98,6 +116,16 @@ export default {
         },
         team_desc: function () {
             return this.team && this.team.name + "@" + this.team.server;
+        },
+        verifyLink: function () {
+            if (this.variant === "archive") {
+                return {
+                    name: "view_my_org",
+                    params: { id: this.team_id },
+                    query: { tab: "setting", section: "verify" },
+                };
+            }
+            return "/org/verify/" + this.team_id;
         },
     },
     methods: {
@@ -169,7 +197,6 @@ export default {
     mounted: function () {
         this.getData();
     },
-    components: {},
 };
 </script>
 

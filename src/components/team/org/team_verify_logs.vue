@@ -1,7 +1,9 @@
 <template>
     <div class="m-verify-logs">
-        <h5 class="u-title">近期认证记录</h5>
-        <table class="u-list">
+        <header class="m-verify-section-title">
+            <h2>近期认证记录</h2>
+        </header>
+        <table v-if="data.length" class="u-list">
             <thead>
                 <tr>
                     <th>状态</th>
@@ -9,10 +11,13 @@
                 </tr>
             </thead>
             <tr v-for="(item, i) in data" :key="i">
-                <td>{{ statusLabel(item.status) }}</td>
+                <td>
+                    <span class="u-status" :class="`is-${item.status}`">{{ statusLabel(item.status) }}</span>
+                </td>
                 <td>{{ showTime(item.created_at) }}</td>
             </tr>
         </table>
+        <el-empty v-else description="暂无认证记录" :image-size="72" />
     </div>
 </template>
 
@@ -22,7 +27,7 @@ import { getVerifyLogs } from "@/service/team/verify.js";
 import { showTime } from "@/utils/filters.js";
 export default {
     name: "",
-    props: [],
+    props: ["teamId"],
     data: function () {
         return {
             data: [],
@@ -30,17 +35,17 @@ export default {
     },
     computed: {
         id: function () {
-            return this.$route.params.id;
+            return this.teamId || this.$route.params.id;
         },
     },
     methods: {
         init: function () {
             getVerifyLogs(this.id).then((res) => {
-                this.data = res.data.data.list;
+                this.data = res.data.data.list || [];
 
                 // 根据最新一条记录判断是否已经认证
-                let last = this.data[0];
-                this.$emit("update:status", last.status);
+                const last = this.data[0];
+                this.$emit("update:status", last?.status);
             });
         },
         statusLabel: function (val) {

@@ -1,6 +1,6 @@
 <template>
-    <div class="v-raid-list">
-        <h1 class="m-title">
+    <div class="v-raid-list" :class="{ 'is-embedded': embedded }">
+        <h1 v-if="!embedded" class="m-title">
             <i class="el-icon-date"></i>
             <span class="u-txt">团队活动</span>
             <div class="u-op">
@@ -16,8 +16,18 @@
                 </router-link>
             </div>
         </h1>
+        <header v-else class="m-raid-embedded-header">
+            <div>
+                <h2>排表管理</h2>
+                <p>创建和维护当前团队的活动排表。</p>
+            </div>
+            <router-link target="_blank" to="/raid/add" class="el-button el-button--primary el-button--small">
+                <i class="el-icon-circle-plus-outline"></i>
+                创建活动
+            </router-link>
+        </header>
         <div class="m-raid-box" v-if="orgs.length">
-            <div class="m-raid-tab">
+            <div v-if="!embedded && orgs.length > 1" class="m-raid-tab">
                 <el-tabs v-model="team_id" type="card" class="m-raid-card-tabs">
                     <el-tab-pane :name="String(item.ID)" v-for="(item, i) in orgs" :key="i">
                         <template #label>
@@ -83,7 +93,16 @@ import localforage from "localforage";
 
 export default {
     name: "ManageRaid",
-    props: [],
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: 0,
+        },
+        embedded: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data: function () {
         return {
             team_id: "",
@@ -110,8 +129,15 @@ export default {
     methods: {
         loadTeams() {
             return getMyPowerTeams("r_raid").then(async (res) => {
-                this.orgs = res.data.data.list || [];
-                this.team_id = this.orgs[0]?.["ID"] || 0;
+                const orgs = res.data.data.list || [];
+                if (~~this.teamId) {
+                    const current = orgs.find((item) => ~~item.ID === ~~this.teamId);
+                    this.orgs = current ? [current] : [];
+                    this.team_id = current ? String(current.ID) : "";
+                    return;
+                }
+                this.orgs = orgs;
+                this.team_id = this.orgs[0]?.ID ? String(this.orgs[0].ID) : "";
             });
         },
         loadData() {
@@ -130,7 +156,7 @@ export default {
         },
         changeTeam: function () {
             // 将当前团队的信息保存在localStorage
-            const currentTeam = this.orgs.find((org) => org.ID === this.team_id);
+            const currentTeam = this.orgs.find((org) => String(org.ID) === String(this.team_id));
             if (currentTeam) {
                 localforage.setItem("currentTeam", currentTeam);
             }
@@ -156,6 +182,9 @@ export default {
         this.init();
     },
     watch: {
+        teamId: function (value) {
+            if (~~value) this.loadTeams();
+        },
         params: {
             deep: true,
             handler: function () {

@@ -7,49 +7,25 @@
                         <el-icon><OfficeBuilding /></el-icon>
                     </span>
                     <div class="m-my-org__heading">
-                        <h1 id="my-org-title">团队工作台</h1>
-                        <p>管理团队成员、战绩、内容与基础设置</p>
+                        <div class="m-my-org__title-row">
+                            <h1 id="my-org-title">{{ workspaceTitle }}</h1>
+                            <span class="u-my-org-mode" :class="`is-${workspaceMode}`">{{ workspaceModeLabel }}</span>
+                        </div>
+                        <p>{{ workspaceDescription }}</p>
                     </div>
                 </div>
 
                 <div class="m-my-org__actions">
-                    <div class="m-team-switch">
-                        <el-select
-                            v-model="selectedTeamId"
-                            class="u-team-switcher"
-                            placeholder="选择团队"
-                            :loading="teamsLoading"
-                            aria-label="切换当前团队"
-                            @change="switchTeam"
-                        >
-                            <template #prefix>
-                                <el-icon><Switch /></el-icon>
-                            </template>
-                            <el-option
-                                v-for="team in teams"
-                                :key="team.ID"
-                                :label="team.name"
-                                :value="String(team.ID)"
-                            >
-                                <div class="u-team-option">
-                                    <img
-                                        :src="showTeamLogo(team.logo)"
-                                        :alt="`${team.name}团队 Logo`"
-                                        @error="handleTeamLogoError"
-                                    />
-                                    <span>{{ team.name }}</span>
-                                    <em v-if="team.super == uid">我创建的</em>
-                                </div>
-                            </el-option>
-                        </el-select>
-                    </div>
-
-                    <router-link
-                        class="u-my-org-action"
-                        :to="`/org/${id}`"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        v-if="canManageTeam"
+                        type="button"
+                        class="u-my-org-action is-mode-switch"
+                        @click="switchWorkspaceMode"
                     >
+                        <el-icon><Switch /></el-icon>
+                        <span>{{ workspaceSwitchLabel }}</span>
+                    </button>
+                    <router-link class="u-my-org-action" :to="`/org/${id}`" target="_blank" rel="noopener noreferrer">
                         <span>查看团队主页</span>
                         <el-icon><ArrowRight /></el-icon>
                     </router-link>
@@ -60,125 +36,167 @@
                 <span>团队信息加载失败，请稍后重试。</span>
                 <button type="button" @click="loadData">重新加载</button>
             </div>
-            <team-info v-else class="m-my-org__profile" :info="data" :team_id="id" :isMine="true" />
+            <team-info
+                v-else
+                class="m-my-org__profile"
+                :info="data"
+                :team_id="id"
+                :isMine="true"
+                :show-manage-action="isManagementMode"
+            />
         </section>
 
-        <section v-if="!loadError" class="m-my-org__workspace" aria-label="团队管理功能">
+        <section v-if="!loadError" class="m-my-org__workspace" :aria-label="workspaceAriaLabel">
             <el-tabs v-model="tab" class="m-team-view">
-                <el-tab-pane label="我的角色" name="overview" lazy>
-                    <template #label>
-                        <el-icon><User /></el-icon>
-                        <span>我的角色</span>
-                    </template>
-                    <team-role v-if="isLogin" :team_id="id" />
-                </el-tab-pane>
+                <template v-if="isManagementMode">
+                    <el-tab-pane label="成员管理" name="manage-member" lazy v-if="permissions.r_member || isSuper">
+                        <template #label>
+                            <el-icon><Avatar /></el-icon>
+                            <span>成员管理</span>
+                            <i class="u-count" v-if="pendingCount">{{ pendingCount }}</i>
+                        </template>
+                        <ListMember :id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="我的战绩" name="history" lazy>
-                    <template #label>
-                        <el-icon><Medal /></el-icon>
-                        <span>我的战绩</span>
-                    </template>
-                    <myBattle :team-id="id" />
-                </el-tab-pane>
+                    <el-tab-pane label="战绩管理" name="manage-battle" lazy v-if="permissions.r_race || isSuper">
+                        <template #label>
+                            <el-icon><Trophy /></el-icon>
+                            <span>战绩管理</span>
+                        </template>
+                        <ManageBattle :team-id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="我的DKP" name="my-dkp" lazy v-if="isLogin">
-                    <template #label>
-                        <el-icon><Coin /></el-icon>
-                        <span>我的DKP</span>
-                    </template>
-                    <MyDkp :team-id="id" />
-                </el-tab-pane>
+                    <el-tab-pane label="视频管理" name="video" lazy v-if="permissions.r_video || isSuper">
+                        <template #label>
+                            <el-icon><VideoCamera /></el-icon>
+                            <span>视频管理</span>
+                        </template>
+                        <ManageVideo :super="data.super" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="团员管理" name="manage-member" lazy v-if="permissions.r_member || isSuper">
-                    <template #label>
-                        <el-icon><Avatar /></el-icon>
-                        <span>团员管理</span>
-                        <i class="u-count" v-if="pendingCount">{{ pendingCount }}</i>
-                    </template>
-                    <ListMember :id="id" />
-                </el-tab-pane>
+                    <el-tab-pane label="快照管理" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
+                        <template #label>
+                            <el-icon><Camera /></el-icon>
+                            <span>快照管理</span>
+                        </template>
+                        <SnapshotList />
+                    </el-tab-pane>
 
-                <el-tab-pane label="快照管理" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
-                    <template #label>
-                        <el-icon><Camera /></el-icon>
-                        <span>快照管理</span>
-                    </template>
-                    <SnapshotList />
-                </el-tab-pane>
+                    <el-tab-pane label="DKP管理" name="manage-dkp" lazy v-if="permissions.r_dkp || isSuper">
+                        <template #label>
+                            <el-icon><Coin /></el-icon>
+                            <span>DKP管理</span>
+                        </template>
+                        <ManageDkp :team-id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="DKP管理" name="manage-dkp" lazy v-if="permissions.r_dkp || isSuper">
-                    <template #label>
-                        <el-icon><Coin /></el-icon>
-                        <span>DKP管理</span>
-                    </template>
-                    <ManageDkp :team-id="id" />
-                </el-tab-pane>
+                    <el-tab-pane label="RAID管理" name="manage-raid" lazy v-if="permissions.r_raid || isSuper">
+                        <template #label>
+                            <el-icon><Calendar /></el-icon>
+                            <span>RAID管理</span>
+                        </template>
+                        <ManageRaid :team-id="id" embedded />
+                    </el-tab-pane>
 
-                <el-tab-pane label="战绩管理" name="battle-record" lazy v-if="permissions.r_raid || isSuper">
-                    <template #label>
-                        <el-icon><Trophy /></el-icon>
-                        <span>战绩管理</span>
-                    </template>
-                    <ManageBattle :team-id="id" />
-                </el-tab-pane>
+                    <el-tab-pane label="团队档案" name="setting" lazy v-if="isSuper">
+                        <template #label>
+                            <el-icon><FolderOpened /></el-icon>
+                            <span>团队档案</span>
+                        </template>
 
-                <el-tab-pane label="视频管理" name="video" lazy v-if="permissions.r_video || isSuper">
-                    <template #label>
-                        <el-icon><VideoCamera /></el-icon>
-                        <span>视频管理</span>
-                    </template>
-                    <ManageVideo :super="data.super" />
-                </el-tab-pane>
+                        <nav class="m-workspace-subnav" aria-label="团队档案设置">
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'basic' }"
+                                @click="switchSection('basic')"
+                            >
+                                基本设置
+                            </button>
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'verify' }"
+                                @click="switchSection('verify')"
+                            >
+                                团队认证
+                            </button>
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'permission' }"
+                                @click="switchSection('permission')"
+                            >
+                                权限管理
+                            </button>
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'advanced' }"
+                                @click="switchSection('advanced')"
+                            >
+                                高级设置
+                            </button>
+                        </nav>
 
-                <el-tab-pane label="基本设置" name="setting" lazy v-if="isSuper">
-                    <template #label>
-                        <el-icon><Edit /></el-icon>
-                        <span>基本设置</span>
-                    </template>
-                    <team-form
-                        ref="teamForm"
-                        :data="data"
-                        btn_txt="更新"
-                        :processing="processing"
-                        @submit="submit"
-                    />
-                </el-tab-pane>
+                        <team-form
+                            v-if="archiveSection === 'basic'"
+                            ref="teamForm"
+                            variant="archive"
+                            :data="data"
+                            btn_txt="更新"
+                            :processing="processing"
+                            @submit="submit"
+                        />
+                        <VerifyOrg
+                            v-else-if="archiveSection === 'verify'"
+                            :key="`verify-${id}`"
+                            variant="archive"
+                            :team-id="id"
+                            :team-data="data"
+                        />
+                        <EditPermission v-else-if="archiveSection === 'permission'" variant="archive" :team-id="id" />
+                        <div v-else class="m-archive-advanced">
+                            <EditOrgConfig variant="archive" :team-info="data" />
+                            <team-advanced-setting
+                                class="is-single-setting"
+                                variant="archive"
+                                :data="data"
+                                initial-active="other"
+                            />
+                        </div>
+                    </el-tab-pane>
+                </template>
 
-                <el-tab-pane label="团队认证" name="verify" lazy v-if="isSuper">
-                    <template #label>
-                        <el-icon><CircleCheck /></el-icon>
-                        <span>团队认证</span>
-                    </template>
-                    <VerifyOrg />
-                </el-tab-pane>
+                <template v-else>
+                    <el-tab-pane label="我的角色" name="overview" lazy>
+                        <template #label>
+                            <el-icon><User /></el-icon>
+                            <span>我的角色</span>
+                        </template>
+                        <team-role v-if="isLogin" :team_id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="权限管理" name="permission" lazy v-if="isSuper">
-                    <template #label>
-                        <el-icon><Key /></el-icon>
-                        <span>权限管理</span>
-                    </template>
-                    <EditPermission />
-                </el-tab-pane>
+                    <el-tab-pane label="我的战绩" name="history" lazy>
+                        <template #label>
+                            <el-icon><Trophy /></el-icon>
+                            <span>我的战绩</span>
+                        </template>
+                        <myBattle :team-id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="高级配置" name="config" lazy v-if="isSuper">
-                    <template #label>
-                        <el-icon><Tools /></el-icon>
-                        <span>高级配置</span>
-                    </template>
-                    <EditOrgConfig :team-info="data" />
-                </el-tab-pane>
+                    <el-tab-pane label="我的DKP" name="my-dkp" lazy>
+                        <template #label>
+                            <el-icon><Coin /></el-icon>
+                            <span>我的DKP</span>
+                        </template>
+                        <MyDkp :team-id="id" />
+                    </el-tab-pane>
 
-                <el-tab-pane label="其他设置" name="other" lazy v-if="isSuper">
-                    <template #label>
-                        <el-icon><MoreFilled /></el-icon>
-                        <span>其他设置</span>
-                    </template>
-                    <team-advanced-setting
-                        class="is-single-setting"
-                        :data="data"
-                        initial-active="other"
-                    />
-                </el-tab-pane>
+                    <el-tab-pane label="参与的RAID" name="my-raid" lazy>
+                        <template #label>
+                            <el-icon><Calendar /></el-icon>
+                            <span>参与的RAID</span>
+                        </template>
+                        <MyTeamRaid :team-id="id" embedded />
+                    </el-tab-pane>
+                </template>
             </el-tabs>
         </section>
     </div>
@@ -199,36 +217,52 @@ import myBattle from "../battle/myBattle.vue";
 import ManageBattle from "../battle/index.vue";
 import ManageDkp from "../dkp/ManageDkp.vue";
 import MyDkp from "../dkp/MyDkp.vue";
+import ManageRaid from "../raid/ManageRaid.vue";
+import MyTeamRaid from "../raid/MyTeamRaid.vue";
 
 import User from "@jx3box/jx3box-common/js/user.js";
-import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
 import { getAllMyTeams, getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
-import { checkMyAuthority, getPendingCount } from "@/service/team/member.js";
+import { getPendingCount } from "@/service/team/member.js";
 import {
     ArrowRight,
     Avatar,
+    Calendar,
     Camera,
-    CircleCheck,
     Coin,
-    Edit,
-    Key,
-    Medal,
-    MoreFilled,
+    FolderOpened,
     OfficeBuilding,
     Switch,
-    Tools,
     Trophy,
     User as UserIcon,
     VideoCamera,
 } from "@element-plus/icons-vue";
+
+const MEMBER_TABS = ["overview", "history", "my-dkp", "my-raid"];
+const MANAGEMENT_TAB_NAMES = [
+    "manage-member",
+    "manage-battle",
+    "video",
+    "manage-snapshot",
+    "manage-dkp",
+    "manage-raid",
+    "setting",
+];
+const LEGACY_TAB_MAP = {
+    "battle-record": { mode: "manage", tab: "manage-battle" },
+    verify: { mode: "manage", tab: "setting", section: "verify" },
+    permission: { mode: "manage", tab: "setting", section: "permission" },
+    config: { mode: "manage", tab: "setting", section: "advanced" },
+    other: { mode: "manage", tab: "setting", section: "advanced" },
+};
 
 export default {
     name: "ViewMyOrg",
     data: function () {
         return {
             tab: "overview",
-            selectedTeamId: "",
+            archiveSection: "basic",
+            syncingRoute: false,
             teams: [],
             teamsLoading: false,
             teamsLoaded: false,
@@ -250,18 +284,6 @@ export default {
                 v_comment: 0,
             },
             loading: false,
-            authority: {
-                authority: 0,
-                r_dkp: 0,
-                r_member: 0,
-                r_audit: 0,
-                r_plan: 0,
-                r_snapshot: 0,
-                r_drop: 0,
-                r_raid: 0,
-                r_video: 0,
-                r_race: 0,
-            },
             done: false,
             processing: false,
             permissionsLoaded: false,
@@ -288,11 +310,50 @@ export default {
         isLogin: function () {
             return User.isLogin();
         },
-        query: function () {
-            return this.$route.query.tab;
+        routeState: function () {
+            return `${this.$route.query.mode || ""}|${this.$route.query.tab || "overview"}|${
+                this.$route.query.section || ""
+            }`;
         },
         isSuper: function () {
             return this.data.super == this.uid;
+        },
+        managementTabs: function () {
+            const tabs = [];
+            if (this.permissions.r_member || this.isSuper) tabs.push("manage-member");
+            if (this.permissions.r_race || this.isSuper) tabs.push("manage-battle");
+            if (this.permissions.r_video || this.isSuper) tabs.push("video");
+            if (this.permissions.r_snapshot || this.isSuper) tabs.push("manage-snapshot");
+            if (this.permissions.r_dkp || this.isSuper) tabs.push("manage-dkp");
+            if (this.permissions.r_raid || this.isSuper) tabs.push("manage-raid");
+            if (this.isSuper) tabs.push("setting");
+            return tabs;
+        },
+        canManageTeam: function () {
+            return this.managementTabs.length > 0;
+        },
+        workspaceMode: function () {
+            return this.$route.query.mode === "manage" ? "manage" : "member";
+        },
+        isManagementMode: function () {
+            return this.workspaceMode === "manage";
+        },
+        workspaceTitle: function () {
+            return this.isManagementMode ? "团队管理" : "我的团队";
+        },
+        workspaceModeLabel: function () {
+            return this.isManagementMode ? "管理视图" : "成员视图";
+        },
+        workspaceDescription: function () {
+            return this.isManagementMode
+                ? "专注成员、内容、团队数据与基础设置"
+                : "查看我在当前团队中的角色、战绩、DKP 与 RAID";
+        },
+        workspaceSwitchLabel: function () {
+            return this.isManagementMode ? "切换到成员视图" : "切换到管理视图";
+        },
+        workspaceAriaLabel: function () {
+            return this.isManagementMode ? "团队管理功能" : "我的团队信息";
         },
         pendingCount: function () {
             const pendingList = this.$store.state.pendingList;
@@ -300,46 +361,34 @@ export default {
             return pending ? pending?.pending : 0;
         },
         allowedTabs: function () {
-            const tabs = ["overview", "history"];
-            if (this.isLogin) tabs.push("my-dkp");
-            if (this.permissions.r_member || this.isSuper) tabs.push("manage-member");
-            if (this.permissions.r_snapshot || this.isSuper) tabs.push("manage-snapshot");
-            if (this.permissions.r_dkp || this.isSuper) tabs.push("manage-dkp");
-            if (this.permissions.r_raid || this.isSuper) tabs.push("battle-record");
-            if (this.permissions.r_video || this.isSuper) tabs.push("video");
-            if (this.isSuper) tabs.push("setting", "verify", "permission", "config", "other");
-            return tabs;
+            return this.isManagementMode ? this.managementTabs : MEMBER_TABS;
         },
     },
     watch: {
         id: {
             immediate: true,
             handler: function (value) {
-                if (!value) return;
-                this.selectedTeamId = String(value);
+                if (!value) {
+                    this.openFirstTeam();
+                    return;
+                }
                 this.init();
             },
         },
-        query: {
+        routeState: {
             immediate: true,
-            handler: function (value) {
-                this.tab = value || "overview";
-                this.ensureTabAccessible();
+            handler: function () {
+                this.applyRouteState();
             },
         },
         tab: function (value) {
-            if (this.$route.query.tab === value) return;
-            this.$router.replace({
-                query: {
-                    ...this.$route.query,
-                    tab: value,
-                },
-            });
+            if (this.syncingRoute) return;
+            this.replaceRouteState(this.workspaceMode, value, value === "setting" ? this.archiveSection : "");
         },
         permissions: {
             deep: true,
             handler: function () {
-                this.ensureTabAccessible();
+                this.applyRouteState();
             },
         },
     },
@@ -386,27 +435,47 @@ export default {
 
             Promise.allSettled([teamRequest, permissionsRequest]).finally(() => {
                 this.loading = false;
-                this.ensureTabAccessible();
+                this.applyRouteState();
             });
         },
         loadTeams: function () {
-            if (this.teamsLoading) return;
+            if (this.teamsLoaded) return Promise.resolve(this.teams);
+            if (this.teamsLoading) return Promise.resolve([]);
             this.teamsLoading = true;
 
-            getAllMyTeams()
+            return getAllMyTeams()
                 .then((res) => {
                     this.teams = res.data.data || [];
                     this.teams.sort((a, b) => {
                         return a.super == this.uid ? -1 : b.super == this.uid ? 1 : 0;
                     });
                     this.teamsLoaded = true;
+                    return this.teams;
                 })
                 .catch(() => {
                     this.teams = [];
+                    return this.teams;
                 })
                 .finally(() => {
                     this.teamsLoading = false;
                 });
+        },
+        openFirstTeam: function () {
+            if (!User.isLogin()) return;
+
+            this.loadTeams().then((teams) => {
+                if (this.id || !teams.length) return;
+                this.$router.replace({
+                    name: "view_my_org",
+                    params: {
+                        id: teams[0].ID,
+                    },
+                    query: {
+                        mode: "member",
+                        tab: "overview",
+                    },
+                });
+            });
         },
         loadPendingCount: function () {
             getPendingCount()
@@ -415,54 +484,94 @@ export default {
                 })
                 .catch(() => {});
         },
-        checkAuthority: function () {
-            User.isLogin() &&
-                checkMyAuthority(this.id)
-                    .then((res) => {
-                        this.authority = res.data.data;
-                    })
-                    .catch(() => {});
-        },
-        ensureTabAccessible: function () {
-            if (!this.permissionsLoaded || !this.done) return;
-            if (this.allowedTabs.includes(this.tab)) return;
+        normalizeRouteState: function () {
+            const rawMode = this.$route.query.mode;
+            const rawTab = this.$route.query.tab || "overview";
+            const rawSection = this.$route.query.section || "";
+            const legacyState = LEGACY_TAB_MAP[rawTab];
+            let mode = legacyState?.mode || (rawMode === "manage" || rawMode === "member" ? rawMode : "");
+            let tab = legacyState?.tab || rawTab;
+            let section = legacyState?.section || rawSection;
 
-            const fallback = this.allowedTabs[0] || "overview";
-            if (this.tab !== fallback) this.tab = fallback;
-            if (this.$route.query.tab !== fallback) {
-                this.$router.replace({
-                    query: {
-                        ...this.$route.query,
-                        tab: fallback,
-                    },
-                });
+            if (!legacyState && rawTab === "history" && rawSection === "manage") {
+                mode = "manage";
+                tab = "manage-battle";
+                section = "";
+            } else if (!legacyState && rawTab === "my-dkp" && rawSection === "manage") {
+                mode = "manage";
+                tab = "manage-dkp";
+                section = "";
+            } else if (!legacyState && rawTab === "raid") {
+                mode = rawSection === "manage" ? "manage" : "member";
+                tab = rawSection === "manage" ? "manage-raid" : "my-raid";
+                section = "";
             }
+
+            if (!mode) mode = MANAGEMENT_TAB_NAMES.includes(tab) ? "manage" : "member";
+            if (mode === "manage" && !this.canManageTeam) {
+                mode = "member";
+                tab = "overview";
+                section = "";
+            }
+
+            const allowedTabs = mode === "manage" ? this.managementTabs : MEMBER_TABS;
+            if (!allowedTabs.includes(tab)) tab = allowedTabs[0] || "overview";
+
+            if (tab === "setting") {
+                const allowedSections = ["basic", "verify", "permission", "advanced"];
+                section = allowedSections.includes(section) ? section : "basic";
+            } else {
+                section = "";
+            }
+
+            return { rawMode, rawTab, rawSection, mode, tab, section };
+        },
+        applyRouteState: function () {
+            if (!this.permissionsLoaded || !this.done) return;
+
+            const { rawMode, rawTab, rawSection, mode, tab, section } = this.normalizeRouteState();
+            this.syncingRoute = true;
+            this.tab = tab;
+            if (tab === "setting") this.archiveSection = section;
+
+            this.$nextTick(() => {
+                this.syncingRoute = false;
+                if (rawMode !== mode || rawTab !== tab || rawSection !== section) {
+                    this.replaceRouteState(mode, tab, section);
+                }
+            });
+        },
+        replaceRouteState: function (mode, tab, section = "") {
+            if (
+                this.$route.query.mode === mode &&
+                this.$route.query.tab === tab &&
+                (this.$route.query.section || "") === section
+            )
+                return;
+
+            const query = {
+                ...this.$route.query,
+                mode,
+                tab,
+            };
+            if (section) query.section = section;
+            else delete query.section;
+            this.$router.replace({ query });
+        },
+        switchSection: function (section) {
+            this.archiveSection = section;
+            this.replaceRouteState("manage", "setting", section);
+        },
+        switchWorkspaceMode: function () {
+            const mode = this.isManagementMode ? "member" : "manage";
+            const tab = mode === "manage" ? this.managementTabs[0] : "overview";
+            this.replaceRouteState(mode, tab);
         },
         init: function () {
-            this.checkTab();
             this.loadData();
             if (User.isLogin()) {
-                if (!this.teamsLoaded) this.loadTeams();
-                this.checkAuthority();
                 this.loadPendingCount();
             }
-        },
-        checkTab: function () {
-            this.tab = this.$route.query.tab || "overview";
-            this.ensureTabAccessible();
-        },
-        switchTeam: function (teamId) {
-            if (!teamId || String(this.id) === String(teamId)) return;
-            this.$router.push({
-                name: "view_my_org",
-                params: {
-                    id: teamId,
-                },
-                query: {
-                    ...this.$route.query,
-                    tab: this.tab,
-                },
-            });
         },
         submit: function () {
             this.processing = true;
@@ -481,12 +590,6 @@ export default {
                     this.processing = false;
                 });
         },
-        showTeamLogo: function (value) {
-            return value ? getThumbnail(value, 96, true) : require("@/assets/img/team/team_logo_null.svg");
-        },
-        handleTeamLogoError: function (event) {
-            event.target.src = require("@/assets/img/team/team_logo_null.svg");
-        },
     },
     components: {
         "team-role": team_role,
@@ -495,25 +598,23 @@ export default {
         "team-advanced-setting": team_advanced_setting,
         ArrowRight,
         Avatar,
+        Calendar,
         Camera,
-        CircleCheck,
         Coin,
-        Edit,
         EditOrgConfig,
         EditPermission,
-        Key,
-        Medal,
-        MoreFilled,
+        FolderOpened,
         OfficeBuilding,
         SnapshotList,
-        Switch,
-        Tools,
         ListMember,
         ManageVideo,
         myBattle,
         ManageBattle,
         ManageDkp,
+        ManageRaid,
         MyDkp,
+        MyTeamRaid,
+        Switch,
         Trophy,
         User: UserIcon,
         VideoCamera,

@@ -68,7 +68,7 @@
             </el-form>
         </div>
         <div class="m-dkp-logs-container">
-            <el-table class="m-dkp-logs-table" :data="logs" size="small" border empty-text="暂无分值变更记录">
+            <el-table class="m-dkp-logs-table" :data="logs" size="small" empty-text="暂无分值变更记录">
                 <el-table-column label="人员" v-if="!user_id">
                     <template #default="scope">
                         <a :href="authorLink(scope.row.user_id)" target="_blank">

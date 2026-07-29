@@ -6,15 +6,14 @@
             tooltip-effect="dark"
             class="m-dkp-table"
             size="small"
-            border
             ref="dkpTable"
             :default-sort="defaultSort"
             @selection-change="handleSelectionChange"
         >
-            <el-table-column type="selection" width="70" v-if="!readOnly"> </el-table-column>
+            <el-table-column type="selection" width="52" align="center" v-if="!readOnly"> </el-table-column>
             <el-table-column label="人员">
                 <template #default="scope">
-                    <a :href="authorLink(scope.row.uid)" target="_blank">
+                    <a class="u-user" :href="authorLink(scope.row.uid)" target="_blank">
                         <img :src="renderAvatar(scope.row.user_info)" class="u-user-avatar" />
                         <span class="u-user-name">
                             {{ scope.row.user_info && scope.row.user_info.display_name }}

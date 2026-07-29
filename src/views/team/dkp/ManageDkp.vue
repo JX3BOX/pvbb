@@ -55,17 +55,24 @@
             </div>
         </header>
         <div v-if="org" class="m-dkp-box">
-            <el-tabs type="card" v-model="activeTab" class="m-dkp-manage-tabs">
-                <el-tab-pane label="当前分值" name="score">
-                    <template #label> <i class="el-icon-tickets"></i> 当前分值 </template>
-                </el-tab-pane>
-                <el-tab-pane label="历史记录" name="logs">
-                    <template #label> <i class="el-icon-time"></i> 历史记录 </template>
-                </el-tab-pane>
-                <el-tab-pane label="快照关联" name="snapshot">
-                    <template #label> <i class="el-icon-camera"></i> 快照关联 </template>
-                </el-tab-pane>
-            </el-tabs>
+            <nav class="m-dkp-manage-nav" aria-label="DKP管理功能">
+                <button type="button" :class="{ 'is-active': activeTab === 'score' }" @click="activeTab = 'score'">
+                    <i class="el-icon-tickets"></i>
+                    <span>当前分值</span>
+                </button>
+                <button type="button" :class="{ 'is-active': activeTab === 'logs' }" @click="activeTab = 'logs'">
+                    <i class="el-icon-time"></i>
+                    <span>历史记录</span>
+                </button>
+                <button
+                    type="button"
+                    :class="{ 'is-active': activeTab === 'snapshot' }"
+                    @click="activeTab = 'snapshot'"
+                >
+                    <i class="el-icon-camera"></i>
+                    <span>快照关联</span>
+                </button>
+            </nav>
             <keep-alive>
                 <component
                     :is="componentsMaps[activeTab]"

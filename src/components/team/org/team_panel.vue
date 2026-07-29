@@ -75,6 +75,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        showManageAction: {
+            type: Boolean,
+            default: true,
+        },
     },
     data: function () {
         return {
@@ -104,7 +108,7 @@ export default {
             return !this.isMine && !this.isLeader;
         },
         showEditAction: function () {
-            return this.isLeader || this.isSuperAdmin;
+            return this.showManageAction && (this.isLeader || this.isSuperAdmin);
         },
         status: function () {
             return !!this.data.status;
@@ -164,9 +168,14 @@ export default {
         },
         editTeam: function () {
             this.$router.push({
-                name: "edit_org",
+                name: "view_my_org",
                 params: {
                     id: this.team_id,
+                },
+                query: {
+                    mode: "manage",
+                    tab: "setting",
+                    section: "basic",
                 },
             });
         },

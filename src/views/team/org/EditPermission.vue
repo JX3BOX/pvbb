@@ -1,13 +1,18 @@
 <template>
-    <div class="m-permission-panel">
+    <div class="m-permission-panel" :class="{ 'is-archive': isArchive }">
         <div class="m-permission-box" v-if="status">
             <div class="m-permission-header">
+                <div class="m-permission-heading" v-if="isArchive">
+                    <span class="u-heading-mark" aria-hidden="true"></span>
+                    <h2>管理员权限</h2>
+                    <span class="u-admin-count">{{ len }} / {{ limit }}</span>
+                </div>
                 <el-button class="u-btn-add" type="primary" icon="Plus" @click="openDialog" :disabled="len >= limit"
                     >添加管理员
                     <span class="u-limit" :class="{ limit: len >= limit }">({{ len }}/{{ limit }})</span></el-button
                 >
             </div>
-            <div class="m-permission-box">
+            <div class="m-permission-box m-permission-table">
                 <div class="m-permission-list">
                     <el-row :gutter="10" class="m-permission-list-header" type="flex">
                         <el-col :span="2" class="u-leader">用户</el-col>
@@ -24,14 +29,21 @@
                         <el-col :span="1">团队活动</el-col>
                         <el-col :span="1">操作</el-col>
                     </el-row>
-                    <el-row :gutter="10" class="u-super" type="flex" v-for="(item, i) in data" :key="i">
+                    <el-row
+                        :gutter="10"
+                        class="u-super"
+                        :class="{ 'is-founder': item.level == 99 }"
+                        type="flex"
+                        v-for="(item, i) in data"
+                        :key="i"
+                    >
                         <template v-if="item.level == 99">
                             <el-col :span="2" class="u-leader">
                                 <a class="u-leader-link" :href="authorLink(item.user_id)" target="_blank"
                                     ><img class="u-leader-img" :src="showAvatar(item.user_avatar)" /><span
                                         class="u-leader-name"
                                         >{{ item.display_name }}</span
-                                    ></a
+                                    ><em v-if="isArchive" class="u-leader-role">创建者</em></a
                                 >
                             </el-col>
                             <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
@@ -52,7 +64,7 @@
                                         ><img class="u-leader-img" :src="showAvatar(item.user_avatar)" /><span
                                             class="u-leader-name"
                                             >{{ item.display_name }}</span
-                                        ></a
+                                        ><em v-if="isArchive" class="u-leader-role">管理员</em></a
                                     >
                                 </div>
                             </el-col>
@@ -128,7 +140,13 @@
                                 ></el-checkbox
                             ></el-col>
                             <el-col :span="1"
-                                ><el-button type="info" icon="Delete" size="small" plain @click="removeLeader(item)"
+                                ><el-button
+                                    class="u-delete"
+                                    type="info"
+                                    icon="Delete"
+                                    size="small"
+                                    plain
+                                    @click="removeLeader(item)"
                                     >删除</el-button
                                 ></el-col
                             >
@@ -153,6 +171,7 @@
         <userpop
             title="添加管理员"
             :data="leader"
+            :variant="variant"
             class="m-team-leader-dialog"
             v-model="user_pop_status"
             @confirm="addLeader"
@@ -168,7 +187,7 @@ import User from "@jx3box/jx3box-common/js/user";
 import { getAdmins, addAdmin, delAdmin, updateAdmin } from "@/service/team/admin.js";
 export default {
     name: "EditPermission",
-    props: [],
+    props: ["variant", "teamId"],
     data: function () {
         return {
             status: true,
@@ -189,7 +208,10 @@ export default {
     },
     computed: {
         id: function () {
-            return ~~this.$route.params.id;
+            return ~~(this.teamId || this.$route.params.id);
+        },
+        isArchive: function () {
+            return this.variant === "archive";
         },
         len: function () {
             return ~~this.data.length;
@@ -224,21 +246,28 @@ export default {
             }
         },
         removeLeader: function (item) {
-            this.$alert(`确定取消${item.display_name}的管理员身份吗？`, "提醒", {
-                confirmButtonText: "确定",
-                callback: (action) => {
-                    if (action == "confirm") {
-                        delAdmin(this.id, item.user_id).then((res) => {
-                            this.$notify({
-                                title: "成功",
-                                message: res.data.msg,
-                                type: "success",
-                            });
-                            location.reload();
-                        });
-                    }
-                },
-            });
+            this.$confirm(`确定要删除管理员“${item.display_name}”吗？删除后该用户将失去当前团队的管理权限。`, "删除管理员", {
+                confirmButtonText: "确认删除",
+                cancelButtonText: "取消",
+                type: "warning",
+            })
+                .then(() => delAdmin(this.id, item.user_id))
+                .then((res) => {
+                    this.$notify({
+                        title: "成功",
+                        message: res.data.msg,
+                        type: "success",
+                    });
+                    location.reload();
+                })
+                .catch((reason) => {
+                    if (reason === "cancel" || reason === "close") return;
+                    this.$notify({
+                        title: "删除失败",
+                        message: reason?.response?.data?.msg || "请稍后重试",
+                        type: "error",
+                    });
+                });
         },
         updateLeader: function (type, item) {
             let value = item[type];

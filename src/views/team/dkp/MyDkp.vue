@@ -29,53 +29,71 @@
                     </template>
                 </el-tab-pane>
             </el-tabs>
-            <div class="m-dkp-my-overview" v-if="overview" v-loading="overview_loading">
-                <div class="u-dkp-stat">
-                    <span class="u-stat-icon is-score"><el-icon><TrendCharts /></el-icon></span>
-                    <div class="u-stat-content">
-                        <span class="u-stat-label">当前分数</span>
-                        <b :class="{ isNegative: overview.score < 0 }">{{ overview.score }}</b>
+            <template v-if="showAllScores">
+                <section class="m-dkp-all-scores" v-loading="allScoresLoading">
+                    <header class="m-dkp-all-scores__header">
+                        <div>
+                            <h3>全团成绩</h3>
+                            <p>查看当前团队所有成员的历史累计与当前分值。</p>
+                        </div>
+                        <button type="button" class="u-back-my-dkp" @click="showAllScores = false">
+                            <el-icon><ArrowLeft /></el-icon>
+                            <span>返回我的DKP</span>
+                        </button>
+                    </header>
+                    <dkp-list :org="~~org" :read-only="true" />
+                </section>
+            </template>
+            <template v-else>
+                <div class="m-dkp-my-overview" v-if="overview" v-loading="overview_loading">
+                    <div class="u-dkp-stat">
+                        <span class="u-stat-icon is-score"><el-icon><TrendCharts /></el-icon></span>
+                        <div class="u-stat-content">
+                            <span class="u-stat-label">当前分数</span>
+                            <b :class="{ isNegative: overview.score < 0 }">{{ overview.score }}</b>
+                        </div>
                     </div>
-                </div>
-                <div class="u-dkp-stat">
-                    <span class="u-stat-icon is-rank"><el-icon><Trophy /></el-icon></span>
-                    <div class="u-stat-content">
-                        <span class="u-stat-label">当前排名</span>
-                        <b>{{ rank || "-" }}</b>
+                    <div class="u-dkp-stat">
+                        <span class="u-stat-icon is-rank"><el-icon><Trophy /></el-icon></span>
+                        <div class="u-stat-content">
+                            <span class="u-stat-label">当前排名</span>
+                            <b>{{ rank || "-" }}</b>
+                        </div>
                     </div>
-                </div>
-                <div class="u-dkp-stat">
-                    <span class="u-stat-icon is-total"><el-icon><Timer /></el-icon></span>
-                    <div class="u-stat-content">
-                        <span class="u-stat-label">历史累计</span>
-                        <b>{{ overview.total }}</b>
+                    <div class="u-dkp-stat">
+                        <span class="u-stat-icon is-total"><el-icon><Timer /></el-icon></span>
+                        <div class="u-stat-content">
+                            <span class="u-stat-label">历史累计</span>
+                            <b>{{ overview.total }}</b>
+                        </div>
                     </div>
+                    <button type="button" class="u-all-score" @click="showAllTeamScores">
+                        <span>查看全团成绩</span>
+                        <el-icon><ArrowRight /></el-icon>
+                    </button>
                 </div>
-                <router-link class="u-all-score" :to="`/org/${org}?tab=dkp`">
-                    <span>查看全团成绩</span>
-                    <el-icon><ArrowRight /></el-icon>
-                </router-link>
-            </div>
-            <div class="m-dkp-my-history">
-                <div class="m-dkp-section-heading">
-                    <div>
-                        <h3>分值记录</h3>
-                        <p>按角色或分数变动类型筛选历史明细</p>
+                <div class="m-dkp-my-history">
+                    <div class="m-dkp-section-heading">
+                        <div>
+                            <h3>分值记录</h3>
+                            <p>按角色或分数变动类型筛选历史明细</p>
+                        </div>
                     </div>
+                    <dkp-logs :user_id="user_id" :org="~~org" :my-roles="orgs" />
                 </div>
-                <dkp-logs :user_id="user_id" :org="~~org" :my-roles="orgs" />
-            </div>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
-import { getMyJoinedTeams } from "@/service/team/member.js";
+import { getMyJoinedTeams, getMyTeamUsersNoPager } from "@/service/team/member.js";
 import { getTeamMyDkp, getTeamDkpList } from "@/service/team/dkp.js";
 import User from "@jx3box/jx3box-common/js/user";
 import dkp_logs from "@/components/team/dkp/dkp_logs.vue";
-import { ArrowRight, Coin, Timer, TrendCharts, Trophy } from "@element-plus/icons-vue";
+import dkp_list from "@/components/team/dkp/dkp_list.vue";
+import { ArrowLeft, ArrowRight, Coin, Timer, TrendCharts, Trophy } from "@element-plus/icons-vue";
 export default {
     name: "MyDkp",
     props: {
@@ -98,6 +116,8 @@ export default {
 
             logs_loading: false,
             user_id: ~~User.getInfo().uid,
+            showAllScores: false,
+            allScoresLoading: false,
         };
     },
     methods: {
@@ -140,6 +160,23 @@ export default {
             });
         },
         loadDkpLogs: function () {},
+        showAllTeamScores: function () {
+            const teamId = ~~this.org;
+            if (!teamId) return;
+
+            this.showAllScores = true;
+            this.allScoresLoading = true;
+            this.$store.commit("SET_TEAM_MEMBERS", []);
+            getMyTeamUsersNoPager(teamId)
+                .then((res) => {
+                    if (teamId === ~~this.org) {
+                        this.$store.commit("SET_TEAM_MEMBERS", res.data.data.list || []);
+                    }
+                })
+                .finally(() => {
+                    if (teamId === ~~this.org) this.allScoresLoading = false;
+                });
+        },
         loadDkp: function () {
             this.loadDkpOverview();
             this.loadDkpLogs();
@@ -158,12 +195,15 @@ export default {
         },
         org: function (val) {
             if (~~val) {
+                this.showAllScores = false;
                 this.loadDkp();
             }
         },
     },
     components: {
         "dkp-logs": dkp_logs,
+        "dkp-list": dkp_list,
+        ArrowLeft,
         ArrowRight,
         Coin,
         Timer,

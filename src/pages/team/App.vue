@@ -30,21 +30,29 @@
                 :class="{ 'is-team-modern-content': isModernWorkspace }"
                 :style="{ minHeight: keepHeight }"
             >
-                <router-view v-if="isPublic || isLogin" />
-                <section v-else-if="isModernWorkspace" class="m-team-login-state" aria-labelledby="team-login-title">
-                    <span class="u-team-login-icon" aria-hidden="true">
-                        <el-icon><Lock /></el-icon>
-                    </span>
-                    <h1 id="team-login-title">登录后管理我的团队</h1>
-                    <p>查看已加入的团队与关联角色，并管理角色在团队主页的展示状态。</p>
-                    <div class="m-team-login-actions">
-                        <a class="u-team-login-primary" :href="loginUrl">
-                            <span>登录后查看</span>
-                            <el-icon><ArrowRight /></el-icon>
-                        </a>
-                        <router-link class="u-team-login-secondary" to="/">先逛团队广场</router-link>
+                <div v-if="isModernWorkspace" class="m-team-modern-shell">
+                    <div class="m-team-modern-shell__sidebar p-team-home">
+                        <TeamHomeSidebar />
                     </div>
-                </section>
+                    <div class="m-team-modern-shell__content">
+                        <router-view v-if="isPublic || isLogin" />
+                        <section v-else class="m-team-login-state" aria-labelledby="team-login-title">
+                            <span class="u-team-login-icon" aria-hidden="true">
+                                <el-icon><Lock /></el-icon>
+                            </span>
+                            <h1 id="team-login-title">登录后管理我的团队</h1>
+                            <p>查看已加入的团队与关联角色，并管理角色在团队主页的展示状态。</p>
+                            <div class="m-team-login-actions">
+                                <a class="u-team-login-primary" :href="loginUrl">
+                                    <span>登录后查看</span>
+                                    <el-icon><ArrowRight /></el-icon>
+                                </a>
+                                <router-link class="u-team-login-secondary" to="/">先逛团队广场</router-link>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <router-view v-else-if="isPublic || isLogin" />
                 <el-alert v-else title="请先登录" type="warning" description="使用本功能请先登录" show-icon />
             </div>
             <CommonFooter></CommonFooter>
@@ -61,6 +69,7 @@
 <script>
 // import Nav from "@/components/widget/Nav.vue";
 import Nav from "@/components/team/widget/Nav2.vue";
+import TeamHomeSidebar from "@/components/team/org/team_home_sidebar.vue";
 import User from "@jx3box/jx3box-common/js/user";
 import { __Root, __cdn } from "@/utils/config";
 import { ArrowRight, Lock } from "@element-plus/icons-vue";
@@ -99,11 +108,13 @@ export default {
         ArrowRight,
         Lock,
         Nav,
+        TeamHomeSidebar,
     },
 };
 </script>
 
 <style lang="less">
 @import "@/assets/css/team/app.less";
+@import "@/assets/css/team/modules/home-theme.less";
 @import "@/assets/css/team/miniprogram.less";
 </style>

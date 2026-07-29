@@ -1,5 +1,5 @@
 <template>
-    <div class="v-org-list">
+    <div class="v-org-list m-team-role">
         <div class="m-group-role-box" v-if="data && data.length">
             <table class="m-group-role-table">
                 <thead>

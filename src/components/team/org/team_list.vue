@@ -2,7 +2,7 @@
     <div class="m-team-list" :class="{ isIndex }" :aria-busy="loading">
         <div class="m-team-list-header">
             <div class="m-filter">
-                <router-link to="/org/add" class="el-button el-button--primary el-button--large"
+                <router-link v-if="!homeMode" to="/org/add" class="el-button el-button--primary el-button--large"
                     ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
                 >
                 <el-select
@@ -118,6 +118,10 @@
                             :title="medal.name"
                         />
                     </span>
+                    <span class="u-card-enter">
+                        查看团队
+                        <span aria-hidden="true">→</span>
+                    </span>
                 </span>
                 <span class="u-meta">
                     <span class="u-meta-item u-server">
@@ -134,24 +138,25 @@
                             {{ item.super_user_info && item.super_user_info.display_name }}
                         </a>
                     </span>
-                    <div class="u-meta-item u-tag">
-                        <em>类型</em>
-                        <span class="u-tag-list" v-if="item.tags && item.tags.length">
-                            <span
-                                class="u-tag-item"
-                                :class="{ love: tag == '可教学' }"
-                                v-for="(tag, i) in item.tags"
-                                :key="i"
-                                >{{ tag }}</span
-                            >
-                        </span>
-                        <span class="u-tag-list" v-else></span>
-                    </div>
+                </span>
+                <span class="u-tag-list" :class="{ 'is-empty': !item.tags || !item.tags.length }">
+                    <span
+                        class="u-tag-item"
+                        :class="{ love: tag == '可教学' }"
+                        v-for="(tag, i) in item.tags"
+                        :key="i"
+                        >{{ tag }}</span
+                    >
+                    <span v-if="!item.tags || !item.tags.length" class="u-tag-item">类型待补充</span>
                 </span>
                 <span class="u-recruit u-meta">
                     <div class="u-meta-item">
-                        <em>公告</em>
-                        <span :title="item.recruit || item.desc || '-'">{{ item.recruit || item.desc || "-" }}</span>
+                        <em>招募公告</em>
+                        <span
+                            :class="{ 'is-empty': !item.recruit && !item.desc }"
+                            :title="item.recruit || item.desc || '暂未发布招募公告'"
+                            >{{ item.recruit || item.desc || "暂未发布招募公告" }}</span
+                        >
                     </div>
                 </span>
             </router-link>
@@ -174,7 +179,7 @@
             v-if="!isIndex && !loading"
             class="m-team-list-pages"
             background
-            layout="total, prev, pager, next,jumper"
+            :layout="homeMode ? 'prev, pager, next, jumper' : 'total, prev, pager, next, jumper'"
             :hide-on-single-page="true"
             :page-size="per"
             :total="total"
@@ -197,6 +202,7 @@ import { uniq } from "lodash";
 export default {
     name: "TeamList",
     props: ["limit", "isIndex", "homeMode"],
+    emits: ["changePage", "total-change"],
     components: {},
     data: function () {
         return {
@@ -253,6 +259,7 @@ export default {
                     this.total = res.data.data.page.total;
                     this.pages = res.data.data.page.pageTotal;
                     this.data = res.data.data.list || [];
+                    this.$emit("total-change", this.total);
                 })
                 .finally(() => {
                     this.loading = false;

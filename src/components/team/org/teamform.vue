@@ -1,10 +1,20 @@
 <template>
-    <div class="m-team-teamform">
-        <el-form ref="form" :model="form" label-width="90px" size="large" :label-position="position">
-            <el-form-item label="队徽">
+    <div class="m-team-teamform" :class="{ 'is-archive': isArchive }">
+        <el-form
+            ref="form"
+            :model="form"
+            :label-width="isArchive ? 'auto' : '90px'"
+            size="large"
+            :label-position="isArchive ? 'top' : position"
+        >
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>团队身份</h2>
+            </header>
+
+            <el-form-item label="队徽" class="m-team-field is-logo">
                 <UploadLogo v-model="form.logo" />
             </el-form-item>
-            <el-form-item label="团队名称">
+            <el-form-item label="团队名称" class="m-team-field is-name">
                 <el-input
                     v-model="form.name"
                     placeholder="请输入团队名称,不能为纯数字"
@@ -22,7 +32,7 @@
                     团队名称不能为纯数字
                 </div>
             </el-form-item>
-            <el-form-item label="服务器" class="m-team-server">
+            <el-form-item label="服务器" class="m-team-field m-team-server is-server">
                 <el-select
                     placeholder="选择客户端"
                     v-model="form.client"
@@ -42,12 +52,16 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队类型">
+            <el-form-item label="团队类型" class="m-team-field is-tags">
                 <el-select class="u-select-tags" v-model="form.tags" multiple placeholder="请选择（可多选）">
                     <el-option v-for="tag in tags" :key="tag" :label="tag" :value="tag"> </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队简介">
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>对外展示</h2>
+            </header>
+
+            <el-form-item label="团队简介" class="m-team-field is-description">
                 <el-input
                     v-model="form.desc"
                     type="textarea"
@@ -57,7 +71,7 @@
                     :rows="5"
                 ></el-input>
             </el-form-item>
-            <el-form-item label="招募信息">
+            <el-form-item label="招募信息" class="m-team-field is-recruit">
                 <el-input
                     v-model="form.recruit"
                     type="textarea"
@@ -67,13 +81,17 @@
                     :rows="5"
                 ></el-input>
             </el-form-item>
-            <el-form-item label="YY频道">
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>联系与直播</h2>
+            </header>
+
+            <el-form-item label="YY频道" class="m-team-field is-contact">
                 <el-input v-model="form.yy_channel" placeholder="YY频道（非必填）"></el-input>
             </el-form-item>
-            <el-form-item label="QQ群号">
+            <el-form-item label="QQ群号" class="m-team-field is-contact">
                 <el-input v-model="form.qq_group" placeholder="QQ群号（非必填）"></el-input>
             </el-form-item>
-            <el-form-item label="直播间">
+            <el-form-item label="直播间" class="m-team-field is-tv">
                 <div class="m-tv-list">
                     <el-row class="m-tv-item" v-for="(item, index) in tv_list" :key="index + ''">
                         <el-col :span="6"
@@ -124,7 +142,11 @@
                     <el-button type="primary" class="u-add" @click="addTv" icon="Plus">添加直播间</el-button>
                 </div>
             </el-form-item>
-            <el-form-item label="团队成员">
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>内容可见范围</h2>
+            </header>
+
+            <el-form-item label="团队成员" class="m-team-field is-visibility">
                 <el-select v-model.number="form.v_member" placeholder="请选择">
                     <el-option
                         v-for="item in vismap"
@@ -134,7 +156,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队活动">
+            <el-form-item label="团队活动" class="m-team-field is-visibility">
                 <el-select v-model.number="form.v_activity" placeholder="请选择">
                     <el-option
                         v-for="item in vismap"
@@ -144,7 +166,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队DKP">
+            <el-form-item label="团队DKP" class="m-team-field is-visibility">
                 <el-select v-model.number="form.v_dkp" placeholder="请选择">
                     <el-option
                         v-for="item in vismap"
@@ -154,7 +176,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="留言板">
+            <el-form-item label="留言板" class="m-team-field is-visibility">
                 <el-select v-model.number="form.v_comment" placeholder="请选择">
                     <el-option
                         v-for="item in vismap"
@@ -164,7 +186,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item class="m-team-form-actions">
                 <el-button class="u-btn" type="primary" @click="submit" :disabled="building || !ready">{{
                     btn_txt
                 }}</el-button>
@@ -196,7 +218,7 @@ const default_tv = {
 };
 
 export default {
-    props: ["data", "btn_txt", "processing"],
+    props: ["data", "btn_txt", "processing", "variant"],
     data: function () {
         return {
             position: window.innerWidth < 768 ? "top" : "left",
@@ -255,6 +277,9 @@ export default {
         },
     },
     computed: {
+        isArchive: function () {
+            return this.variant === "archive";
+        },
         id: function () {
             return this.$route.params.id;
         },
