@@ -239,6 +239,8 @@ export default {
 
     joke: {
         title: "Câu Nói Vui",
+        loadMore: "Tải thêm",
+        noMore: "Không còn nội dung",
         heroDescription: "Góp nhặt những câu nói dí dỏm, hoặc chia sẻ khoảnh khắc lóe sáng của bạn.",
         backToList: "Quay lại danh sách", gameGuide: "Lấy hoặc đăng câu nói vui trong game", comments: "Bình luận", notFound: "Câu nói vui này không tồn tại hoặc đã bị xóa", returnToList: "Quay lại câu nói vui", retryFromList: "Vui lòng quay lại danh sách và chọn lại một câu nói", searchPlaceholder: "Nhập nội dung tìm kiếm", featured: "Nổi bật", noResults: "Không tìm thấy mục phù hợp", selectAll: "Chọn tất cả", deselectAll: "Bỏ chọn tất cả", markFeatured: "Đặt làm nổi bật", listLoadFailed: "Không thể tải danh sách câu nói vui. Vui lòng thử lại sau.", batchFeaturedTitle: "Nổi bật hàng loạt", selectedAlreadyFeatured: "Tất cả câu nói đã chọn đều đang nổi bật", batchFeaturedConfirm: "Đặt {count} câu nói đã chọn làm nổi bật?", batchFeaturedPartial: "Đã đặt {success} mục, thất bại {failed} mục. Vui lòng thử lại sau.", batchFeaturedSuccess: "Đã đặt {count} câu nói làm nổi bật", publishPlaceholder: "Đăng nhanh một câu nói vui", insertEmotion: "Chèn biểu cảm", selectEmotion: "Chọn biểu cảm", selectSchool: "Chọn môn phái", submit: "Gửi", publishSuccess: "Đăng thành công. Vui lòng chờ duyệt.", error: "Lỗi", notice: "Thông báo", contentRequired: "Nội dung không được để trống", emotionLimit: "Không được quá 10 biểu cảm", digitAlphaLimit: "Nội dung chỉ gồm số hoặc chữ cái không được quá 128 ký tự", chineseLimit: "Nội dung tiếng Trung không được quá 64 ký tự", contentLimit: "Nội dung không được quá 128 ký tự", anonymous: "Ẩn danh", featuredTitle: "Nổi bật", like: "Thích", edit: "Chỉnh sửa", cancelFeatured: "Bỏ nổi bật", delete: "Xóa", selected: "Đã chọn", copy: "Sao chép", copied: "Đã sao chép", copyFailed: "Sao chép thất bại", clipboardDenied: "Trình duyệt không được phép truy cập bảng nhớ tạm. Vui lòng sao chép thủ công.", success: "Thành công", featuredSuccess: "Đặt nổi bật thành công", cancelFeaturedSuccess: "Đã bỏ nổi bật", noAuthorAutoAppraise: "Tác phẩm này không có ID tác giả nên không tự động đánh giá", failed: "Thất bại", autoAppraiseRollbackFailed: "Tự động đánh giá thất bại và hoàn tác cũng thất bại. Vui lòng thử lại sau.", cancelAutoAppraiseFailed: "Hủy tự động đánh giá thất bại; trạng thái nổi bật đã được hoàn tác", autoAppraiseFailed: "Đánh giá tự động thất bại; trạng thái nổi bật đã được hoàn tác", deleteConfirm: "Xóa câu nói vui này?", confirm: "Xác nhận", cancel: "Hủy", deleteSuccess: "Đã xóa", deleteFailed: "Xóa thất bại", deleteUnavailable: "Hiện không thể xóa câu nói này. Vui lòng thử lại sau.",
         keywords: "kinh nghiệm lối chơi,video fan,câu chuyện người chơi,hồi ức,thảo luận",
@@ -258,6 +260,7 @@ export default {
         like: "Thích",
         noEntries: "Không tìm thấy mục phù hợp",
         loadMore: "Tải thêm",
+        noMore: "Không còn nội dung",
         loadError: "Không thể tải danh sách ảnh vui. Vui lòng thử lại sau.",
         anonymous: "Ẩn danh",
         untitled: "Không tiêu đề",

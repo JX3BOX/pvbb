@@ -53,7 +53,7 @@
                 <el-skeleton-item variant="text" class="u-skeleton-page" />
             </div>
             <div class="m-collection-list">
-                <el-skeleton v-for="item in 12" :key="item" animated class="m-collection-skeleton-item">
+                <el-skeleton v-for="item in per" :key="item" animated class="m-collection-skeleton-item">
                     <template #template>
                         <el-skeleton-item variant="image" class="u-skeleton-cover" />
                         <el-skeleton-item variant="text" class="u-skeleton-title" />
@@ -175,9 +175,15 @@ export default {
             this.loadData();
         },
         showCount() {
-            const listWidth = this.$refs.listRef?.clientWidth;
-            this.count = Math.floor(listWidth / 260);
-            this.per = this.isPhone ? 12 : Math.max(this.count, 1) * 4;
+            const list = this.$refs.listRef?.querySelector(".m-collection-list");
+            const columns = list
+                ? window
+                      .getComputedStyle(list)
+                      .gridTemplateColumns.split(" ")
+                      .filter(Boolean).length
+                : 0;
+            this.count = Math.max(columns, 1);
+            this.per = this.isPhone ? Math.ceil(12 / this.count) * this.count : this.count * 4;
         },
     },
     watch: {
@@ -186,8 +192,11 @@ export default {
         },
     },
     mounted() {
-        this.showCount();
-        this.loadData();
+        this.loading = true;
+        this.$nextTick(() => {
+            this.showCount();
+            this.loadData();
+        });
     },
 };
 </script>

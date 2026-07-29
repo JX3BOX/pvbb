@@ -51,18 +51,32 @@
         <el-alert v-else :title="$t('pages.joke.noResults')" type="info" show-icon />
 
         <div v-if="!loading" class="m-joke-footer">
-            <el-pagination
-                v-model:current-page="page"
-                class="m-joke-pagination"
-                background
-                :page-size="per"
-                :hide-on-single-page="true"
-                layout="total, prev, pager, next, jumper,sizes"
-                :total="total"
-                :page-sizes="[10, 30, 50, 70, 90]"
-                @current-change="handleCurrentChange"
-                @size-change="handleSizeChange"
-            />
+            <div class="m-joke-pagination-wrap">
+                <el-button
+                    class="m-joke-load-more"
+                    :type="hasNextPage ? 'primary' : 'info'"
+                    :link="!hasNextPage"
+                    :loading="loadingMore"
+                    :disabled="!hasNextPage"
+                    :icon="hasNextPage ? 'ArrowDown' : ''"
+                    size="large"
+                    @click="appendPage"
+                >
+                    {{ hasNextPage ? $t("pages.joke.loadMore") : $t("pages.joke.noMore") }}
+                </el-button>
+                <el-pagination
+                    v-model:current-page="page"
+                    class="m-joke-pagination"
+                    background
+                    :page-size="per"
+                    :hide-on-single-page="true"
+                    layout="total, prev, pager, next, jumper,sizes"
+                    :total="total"
+                    :page-sizes="[10, 30, 50, 70, 90]"
+                    @current-change="handleCurrentChange"
+                    @size-change="handleSizeChange"
+                />
+            </div>
             <div class="m-joke-reward" v-if="isEditor">
                 <el-button class="m-joke-all" type="primary" size="small" @click="toggleSelectAll">
                     {{ allSelected ? $t("pages.joke.deselectAll") : $t("pages.joke.selectAll") }}
@@ -103,6 +117,7 @@ export default {
     data() {
         return {
             loading: false,
+            loadingMore: false,
             listError: "",
             type: "all",
             star: 0,
@@ -138,6 +153,9 @@ export default {
         },
         allSelected() {
             return !!this.jokes.length && this.jokes.every((item) => this.selectedJokeIds.includes(String(item.id)));
+        },
+        hasNextPage() {
+            return this.page * this.per < this.total;
         },
     },
     watch: {
@@ -274,6 +292,26 @@ export default {
             this.skipTop();
             if (!this.updatePaginationQuery({ page, per: this.per })) {
                 this.loadList();
+            }
+        },
+        async appendPage() {
+            if (this.loading || this.loadingMore || !this.hasNextPage) return;
+
+            const nextPage = this.page + 1;
+            this.loadingMore = true;
+            this.listError = "";
+            try {
+                const res = await getJokes({ ...this.params, page: nextPage });
+                const nextJokes = res?.data?.data?.list || [];
+                const existingIds = new Set(this.jokes.map((item) => String(item.id)));
+                this.jokes = this.jokes.concat(nextJokes.filter((item) => !existingIds.has(String(item.id))));
+                this.total = res?.data?.data?.total || 0;
+                this.page = nextPage;
+                await this.loadLike();
+            } catch (error) {
+                this.listError = this.getRequestErrorMessage(error, this.$t("pages.joke.listLoadFailed"));
+            } finally {
+                this.loadingMore = false;
             }
         },
         loadLike() {

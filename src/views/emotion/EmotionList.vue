@@ -75,30 +75,32 @@
                 <el-alert v-else-if="!loading && !loadError" :title="$t('pages.emotion.noEntries')" type="info" show-icon />
 
                 <div class="m-emotion-footer">
-                    <el-pagination
-                        v-model:current-page="page"
-                        class="m-emotion-pagination"
-                        background
-                        :page-size="per"
-                        :hide-on-single-page="true"
-                        layout="total, prev, pager, next, jumper,sizes"
-                        :total="total"
-                        :page-sizes="[10, 30, 50, 70, 90]"
-                        @current-change="handleCurrentChange"
-                        @size-change="handleSizeChange"
-                    />
-                    <el-button
-                        v-if="!isEditor"
-                        v-show="page < pages"
-                        class="m-emotion-more"
-                        type="primary"
-                        icon="ArrowDown"
-                        size="small"
-                        :disabled="loading"
-                        @click="loadMore"
-                    >
-                        {{ $t("pages.emotion.loadMore") }}
-                    </el-button>
+                    <div class="m-emotion-pagination-wrap">
+                        <el-button
+                            class="m-emotion-more"
+                            :type="hasNextPage ? 'primary' : 'info'"
+                            :link="!hasNextPage"
+                            :loading="loading"
+                            :disabled="!hasNextPage"
+                            :icon="hasNextPage ? 'ArrowDown' : ''"
+                            size="large"
+                            @click="loadMore"
+                        >
+                            {{ hasNextPage ? $t("pages.emotion.loadMore") : $t("pages.emotion.noMore") }}
+                        </el-button>
+                        <el-pagination
+                            v-model:current-page="page"
+                            class="m-emotion-pagination"
+                            background
+                            :page-size="per"
+                            :hide-on-single-page="true"
+                            layout="total, prev, pager, next, jumper,sizes"
+                            :total="total"
+                            :page-sizes="[10, 30, 50, 70, 90]"
+                            @current-change="handleCurrentChange"
+                            @size-change="handleSizeChange"
+                        />
+                    </div>
                 </div>
     </ContentListShell>
 </template>
@@ -171,6 +173,9 @@ export default {
         },
         skeletonItems() {
             return Math.min(Math.max(Number(this.per) || 10, 5), 10);
+        },
+        hasNextPage() {
+            return this.page < this.pages;
         },
     },
     watch: {

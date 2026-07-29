@@ -239,6 +239,8 @@ export default {
 
     joke: {
         title: "Jokes",
+        loadMore: "Load more",
+        noMore: "No more",
         heroDescription: "Collect witty lines from the jianghu, or share your own flash of inspiration.",
         backToList: "Back to list", gameGuide: "Get or post jokes in game", comments: "Comments", notFound: "This joke does not exist or has been deleted", returnToList: "Back to jokes", retryFromList: "Please return to the list and choose a joke again", searchPlaceholder: "Search", featured: "Featured", noResults: "No matching entries found", selectAll: "Select all", deselectAll: "Deselect all", markFeatured: "Mark as featured", listLoadFailed: "Failed to load jokes. Please try again later.", batchFeaturedTitle: "Batch feature", selectedAlreadyFeatured: "All selected jokes are already featured", batchFeaturedConfirm: "Mark {count} selected jokes as featured?", batchFeaturedPartial: "Featured {success}; failed {failed}. Please try again later.", batchFeaturedSuccess: "Marked {count} jokes as featured", publishPlaceholder: "Quickly post a joke", insertEmotion: "Insert emoticon", selectEmotion: "Select an emoticon", selectSchool: "Select school", submit: "Submit", publishSuccess: "Published successfully. Please wait for review.", error: "Error", notice: "Notice", contentRequired: "Content cannot be empty", emotionLimit: "No more than 10 emoticons are allowed", digitAlphaLimit: "Numbers-only or letters-only content cannot exceed 128 characters", chineseLimit: "Chinese content cannot exceed 64 characters", contentLimit: "Content cannot exceed 128 characters", anonymous: "Anonymous", featuredTitle: "Featured", like: "Like", edit: "Edit", cancelFeatured: "Remove featured", delete: "Delete", selected: "Selected", copy: "Copy", copied: "Copied", copyFailed: "Copy failed", clipboardDenied: "The browser cannot access the clipboard. Please copy manually.", success: "Success", featuredSuccess: "Featured successfully", cancelFeaturedSuccess: "Removed from featured successfully", noAuthorAutoAppraise: "This work has no author ID, so automatic appraisal was skipped", failed: "Failed", autoAppraiseRollbackFailed: "Automatic appraisal failed and rollback also failed. Please try again later.", cancelAutoAppraiseFailed: "Automatic removal of appraisal failed; the featured status was restored", autoAppraiseFailed: "Automatic appraisal failed; the featured status was restored", deleteConfirm: "Delete this joke?", confirm: "Confirm", cancel: "Cancel", deleteSuccess: "Deleted successfully", deleteFailed: "Delete failed", deleteUnavailable: "This joke cannot be deleted right now. Please try again later.",
         keywords: "gameplay tips,fan videos,player stories,memoirs,discussion",
@@ -258,6 +260,7 @@ export default {
         like: "Like",
         noEntries: "No matching entries found",
         loadMore: "Load more",
+        noMore: "No more",
         loadError: "Failed to load funny pics. Please try again later.",
         anonymous: "Anonymous",
         untitled: "Untitled",

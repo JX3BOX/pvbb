@@ -79,6 +79,9 @@ export default {
             internalCol: 0, // 内部维护列数
             batchCB: null, // 批处理Promise
             onRender: null, // 渲染完毕回调函数
+            itemResizeObserver: null,
+            itemReflowTimer: null,
+            observedItems: new WeakSet(),
         };
     },
     computed: {
@@ -93,8 +96,15 @@ export default {
     },
     mounted() {
         this.mainW = this.getWidth();
+        if (typeof ResizeObserver !== "undefined") {
+            this.itemResizeObserver = new ResizeObserver(() => this.scheduleItemReflow());
+        }
         this.init();
         this.polling();
+    },
+    beforeUnmount() {
+        this.itemResizeObserver?.disconnect();
+        clearTimeout(this.itemReflowTimer);
     },
     watch: {
         ["list.length"]: {
@@ -252,11 +262,38 @@ export default {
             }
             this.$forceUpdate();
             await this.$nextTick();
+            this.observeItems();
+            this.syncContainerHeight();
             this.onRender &&
                 this.onRender({
                     cause: cause,
                     start: index,
                 });
+        },
+        observeItems() {
+            if (!this.itemResizeObserver) return;
+            this.list.forEach((_, index) => {
+                const item = this.getColDom(index);
+                if (item && !this.observedItems.has(item)) {
+                    this.observedItems.add(item);
+                    this.itemResizeObserver.observe(item);
+                }
+            });
+        },
+        scheduleItemReflow() {
+            clearTimeout(this.itemReflowTimer);
+            this.itemReflowTimer = setTimeout(() => this.repaints(0, 0), 50);
+        },
+        syncContainerHeight() {
+            const main = this.$refs.main;
+            if (!main) return;
+
+            const mainTop = main.getBoundingClientRect().top;
+            const itemBottoms = this.list.map((_, index) => this.getColDom(index)?.getBoundingClientRect().bottom || 0);
+            const measuredHeight = Math.ceil(Math.max(0, ...itemBottoms) - mainTop);
+            if (measuredHeight > this.maxH) {
+                this.maxH = measuredHeight;
+            }
         },
         getMinCol(curIndex) {
             if (!curIndex) {

@@ -239,6 +239,8 @@ export default {
 
     joke: {
         title: "騷話",
+        loadMore: "載入更多",
+        noMore: "沒有更多了",
         heroDescription: "收集江湖裡的妙語連珠，也分享你的靈光一現。",
         backToList: "返回列表", gameGuide: "遊戲內獲取或發布騷話", comments: "評論", notFound: "騷話不存在或已被刪除", returnToList: "返回騷話列表", retryFromList: "請返回列表後重新選擇一條騷話", searchPlaceholder: "請輸入搜尋內容", featured: "精選", noResults: "沒有找到相關條目", selectAll: "全選", deselectAll: "取消全選", markFeatured: "設為精選", listLoadFailed: "騷話列表載入失敗，請稍後重試", batchFeaturedTitle: "批量精選", selectedAlreadyFeatured: "選中的騷話已全部是精選", batchFeaturedConfirm: "確定將選中的 {count} 條騷話設為精選嗎？", batchFeaturedPartial: "成功設定 {success} 條，失敗 {failed} 條，請稍後重試", batchFeaturedSuccess: "已將 {count} 條騷話設為精選", publishPlaceholder: "快速發布一條騷話", insertEmotion: "插入表情", selectEmotion: "選擇表情", selectSchool: "選擇門派", submit: "提交", publishSuccess: "發布成功，請等待審核", error: "錯誤", notice: "提示", contentRequired: "內容不能為空", emotionLimit: "表情個數不能超過10個", digitAlphaLimit: "純數字或純字母內容長度不能超過128個字元", chineseLimit: "中文字元不能超過64個", contentLimit: "內容長度不能超過128個字元", anonymous: "匿名", featuredTitle: "精選", like: "讚", edit: "編輯", cancelFeatured: "取消精選", delete: "刪除", selected: "選中", copy: "複製", copied: "已複製", copyFailed: "複製失敗", clipboardDenied: "瀏覽器未允許存取剪貼簿，請手動複製內容", success: "成功", featuredSuccess: "加精成功", cancelFeaturedSuccess: "取消加精成功", noAuthorAutoAppraise: "該作品無作者ID，未執行自動品鑑", failed: "失敗", autoAppraiseRollbackFailed: "自動品鑑失敗，且回滾失敗，請稍後重試", cancelAutoAppraiseFailed: "自動取消品鑑失敗，已回滾精選狀態", autoAppraiseFailed: "自動品鑑失敗，已回滾精選狀態", deleteConfirm: "此操作將會刪除該條騷話，是否繼續？", confirm: "確定", cancel: "取消", deleteSuccess: "刪除成功", deleteFailed: "刪除失敗", deleteUnavailable: "該條騷話暫時無法刪除，請稍後重試",
         keywords: "玩法心得,同人影音,玩家故事,回憶錄,交流討論",
@@ -258,6 +260,7 @@ export default {
         like: "讚",
         noEntries: "沒有找到相關項目",
         loadMore: "載入更多",
+        noMore: "沒有更多了",
         loadError: "趣圖列表載入失敗，請稍後再試",
         anonymous: "匿名",
         untitled: "無標題",

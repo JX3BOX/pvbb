@@ -239,6 +239,8 @@ export default {
 
     joke: {
         title: "骚话",
+        loadMore: "加载更多",
+        noMore: "没有更多了",
         heroDescription: "收集江湖里的妙语连珠，也分享你的灵光一现。",
         backToList: "返回列表",
         gameGuide: "游戏内获取或发布骚话",
@@ -313,6 +315,7 @@ export default {
         like: "赞",
         noEntries: "没有找到相关条目",
         loadMore: "加载更多",
+        noMore: "没有更多了",
         loadError: "趣图列表加载失败，请稍后重试",
         anonymous: "匿名",
         untitled: "无标题",
