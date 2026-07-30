@@ -1,46 +1,108 @@
 <template>
     <div class="m-team-play" v-loading="loading">
-        <div class="u-add" @click="openDialog" v-if="isMaster">
-            <i class="el-icon-video-camera-solid"></i> 添加赛季通关视频
-        </div>
-        <!-- 视频 -->
+        <header class="m-team-play-header">
+            <div class="u-header-copy">
+                <span class="u-header-icon" aria-hidden="true"><el-icon><VideoCamera /></el-icon></span>
+                <span>
+                    <h2>赛季视频</h2>
+                    <p>管理团队在各赛季活动中的首领通关录像。</p>
+                </span>
+            </div>
+            <el-button class="u-add" type="primary" v-if="isMaster" @click="openDialog">
+                <el-icon><Plus /></el-icon>
+                <span>添加通关视频</span>
+            </el-button>
+        </header>
+
         <team-videos :data="videos" @toEmit="isEmit" :isMine="true" />
-        <!-- 添加视频表单 -->
-        <el-dialog class="m-rank-video-dialog" title="添加/编辑视频" v-model="dialogVisible" :append-to-body="true">
+
+        <el-dialog
+            class="m-rank-video-dialog"
+            v-model="dialogVisible"
+            :title="dialogTitle"
+            width="640px"
+            append-to-body
+            destroy-on-close
+        >
+            <template #header>
+                <div class="m-rank-video-dialog-header">
+                    <span class="u-dialog-icon" aria-hidden="true">
+                        <el-icon><Film /></el-icon>
+                    </span>
+                    <span class="u-dialog-copy">
+                        <b>{{ dialogTitle }}</b>
+                        <em>补充活动、首领和视频信息，提交后将进入审核。</em>
+                    </span>
+                </div>
+            </template>
+
             <div class="m-rank-video-form">
-                <el-form ref="form" :model="video" label-width="80px" :rules="rules">
-                    <el-form-item label="赛事活动" prop="event_id">
-                        <el-select v-model.number="video.event_id" placeholder="请选择">
-                            <el-option v-for="(item, key) of eventsList" :key="key" :label="item.name" :value="item.ID">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="门派天团" prop="is_superstar">
-                        <el-checkbox v-model="video.is_superstar" :true-value="1" :false-value="0"></el-checkbox>
-                    </el-form-item>
-                    <el-form-item label="首领名称" v-if="video.event_id" prop="aid">
-                        <el-select v-model.number="video.aid" placeholder="请选择">
-                            <el-option
-                                v-for="(item, key) of eventsBoss"
-                                :key="key"
-                                :label="item.name"
-                                :value="item.achievement_id"
+                <div class="u-form-notice">
+                    <el-icon aria-hidden="true"><WarningFilled /></el-icon>
+                    <span>请填写与当前团队和首领对应的公开视频地址，避免提交无关内容。</span>
+                </div>
+
+                <el-form ref="form" :model="video" label-position="top" :rules="rules">
+                    <div class="u-form-grid">
+                        <el-form-item label="赛事活动" prop="event_id">
+                            <el-select v-model.number="video.event_id" placeholder="请选择赛事活动">
+                                <el-option
+                                    v-for="item of eventsList"
+                                    :key="item.ID"
+                                    :label="item.name"
+                                    :value="item.ID"
+                                >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="首领名称" prop="aid">
+                            <el-select
+                                v-model.number="video.aid"
+                                :disabled="!video.event_id"
+                                :placeholder="video.event_id ? '请选择首领' : '请先选择赛事活动'"
                             >
-                            </el-option>
-                        </el-select>
+                                <el-option
+                                    v-for="item of eventsBoss"
+                                    :key="item.achievement_id"
+                                    :label="item.name"
+                                    :value="item.achievement_id"
+                                >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </div>
+                    <el-form-item label="视频标题" prop="title">
+                        <el-input v-model.trim="video.title" maxlength="80" show-word-limit placeholder="例如：XX 视角" />
                     </el-form-item>
                     <el-form-item label="视频链接" prop="url">
-                        <el-input v-model="video.url" placeholder="请输入视频网址"></el-input>
+                        <el-input v-model.trim="video.url" placeholder="请输入完整视频网址">
+                            <template #prefix><el-icon><Link /></el-icon></template>
+                        </el-input>
                     </el-form-item>
-                    <el-form-item label="视频标题" prop="title">
-                        <el-input v-model="video.title" placeholder="请注明XX视角"></el-input>
+                    <el-form-item class="u-superstar-field" label="门派天团" prop="is_superstar">
+                        <div class="u-switch-row">
+                            <span>
+                                <b>标记为门派天团视频</b>
+                                <em>开启后将在相关榜单中显示特殊标记。</em>
+                            </span>
+                            <el-switch
+                                v-model="video.is_superstar"
+                                :active-value="1"
+                                :inactive-value="0"
+                                inline-prompt
+                                active-text="是"
+                                inactive-text="否"
+                            />
+                        </div>
                     </el-form-item>
                 </el-form>
             </div>
             <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="submit">确 定</el-button>
+                <div class="m-rank-video-dialog-footer">
+                    <el-button :disabled="submitting" @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" :loading="submitting" @click="submit">
+                        {{ video.ID ? "保存修改" : "提交视频" }}
+                    </el-button>
                 </div>
             </template>
         </el-dialog>
@@ -48,7 +110,6 @@
 </template>
 <script>
 import {
-    getBoss,
     getTeamsList,
     getVideos,
     getVideosMaster,
@@ -57,17 +118,22 @@ import {
     addVideo,
 } from "@/service/team/team.js";
 import team_videos from "@/components/team/org/team_videos.vue";
-import rank_event_boss from "@/assets/data/team/rank_event_boss.json";
 import User from "@jx3box/jx3box-common/js/user";
+import { Film, Link, Plus, VideoCamera, WarningFilled } from "@element-plus/icons-vue";
 export default {
-    name: "ViewVideo",
-    props: ["super"],
-    components: { "team-videos": team_videos },
+    name: "ManageVideo",
+    props: {
+        super: {
+            type: [Number, String],
+            default: 0,
+        },
+    },
+    components: { Film, Link, Plus, VideoCamera, WarningFilled, "team-videos": team_videos },
     data: function () {
         return {
             loading: false,
+            submitting: false,
             dialogVisible: false,
-            bossList: [],
             page: 1,
             per: 16,
             total: 0,
@@ -78,8 +144,8 @@ export default {
             rules: {
                 title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
                 url: [{ required: true, message: "视频链接不能为空", trigger: "blur" }],
-                event_id: [{ required: true, message: "请选择赛事", trigger: " change" }],
-                aid: [{ required: true, message: "请选择BOSS", trigger: " change" }],
+                event_id: [{ required: true, message: "请选择赛事", trigger: "change" }],
+                aid: [{ required: true, message: "请选择首领", trigger: "change" }],
             },
         };
     },
@@ -99,18 +165,15 @@ export default {
         isMaster() {
             return User.getInfo().uid == this.super;
         },
-        rank_event_boss() {
-            return rank_event_boss;
-        },
         eventsBoss() {
-            const index = this.eventsList.findIndex((item) => this.video.event_id == item.ID);
-            return this.eventsList[index].boss_map || [];
+            const event = this.eventsList.find((item) => this.video.event_id == item.ID);
+            return event?.boss_map || [];
+        },
+        dialogTitle() {
+            return this.video.ID ? "编辑赛季视频" : "添加赛季视频";
         },
     },
     watch: {
-        dialogVisible(val) {
-            val && !this.bossList.length ? this.getBossList() : "";
-        },
         page() {
             this.loadVideos();
         },
@@ -150,24 +213,19 @@ export default {
                 this.eventsList = res.data.data.list;
             });
         },
-        // 获取boss列表
-        getBossList() {
-            getBoss().then((res) => {
-                this.bossList = res.data.data.list.reverse();
-            });
-        },
         // 子组件提交数据
         isEmit(data) {
             if (data.page) this.page = data.page;
             if (data.item) {
-                let { ID, event_id, aid, title, url } = data.item;
-                this.restVideo(ID, event_id, aid, title, url);
+                let { ID, event_id, aid, title, url, is_superstar, status } = data.item;
+                this.restVideo(ID, event_id, aid, title, url, is_superstar, status);
                 this.dialogVisible = true;
             }
+            if (data.add) this.openDialog();
             if (data.del) this.del(data.del);
         },
         // 重置视频信息填写信息
-        restVideo(ID, event_id, aid, title, url, status = 0) {
+        restVideo(ID, event_id, aid, title, url, is_superstar = 0, status = 0) {
             this.video = {
                 team_id: ~~this.id,
                 event_id,
@@ -175,17 +233,9 @@ export default {
                 aid,
                 title,
                 url,
+                is_superstar,
                 status,
             };
-        },
-        // 获取对应活动id
-        eventID(id, str = "") {
-            if (!id) return str;
-            const _obj = this.rank_event_boss;
-            for (const key in _obj) {
-                if (_obj[key].indexOf(id) !== -1) str = key;
-            }
-            return str;
         },
         // 重置填写内容并打开弹窗
         openDialog() {
@@ -212,34 +262,23 @@ export default {
         // 提交
         submit: function () {
             this.$refs.form.validate((valid, fields) => {
-                if (valid) {
-                    if (this.video.ID) {
-                        updateVideo(this.video.ID, this.video).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `更新成功`,
-                            });
-                            this.dialogVisible = false;
-                            this.videos_list.forEach((item, key) => {
-                                if (this.video.ID == item.ID) {
-                                    item = this.video;
-                                    this.videos_list[key] = item;
-                                }
-                            });
-                        });
-                    } else {
-                        addVideo(this.video).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `发布成功`,
-                            });
-                            this.dialogVisible = false;
-                            location.reload();
-                        });
-                    }
-                } else {
+                if (!valid) {
                     console.log("error submit!!!", fields);
+                    return;
                 }
+
+                const isEditing = Boolean(this.video.ID);
+                const request = isEditing ? updateVideo(this.video.ID, this.video) : addVideo(this.video);
+                this.submitting = true;
+                request
+                    .then(() => {
+                        this.$message.success(isEditing ? "更新成功" : "发布成功");
+                        this.dialogVisible = false;
+                        this.loadVideos();
+                    })
+                    .finally(() => {
+                        this.submitting = false;
+                    });
             });
         },
     },

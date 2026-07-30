@@ -118,10 +118,6 @@
                             :title="medal.name"
                         />
                     </span>
-                    <span class="u-card-enter">
-                        查看团队
-                        <span aria-hidden="true">→</span>
-                    </span>
                 </span>
                 <span class="u-meta">
                     <span class="u-meta-item u-server">

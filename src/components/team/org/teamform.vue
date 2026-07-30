@@ -187,9 +187,14 @@
                 </el-select>
             </el-form-item>
             <el-form-item class="m-team-form-actions">
-                <el-button class="u-btn" type="primary" @click="submit" :disabled="building || !ready">{{
-                    btn_txt
-                }}</el-button>
+                <el-button
+                    class="u-btn"
+                    type="primary"
+                    :loading="building"
+                    :disabled="building || !ready"
+                    @click="submit"
+                    >{{ btn_txt }}</el-button
+                >
             </el-form-item>
         </el-form>
     </div>

@@ -98,14 +98,18 @@
                         ></a>
                         <em v-else>{{ $t("pages.team.battle.unlinked") }}</em>
                     </div>
-                    <div
-                        class="u-battle-link"
-                        v-if="item.boss_info?.is_rank_boss > 0 || item.aid_info?.event_id"
-                    >
+                    <div class="u-battle-link">
                         <span>{{ $t("pages.team.battle.ranking") }}</span>
-                        <a :href="RankLink" class="u-link" @click.stop target="_blank" rel="noopener noreferrer"
+                        <a
+                            v-if="hasRanking"
+                            :href="RankLink"
+                            class="u-link"
+                            @click.stop
+                            target="_blank"
+                            rel="noopener noreferrer"
                             >{{ $t("pages.team.battle.view") }} <i class="el-icon-arrow-right"></i
                         ></a>
+                        <em v-else aria-hidden="true">—</em>
                     </div>
                 </div>
             </section>
@@ -149,6 +153,9 @@ export default {
                 return `/rank/#/${aid_info.event_id}/rank?aid=${aid_info.achievement_id}`;
             }
             return "";
+        },
+        hasRanking() {
+            return this.item.boss_info?.is_rank_boss > 0 || Boolean(this.item.aid_info?.event_id);
         },
     },
     methods: {

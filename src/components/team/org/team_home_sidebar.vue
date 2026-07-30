@@ -44,7 +44,6 @@
             <header class="m-team-home-sidebar__section-header">
                 <div>
                     <h2 id="team-home-workspace-title">团队工作区</h2>
-                    <span v-if="isLogin && !loading">{{ workspaceTeamCount }}</span>
                 </div>
                 <router-link v-if="isLogin" to="/org/add">创建</router-link>
             </header>
@@ -88,7 +87,6 @@
                         </span>
                         <span class="u-sidebar-group-copy">
                             <strong>我管理的团队</strong>
-                            <small>成员、内容、数据与设置</small>
                         </span>
                         <span class="u-sidebar-group-count">{{ managedTeams.length }}</span>
                         <el-icon class="u-sidebar-group-arrow"><ArrowDown /></el-icon>
@@ -135,7 +133,6 @@
                         </span>
                         <span class="u-sidebar-group-copy">
                             <strong>我的团队</strong>
-                            <small>角色、战绩、DKP 与 RAID</small>
                         </span>
                         <span class="u-sidebar-group-count">{{ teams.length }}</span>
                         <el-icon class="u-sidebar-group-arrow"><ArrowDown /></el-icon>

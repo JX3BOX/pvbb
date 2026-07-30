@@ -175,19 +175,6 @@
             line-height: 20px;
         }
 
-        div > span {
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            border-radius: 10px;
-            background: @team-primary-soft;
-            color: @team-primary;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 20px;
-            text-align: center;
-        }
-
         > a {
             color: @team-text-muted;
             font-size: 12px;
@@ -236,9 +223,9 @@
         display: grid;
         width: 100%;
         min-width: 0;
-        min-height: 62px;
+        min-height: 52px;
         align-items: center;
-        padding: 9px @team-space-2;
+        padding: 8px @team-space-2;
         border: 0;
         background: transparent;
         color: @team-text-secondary;
@@ -284,23 +271,13 @@
         min-width: 0;
         flex-direction: column;
 
-        strong,
-        small {
+        strong {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-
-        strong {
             color: @team-text-primary;
             font-size: 13px;
             line-height: 19px;
-        }
-
-        small {
-            color: @team-text-muted;
-            font-size: 10px;
-            line-height: 16px;
         }
     }
 
@@ -984,33 +961,6 @@
             width: 20px;
             height: 20px;
             flex: none;
-        }
-
-        .u-card-enter {
-            display: inline-flex;
-            min-height: 26px;
-            align-items: center;
-            flex: none;
-            margin-left: auto;
-            color: @team-text-muted;
-            font-size: 12px;
-            font-weight: 500;
-            gap: 4px;
-            transition: color @team-duration-fast @team-ease-standard;
-
-            > span {
-                font-size: 15px;
-                line-height: 1;
-                transition: transform @team-duration-fast @team-ease-standard;
-            }
-        }
-
-        &:hover .u-card-enter {
-            color: @team-primary;
-
-            > span {
-                transform: translateX(2px);
-            }
         }
 
         .u-meta {

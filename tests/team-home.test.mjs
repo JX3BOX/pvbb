@@ -17,7 +17,7 @@ test("team home uses a personal workbench beside the discovery workspace", async
 
     assert.match(app, /class="m-team-modern-shell"/);
     assert.match(app, /<TeamHomeSidebar\s*\/>/);
-    assert.match(app, /\["index", "view_my_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(app, /\["index", "view_my_org", "add_org"\]\.includes\(this\.\$route\.name\)/);
     assert.doesNotMatch(page, /TeamHomeSidebar/);
     assert.match(page, /class="u-team-home-action is-primary" to="\/org\/add"/);
     assert.match(sidebar, /getAllMyTeams\(\)/);
@@ -25,12 +25,40 @@ test("team home uses a personal workbench beside the discovery workspace", async
     assert.match(sidebar, /User\.isLogin\(\)/);
     assert.match(sidebar, /<strong>我管理的团队<\/strong>/);
     assert.match(sidebar, /<strong>我的团队<\/strong>/);
+    assert.doesNotMatch(sidebar, /<span v-if="isLogin && !loading">\{\{ workspaceTeamCount \}\}<\/span>/);
+    assert.doesNotMatch(sidebar, /成员、内容、数据与设置/);
+    assert.doesNotMatch(sidebar, /角色、战绩、DKP 与 RAID/);
     assert.match(sidebar, /:aria-expanded="expandedGroups\.manage"/);
     assert.match(sidebar, /:aria-expanded="expandedGroups\.member"/);
     assert.match(list, /v-if="!homeMode" to="\/org\/add"/);
     assert.match(shell, /\.m-main\.is-team-modern-content[\s\S]*padding:\s*24px 24px 32px 12px/);
     assert.match(shell, /\.m-team-modern-shell[\s\S]*max-width:\s*none/);
     assert.match(shell, /grid-template-columns:\s*280px minmax\(0, 1fr\)/);
+});
+
+test("team creation reuses the modern workspace and grouped archive form language", async () => {
+    const [app, page, form, styles] = await Promise.all([
+        read("../src/pages/team/App.vue"),
+        read("../src/views/team/org/AddOrg.vue"),
+        read("../src/components/team/org/teamform.vue"),
+        read("../src/assets/css/team/org/add_org.less"),
+    ]);
+
+    assert.match(app, /\["index", "view_my_org", "add_org"\]/);
+    assert.match(page, /class="v-org-add p-team-create"/);
+    assert.match(page, /class="m-team-create__hero"/);
+    assert.match(page, /variant="archive"/);
+    assert.match(page, /正在检查创建权限/);
+    assert.match(page, /name:\s*"view_my_org"/);
+    assert.match(page, /v_member:\s*0/);
+    assert.match(page, /v_dkp:\s*0/);
+    assert.match(page, /v_activity:\s*0/);
+    assert.match(page, /v_comment:\s*0/);
+    assert.doesNotMatch(page, /带有必填校验的项目会在提交时提示/);
+    assert.doesNotMatch(page, /class="m-title"/);
+    assert.match(form, /:loading="building"/);
+    assert.match(styles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
+    assert.match(styles, /\.m-team-create__workspace[\s\S]*border-radius:\s*@team-radius-panel/);
 });
 
 test("team home sidebar has loading, error, empty and unauthenticated states", async () => {
@@ -182,6 +210,7 @@ test("team role table follows the archive certification table language", async (
     assert.match(role, /class="v-org-list m-team-role"/);
     assert.match(styles, /\.m-team-role[\s\S]*\.m-group-role-box[\s\S]*border-radius:\s*12px/);
     assert.match(styles, /\.m-team-role[\s\S]*\.m-group-role-table[\s\S]*border-collapse:\s*separate/);
+    assert.match(styles, /\.u-role__mount[\s\S]*justify-content:\s*flex-start/);
     assert.match(styles, /tbody tr:last-child td[\s\S]*border-bottom:\s*0/);
 });
 
@@ -286,6 +315,7 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     assert.match(page, /@total-change="updateTeamTotal"/);
     assert.match(list, /this\.\$emit\("total-change", this\.total\)/);
     assert.doesNotMatch(list, /m-team-results-header/);
+    assert.doesNotMatch(list, /u-card-enter/);
     assert.match(list, /暂未发布招募公告/);
     assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
 });
