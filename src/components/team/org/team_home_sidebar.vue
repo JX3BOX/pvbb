@@ -113,10 +113,13 @@
                                     <strong>{{ team.name }}</strong>
                                     <small>{{ team.server || "服务器未填写" }}</small>
                                 </span>
-                                <span v-if="team.super == uid" class="u-sidebar-team-role" title="我创建的团队"
-                                    >团长</span
+                                <span
+                                    class="u-sidebar-team-role"
+                                    :class="team.super == uid ? 'is-founder' : 'is-admin'"
+                                    :title="team.super == uid ? '团队创始人' : '团队管理员'"
                                 >
-                                <el-icon v-else class="u-sidebar-team-arrow"><ArrowRight /></el-icon>
+                                    {{ team.super == uid ? "创始人" : "管理员" }}
+                                </span>
                             </router-link>
                         </template>
                         <p v-else class="u-sidebar-group-empty">当前没有可管理的团队</p>
@@ -260,7 +263,7 @@ export default {
             return ["list_raid", "view_raid"].includes(this.$route.name);
         },
         workspaceMode: function () {
-            return this.$route.query.mode === "manage" ? "manage" : "member";
+            return this.$route.meta.workspaceMode || "member";
         },
         workspaceTeamCount: function () {
             return this.uniqueTeams([...this.teams, ...this.managedTeams]).length;
@@ -270,7 +273,7 @@ export default {
         workspaceMode: {
             immediate: true,
             handler: function (mode) {
-                if (!this.isLogin || this.$route.name !== "view_my_org") return;
+                if (!this.isLogin || !["view_my_org", "manage_my_org"].includes(this.$route.name)) return;
                 this.expandedGroups[mode] = true;
             },
         },
@@ -324,17 +327,13 @@ export default {
         },
         teamRoute: function (team, mode) {
             return {
-                name: "view_my_org",
+                name: mode === "manage" ? "manage_my_org" : "view_my_org",
                 params: { id: team.ID },
-                query: {
-                    mode,
-                    tab: mode === "manage" ? "manage-member" : "overview",
-                },
             };
         },
         isActiveTeam: function (team, mode) {
             return (
-                this.$route.name === "view_my_org" &&
+                ["view_my_org", "manage_my_org"].includes(this.$route.name) &&
                 String(team.ID) === String(this.$route.params.id) &&
                 this.workspaceMode === mode
             );

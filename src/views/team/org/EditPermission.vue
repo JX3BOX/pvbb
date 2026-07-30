@@ -55,6 +55,7 @@
                             <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
                             <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
                             <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
+                            <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
                             <el-col :span="1"></el-col>
                         </template>
                         <template v-else>
@@ -117,7 +118,6 @@
                                     v-model="item.r_dkp"
                                     :true-value="1"
                                     :false-value="0"
-                                    disabled
                                     @change="updateLeader('r_dkp', item)"
                                 ></el-checkbox
                             ></el-col>
@@ -126,7 +126,6 @@
                                     v-model="item.r_drop"
                                     :true-value="1"
                                     :false-value="0"
-                                    disabled
                                     @change="updateLeader('r_drop', item)"
                                 ></el-checkbox
                             ></el-col>
@@ -135,7 +134,6 @@
                                     v-model="item.r_raid"
                                     :true-value="1"
                                     :false-value="0"
-                                    disabled
                                     @change="updateLeader('r_raid', item)"
                                 ></el-checkbox
                             ></el-col>
@@ -147,7 +145,7 @@
                                     size="small"
                                     plain
                                     @click="removeLeader(item)"
-                                    >删除</el-button
+                                    >移除</el-button
                                 ></el-col
                             >
                         </template>
@@ -246,8 +244,8 @@ export default {
             }
         },
         removeLeader: function (item) {
-            this.$confirm(`确定要删除管理员“${item.display_name}”吗？删除后该用户将失去当前团队的管理权限。`, "删除管理员", {
-                confirmButtonText: "确认删除",
+            this.$confirm(`确定要移除管理员“${item.display_name}”吗？移除后该用户将失去当前团队的管理权限。`, "移除管理员", {
+                confirmButtonText: "确认移除",
                 cancelButtonText: "取消",
                 type: "warning",
             })
@@ -263,7 +261,7 @@ export default {
                 .catch((reason) => {
                     if (reason === "cancel" || reason === "close") return;
                     this.$notify({
-                        title: "删除失败",
+                        title: "移除失败",
                         message: reason?.response?.data?.msg || "请稍后重试",
                         type: "error",
                     });

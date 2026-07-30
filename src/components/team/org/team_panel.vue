@@ -168,12 +168,11 @@ export default {
         },
         editTeam: function () {
             this.$router.push({
-                name: "view_my_org",
+                name: "manage_my_org",
                 params: {
                     id: this.team_id,
                 },
                 query: {
-                    mode: "manage",
                     tab: "setting",
                     section: "basic",
                 },

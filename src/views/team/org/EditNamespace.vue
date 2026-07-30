@@ -120,7 +120,7 @@ export default {
         verifyLink: function () {
             if (this.variant === "archive") {
                 return {
-                    name: "view_my_org",
+                    name: "manage_my_org",
                     params: { id: this.team_id },
                     query: { tab: "setting", section: "verify" },
                 };

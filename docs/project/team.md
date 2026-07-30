@@ -23,7 +23,7 @@
 
 这套划分与当前代码大体一致，但当前实现不是 8 个完全隔离的应用模块：
 
-- `/my/org/:id` 是当前统一的团队工作台，已经把档案、成员、视频、战绩、快照、DKP、排表按权限组合成页签。
+- `/manage/org/:id` 与 `/my/org/:id` 共用统一团队工作台，分别承载管理视图和成员视图；档案、成员、视频、战绩、快照、DKP、排表按权限组合成页签。
 - `/org/:id` 是团队对外主页，负责公开信息的聚合展示。
 - `battle` 才是“战绩”；`raid` 才是当前真正的“排表/开团报名”。
 - `plan` 名为“活动规划”，但目前主要是静态示例，不能视为已经可用的排表模块。
@@ -42,7 +42,7 @@
 | 统一样式入口 | `src/assets/css/team/app.less` | 团队应用布局及现代工作台外壳 |
 | 设计令牌 | `src/assets/css/team/design-system/_tokens.less` | 团队模块颜色、间距、圆角、阴影、动效 |
 
-应用外壳把 `index`、`view_my_org`、`add_org` 视为现代工作区；其它历史路由仍使用面包屑和 `Nav2.vue` 旧侧栏。
+应用外壳把 `index`、`view_my_org`、`manage_my_org`、`add_org` 等视为现代工作区；其它历史路由仍使用面包屑和 `Nav2.vue` 旧侧栏。
 
 ## 3. 核心入口与两种视图
 
@@ -58,27 +58,36 @@
 
 ### 3.2 团队工作台
 
-- 路由：`/team/my/org/:id?`
+- 管理路由：`/team/manage/org/:id`
+- 成员路由：`/team/my/org/:id?`
 - 页面：`src/views/team/org/ViewMyOrg.vue`
-- 身份参数：`mode=manage|member`
-- 页签参数：`tab=...`
-- 档案子区域：`section=basic|verify|permission|advanced`
+- 视图身份由路径表达，不再使用 `mode=manage|member` 查询参数。
+- 页签参数：`tab=...`；默认页签省略该参数。
+- 团队设置子区域：`section=basic|verify|permission|feature|other|advanced`
+
+旧地址 `/team/my/org/:id?mode=manage...` 会保留 `tab`、`section` 并自动迁移到管理路由；`mode=member` 会被清理为成员路由。
+
+管理页顶部只承担“当前正在管理哪个团队”的识别作用，保留团队 Logo、名称、服务器、团队 ID、创始人/管理员身份、认证状态和团队主页入口。公告、招募、百科、直播、YY、QQ群、好评等公开团队资料不在管理页头部重复展示，管理功能紧接着以页签呈现。Web 与后续 App 应沿用该信息层级。
+
+团队设置分为“基本设置 / 团队认证 / 权限管理 / 功能设置 / 其它设置 / 高级设置”：功能设置只承载快照密码和 DKP 制度；其它设置承载团队铭牌和团队海报；高级设置只保留移交团队、删除团队等高风险操作。PC 与后续 App 都应保持这组业务边界，不按组件历史位置重新混排。
+
+高级设置中的移交和删除使用实色警示按钮，并且不得由按钮直接调用接口。移交需要先选择并校验目标 UID，再显示包含团队名、目标 UID 和后果说明的二次确认；删除需要显示不可恢复说明并二次确认，用户取消或关闭确认框时不执行请求。
 
 管理视图按权限显示：
 
 | 页签 | 权限字段 | 主要组件 |
 | --- | --- | --- |
-| 成员管理 | `r_member` 或团长 | `member/ListMember.vue` |
-| 战绩管理 | `r_race` 或团长 | `battle/index.vue` |
-| 视频管理 | `r_video` 或团长 | `org/ManageVideo.vue` |
-| 快照管理 | `r_snapshot` 或团长 | `snapshot/ListSnapshot.vue` |
-| DKP 管理 | `r_dkp` 或团长 | `dkp/ManageDkp.vue` |
-| RAID 管理 | `r_raid` 或团长 | `raid/ManageRaid.vue` |
-| 团队档案 | 仅团长 | 档案表单、认证、权限、高级设置 |
+| 成员管理 | `r_member` 或创始人 | `member/ListMember.vue` |
+| 战绩管理 | `r_race` 或创始人 | `battle/index.vue` |
+| 视频管理 | `r_video` 或创始人 | `org/ManageVideo.vue` |
+| 快照管理 | `r_snapshot` 或创始人 | `snapshot/ListSnapshot.vue` |
+| DKP 管理 | `r_dkp` 或创始人 | `dkp/ManageDkp.vue` |
+| RAID 管理 | `r_raid` 或创始人 | `raid/ManageRaid.vue` |
+| 团队设置 | 仅创始人 | 档案表单、认证、权限、功能、其它及高级设置 |
 
 成员视图显示：我的角色、我的战绩、我的 DKP、参与的 RAID。
 
-团队信息来自 `GET /api/team/info/:id`，管理权限来自 `GET /api/team/my-team/:id/manage/power-list`。团长通过 `team.super == 当前 uid` 获得完整管理能力。
+团队信息来自 `GET /api/team/info/:id`，管理权限来自 `GET /api/team/my-team/:id/manage/power-list`。创始人通过 `team.super == 当前 uid` 获得完整管理能力。
 
 ### 3.3 团队公开主页
 
@@ -99,9 +108,21 @@
 
 ### 4.1 档案
 
+#### 产品定义与跨端约束
+
+“档案”就是团队实体本身的 **CUD**：创建（Create）、更新（Update）和删除（Delete）。它负责建立和维护一支团队的身份与基础资料，不等同于团队主页，也不承接成员、视频、战绩、快照、DKP、排表等独立业务的内容管理。
+
+后续 PC 与 App 应沿用同一业务思路：
+
+- 创建团队后得到稳定的团队 ID，再进入该团队的管理工作区。
+- 更新围绕同一个团队实体进行，包括基础资料、公开范围、认证、管理员权限、功能设置、其它外观设置和高级操作。
+- 删除是创始人专属的高风险操作，必须与普通资料更新分开呈现并二次确认。
+- 团队主页只消费档案及其它模块允许公开的数据，不反向承担档案编辑。
+- 跨端应复用真实接口、权限字段和数据合同；页面结构与交互按 PC/App 各自的使用场景实现，不照搬布局。
+
 #### 职责
 
-团队创建、基础资料、招募信息、联系方式、直播信息、内容公开范围、认证、管理员权限、高级设置、命名空间、移交和删除。
+团队创建、基础资料、招募信息、联系方式、直播信息、内容公开范围、认证、管理员权限、功能设置、铭牌与海报、移交和删除。
 
 #### 路由
 
@@ -111,13 +132,13 @@
 | `/org/manage` | `org/ManageOrg.vue` | 历史团队管理列表 |
 | `/org/edit/:id` | `org/EditOrg.vue` | 历史独立设置页 |
 | `/org/verify/:id` | `org/VerifyOrg.vue` | 历史独立认证页 |
-| `/my/org/:id?mode=manage&tab=setting` | `org/ViewMyOrg.vue` | 当前统一档案入口 |
+| `/manage/org/:id?tab=setting` | `org/ViewMyOrg.vue` | 当前统一档案入口 |
 
 #### 主要文件
 
 - `components/team/org/teamform.vue`：创建和编辑共用的基础表单。
-- `components/team/org/team_advanced_setting.vue`：高级功能组合。
-- `views/team/org/EditOrgConfig.vue`：可见范围、快照密码、DKP 规则等配置。
+- `components/team/org/team_advanced_setting.vue`：移交、删除等高级操作。
+- `views/team/org/EditOrgConfig.vue`：快照密码、DKP 规则和团队海报配置。
 - `views/team/org/EditPermission.vue`：管理员及权限分配。
 - `views/team/org/EditNamespace.vue`：团队命名空间。
 - `views/team/org/VerifyOrg.vue`：团队认证申请。
@@ -132,6 +153,15 @@
 - `/api/team/my-team/:id/manage/admin...`：管理员 CRUD。
 - `/api/cms/team/:id/verify`：认证申请与记录。
 - `/api/cms/namespace/team`：团队命名空间。
+
+#### 团队海报的数据合同
+
+团队海报使用团队对象的 `banner` 字符串字段，交互分为两步：
+
+1. 选择图片后，上传组件以 `multipart/form-data` 请求 `POST /api/cms/upload`，文件字段为 `file`；取返回值 `res.data.data[0]` 作为图片地址。
+2. 点击“保存海报”后，请求 `PATCH /api/team/my-team/:id`，请求体为 `{ "banner": "图片地址" }`，才会把地址写入团队档案。
+
+已有海报随 `GET /api/team/info/:id` 返回，从团队对象的 `banner` 字段回填。预览使用缩略图工具，但保存的仍是 CMS 上传接口返回的原始地址字符串；移除预览只会先把本地值清空，仍需保存，最终提交 `{ "banner": "" }`。
 
 #### 当前判断
 
@@ -183,11 +213,11 @@
 
 #### 团队管理员侧成员管理
 
-- 当前入口：`/my/org/:id?mode=manage&tab=manage-member`。
+- 当前入口：`/manage/org/:id`；默认直接进入成员管理页签。
 - 容器：`views/team/member/ListMember.vue`。
 - 正式团员：`UserList.vue` + `MemberItem.vue`，按账号查看并管理其角色。
 - 加入申请：`PendingList.vue`，支持批准与拒绝。
-- 权限：`r_member` 或团长。
+- 权限：`r_member` 或创始人。
 
 关键接口包括：
 
@@ -217,7 +247,7 @@
 - `PUT /api/team/video/:id`：编辑。
 - `DELETE /api/team/video/:id`：删除。
 
-管理权限为 `r_video` 或团长。当前没有单独的视频顶层路由，管理和展示都嵌在团队上下文中，这与业务归属是合理的。
+管理权限为 `r_video` 或创始人。当前没有单独的视频顶层路由，管理和展示都嵌在团队上下文中，这与业务归属是合理的。
 
 ### 4.5 战绩
 
@@ -237,7 +267,7 @@
 - `POST /api/team/my-race-rank/records/item/:id/bind-battle`：绑定战斗数据。
 - `GET /api/cms/team/boss_aid`：首领配置。
 
-管理权限为 `r_race` 或团长。这里的“战绩”与公开主页中的 `team_trophy.vue` 有展示层关联，但不是 `raid` 排表。
+管理权限为 `r_race` 或创始人。这里的“战绩”与公开主页中的 `team_trophy.vue` 有展示层关联，但不是 `raid` 排表。
 
 ### 4.6 快照
 
@@ -247,7 +277,7 @@
 - 历史路由：`/snapshot/list`、`/snapshot/add`、`/snapshot/edit/:id`。
 - 页面：`snapshot/ListSnapshot.vue`、`AddSnapshot.vue`。
 - 组件：`snapshotList.vue`、`snapshotItem.vue`、`snapshotDetail.vue`、`snapshotBody.vue`、`snapshotRole.vue`、`snapshotStat.vue`、`snapshotChart.vue`。
-- 高级设置：`snapshot/EditPassword.vue`。
+- 功能设置：`snapshot/EditPassword.vue`。
 
 #### 接口
 
@@ -259,7 +289,7 @@
 - `GET /api/team/snapshot/team/:teamId/more`：按时间查看更多/统计。
 - `POST /api/team/snapshot/record/:id/dkp`：将快照同步到 DKP。
 
-管理权限为 `r_snapshot` 或团长。公开主页的快照页签目前已注释，因此当前可确认的是“管理能力存在”，不能说“访客可在主页查看快照”。
+管理权限为 `r_snapshot` 或创始人。公开主页的快照页签目前已注释，因此当前可确认的是“管理能力存在”，不能说“访客可在主页查看快照”。
 
 ### 4.7 DKP
 
@@ -280,7 +310,7 @@
 - 重置 DKP、配置 DKP 规则。
 - 从快照同步成员/DKP 数据。
 
-DKP 同时使用 Team API 和 CMS API；管理权限为 `r_dkp` 或团长，公开查看还受团队 `v_dkp` 设置控制。
+DKP 同时使用 Team API 和 CMS API；管理权限为 `r_dkp` 或创始人，公开查看还受团队 `v_dkp` 设置控制。
 
 ### 4.8 排表（RAID）
 
@@ -314,7 +344,7 @@ DKP 同时使用 Team API 和 CMS API；管理权限为 `r_dkp` 或团长，公�
 
 RAID 主数据位于 CMS：`/api/cms/team/raid...`；角色搜索来自 Team API。接口支持活动 CRUD、模板 CRUD、公开搜索、我的报名、置顶、退出，以及正式/替补/候选成员的新增、转换、拒绝、移除和排序。
 
-管理权限为 `r_raid` 或团长。
+管理权限为 `r_raid` 或创始人。
 
 #### 与 plan 的区别
 
@@ -343,12 +373,18 @@ RAID 主数据位于 CMS：`/api/cms/team/raid...`；角色搜索来自 Team API
 
 ## 6. 权限模型
 
-当前权限不是简单的“团长/团员”二元判断：
+当前权限不是简单的“创始人/团员”二元判断：
 
 - **访客**：浏览团队广场、公开团队主页、活动大厅和公开 RAID 详情。
 - **登录用户/团员**：查看自己在团队中的角色、战绩、DKP 和已参与 RAID。
 - **管理员**：由团队权限列表获得一个或多个业务权限。
-- **团长**：`team.super == uid`，拥有全部管理页签，并独占团队档案设置。
+- **创始人**：`team.super == uid`，拥有全部管理页签，并独占团队档案设置。
+
+团队管理列表的身份标签在 Web 与后续 App 中统一使用以下判定：
+
+- `team.super == 当前 uid`：显示“创始人”。
+- 团队出现在当前用户的可管理列表中、但 `team.super != 当前 uid`：显示“管理员”。
+- 管理列表不再使用“团长”标签，也不以无标签的箭头代替“管理员”身份。
 
 主要权限字段：
 
@@ -361,7 +397,8 @@ RAID 主数据位于 CMS：`/api/cms/team/raid...`；角色搜索来自 Team API
 | `r_dkp` | DKP 管理 |
 | `r_raid` | RAID/排表管理 |
 | `r_plan` | 历史活动规划权限，当前统一工作台未使用 |
-| `r_audit`、`r_drop` | 仍存在于数据结构，需结合服务端业务进一步确认 |
+| `r_drop` | 金团账目；管理员权限界面允许分配，当前统一工作台尚无对应页签 |
+| `r_audit` | 仍存在于数据结构，需结合服务端业务进一步确认 |
 
 路由的 `meta.isPublic` 只负责第一层登录拦截；团队内具体操作还依赖接口权限和组件内判断，不能仅根据路由公开性推断业务授权。
 

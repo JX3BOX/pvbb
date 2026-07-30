@@ -466,13 +466,26 @@
     }
 
     .u-sidebar-team-role {
+        flex-shrink: 0;
         padding: 1px 6px;
+        border: 1px solid transparent;
         border-radius: 7px;
-        background: #fff7ed;
-        color: #d97706;
         font-size: 9px;
-        font-weight: 500;
+        font-weight: 600;
         line-height: 15px;
+        white-space: nowrap;
+
+        &.is-founder {
+            border-color: #ffedd5;
+            background: #fff7ed;
+            color: #d97706;
+        }
+
+        &.is-admin {
+            border-color: #bae6fd;
+            background: #f0f9ff;
+            color: #0284c7;
+        }
     }
 
     .u-sidebar-team-arrow {

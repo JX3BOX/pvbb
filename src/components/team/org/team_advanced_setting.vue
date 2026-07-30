@@ -20,7 +20,6 @@
         </template>
         <template v-else-if="active == 'other'">
             <template v-if="variant === 'archive'">
-                <EditNamespace :variant="variant" />
                 <section class="m-team-operation-card">
                     <header class="m-team-form-section">
                         <h2>团队操作</h2>
@@ -31,14 +30,20 @@
                                 <h3>移交团队</h3>
                                 <p>将团队所有权转交给另一位用户，移交后您将不再是团长。</p>
                             </div>
-                            <el-button class="u-transform" type="warning" plain @click="transformTeam">发起移交</el-button>
+                            <el-button class="u-transform" type="warning" @click="transformTeam">
+                                <el-icon><Switch /></el-icon>
+                                <span>发起移交</span>
+                            </el-button>
                         </div>
                         <div class="m-team-operation-item is-danger">
                             <div class="u-operation-copy">
                                 <h3>删除团队</h3>
                                 <p>永久删除团队及相关数据，此操作完成后无法恢复。</p>
                             </div>
-                            <el-button v-if="id" class="u-delete" type="danger" plain @click="deleteTeam">删除团队</el-button>
+                            <el-button v-if="id" class="u-delete" type="danger" @click="deleteTeam">
+                                <el-icon><Delete /></el-icon>
+                                <span>删除团队</span>
+                            </el-button>
                         </div>
                     </div>
                 </section>
@@ -79,6 +84,7 @@ import userpop from "@/components/team/widget/userpop.vue";
 import team_from from "@/components/team/org/teamform.vue";
 import { delTeam, transformTeam, updateTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user.js";
+import { Delete, Switch } from "@element-plus/icons-vue";
 export default {
     name: "AdvancedSetting",
     props: {
@@ -96,9 +102,11 @@ export default {
         },
     },
     components: {
+        Delete,
         VerifyOrg,
         EditPermission,
         EditNamespace,
+        Switch,
         userpop,
         "team-form": team_from,
     },
@@ -127,7 +135,7 @@ export default {
                 return;
             }
 
-            this.$confirm("团队及相关数据将被永久删除，且无法恢复。", "删除团队", {
+            return this.$confirm("团队及相关数据将被永久删除，且无法恢复。", "确认删除团队", {
                 confirmButtonText: "确认删除",
                 cancelButtonText: "取消",
                 type: "warning",
@@ -170,12 +178,27 @@ export default {
                 });
                 return;
             }
-            transformTeam(this.id, this.to_uid).then((res) => {
-                this.$message({
-                    message: "移交成功",
-                    type: "success",
+            return this.$confirm(
+                `确认将团队${this.data.name ? `“${this.data.name}”` : ""}移交给 UID ${this.to_uid}？移交后您将不再是团长。`,
+                "确认移交团队",
+                {
+                    confirmButtonText: "确认移交",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                }
+            )
+                .then(() => {
+                    return transformTeam(this.id, this.to_uid);
+                })
+                .then(() => {
+                    this.$message({
+                        message: "移交成功",
+                        type: "success",
+                    });
+                })
+                .catch((action) => {
+                    if (action !== "cancel" && action !== "close") throw action;
                 });
-            });
         },
         submit: function () {
             this.processing = true;

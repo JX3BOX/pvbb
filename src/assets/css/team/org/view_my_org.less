@@ -18,10 +18,10 @@
     }
 
     .m-my-org__hero {
-        padding: @team-space-5;
+        padding: @team-space-3 @team-space-4;
         overflow: hidden;
-        border-radius: @team-radius-panel;
-        background: radial-gradient(circle at 92% 8%, rgba(91, 92, 245, 0.1), transparent 27%), @team-surface;
+        border-radius: @team-radius-control;
+        background: @team-surface;
     }
 
     .m-my-org__header {
@@ -32,25 +32,30 @@
         gap: @team-space-4;
     }
 
-    .m-my-org__intro {
+    .m-my-org__identity {
         display: flex;
         min-width: 0;
         align-items: center;
-        gap: @team-space-3;
+        gap: 14px;
     }
 
-    .u-my-org-icon {
-        display: inline-flex;
-        width: 44px;
-        height: 44px;
-        align-items: center;
-        justify-content: center;
+    .u-my-org-team-logo {
+        display: block;
+        width: 52px;
+        height: 52px;
+        overflow: hidden;
         flex: none;
-        border: 1px solid rgba(245, 158, 11, 0.3);
+        border: 1px solid @team-border-light;
         border-radius: 14px;
-        background: linear-gradient(145deg, @team-surface-dark, #1e293b);
-        color: @team-accent-yellow;
-        font-size: 24px;
+        background: @team-surface-muted;
+        box-shadow: @team-shadow-xs;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     }
 
     .m-my-org__heading {
@@ -65,63 +70,82 @@
         }
 
         h1 {
+            max-width: min(420px, 42vw);
             margin: 0;
+            overflow: hidden;
             color: @team-text-primary;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
-            line-height: 32px;
-            letter-spacing: -0.025em;
-        }
-
-        p {
-            margin: 1px 0 0;
-            color: @team-text-muted;
-            font-size: 12px;
-            font-weight: 600;
-            line-height: 20px;
+            line-height: 28px;
+            letter-spacing: -0.015em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 
-    .u-my-org-mode {
+    .u-my-org-role,
+    .u-my-org-verified {
         display: inline-flex;
-        min-height: 22px;
+        min-height: 20px;
         align-items: center;
-        padding: 0 8px;
-        border-radius: 9999px;
-        font-size: 11px;
+        padding: 0 7px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        font-size: 10px;
         font-weight: 600;
         line-height: 1;
+        white-space: nowrap;
+    }
 
-        &.is-manage {
+    .u-my-org-role {
+        &.is-founder {
+            border-color: #ffedd5;
             background: #fff7ed;
             color: #d97706;
         }
 
-        &.is-member {
-            background: @team-primary-soft;
-            color: @team-primary;
+        &.is-admin {
+            border-color: #bae6fd;
+            background: #f0f9ff;
+            color: #0284c7;
         }
     }
 
-    .m-my-org__actions {
+    .u-my-org-verified {
+        border-color: #bbf7d0;
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .m-my-org__meta {
         display: flex;
-        flex: none;
         align-items: center;
-        gap: @team-space-2;
+        margin-top: 1px;
+        color: @team-text-muted;
+        font-size: 11px;
+        line-height: 18px;
+        gap: 7px;
+
+        i {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: @team-border-focus;
+        }
     }
 
     .u-my-org-action {
         display: inline-flex;
-        min-height: 42px;
+        min-height: 36px;
         align-items: center;
         justify-content: center;
         gap: 5px;
         padding: 0 @team-space-3;
         border: 1px solid @team-border;
-        border-radius: 12px;
+        border-radius: 10px;
         background: @team-surface;
         color: @team-text-secondary;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 600;
         text-decoration: none;
         cursor: pointer;
@@ -139,201 +163,11 @@
             outline: none;
             box-shadow: @team-shadow-focus;
         }
-
-        &.is-mode-switch {
-            border-color: fade(@team-primary, 22%);
-            background: @team-primary-soft;
-            color: @team-primary;
-        }
-    }
-
-    .m-my-org__profile {
-        display: grid;
-        min-width: 0;
-        margin-top: @team-space-4;
-        padding-top: @team-space-4;
-        border-top: 1px solid @team-border-light;
-        grid-template-columns: 88px minmax(0, 1fr) auto;
-        grid-template-rows: auto auto auto;
-        column-gap: @team-space-4;
-
-        .u-logo {
-            width: 88px;
-            height: 88px;
-            grid-column: 1;
-            grid-row: 1 / 4;
-            float: none;
-            margin: 0;
-            overflow: hidden;
-            border: 1px solid @team-border-light;
-            border-radius: 20px;
-            background: @team-surface-muted;
-            box-shadow: @team-shadow-xs;
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-        }
-
-        .u-id {
-            right: 6px;
-            bottom: 6px;
-            padding: 2px 6px;
-            border-radius: 6px;
-            background: fade(@team-surface-dark, 82%);
-            color: @team-text-inverse;
-        }
-
-        .u-title {
-            min-width: 0;
-            grid-column: 2;
-            margin: 0 0 @team-space-1;
-            align-items: center;
-            flex-direction: row;
-            text-align: left;
-            gap: @team-space-1;
-        }
-
-        .u-team-name {
-            min-width: 0;
-            overflow: hidden;
-            color: @team-text-primary;
-            font-size: 24px;
-            font-weight: 600;
-            line-height: 32px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .u-icons {
-            flex: none;
-        }
-
-        .u-status {
-            padding: 3px 7px;
-            border-radius: 9999px;
-            background: @team-surface-muted;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .u-meta {
-            display: flex;
-            min-width: 0;
-            grid-column: 2;
-            flex-wrap: wrap;
-            align-items: center;
-            color: @team-text-secondary;
-            font-size: 13px;
-            line-height: 28px;
-            gap: 4px @team-space-3;
-
-            em {
-                margin-right: 4px;
-                color: @team-text-muted;
-                font-weight: 600;
-            }
-
-            a {
-                color: @team-primary;
-            }
-        }
-
-        .u-meta-item {
-            margin: 0;
-        }
-
-        .u-namespace {
-            padding: 3px 7px;
-            border-radius: 7px;
-            background: @team-surface-dark;
-        }
-
-        .m-team-admin {
-            position: static;
-            display: flex;
-            min-width: 0;
-            align-self: center;
-            align-items: center;
-            justify-content: flex-end;
-            grid-column: 3;
-            grid-row: 1 / 4;
-            margin: 0;
-            padding-left: @team-space-4;
-            border-left: 1px solid @team-border-light;
-            gap: @team-space-2;
-
-            .u-feeling,
-            .u-panel {
-                display: flex;
-                align-items: center;
-                text-align: left;
-            }
-
-            .u-panel {
-                gap: @team-space-2;
-            }
-
-            .el-button {
-                min-height: 36px;
-                margin: 0;
-                padding: 8px 13px;
-                border-radius: 9px;
-                font-weight: 600;
-            }
-
-            .u-like {
-                display: inline-flex;
-                height: 36px;
-                align-items: center;
-                padding: 0 11px 0 5px;
-                border: 1px solid @team-border;
-                border-radius: 999px;
-                background: @team-surface-muted;
-                transition: border-color @team-duration-fast @team-ease-standard,
-                    background-color @team-duration-fast @team-ease-standard,
-                    color @team-duration-fast @team-ease-standard;
-
-                &:hover {
-                    border-color: @team-border-focus;
-                    background: @team-primary-soft;
-
-                    .u-text {
-                        color: @team-primary;
-                    }
-                }
-
-                .w-heart {
-                    width: 30px;
-                    height: 30px;
-                    background-size: 870px;
-                }
-
-                .u-text,
-                .u-count {
-                    padding: 0;
-                    font-size: 12px;
-                    line-height: 34px;
-                }
-
-                .u-text {
-                    margin-right: 4px;
-                    color: @team-text-regular;
-                    font-weight: 600;
-                }
-
-                .u-count {
-                    color: @team-text-muted;
-                }
-            }
-        }
     }
 
     .m-my-org__workspace {
-        margin-top: @team-space-4;
-        padding: @team-space-5;
+        margin-top: @team-space-2;
+        padding: @team-space-4;
         overflow: hidden;
         border-radius: @team-radius-control;
     }
@@ -464,6 +298,8 @@
         }
     }
 
+    .m-archive-feature,
+    .m-archive-other,
     .m-archive-advanced {
         display: block;
         min-width: 0;
@@ -538,6 +374,10 @@
                 line-height: 20px;
             }
         }
+    }
+
+    .m-archive-other > .v-team-config.is-archive {
+        margin-top: @team-space-4;
     }
 
     .m-raid-embedded-header {
@@ -646,10 +486,6 @@
             align-items: flex-start;
             flex-direction: column;
         }
-
-        .m-my-org__actions {
-            width: 100%;
-        }
     }
 }
 
@@ -659,11 +495,6 @@
         .m-my-org__workspace {
             padding: @team-space-3;
             border-radius: @team-radius-control;
-        }
-
-        .m-my-org__actions {
-            align-items: stretch;
-            flex-direction: column;
         }
 
         .u-my-org-action {
@@ -688,45 +519,6 @@
             align-items: stretch;
             flex-direction: column;
         }
-
-        .m-my-org__profile {
-            grid-template-columns: 64px minmax(0, 1fr);
-            column-gap: @team-space-3;
-
-            .u-logo {
-                width: 64px;
-                height: 64px;
-                border-radius: 16px;
-            }
-
-            .u-title {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .u-team-name {
-                font-size: 20px;
-                line-height: 26px;
-            }
-
-            .u-meta {
-                margin-top: 6px;
-                line-height: 23px;
-            }
-
-            .m-team-admin {
-                width: 100%;
-                justify-content: flex-start;
-                grid-column: 1 / -1;
-                grid-row: auto;
-                margin-top: @team-space-3;
-                padding-top: @team-space-3;
-                padding-left: 0;
-                border-top: 1px solid @team-border-light;
-                border-left: 0;
-            }
-        }
-
         .m-team-view {
             > .el-tabs__header {
                 margin-right: -@team-space-3;
@@ -760,32 +552,20 @@
 
 @media screen and (max-width: 420px) {
     .p-team-my-org {
-        .m-my-org__heading h1 {
-            font-size: 21px;
+        .m-my-org__identity {
+            gap: 10px;
         }
 
-        .m-my-org__profile {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+        .u-my-org-team-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+        }
 
-            .u-logo {
-                width: 56px;
-                height: 56px;
-                margin-right: @team-space-2;
-            }
-
-            .u-title {
-                width: calc(100% - 68px);
-                min-height: 56px;
-                justify-content: center;
-                margin: 0;
-            }
-
-            .u-meta {
-                width: 100%;
-                margin-top: @team-space-2;
-            }
+        .m-my-org__heading h1 {
+            max-width: 52vw;
+            font-size: 18px;
+            line-height: 25px;
         }
     }
 }

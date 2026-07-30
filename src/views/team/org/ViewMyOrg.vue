@@ -1,49 +1,44 @@
 <template>
     <div class="p-team-my-org" v-if="id" v-loading="loading">
         <section class="m-my-org__hero" aria-labelledby="my-org-title">
-            <header class="m-my-org__header">
-                <div class="m-my-org__intro">
-                    <span class="u-my-org-icon" aria-hidden="true">
-                        <el-icon><OfficeBuilding /></el-icon>
-                    </span>
-                    <div class="m-my-org__heading">
-                        <div class="m-my-org__title-row">
-                            <h1 id="my-org-title">{{ workspaceTitle }}</h1>
-                            <span class="u-my-org-mode" :class="`is-${workspaceMode}`">{{ workspaceModeLabel }}</span>
-                        </div>
-                        <p>{{ workspaceDescription }}</p>
-                    </div>
-                </div>
-
-                <div class="m-my-org__actions">
-                    <button
-                        v-if="canManageTeam"
-                        type="button"
-                        class="u-my-org-action is-mode-switch"
-                        @click="switchWorkspaceMode"
-                    >
-                        <el-icon><Switch /></el-icon>
-                        <span>{{ workspaceSwitchLabel }}</span>
-                    </button>
-                    <router-link class="u-my-org-action" :to="`/org/${id}`" target="_blank" rel="noopener noreferrer">
-                        <span>查看团队主页</span>
-                        <el-icon><ArrowRight /></el-icon>
-                    </router-link>
-                </div>
-            </header>
-
             <div v-if="loadError" class="m-my-org__error">
                 <span>团队信息加载失败，请稍后重试。</span>
                 <button type="button" @click="loadData">重新加载</button>
             </div>
-            <team-info
-                v-else
-                class="m-my-org__profile"
-                :info="data"
-                :team_id="id"
-                :isMine="true"
-                :show-manage-action="isManagementMode"
-            />
+            <header v-else class="m-my-org__header">
+                <div class="m-my-org__identity">
+                    <router-link class="u-my-org-team-logo" :to="`/org/${id}`" target="_blank">
+                        <img
+                            :src="data.logo ? showTeamLogo(data.logo) : defaultLogo"
+                            :alt="`${data.name}团队 Logo`"
+                            @error="useDefaultLogo"
+                        />
+                    </router-link>
+                    <div class="m-my-org__heading">
+                        <div class="m-my-org__title-row">
+                            <h1 id="my-org-title">{{ data.name }}</h1>
+                            <span
+                                v-if="isManagementMode"
+                                class="u-my-org-role"
+                                :class="isSuper ? 'is-founder' : 'is-admin'"
+                            >
+                                {{ isSuper ? "创始人" : "管理员" }}
+                            </span>
+                            <span v-if="data.status == 1" class="u-my-org-verified">已认证</span>
+                        </div>
+                        <div class="m-my-org__meta">
+                            <span>{{ data.server || "服务器未填写" }}</span>
+                            <i aria-hidden="true"></i>
+                            <span>团队 ID {{ id }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <router-link class="u-my-org-action" :to="`/org/${id}`" target="_blank" rel="noopener noreferrer">
+                    <span>团队主页</span>
+                    <el-icon><ArrowRight /></el-icon>
+                </router-link>
+            </header>
         </section>
 
         <section v-if="!loadError" class="m-my-org__workspace" :aria-label="workspaceAriaLabel">
@@ -98,13 +93,13 @@
                         <ManageRaid :team-id="id" embedded />
                     </el-tab-pane>
 
-                    <el-tab-pane label="团队档案" name="setting" lazy v-if="isSuper">
+                    <el-tab-pane label="团队设置" name="setting" lazy v-if="isSuper">
                         <template #label>
-                            <el-icon><FolderOpened /></el-icon>
-                            <span>团队档案</span>
+                            <el-icon><Setting /></el-icon>
+                            <span>团队设置</span>
                         </template>
 
-                        <nav class="m-workspace-subnav" aria-label="团队档案设置">
+                        <nav class="m-workspace-subnav" aria-label="团队设置">
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'basic' }"
@@ -125,6 +120,20 @@
                                 @click="switchSection('permission')"
                             >
                                 权限管理
+                            </button>
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'feature' }"
+                                @click="switchSection('feature')"
+                            >
+                                功能设置
+                            </button>
+                            <button
+                                type="button"
+                                :class="{ 'is-active': archiveSection === 'other' }"
+                                @click="switchSection('other')"
+                            >
+                                其它设置
                             </button>
                             <button
                                 type="button"
@@ -152,8 +161,26 @@
                             :team-data="data"
                         />
                         <EditPermission v-else-if="archiveSection === 'permission'" variant="archive" :team-id="id" />
-                        <div v-else class="m-archive-advanced">
-                            <EditOrgConfig variant="archive" :team-info="data" />
+                        <div
+                            v-else-if="archiveSection === 'feature'"
+                            :key="`feature-${id}`"
+                            class="m-archive-feature"
+                        >
+                            <EditOrgConfig
+                                variant="archive"
+                                config-section="feature"
+                                :team-info="data"
+                            />
+                        </div>
+                        <div
+                            v-else-if="archiveSection === 'other'"
+                            :key="`other-${id}`"
+                            class="m-archive-other"
+                        >
+                            <EditNamespace variant="archive" />
+                            <EditOrgConfig variant="archive" config-section="other" :team-info="data" />
+                        </div>
+                        <div v-else :key="`advanced-${id}`" class="m-archive-advanced">
                             <team-advanced-setting
                                 class="is-single-setting"
                                 variant="archive"
@@ -203,7 +230,6 @@
 </template>
 
 <script>
-import team_info from "@/components/team/org/team_info.vue";
 import team_role from "@/components/team/org/team_role.vue";
 import team_form from "@/components/team/org/teamform.vue";
 import team_advanced_setting from "@/components/team/org/team_advanced_setting.vue";
@@ -211,6 +237,7 @@ import SnapshotList from "@/views/team/snapshot/ListSnapshot.vue";
 import VerifyOrg from "@/views/team/org/VerifyOrg.vue";
 import EditPermission from "@/views/team/org/EditPermission.vue";
 import EditOrgConfig from "@/views/team/org/EditOrgConfig.vue";
+import EditNamespace from "@/views/team/org/EditNamespace.vue";
 import ListMember from "../member/ListMember.vue";
 import ManageVideo from "./ManageVideo.vue";
 import myBattle from "../battle/myBattle.vue";
@@ -222,17 +249,17 @@ import MyTeamRaid from "../raid/MyTeamRaid.vue";
 
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
+import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { getAllMyTeams, getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
 import { getPendingCount } from "@/service/team/member.js";
+import defaultLogo from "@/assets/img/team/team_logo_null.svg";
 import {
     ArrowRight,
     Avatar,
     Calendar,
     Camera,
     Coin,
-    FolderOpened,
-    OfficeBuilding,
-    Switch,
+    Setting,
     Trophy,
     User as UserIcon,
     VideoCamera,
@@ -252,14 +279,15 @@ const LEGACY_TAB_MAP = {
     "battle-record": { mode: "manage", tab: "manage-battle" },
     verify: { mode: "manage", tab: "setting", section: "verify" },
     permission: { mode: "manage", tab: "setting", section: "permission" },
-    config: { mode: "manage", tab: "setting", section: "advanced" },
-    other: { mode: "manage", tab: "setting", section: "advanced" },
+    config: { mode: "manage", tab: "setting", section: "feature" },
+    other: { mode: "manage", tab: "setting", section: "other" },
 };
 
 export default {
     name: "ViewMyOrg",
     data: function () {
         return {
+            defaultLogo,
             tab: "overview",
             archiveSection: "basic",
             syncingRoute: false,
@@ -311,7 +339,7 @@ export default {
             return User.isLogin();
         },
         routeState: function () {
-            return `${this.$route.query.mode || ""}|${this.$route.query.tab || "overview"}|${
+            return `${this.$route.name}|${this.$route.query.mode || ""}|${this.$route.query.tab || ""}|${
                 this.$route.query.section || ""
             }`;
         },
@@ -333,24 +361,12 @@ export default {
             return this.managementTabs.length > 0;
         },
         workspaceMode: function () {
-            return this.$route.query.mode === "manage" ? "manage" : "member";
+            if (this.$route.meta.workspaceMode) return this.$route.meta.workspaceMode;
+            if (this.$route.query.mode === "manage") return "manage";
+            return MANAGEMENT_TAB_NAMES.includes(this.$route.query.tab) ? "manage" : "member";
         },
         isManagementMode: function () {
             return this.workspaceMode === "manage";
-        },
-        workspaceTitle: function () {
-            return this.isManagementMode ? "团队管理" : "我的团队";
-        },
-        workspaceModeLabel: function () {
-            return this.isManagementMode ? "管理视图" : "成员视图";
-        },
-        workspaceDescription: function () {
-            return this.isManagementMode
-                ? "专注成员、内容、团队数据与基础设置"
-                : "查看我在当前团队中的角色、战绩、DKP 与 RAID";
-        },
-        workspaceSwitchLabel: function () {
-            return this.isManagementMode ? "切换到成员视图" : "切换到管理视图";
         },
         workspaceAriaLabel: function () {
             return this.isManagementMode ? "团队管理功能" : "我的团队信息";
@@ -470,10 +486,6 @@ export default {
                     params: {
                         id: teams[0].ID,
                     },
-                    query: {
-                        mode: "member",
-                        tab: "overview",
-                    },
                 });
             });
         },
@@ -485,13 +497,16 @@ export default {
                 .catch(() => {});
         },
         normalizeRouteState: function () {
+            const routeMode = this.$route.meta.workspaceMode || "";
             const rawMode = this.$route.query.mode;
-            const rawTab = this.$route.query.tab || "overview";
+            const rawTab = this.$route.query.tab || "";
             const rawSection = this.$route.query.section || "";
             const legacyState = LEGACY_TAB_MAP[rawTab];
-            let mode = legacyState?.mode || (rawMode === "manage" || rawMode === "member" ? rawMode : "");
-            let tab = legacyState?.tab || rawTab;
+            let mode = legacyState?.mode || "";
+            let tab = legacyState?.tab || rawTab || (routeMode === "manage" ? "manage-member" : "overview");
             let section = legacyState?.section || rawSection;
+
+            if (!mode && (rawMode === "manage" || rawMode === "member")) mode = rawMode;
 
             if (!legacyState && rawTab === "history" && rawSection === "manage") {
                 mode = "manage";
@@ -507,7 +522,7 @@ export default {
                 section = "";
             }
 
-            if (!mode) mode = MANAGEMENT_TAB_NAMES.includes(tab) ? "manage" : "member";
+            if (!mode) mode = MANAGEMENT_TAB_NAMES.includes(tab) ? "manage" : routeMode || "member";
             if (mode === "manage" && !this.canManageTeam) {
                 mode = "member";
                 tab = "overview";
@@ -518,7 +533,7 @@ export default {
             if (!allowedTabs.includes(tab)) tab = allowedTabs[0] || "overview";
 
             if (tab === "setting") {
-                const allowedSections = ["basic", "verify", "permission", "advanced"];
+                const allowedSections = ["basic", "verify", "permission", "feature", "other", "advanced"];
                 section = allowedSections.includes(section) ? section : "basic";
             } else {
                 section = "";
@@ -529,43 +544,55 @@ export default {
         applyRouteState: function () {
             if (!this.permissionsLoaded || !this.done) return;
 
-            const { rawMode, rawTab, rawSection, mode, tab, section } = this.normalizeRouteState();
+            const { mode, tab, section } = this.normalizeRouteState();
             this.syncingRoute = true;
             this.tab = tab;
             if (tab === "setting") this.archiveSection = section;
 
             this.$nextTick(() => {
                 this.syncingRoute = false;
-                if (rawMode !== mode || rawTab !== tab || rawSection !== section) {
-                    this.replaceRouteState(mode, tab, section);
-                }
+                this.replaceRouteState(mode, tab, section);
             });
         },
         replaceRouteState: function (mode, tab, section = "") {
+            const routeName = mode === "manage" ? "manage_my_org" : "view_my_org";
+            const defaultTab = mode === "manage" ? this.managementTabs[0] || "manage-member" : "overview";
+            const hasCanonicalTab = tab === defaultTab ? !("tab" in this.$route.query) : this.$route.query.tab === tab;
+            const hasCanonicalSection = section
+                ? this.$route.query.section === section
+                : !("section" in this.$route.query);
             if (
-                this.$route.query.mode === mode &&
-                this.$route.query.tab === tab &&
-                (this.$route.query.section || "") === section
+                this.$route.name === routeName &&
+                !("mode" in this.$route.query) &&
+                hasCanonicalTab &&
+                hasCanonicalSection
             )
                 return;
 
-            const query = {
-                ...this.$route.query,
-                mode,
-                tab,
-            };
+            const query = { ...this.$route.query };
+            delete query.mode;
+            if (tab === defaultTab) delete query.tab;
+            else query.tab = tab;
             if (section) query.section = section;
             else delete query.section;
-            this.$router.replace({ query });
+            this.$router.replace({
+                name: routeName,
+                params: { id: this.id },
+                query,
+            });
         },
         switchSection: function (section) {
             this.archiveSection = section;
             this.replaceRouteState("manage", "setting", section);
         },
-        switchWorkspaceMode: function () {
-            const mode = this.isManagementMode ? "member" : "manage";
-            const tab = mode === "manage" ? this.managementTabs[0] : "overview";
-            this.replaceRouteState(mode, tab);
+        showTeamLogo: function (logo) {
+            return getThumbnail(logo, 160, true);
+        },
+        useDefaultLogo: function (event) {
+            const image = event.currentTarget;
+            if (image.dataset.fallbackApplied) return;
+            image.dataset.fallbackApplied = "true";
+            image.src = this.defaultLogo;
         },
         init: function () {
             this.loadData();
@@ -593,7 +620,6 @@ export default {
     },
     components: {
         "team-role": team_role,
-        "team-info": team_info,
         "team-form": team_form,
         "team-advanced-setting": team_advanced_setting,
         ArrowRight,
@@ -602,9 +628,9 @@ export default {
         Camera,
         Coin,
         EditOrgConfig,
+        EditNamespace,
         EditPermission,
-        FolderOpened,
-        OfficeBuilding,
+        Setting,
         SnapshotList,
         ListMember,
         ManageVideo,
@@ -614,7 +640,6 @@ export default {
         ManageRaid,
         MyDkp,
         MyTeamRaid,
-        Switch,
         Trophy,
         User: UserIcon,
         VideoCamera,

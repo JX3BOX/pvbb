@@ -1,16 +1,24 @@
 <template>
     <div class="v-team-config" :class="{ 'is-archive': variant === 'archive' }">
         <template v-if="variant === 'archive'">
-            <header class="m-team-form-section">
-                <h2>快照与展示</h2>
-            </header>
-            <snapshot-password :variant="variant" />
-            <team-banner :team-info="teamInfo" :variant="variant" />
+            <template v-if="showFeatureSettings">
+                <header class="m-team-form-section">
+                    <h2>快照设置</h2>
+                </header>
+                <snapshot-password :variant="variant" />
 
-            <header class="m-team-form-section">
-                <h2>DKP 设置</h2>
-            </header>
-            <dkp-rule :variant="variant" />
+                <header class="m-team-form-section">
+                    <h2>DKP 设置</h2>
+                </header>
+                <dkp-rule :variant="variant" />
+            </template>
+
+            <template v-if="showDisplaySettings">
+                <header class="m-team-form-section">
+                    <h2>外观设置</h2>
+                </header>
+                <team-banner :team-info="teamInfo" :variant="variant" />
+            </template>
         </template>
         <template v-else>
             <!-- 快照密码 -->
@@ -39,6 +47,19 @@ export default {
         variant: {
             type: String,
             default: "default",
+        },
+        configSection: {
+            type: String,
+            default: "all",
+            validator: (value) => ["all", "feature", "other"].includes(value),
+        },
+    },
+    computed: {
+        showFeatureSettings: function () {
+            return ["all", "feature"].includes(this.configSection);
+        },
+        showDisplaySettings: function () {
+            return ["all", "other"].includes(this.configSection);
         },
     },
     components: {

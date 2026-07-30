@@ -17,7 +17,7 @@ test("team home uses a personal workbench beside the discovery workspace", async
 
     assert.match(app, /class="m-team-modern-shell"/);
     assert.match(app, /<TeamHomeSidebar\s*\/>/);
-    assert.match(app, /\["index", "list_raid", "view_raid", "view_my_org", "add_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(app, /"manage_my_org"/);
     assert.doesNotMatch(page, /TeamHomeSidebar/);
     assert.match(page, /class="u-team-home-action is-primary" to="\/org\/add"/);
     assert.match(sidebar, /getAllMyTeams\(\)/);
@@ -25,6 +25,9 @@ test("team home uses a personal workbench beside the discovery workspace", async
     assert.match(sidebar, /User\.isLogin\(\)/);
     assert.match(sidebar, /<strong>团队管理<\/strong>/);
     assert.match(sidebar, /<strong>我的团队<\/strong>/);
+    assert.match(sidebar, /team\.super == uid \? "创始人" : "管理员"/);
+    assert.match(sidebar, /team\.super == uid \? 'is-founder' : 'is-admin'/);
+    assert.doesNotMatch(sidebar, />团长<\/span>/);
     assert.match(sidebar, /class="u-sidebar-group-icon is-member"[\s\S]*?<School \/>/);
     assert.match(sidebar, /to="\/raid\/list"/);
     assert.match(sidebar, /<strong>团队活动<\/strong>/);
@@ -57,12 +60,15 @@ test("team creation reuses the modern workspace and grouped archive form languag
         read("../src/assets/css/team/org/add_org.less"),
     ]);
 
-    assert.match(app, /\["index", "list_raid", "view_raid", "view_my_org", "add_org"\]/);
+    assert.match(app, /"manage_my_org"/);
     assert.match(page, /class="v-org-add p-team-create"/);
     assert.match(page, /class="m-team-create__hero"/);
+    assert.match(page, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
+    assert.match(page, /建立团队档案，完善基础资料与对外展示信息/);
+    assert.doesNotMatch(page, /<OfficeBuilding \/>/);
     assert.match(page, /variant="archive"/);
     assert.match(page, /正在检查创建权限/);
-    assert.match(page, /name:\s*"view_my_org"/);
+    assert.match(page, /name:\s*"manage_my_org"/);
     assert.match(page, /v_member:\s*0/);
     assert.match(page, /v_dkp:\s*0/);
     assert.match(page, /v_activity:\s*0/);
@@ -95,15 +101,38 @@ test("team workspace uses the persistent sidebar as its only team switcher", asy
     assert.doesNotMatch(workspace, /selectedTeamId|switchTeam|u-team-switcher|m-team-switch/);
     assert.match(workspace, /openFirstTeam/);
     assert.match(sidebar, /teamRoute:\s*function \(team, mode\)/);
-    assert.match(sidebar, /mode,\s*tab:\s*mode === "manage" \? "manage-member" : "overview"/);
+    assert.match(sidebar, /name:\s*mode === "manage" \? "manage_my_org" : "view_my_org"/);
+    assert.doesNotMatch(sidebar, /query:\s*\{\s*mode/);
     assert.match(sidebar, /this\.workspaceMode === mode/);
+});
+
+test("team management uses a canonical route without the mode query", async () => {
+    const [router, workspace, sidebar, createPage, panel, namespace] = await Promise.all([
+        read("../src/pages/team/router.js"),
+        read("../src/views/team/org/ViewMyOrg.vue"),
+        read("../src/components/team/org/team_home_sidebar.vue"),
+        read("../src/views/team/org/AddOrg.vue"),
+        read("../src/components/team/org/team_panel.vue"),
+        read("../src/views/team/org/EditNamespace.vue"),
+    ]);
+
+    assert.match(router, /name:\s*"manage_my_org"[\s\S]*?path:\s*"\/manage\/org\/:id"/);
+    assert.match(router, /workspaceMode:\s*"manage"/);
+    assert.match(router, /beforeEnter:\s*normalizeLegacyWorkspaceRoute/);
+    assert.match(router, /delete query\.mode/);
+    assert.match(workspace, /name:\s*routeName/);
+    assert.match(workspace, /delete query\.mode/);
+    assert.match(sidebar, /name:\s*mode === "manage" \? "manage_my_org" : "view_my_org"/);
+    assert.match(createPage, /name:\s*"manage_my_org"/);
+    assert.match(panel, /name:\s*"manage_my_org"/);
+    assert.match(namespace, /name:\s*"manage_my_org"/);
 });
 
 test("team edit action opens the basic settings section in the workbench", async () => {
     const panel = await read("../src/components/team/org/team_panel.vue");
 
-    assert.match(panel, /name:\s*"view_my_org"/);
-    assert.match(panel, /mode:\s*"manage"/);
+    assert.match(panel, /name:\s*"manage_my_org"/);
+    assert.doesNotMatch(panel, /mode:\s*"manage"/);
     assert.match(panel, /tab:\s*"setting"/);
     assert.match(panel, /section:\s*"basic"/);
     assert.match(panel, /this\.showManageAction && \(this\.isLeader \|\| this\.isSuperAdmin\)/);
@@ -128,16 +157,21 @@ test("team workspace separates management tools from the member view", async () 
         "快照管理",
         "DKP管理",
         "RAID管理",
-        "团队档案",
+        "团队设置",
         "我的角色",
         "我的战绩",
         "我的DKP",
         "参与的RAID",
     ]);
     assert.doesNotMatch(managementTemplate, /我的角色|我的战绩|我的DKP|参与的RAID/);
-    assert.doesNotMatch(memberTemplate, /成员管理|战绩管理|视频管理|快照管理|DKP管理|RAID管理|团队档案/);
-    assert.match(workspace, /:show-manage-action="isManagementMode"/);
-    assert.match(workspace, /switchWorkspaceMode/);
+    assert.doesNotMatch(memberTemplate, /成员管理|战绩管理|视频管理|快照管理|DKP管理|RAID管理|团队设置/);
+    assert.match(managementTemplate, /<Setting \/>[\s\S]*?<span>团队设置<\/span>/);
+    assert.match(workspace, /class="m-my-org__identity"/);
+    assert.doesNotMatch(workspace, /当前管理团队|当前团队/);
+    assert.match(workspace, /data\.logo \? showTeamLogo\(data\.logo\) : defaultLogo/);
+    assert.match(workspace, /isSuper \? "创始人" : "管理员"/);
+    assert.match(workspace, /团队 ID \{\{ id \}\}/);
+    assert.doesNotMatch(workspace, /<team-info|switchWorkspaceMode|专注成员、内容、团队数据与基础设置/);
     assert.match(workspace, /const LEGACY_TAB_MAP = \{/);
     assert.match(workspace, /"battle-record": \{ mode: "manage", tab: "manage-battle" \}/);
     assert.match(raidManager, /teamId:/);
@@ -203,7 +237,21 @@ test("team archive certification and permission management match the compact arc
     assert.match(permissionStyles, /\.el-checkbox__input\.is-disabled\.is-checked/);
     assert.match(permissionStyles, /cursor:\s*not-allowed/);
     assert.match(permission, /:variant="variant"/);
-    assert.match(permission, /this\.\$confirm\([\s\S]*?确认删除[\s\S]*?cancelButtonText:\s*"取消"/);
+    assert.match(permission, />移除<\/el-button/);
+    assert.match(permission, /this\.\$confirm\([\s\S]*?确认移除[\s\S]*?cancelButtonText:\s*"取消"/);
+    assert.doesNotMatch(permission, />删除<\/el-button|确认删除|删除管理员/);
+    const founderPermissions = permission.slice(
+        permission.indexOf('<template v-if="item.level == 99">'),
+        permission.indexOf("<template v-else>")
+    );
+    assert.equal((founderPermissions.match(/<el-checkbox checked disabled>/g) || []).length, 10);
+    for (const permissionKey of ["r_dkp", "r_drop", "r_raid"]) {
+        const checkbox = permission.match(
+            new RegExp(`v-model="item\\.${permissionKey}"[\\s\\S]*?<\\/el-checkbox\\b`)
+        )?.[0];
+        assert.ok(checkbox, `${permissionKey} checkbox should exist`);
+        assert.doesNotMatch(checkbox, /\bdisabled\b/);
+    }
     assert.match(userpop, /等待识别用户/);
     assert.match(userpop, /this\.variant === "archive"/);
     assert.match(userpop, /debounce\(this\.lookupUser, 500\)/);
@@ -250,7 +298,7 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.doesNotMatch(listStyles, /content:\s*"全选"/);
 });
 
-test("team archive advanced settings reuse the basic settings form language", async () => {
+test("team feature, other and advanced settings keep their business sections separate", async () => {
     const [
         workspace,
         config,
@@ -262,6 +310,7 @@ test("team archive advanced settings reuse the basic settings form language", as
         namespaceStyles,
         userpop,
         workspaceStyles,
+        teamService,
     ] = await Promise.all([
         read("../src/views/team/org/ViewMyOrg.vue"),
         read("../src/views/team/org/EditOrgConfig.vue"),
@@ -273,14 +322,36 @@ test("team archive advanced settings reuse the basic settings form language", as
         read("../src/assets/css/team/org/edit_namespace.less"),
         read("../src/components/team/widget/userpop.vue"),
         read("../src/assets/css/team/org/view_my_org.less"),
+        read("../src/service/team/team.js"),
     ]);
 
-    assert.match(workspace, /<EditOrgConfig variant="archive"/);
+    assert.match(workspace, />\s*功能设置\s*<\/button>/);
+    assert.match(workspace, />\s*其它设置\s*<\/button>/);
+    assert.match(workspace, /archiveSection === 'feature'[\s\S]*?config-section="feature"/);
+    assert.match(
+        workspace,
+        /archiveSection === 'other'[\s\S]*?class="m-archive-other"[\s\S]*?<EditNamespace variant="archive"[\s\S]*?config-section="other"/,
+    );
+    assert.match(workspace, /class="m-archive-advanced"[\s\S]*?<team-advanced-setting/);
+    assert.doesNotMatch(workspace, /config-section="advanced"/);
+    assert.match(workspace, /:key="`feature-\$\{id\}`"/);
+    assert.match(workspace, /:key="`other-\$\{id\}`"/);
+    assert.match(workspace, /:key="`advanced-\$\{id\}`"/);
+    assert.match(workspace, /config: \{ mode: "manage", tab: "setting", section: "feature" \}/);
+    assert.match(workspace, /other: \{ mode: "manage", tab: "setting", section: "other" \}/);
+    assert.match(workspace, /\["basic", "verify", "permission", "feature", "other", "advanced"\]/);
     assert.match(workspace, /<team-advanced-setting[\s\S]*?variant="archive"/);
     assert.match(config, /class="v-team-config"[\s\S]*?'is-archive'/);
     assert.match(config, /\.v-team-config\.is-archive[\s\S]*display:\s*block/);
-    assert.match(config, /<h2>快照与展示<\/h2>/);
+    assert.match(config, /<h2>快照设置<\/h2>/);
     assert.match(config, /<h2>DKP 设置<\/h2>/);
+    assert.match(config, /<h2>外观设置<\/h2>/);
+    assert.match(config, /showFeatureSettings[\s\S]*?<snapshot-password[\s\S]*?<dkp-rule/);
+    assert.match(config, /showDisplaySettings[\s\S]*?<team-banner/);
+    assert.match(config, /configSection:[\s\S]*?default:\s*"all"/);
+    assert.match(config, /validator:[\s\S]*?\["all", "feature", "other"\]/);
+    assert.doesNotMatch(config, /"advanced"/);
+    assert.match(config, /showDisplaySettings:[\s\S]*?\["all", "other"\]/);
     assert.match(password, /m-archive-field-label">快照密码/);
     assert.match(password, /\^\\d\{6\}\$/);
     assert.match(password, /@input="formatPassword"/);
@@ -289,6 +360,8 @@ test("team archive advanced settings reuse the basic settings form language", as
     assert.match(banner, /width:\s*320px[\s\S]*height:\s*179px/);
     assert.match(banner, /aspect-ratio:\s*1125 \/ 630/);
     assert.match(banner, /\.u-tip[\s\S]*display:\s*none/);
+    assert.match(banner, /updateTeamInfo\(this\.id,\s*\{\s*banner:\s*this\.banner/);
+    assert.match(teamService, /function updateTeamInfo\(team_id, data\)[\s\S]*?\.patch\(`\/api\/team\/my-team\/\$\{team_id\}`/);
     assert.match(dkpRule, /m-archive-field-label">DKP 制度/);
     assert.match(dkpRule, /class="m-dkp-rule__footer"/);
     assert.match(advanced, /<h2>团队操作<\/h2>/);
@@ -297,6 +370,15 @@ test("team archive advanced settings reuse the basic settings form language", as
     assert.doesNotMatch(advanced, /u-operation-icon|m-advanced-card__header/);
     assert.match(advanced, /cancelButtonText:\s*"取消"/);
     assert.match(advanced, /confirm-text="确认移交"/);
+    assert.match(advanced, /class="u-transform" type="warning" @click="transformTeam"/);
+    assert.match(advanced, /class="u-delete" type="danger" @click="deleteTeam"/);
+    assert.match(advanced, /class="u-transform"[\s\S]*?<el-icon><Switch \/><\/el-icon>[\s\S]*?<span>发起移交<\/span>/);
+    assert.match(advanced, /class="u-delete"[\s\S]*?<el-icon><Delete \/><\/el-icon>[\s\S]*?<span>删除团队<\/span>/);
+    assert.match(advanced, /import \{ Delete, Switch \} from "@element-plus\/icons-vue"/);
+    assert.doesNotMatch(advanced, /type="(?:warning|danger)" plain/);
+    assert.match(advanced, /confirmTransform:[\s\S]*?this\.\$confirm\([\s\S]*?"确认移交团队"[\s\S]*?transformTeam\(this\.id, this\.to_uid\)/);
+    assert.match(advanced, /deleteTeam:[\s\S]*?this\.\$confirm\([\s\S]*?"确认删除团队"[\s\S]*?this\.removeTeam\(\)/);
+    assert.doesNotMatch(advanced, /<EditNamespace :variant="variant"/);
     assert.match(namespace, /<h2>团队铭牌<\/h2>/);
     assert.match(namespace, /v-if="variant !== 'archive'" class="u-desc"/);
     assert.match(namespace, /section:\s*"verify"/);
@@ -304,7 +386,11 @@ test("team archive advanced settings reuse the basic settings form language", as
     assert.match(namespaceStyles, /\.el-input-group__prepend[\s\S]*border-radius:\s*10px 0 0 10px/);
     assert.match(namespaceStyles, /\.el-input-group \.el-input__wrapper[\s\S]*border-radius:\s*0 10px 10px 0/);
     assert.match(userpop, /confirmText \|\| \(isArchive \? "确认添加"/);
-    assert.match(workspaceStyles, /\.m-archive-advanced[\s\S]*\.m-team-form-section[\s\S]*&::before/);
+    assert.match(
+        workspaceStyles,
+        /\.m-archive-feature,[\s\S]*\.m-archive-other,[\s\S]*\.m-archive-advanced[\s\S]*\.m-team-form-section[\s\S]*&::before/,
+    );
+    assert.match(workspaceStyles, /\.m-archive-other > \.v-team-config\.is-archive\s*\{\s*margin-top:\s*@team-space-4/);
     assert.doesNotMatch(workspaceStyles, /\.m-archive-advanced\s*\{[\s\S]{0,160}border:/);
 });
 
