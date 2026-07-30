@@ -21,7 +21,12 @@
     <LeftSidebar>
         <Nav />
     </LeftSidebar>
-    <Main :withoutRight="false">
+    <Main
+        :withoutRight="false"
+        :class="{
+            'is-compact-content-page': ['joke', 'emotion', 'collection', 'namespace'].includes($route.name),
+        }"
+    >
         <div class="m-main">
             <slot></slot>
         </div>
@@ -69,6 +74,17 @@ export default {
 </script>
 
 <style lang="less">
+@media screen and (max-width: @phone) {
+    .c-main.is-compact-content-page {
+        padding: 0 20px;
+
+        .m-main {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+
 .m-bbs-right-side {
     //&.c-sidebar-right.is-close {
     //transform: translateX(0) !important;

@@ -390,9 +390,25 @@
 
     .m-namespace-toolbar {
         align-items: flex-end;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .m-namespace-tab {
+        flex: 1;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+
+        .el-tabs__header,
+        .el-tabs__nav-wrap,
+        .el-tabs__nav-scroll {
+            min-width: 0;
+        }
     }
 
     .m-namespace-order {
+        flex-shrink: 0;
         padding-bottom: 8px;
     }
 }

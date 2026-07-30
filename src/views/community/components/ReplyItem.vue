@@ -11,7 +11,6 @@
                 <div class="u-floor">
                     {{ isMaster ? $t("pages.community.single.topicAuthor") : "#" + post.floor }}
                 </div>
-                <div class="m-reply-time">{{ showTime }}</div>
             </div>
         </div>
         <div class="m-reply-right">
@@ -164,13 +163,18 @@
                         </el-button>
                     </div>
                     <div>
-                        <el-dropdown class="u-more u-mobile-show" trigger="click" placement="bottom">
+                        <el-dropdown
+                            class="u-more u-mobile-show"
+                            trigger="click"
+                            placement="bottom-end"
+                            popper-class="m-community-reply-actions"
+                        >
                             <span class="el-dropdown-link">
                                 <i class="el-icon-more"></i>
                             </span>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-primary-action">
                                         <ForwardButton class="u-mobile-hidden" :post="post" :isMaster="isMaster" />
                                     </el-dropdown-item>
                                     <el-dropdown-item v-if="!isMaster && (isSuper || isFollower)">
@@ -183,7 +187,7 @@
                                             >{{ $t("pages.community.reply.thanks") }}</el-button
                                         >
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <DeleteButton
                                             class="u-mobile-hidden"
                                             :post="post"
@@ -191,10 +195,10 @@
                                             :isMaster="isMaster"
                                         />
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <AddBlockButton class="u-mobile-hidden" :post="post" />
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <ComplaintButton class="u-mobile-hidden" :post="post" />
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
@@ -202,6 +206,7 @@
                         </el-dropdown>
                     </div>
                 </div>
+                <div class="m-reply-time u-mobile-show">{{ showTime }}</div>
                 <!-- 回复的输入框 ，判断主楼不需要展示主楼是跟帖 -->
                 <ReplyForReply
                     v-if="showReplyForReplyFrom"

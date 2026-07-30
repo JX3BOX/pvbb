@@ -175,6 +175,10 @@ export default {
     }
 }
 @media screen and (max-width: @phone) {
+    .m-sticky-info .u-title {
+        display: none;
+    }
+
     .u-podate {
         display: none;
     }

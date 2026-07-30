@@ -65,6 +65,17 @@ export default {
     .c-header {
         z-index: 9999;
     }
+
+    @media screen and (max-width: @phone) {
+        .c-main {
+            padding: 0 20px;
+        }
+
+        .m-main {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
 }
 .m-bbs-right-side {
     .c-sidebar-right-inner {

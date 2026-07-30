@@ -19,19 +19,24 @@
                         <span class="m-comment-time u-mobile-show">{{ post.updated_at }}</span>
                     </div>
                     <div>
-                        <el-dropdown class="u-more u-mobile-show" trigger="click" placement="bottom">
+                        <el-dropdown
+                            class="u-more u-mobile-show"
+                            trigger="click"
+                            placement="bottom-end"
+                            popper-class="m-community-reply-actions m-community-comment-actions"
+                        >
                             <span class="el-dropdown-link">
                                 <i class="el-icon-more"></i>
                             </span>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <DeleteButton :post="post" type="comment" />
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <AddBlockButton :post="post" />
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item class="is-danger-action">
                                         <ComplaintButton :post="post" />
                                     </el-dropdown-item>
                                 </el-dropdown-menu>

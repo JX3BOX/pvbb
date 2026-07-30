@@ -20,6 +20,10 @@
             </template>
         </Breadcrumb>
 
+        <LeftSidebar v-if="isPhone">
+            <ListNav />
+        </LeftSidebar>
+
         <Main :withoutRight="false">
             <div class="m-community-single__main">
                 <div class="m-community-single__left">
@@ -37,6 +41,7 @@
 
 <script>
 import TopStickyInfo from "@/views/community/components/TopStickyInfo.vue";
+import ListNav from "@/components/nav/ListNav.vue";
 import publishGate from "@/components/common/PublishGate.vue";
 import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
 import AdminDrop from "@jx3box/jx3box-ui/src/bread/AdminDrop.vue";
@@ -60,6 +65,11 @@ const postTypeMaps = {
 export default {
     name: "CommunitySingleLayout",
     props: ["post"],
+    data() {
+        return {
+            isPhone: window.innerWidth <= 720,
+        };
+    },
     computed: {
         id() {
             return this.$route.params.id;
@@ -89,9 +99,20 @@ export default {
             return postTypeMaps[this.post.category];
         },
     },
-    mounted() {},
-    methods: { getAppIcon },
+    mounted() {
+        window.addEventListener("resize", this.updatePhoneState);
+    },
+    beforeUnmount() {
+        window.removeEventListener("resize", this.updatePhoneState);
+    },
+    methods: {
+        getAppIcon,
+        updatePhoneState() {
+            this.isPhone = window.innerWidth <= 720;
+        },
+    },
     components: {
+        ListNav,
         "publish-gate": publishGate,
         AdminDrop,
         TopStickyInfo,
