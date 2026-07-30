@@ -1,13 +1,12 @@
 <template>
     <aside class="m-team-home-sidebar" aria-label="团队个人工作台">
-        <section class="m-team-home-sidebar__panel is-navigation">
+        <section class="m-team-home-sidebar__panel is-navigation is-discovery">
             <div class="m-team-home-sidebar__brand">
                 <span class="u-sidebar-brand-icon" aria-hidden="true">
-                    <el-icon><Grid /></el-icon>
+                    <img :src="teamLogo" alt="" />
                 </span>
                 <div>
-                    <strong>团队中心</strong>
-                    <span>发现团队，切换我的工作视角</span>
+                    <strong>团队平台</strong>
                 </div>
             </div>
 
@@ -27,25 +26,29 @@
                     </span>
                     <el-icon class="u-sidebar-nav-arrow"><ArrowRight /></el-icon>
                 </router-link>
-                <a class="u-sidebar-nav-item" :href="dashboardRoleUrl" target="_blank" rel="noopener noreferrer">
+                <router-link
+                    class="u-sidebar-nav-item"
+                    :class="{ 'is-active': isTeamActivity }"
+                    to="/raid/list"
+                    :aria-current="isTeamActivity ? 'page' : undefined"
+                >
                     <span class="u-sidebar-nav-icon"
-                        ><el-icon><User /></el-icon
+                        ><el-icon><Calendar /></el-icon
                     ></span>
                     <span class="u-sidebar-nav-copy">
-                        <strong>角色中心</strong>
-                        <small>管理全部已绑定角色</small>
+                        <strong>团队活动</strong>
+                        <small>查看团队公开招募活动</small>
                     </span>
-                    <el-icon class="u-sidebar-nav-arrow"><TopRight /></el-icon>
-                </a>
+                    <el-icon class="u-sidebar-nav-arrow"><ArrowRight /></el-icon>
+                </router-link>
             </nav>
         </section>
 
-        <section class="m-team-home-sidebar__panel is-my-teams" aria-labelledby="team-home-workspace-title">
+        <section class="m-team-home-sidebar__panel is-my-teams is-workspace" aria-labelledby="team-home-workspace-title">
             <header class="m-team-home-sidebar__section-header">
                 <div>
                     <h2 id="team-home-workspace-title">团队工作区</h2>
                 </div>
-                <router-link v-if="isLogin" to="/org/add">创建</router-link>
             </header>
 
             <div v-if="!isLogin" class="m-team-home-sidebar__login">
@@ -86,7 +89,7 @@
                             <el-icon><Setting /></el-icon>
                         </span>
                         <span class="u-sidebar-group-copy">
-                            <strong>我管理的团队</strong>
+                            <strong>团队管理</strong>
                         </span>
                         <span class="u-sidebar-group-count">{{ managedTeams.length }}</span>
                         <el-icon class="u-sidebar-group-arrow"><ArrowDown /></el-icon>
@@ -129,7 +132,7 @@
                         @click="toggleGroup('member')"
                     >
                         <span class="u-sidebar-group-icon is-member" aria-hidden="true">
-                            <el-icon><User /></el-icon>
+                            <el-icon><School /></el-icon>
                         </span>
                         <span class="u-sidebar-group-copy">
                             <strong>我的团队</strong>
@@ -172,6 +175,21 @@
                 <p>从团队广场选择合适的伙伴，或者创建自己的团队。</p>
                 <router-link to="/org/add">创建团队</router-link>
             </div>
+
+            <a
+                class="u-sidebar-workspace-link"
+                :href="dashboardRoleUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <span class="u-sidebar-group-icon is-role" aria-hidden="true">
+                    <el-icon><User /></el-icon>
+                </span>
+                <span class="u-sidebar-group-copy">
+                    <strong>我的角色</strong>
+                </span>
+                <el-icon class="u-sidebar-nav-arrow"><TopRight /></el-icon>
+            </a>
         </section>
     </aside>
 </template>
@@ -179,15 +197,17 @@
 <script>
 import User from "@jx3box/jx3box-common/js/user";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
+import { __cdn } from "@/utils/config";
 import { getAllMyTeams, getMyManageTeams } from "@/service/team/team";
 import defaultLogo from "@/assets/img/team/team_logo_null.svg";
 import {
     ArrowDown,
     ArrowRight,
-    Grid,
+    Calendar,
     Lock,
     OfficeBuilding,
     Search,
+    School,
     Setting,
     TopRight,
     User as UserIcon,
@@ -199,10 +219,11 @@ export default {
     components: {
         ArrowDown,
         ArrowRight,
-        Grid,
+        Calendar,
         Lock,
         OfficeBuilding,
         Search,
+        School,
         Setting,
         TopRight,
         User: UserIcon,
@@ -212,8 +233,9 @@ export default {
         const userInfo = User.getInfo() || {};
         return {
             defaultLogo,
+            teamLogo: __cdn + "logo/logo-light/team.svg",
             expandedGroups: {
-                manage: true,
+                manage: false,
                 member: false,
             },
             isLogin: User.isLogin(),
@@ -233,6 +255,9 @@ export default {
         },
         isTeamHome: function () {
             return this.$route.name === "index";
+        },
+        isTeamActivity: function () {
+            return ["list_raid", "view_raid"].includes(this.$route.name);
         },
         workspaceMode: function () {
             return this.$route.query.mode === "manage" ? "manage" : "member";

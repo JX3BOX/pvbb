@@ -90,7 +90,7 @@ export default {
             return this.$route.meta.isCreateTeam;
         },
         isModernWorkspace: function () {
-            return ["index", "view_my_org", "add_org"].includes(this.$route.name);
+            return ["index", "list_raid", "view_raid", "view_my_org", "add_org"].includes(this.$route.name);
         },
         loginUrl: function () {
             return `/account/login?redirect=${encodeURIComponent(window.location.href)}`;

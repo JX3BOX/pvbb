@@ -17,14 +17,27 @@ test("team home uses a personal workbench beside the discovery workspace", async
 
     assert.match(app, /class="m-team-modern-shell"/);
     assert.match(app, /<TeamHomeSidebar\s*\/>/);
-    assert.match(app, /\["index", "view_my_org", "add_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(app, /\["index", "list_raid", "view_raid", "view_my_org", "add_org"\]\.includes\(this\.\$route\.name\)/);
     assert.doesNotMatch(page, /TeamHomeSidebar/);
     assert.match(page, /class="u-team-home-action is-primary" to="\/org\/add"/);
     assert.match(sidebar, /getAllMyTeams\(\)/);
     assert.match(sidebar, /getMyManageTeams\(\)/);
     assert.match(sidebar, /User\.isLogin\(\)/);
-    assert.match(sidebar, /<strong>我管理的团队<\/strong>/);
+    assert.match(sidebar, /<strong>团队管理<\/strong>/);
     assert.match(sidebar, /<strong>我的团队<\/strong>/);
+    assert.match(sidebar, /class="u-sidebar-group-icon is-member"[\s\S]*?<School \/>/);
+    assert.match(sidebar, /to="\/raid\/list"/);
+    assert.match(sidebar, /<strong>团队活动<\/strong>/);
+    assert.match(sidebar, /<strong>团队平台<\/strong>/);
+    assert.doesNotMatch(sidebar, /<strong>团队中心<\/strong>/);
+    assert.match(sidebar, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
+    assert.match(page, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
+    assert.match(sidebar, /<strong>我的角色<\/strong>/);
+    assert.match(sidebar, /:href="dashboardRoleUrl"/);
+    assert.doesNotMatch(sidebar, /发现团队与公开活动/);
+    assert.doesNotMatch(sidebar, /管理全部已绑定角色/);
+    assert.match(sidebar, /expandedGroups:\s*\{\s*manage:\s*false/);
+    assert.doesNotMatch(sidebar, /<router-link v-if="isLogin" to="\/org\/add">创建<\/router-link>/);
     assert.doesNotMatch(sidebar, /<span v-if="isLogin && !loading">\{\{ workspaceTeamCount \}\}<\/span>/);
     assert.doesNotMatch(sidebar, /成员、内容、数据与设置/);
     assert.doesNotMatch(sidebar, /角色、战绩、DKP 与 RAID/);
@@ -44,7 +57,7 @@ test("team creation reuses the modern workspace and grouped archive form languag
         read("../src/assets/css/team/org/add_org.less"),
     ]);
 
-    assert.match(app, /\["index", "view_my_org", "add_org"\]/);
+    assert.match(app, /\["index", "list_raid", "view_raid", "view_my_org", "add_org"\]/);
     assert.match(page, /class="v-org-add p-team-create"/);
     assert.match(page, /class="m-team-create__hero"/);
     assert.match(page, /variant="archive"/);

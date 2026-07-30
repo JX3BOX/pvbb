@@ -5,7 +5,7 @@
                 <header class="m-team-home__header">
                     <div class="m-team-home__intro">
                         <span class="u-team-home-icon" aria-hidden="true">
-                            <el-icon><UserFilled /></el-icon>
+                            <img :src="teamLogo" alt="" />
                         </span>
                         <div class="m-team-home__heading">
                             <h1 id="team-home-title">团队平台</h1>
@@ -42,7 +42,8 @@
 
 <script>
 import TeamList from "@/components/team/org/team_list.vue";
-import { Plus, QuestionFilled, UserFilled } from "@element-plus/icons-vue";
+import { __cdn } from "@/utils/config";
+import { Plus, QuestionFilled } from "@element-plus/icons-vue";
 export default {
     name: "ListOrg",
     props: [],
@@ -50,11 +51,11 @@ export default {
         "team-list": TeamList,
         Plus,
         QuestionFilled,
-        UserFilled,
     },
     data: function () {
         return {
             teamTotal: null,
+            teamLogo: __cdn + "logo/logo-light/team.svg",
         };
     },
     computed: {
