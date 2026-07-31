@@ -12,7 +12,7 @@
 
 ## QQBOT
 
-截图 ready 状态说明见 [docs/QQBOT_READY.md](docs/QQBOT_READY.md)。
+截图 ready 状态说明见 [docs/design/QQBOT_READY.md](docs/design/QQBOT_READY.md)。
 
 ### pvx
 

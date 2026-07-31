@@ -1468,6 +1468,22 @@
         .m-team-list > .u-list {
             grid-template-columns: minmax(0, 1fr);
         }
+
+        .m-team-list .u-item {
+            > .u-meta:not(.u-recruit) {
+                display: grid;
+                height: auto;
+                align-content: start;
+                align-items: start;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 4px;
+                overflow: visible;
+            }
+
+            > .u-meta:not(.u-recruit) .u-meta-item {
+                width: 100%;
+            }
+        }
     }
 }
 

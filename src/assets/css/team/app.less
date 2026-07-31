@@ -36,6 +36,7 @@
 .p-team .m-team-modern-shell__content {
     > .p-team-home,
     > .p-team-my-org,
+    > .p-team-public,
     > .m-team-login-state {
         width: 100%;
         max-width: none;
@@ -226,6 +227,12 @@
             .bold;
         }
     }
+}
+
+// Element Plus 会将 card tab 上移 1px；当 tab 自带背景色时，
+// 背景会盖住 nav 的顶部边框。团队入口使用独立样式包，需要在这里统一归零。
+.el-tabs--card > .el-tabs__header .el-tabs__item {
+    margin-top: 0 !important;
 }
 
 .m-create-team {

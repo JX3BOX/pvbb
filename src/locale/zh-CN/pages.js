@@ -452,7 +452,7 @@ export default {
     },
 
     team: {
-        title: "团队管理平台",
+        title: "团队平台",
         keywords: "开团,团队管理,帮会管理,角色管理,DKP,团本招募",
         description: "剑网3团队管理平台、角色、团员、DKP、开团与申请管理",
         battle: {

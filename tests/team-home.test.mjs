@@ -128,6 +128,44 @@ test("team management uses a canonical route without the mode query", async () =
     assert.match(namespace, /name:\s*"manage_my_org"/);
 });
 
+test("team public homepage shares the modern shell and keeps public modules intact", async () => {
+    const [app, sidebar, router, page, pageStyles, shellStyles] = await Promise.all([
+        read("../src/pages/team/App.vue"),
+        read("../src/components/team/org/team_home_sidebar.vue"),
+        read("../src/pages/team/router.js"),
+        read("../src/views/team/org/ViewOrg.vue"),
+        read("../src/assets/css/team/org/view_org.less"),
+        read("../src/assets/css/team/app.less"),
+    ]);
+
+    assert.match(app, /"index", "view_org"/);
+    assert.match(sidebar, /\["index", "view_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(router, /name:\s*"view_org"[\s\S]*?path:\s*"\/org\/:id"[\s\S]*?isPublic:\s*true/);
+    assert.match(page, /class="v-org-view p-team-public"/);
+    assert.match(page, /class="m-public-org__hero"/);
+    assert.match(page, /class="m-public-org__workspace"/);
+    assert.match(page, /<team-info[\s\S]*?:info="data"[\s\S]*?:team_id="id"/);
+    assert.match(page, /<team-info[\s\S]*?:show-manage-action="false"/);
+    assert.match(page, /class="m-team-view m-public-org__tabs"/);
+    assert.doesNotMatch(page, /<el-tabs[^>]*type="card"/);
+    for (const tab of ["团队概况", "团队成员", "DKP记录", "通关视频", "留言板"]) {
+        assert.match(page, new RegExp(`<span>${tab}<\\/span>`));
+    }
+    for (const component of ["team-intro", "team-recruit", "team-medals", "team-trophy", "ViewMember", "ViewDkp", "ViewVideo", "ViewComment"]) {
+        assert.match(page, new RegExp(`<${component}\\b`));
+    }
+    assert.match(page, /const PUBLIC_TABS = \["overview", "member", "dkp", "video", "comment"\]/);
+    assert.match(page, /const query = \{ \.\.\.this\.\$route\.query \}/);
+    assert.match(page, /Promise\.all\(\[this\.loadTeamInfo\(id\), this\.loadAuthority\(id\)\]\)/);
+    assert.match(page, /version !== this\.loadVersion \|\| id !== this\.id/);
+    assert.match(page, /:key="`public-team-tabs-\$\{id\}`"/);
+    assert.match(page, /class="m-public-org__error"/);
+    assert.match(shellStyles, /> \.p-team-public/);
+    assert.match(pageStyles, /\.p-team-public[\s\S]*\.m-public-org__hero[\s\S]*border-radius:\s*@team-radius-control/);
+    assert.match(pageStyles, /\.m-team-info[\s\S]*grid-template-columns:\s*76px minmax\(0, 1fr\) auto/);
+    assert.match(pageStyles, /\.m-public-org__overview[\s\S]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+});
+
 test("team join dialog uses an isolated responsive role picker without changing the join contract", async () => {
     const [dialog, styles, service, raidDialog] = await Promise.all([
         read("../src/components/team/member/joinpop.vue"),
@@ -164,6 +202,32 @@ test("team join dialog uses an isolated responsive role picker without changing 
     assert.match(styles, /\.dialog-footer[\s\S]*?justify-content:\s*space-between/);
     assert.match(styles, /@media screen and \(max-width: 520px\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
     assert.doesNotMatch(raidDialog, /m-team-member-join-dialog/);
+});
+
+test("team praise follows the mobile joke heart interaction without changing the team stat contract", async () => {
+    const [good, styles, service] = await Promise.all([
+        read("../src/components/team/widget/Good.vue"),
+        read("../src/assets/css/team/widget/good.less"),
+        read("../src/service/team/team.js"),
+    ]);
+
+    assert.match(good, /class="w-like-heart"/);
+    assert.match(good, /'is-liked': liked, 'is-animating': animating/);
+    assert.match(good, /:aria-pressed="liked \? 'true' : 'false'"/);
+    assert.match(good, /class="u-heart-icon"/);
+    assert.match(good, /v-if="animating" class="u-like-feedback"[^>]*>\+1</);
+    assert.match(good, /if \(!this\.id \|\| this\.submitting \|\| this\.liked\) return/);
+    assert.match(good, /this\.total = Number\(this\.total \|\| 0\) \+ 1/);
+    assert.match(good, /await addLike\(this\.id\)/);
+    assert.match(good, /this\.total = Math\.max\(Number\(this\.total \|\| 1\) - 1, 0\)/);
+    assert.match(good, /}, 760\)/);
+    assert.match(good, /beforeUnmount[\s\S]*?clearTimeout\(this\.animationTimer\)/);
+    assert.doesNotMatch(styles, /web_heart_animation\.png|steps\(28\)/);
+    for (const animation of ["team-good-pop", "team-good-ring", "team-good-particles", "team-good-feedback"]) {
+        assert.match(styles, new RegExp(`@keyframes ${animation}`));
+    }
+    assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
+    assert.match(service, /function addLike\(team_id\)[\s\S]*?postStat\("team", team_id, "like"\)/);
 });
 
 test("team public members use grouped profile cards with compact responsive states", async () => {
@@ -215,6 +279,32 @@ test("member account removal lives in the role dialog footer", async () => {
     assert.match(styles, /\.m-member-role-dialog-footer[\s\S]*?\.u-remove-account[\s\S]*?color:\s*#dc2626/);
     assert.match(styles, /\.u-dialog-done[\s\S]*?margin-left:\s*auto/);
     assert.match(service, /function removeTeamRoleAll\(team_id, user_id\)/);
+});
+
+test("team homepage medals are display-only", async () => {
+    const [teamMedals, medal] = await Promise.all([
+        read("../src/components/team/org/team_medals.vue"),
+        read("../src/components/team/medal.vue"),
+    ]);
+
+    assert.match(teamMedals, /<Medal[^>]*:interactive="false"/);
+    assert.match(medal, /interactive:\s*\{[\s\S]*?type:\s*Boolean[\s\S]*?default:\s*true/);
+    assert.match(medal, /<a[\s\S]*?v-if="interactive"/);
+    assert.match(medal, /<span v-else class="u-medal is-static"/);
+    assert.match(medal, /&\.is-static\s*\{[\s\S]*?cursor:\s*default/);
+});
+
+test("team card tabs keep their top border above painted tab backgrounds", async () => {
+    const [shellStyles, dkp] = await Promise.all([
+        read("../src/assets/css/team/app.less"),
+        read("../src/views/team/dkp/ViewDkp.vue"),
+    ]);
+
+    assert.match(dkp, /<el-tabs v-model="tab" type="card">/);
+    assert.match(
+        shellStyles,
+        /\.el-tabs--card\s*>\s*\.el-tabs__header\s+\.el-tabs__item\s*\{[\s\S]*?margin-top:\s*0\s*!important/,
+    );
 });
 
 test("team edit action opens the basic settings section in the workbench", async () => {
@@ -502,8 +592,16 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
 
     assert.match(page, /@total-change="updateTeamTotal"/);
     assert.match(list, /this\.\$emit\("total-change", this\.total\)/);
+    assert.match(list, /const TEAM_NAME_LIMIT = 12/);
+    assert.match(list, /\{\{ formatTeamName\(item\.name\) \}\}/);
+    assert.match(list, /characters\.slice\(0, TEAM_NAME_LIMIT\)\.join\(""\) \+ "…"/);
+    assert.match(list, /:title="item\.name \|\| ''"/);
     assert.doesNotMatch(list, /m-team-results-header/);
     assert.doesNotMatch(list, /u-card-enter/);
     assert.match(list, /暂未发布招募公告/);
     assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+    assert.match(
+        styles,
+        /@media screen and \(max-width: 820px\)[\s\S]*?> \.u-meta:not\(\.u-recruit\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-meta-item[\s\S]*?width:\s*100%/,
+    );
 });

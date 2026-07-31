@@ -257,7 +257,7 @@ export default {
             return `/account/login?redirect=${encodeURIComponent(window.location.href)}`;
         },
         isTeamHome: function () {
-            return this.$route.name === "index";
+            return ["index", "view_org"].includes(this.$route.name);
         },
         isTeamActivity: function () {
             return ["list_raid", "view_raid"].includes(this.$route.name);

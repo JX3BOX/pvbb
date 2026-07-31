@@ -1,67 +1,225 @@
-.w-like-heart{
-    user-select: none;
+@import (reference) "../design-system/_tokens.less";
 
-    .w-heart{
-        .dbi;
-        .y(top);
-    }
-    .u-text{
-        .fz(14px,50px);
-        padding-right:5px;
-    }
-    // border:1px solid #eee;
-    .r(4px);
-    .dbi;
-    .pointer;
+@team-like: #f43f5e;
+@team-like-hover: #e11d48;
+@team-like-soft: #fff1f2;
 
-    .w-heart{
-        background-position: right; //显示最后一个红心帧
-    }
-    .u-text{
-        color:#e2264d;
-        -webkit-font-smoothing:antialiased;
-    }
-
-    .u-count{
-        .fz(14px,50px);
-        color:#aaa;
-        padding-right:15px;
-    }
-}
-
-.w-heart {
-    background: url("../../../img/team/web_heart_animation.png");
-    background-position: left;
-    background-repeat: no-repeat;
-    height: 50px;
-    width: 50px;
+.w-like-heart {
+    position: relative;
+    display: inline-flex;
+    min-width: 112px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    overflow: visible;
+    border: 1px solid fade(@team-like, 22%);
+    border-radius: 999px;
+    background: linear-gradient(180deg, @team-surface 0%, fade(@team-like-soft, 72%) 100%);
+    box-shadow: 0 1px 2px fade(@team-like, 8%);
+    color: @team-text-secondary;
     cursor: pointer;
-    background-size: 1450px; //实际背景图片尺寸2900px
+    font: inherit;
+    line-height: 1;
+    outline: none;
+    user-select: none;
+    gap: 6px;
+    transition: color @team-duration-fast @team-ease-standard,
+        border-color @team-duration-fast @team-ease-standard,
+        background-color @team-duration-fast @team-ease-standard,
+        box-shadow @team-duration-fast @team-ease-standard,
+        transform @team-duration-fast @team-ease-standard;
+
+    &:hover:not(:disabled) {
+        border-color: fade(@team-like, 42%);
+        background: @team-like-soft;
+        box-shadow: 0 5px 14px fade(@team-like, 13%);
+        color: @team-like-hover;
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px fade(@team-like, 15%);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0) scale(0.98);
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+
+    &.is-liked {
+        border-color: fade(@team-like, 34%);
+        background: @team-like-soft;
+        color: @team-like-hover;
+    }
+
+    .w-heart {
+        display: inline-flex;
+        width: 20px;
+        height: 20px;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        color: @team-like;
+    }
+
+    .u-heart-icon {
+        display: block;
+        width: 20px;
+        height: 20px;
+        overflow: visible;
+        fill: transparent;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.8;
+        transform-origin: center;
+        transition: fill @team-duration-fast @team-ease-standard,
+            stroke @team-duration-fast @team-ease-standard;
+    }
+
+    &.is-liked .u-heart-icon {
+        fill: currentColor;
+        stroke-width: 1.5;
+    }
+
+    .u-text {
+        color: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+        white-space: nowrap;
+    }
+
+    .u-count {
+        min-width: 12px;
+        color: @team-text-muted;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        line-height: 20px;
+        text-align: left;
+    }
+
+    &.is-liked .u-count {
+        color: fade(@team-like-hover, 65%);
+    }
+
+    &.is-animating {
+        z-index: 2;
+
+        .u-heart-icon {
+            animation: team-good-pop 720ms cubic-bezier(0.2, 0.85, 0.32, 1.35) both;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 23px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid fade(@team-like, 48%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: team-good-ring 660ms ease-out both;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 23px;
+            width: 46px;
+            height: 46px;
+            pointer-events: none;
+            background: radial-gradient(circle, #fb7185 0 2px, transparent 2.5px) 50% 0 / 7px 7px no-repeat,
+                radial-gradient(circle, #f59e0b 0 2px, transparent 2.5px) 100% 28% / 7px 7px no-repeat,
+                radial-gradient(circle, #ef4444 0 2px, transparent 2.5px) 82% 88% / 7px 7px no-repeat,
+                radial-gradient(circle, #fbbf24 0 2px, transparent 2.5px) 18% 88% / 7px 7px no-repeat,
+                radial-gradient(circle, #fb7185 0 2px, transparent 2.5px) 0 28% / 7px 7px no-repeat;
+            animation: team-good-particles 700ms ease-out both;
+        }
+    }
+
+    .u-like-feedback {
+        position: absolute;
+        top: -8px;
+        left: 14px;
+        color: @team-like-hover;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1;
+        pointer-events: none;
+        animation: team-good-feedback 720ms ease-out both;
+    }
 }
-@-webkit-keyframes heartBlast {
+
+@keyframes team-good-pop {
     0% {
-        background-position: left;
+        transform: scale(0.65) rotate(-14deg);
+    }
+    42% {
+        transform: scale(1.55) rotate(8deg);
+    }
+    68% {
+        transform: scale(0.9) rotate(-3deg);
     }
     100% {
-        background-position: right;
+        transform: scale(1) rotate(0);
     }
 }
-@keyframes heartBlast {
+
+@keyframes team-good-ring {
     0% {
-        background-position: left;
+        opacity: 0.85;
+        transform: translate(-50%, -50%) scale(0.3);
     }
     100% {
-        background-position: right;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.35);
     }
 }
-.w-heart-animation {
-    -webkit-animation-name: heartBlast; //webkit内核浏览器
-    animation-name: heartBlast;
-    -webkit-animation-duration: 0.8s;
-    animation-duration: 0.8s;
-    -webkit-animation-iteration-count: 1;
-    animation-iteration-count: 1;
-    -webkit-animation-timing-function: steps(28); //共28个背景图片帧
-    animation-timing-function: steps(28);
-    background-position: right;
+
+@keyframes team-good-particles {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(-12deg);
+    }
+    26% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.15) rotate(8deg);
+    }
+}
+
+@keyframes team-good-feedback {
+    0% {
+        opacity: 0;
+        transform: translateY(5px) scale(0.8);
+    }
+    28% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.92);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .w-like-heart.is-animating {
+        .u-heart-icon,
+        &::before,
+        &::after,
+        .u-like-feedback {
+            animation-duration: 1ms !important;
+        }
+    }
 }

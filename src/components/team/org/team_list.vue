@@ -105,7 +105,7 @@
                     <img src="@/assets/img/team/team_logo_null.svg" v-else />
                 </span>
                 <span class="u-name">
-                    <span class="u-name-text">{{ item.name }}</span>
+                    <span class="u-name-text" :title="item.name || ''">{{ formatTeamName(item.name) }}</span>
                     <i class="u-status" v-if="item.status == 1" title="已认证">
                         <img svg-inline src="@/assets/img/team/verify.svg" />
                     </i>
@@ -195,6 +195,9 @@ import { getThumbnail, showAvatar, authorLink } from "@jx3box/jx3box-common/js/u
 import { __ossMirror, __cdn } from "@/utils/config";
 import { getTeams } from "@/service/team/team.js";
 import { uniq } from "lodash";
+
+const TEAM_NAME_LIMIT = 12;
+
 export default {
     name: "TeamList",
     props: ["limit", "isIndex", "homeMode"],
@@ -248,6 +251,14 @@ export default {
     methods: {
         showAvatar,
         authorLink,
+        formatTeamName: function (value) {
+            const name = String(value || "");
+            const characters = Array.from(name);
+
+            return characters.length > TEAM_NAME_LIMIT
+                ? characters.slice(0, TEAM_NAME_LIMIT).join("") + "…"
+                : name;
+        },
         loadData: function () {
             this.loading = true;
             getTeams(this.params)
