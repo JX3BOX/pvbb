@@ -153,10 +153,10 @@ test("team workspace separates management tools from the member view", async () 
     assert.deepEqual(topLevelLabels, [
         "成员管理",
         "战绩管理",
-        "视频管理",
         "快照管理",
         "DKP管理",
         "RAID管理",
+        "视频管理",
         "团队设置",
         "我的角色",
         "我的战绩",

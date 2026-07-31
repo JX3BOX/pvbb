@@ -61,14 +61,6 @@
                         <ManageBattle :team-id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="视频管理" name="video" lazy v-if="permissions.r_video || isSuper">
-                        <template #label>
-                            <el-icon><VideoCamera /></el-icon>
-                            <span>视频管理</span>
-                        </template>
-                        <ManageVideo :super="data.super" />
-                    </el-tab-pane>
-
                     <el-tab-pane label="快照管理" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
                         <template #label>
                             <el-icon><Camera /></el-icon>
@@ -91,6 +83,14 @@
                             <span>RAID管理</span>
                         </template>
                         <ManageRaid :team-id="id" embedded />
+                    </el-tab-pane>
+
+                    <el-tab-pane label="视频管理" name="video" lazy v-if="permissions.r_video || isSuper">
+                        <template #label>
+                            <el-icon><VideoCamera /></el-icon>
+                            <span>视频管理</span>
+                        </template>
+                        <ManageVideo :super="data.super" />
                     </el-tab-pane>
 
                     <el-tab-pane label="团队设置" name="setting" lazy v-if="isSuper">
@@ -350,10 +350,10 @@ export default {
             const tabs = [];
             if (this.permissions.r_member || this.isSuper) tabs.push("manage-member");
             if (this.permissions.r_race || this.isSuper) tabs.push("manage-battle");
-            if (this.permissions.r_video || this.isSuper) tabs.push("video");
             if (this.permissions.r_snapshot || this.isSuper) tabs.push("manage-snapshot");
             if (this.permissions.r_dkp || this.isSuper) tabs.push("manage-dkp");
             if (this.permissions.r_raid || this.isSuper) tabs.push("manage-raid");
+            if (this.permissions.r_video || this.isSuper) tabs.push("video");
             if (this.isSuper) tabs.push("setting");
             return tabs;
         },
