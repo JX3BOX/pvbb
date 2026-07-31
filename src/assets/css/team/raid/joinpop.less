@@ -1,81 +1,422 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-raid-joinpop {
-    .u-list {
-        .mb(0);
-    }
+    font-size: 14px;
+
     .el-dialog {
-        max-height: 640px;
-        min-height: 300px;
-        // height: auto;
+        max-width: calc(100vw - 32px);
+        overflow: hidden;
+        border: 1px solid @team-border-light;
+        border-radius: 18px;
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+    }
+
+    .el-dialog__header {
+        margin: 0;
+        padding: 24px 28px 18px;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__title {
+        color: @team-text-primary;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 28px;
+    }
+
+    .el-dialog__headerbtn {
+        top: 22px;
+        right: 24px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+
+        &:hover {
+            background: @team-surface-muted;
+        }
+    }
+
+    .el-dialog__body {
+        max-height: min(68vh, 680px);
+        padding: 22px 28px 24px;
+        overflow-y: auto;
+    }
+
+    .el-dialog__footer {
+        padding: 16px 28px;
+        border-top: 1px solid @team-border-light;
+        background: @team-surface-muted;
+    }
+
+    .el-button {
+        min-height: 38px;
+        padding: 0 18px;
+        border-radius: 10px;
+        font-weight: 600;
     }
 }
 
-.m-raid-joinpop-box {
-    .mt(20px);
+.m-raid-joinpop-content {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
+.m-raid-joinpop-mode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: @team-surface-muted;
+    gap: 20px;
+
+    > div:first-child {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+
+        strong {
+            color: @team-text-primary;
+            font-size: 14px;
+        }
+
+        span {
+            color: @team-text-muted;
+            font-size: 12px;
+        }
+    }
+
+    .el-radio-group {
+        flex: none;
+    }
+
+    .el-radio-button__inner {
+        min-height: 38px;
+        padding: 10px 18px;
+        border-color: @team-border;
+        box-shadow: none;
+        font-weight: 600;
+    }
+}
+
+.m-raid-joinpop-section {
+    min-width: 0;
+
+    .u-section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        gap: 12px;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        strong,
+        .u-label {
+            color: @team-text-primary;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        span {
+            color: @team-text-muted;
+            font-size: 12px;
+        }
+    }
+
+    .u-selection-count {
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: @team-primary-soft;
+        color: @team-primary !important;
+        font-weight: 600;
+    }
+}
+
+.m-raid-joinpop-list {
+    .u-list {
+        display: grid;
+        margin: 0;
+        grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+        gap: 10px;
+    }
+
+    .u-item {
+        position: relative;
+        width: auto;
+        height: 86px;
+        margin: 0 !important;
+        overflow: hidden;
+        border-color: @team-border;
+        border-radius: @team-radius-control;
+        background: @team-surface;
+        transition:
+            border-color @team-duration-fast @team-ease-standard,
+            box-shadow @team-duration-fast @team-ease-standard,
+            background @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+            box-shadow: @team-shadow-xs;
+        }
+
+        &.is-checked {
+            border-color: @team-primary;
+            background: fade(@team-primary-soft, 45%);
+            box-shadow: inset 0 0 0 1px @team-primary;
+
+            &::after {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                display: flex;
+                width: 18px;
+                height: 18px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: @team-primary;
+                color: #fff;
+                content: "\2713";
+                font-size: 11px;
+                font-weight: 700;
+            }
+        }
+
+        .el-checkbox__input {
+            display: none;
+        }
+
+        .el-checkbox__label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+        }
+    }
+
+    .u-role-card {
+        display: grid;
+        min-width: 0;
+        height: 100%;
+        align-content: center;
+        grid-template-columns: 36px minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        column-gap: 9px;
+    }
+
+    .u-item-avatar {
+        width: 36px;
+        height: 36px;
+        align-self: center;
+        grid-row: 1 / 3;
+        object-fit: contain;
+    }
+
+    .u-item-name,
+    .u-item-server {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .u-item-name {
+        align-self: end;
+        color: @team-text-primary;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .u-item-server {
+        align-self: start;
+        color: @team-text-muted;
+        font-size: 12px;
+    }
+}
 
 .m-team-joinpop-block {
-    .mb(5px);
+    margin: 0;
+
     .u-label {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px;
+        color: @team-text-primary;
+        font-size: 14px;
+        font-weight: 700;
+        gap: 6px;
+
+        b {
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: #fff1f2;
+            color: #e11d48;
+            font-size: 11px;
+        }
+
+        span {
+            color: @team-text-muted;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
+
+    .el-input__wrapper {
+        min-height: 42px;
+        border-radius: 10px;
+        box-shadow: 0 0 0 1px @team-border inset;
+    }
+}
+
+.m-team-xf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+    gap: 8px;
+
+    .el-radio {
+        display: flex;
+        width: auto;
+        min-width: 0;
+        height: 72px;
+        align-items: center;
+        justify-content: center;
         margin: 0;
-        .bold;
-        // color: #fba524;
-        // color:@v4primary;
-        .fz(13px,2.6);
-        b{
-            color:#c00;
-            .fz(12px);
+        border: 1px solid @team-border;
+        border-radius: 10px;
+        background: @team-surface;
+        transition:
+            border-color @team-duration-fast @team-ease-standard,
+            background @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+
+        &.is-checked {
+            border-color: @team-primary;
+            background: fade(@team-primary-soft, 55%);
+            box-shadow: inset 0 0 0 1px @team-primary;
         }
     }
 
-    &.isFirstBlock {
-        .mt(10px);
+    .el-radio__input {
+        display: none;
     }
 
-    .m-team-xf {
+    .el-radio__label {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        flex-direction: column;
+        padding: 8px 4px;
+        gap: 4px;
+    }
+
+    .u-pic {
+        display: block;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: @team-surface-muted;
+        object-fit: contain;
+        opacity: 0.72;
+    }
+
+    .u-txt {
+        width: 100%;
+        overflow: hidden;
+        color: @team-text-regular;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 16px;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .is-checked {
         .u-pic {
-            .db;
-            .size(32px);
-            background-color: @bg-black;
-            .r(4px);
-            transition: 0.1s ease-in;
-            .tm(0.4);
-            box-sizing: border-box;
-
-            &:hover {
-                .tm(1)
-            }
+            opacity: 1;
         }
+
         .u-txt {
-            .db;
-            .x;
-            .fz(12px, 2);
-            white-space: nowrap;
-            overflow: hidden;
-            .w(32px);
+            color: @team-primary;
+        }
+    }
+}
+
+.m-team-joinpop-null {
+    line-height: 1.6;
+}
+
+.m-raid-joinpop-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    > span {
+        color: @team-text-muted;
+        font-size: 12px;
+
+        i {
+            margin-right: 5px;
+            color: @team-primary;
+        }
+    }
+
+    > div {
+        display: flex;
+        gap: 8px;
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-raid-joinpop {
+        .el-dialog {
+            width: calc(100% - 20px) !important;
+            max-width: none;
+            margin: 10px auto !important;
         }
 
-        .el-radio {
-            .ml(0);
-            .mr(15px);
+        .el-dialog__header,
+        .el-dialog__body,
+        .el-dialog__footer {
+            padding-right: 16px;
+            padding-left: 16px;
         }
-        .el-radio__input {
-            .none;
-        }
-        .el-radio__label {
-            .db;
-            padding-left: 0;
-        }
+    }
 
-        .is-checked {
-            .u-pic {
-                border: 3px solid @v4primary;
-                // filter: saturate(120%)  brightness(120%);
-                .tm(1);
-            }
-            .u-txt {
-                .bold;
-            }
-        }
+    .m-raid-joinpop-mode,
+    .m-raid-joinpop-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .m-raid-joinpop-mode .el-radio-group,
+    .m-raid-joinpop-mode .el-radio-button {
+        display: flex;
+        flex: 1;
+    }
+
+    .m-raid-joinpop-mode .el-radio-button__inner {
+        width: 100%;
+    }
+
+    .m-raid-joinpop-list .u-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .m-raid-joinpop-footer > div {
+        justify-content: flex-end;
     }
 }

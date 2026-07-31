@@ -1,66 +1,89 @@
 <template>
     <el-dialog
         class="m-dkp-dialog-modify"
-        title="调整DKP"
+        title="调整 DKP"
         v-model="show"
         :close-on-click-modal="false"
         :close-on-press-escape="!editFormLoading"
         :show-close="!editFormLoading"
-        width="700px"
+        width="620px"
+        append-to-body
     >
-        <el-form :model="form" v-loading="editFormLoading" :rules="editFormRules" ref="editForm" label-width="100px">
-            <el-form-item label="调整对象">
-                <el-row>
-                    <el-col
-                        :md="4"
+        <el-form
+            :model="form"
+            v-loading="editFormLoading"
+            :rules="editFormRules"
+            ref="editForm"
+            label-position="top"
+            class="m-dkp-dialog-form"
+        >
+            <el-form-item>
+                <template #label>
+                    <span class="u-field-label">
+                        调整对象
+                        <em>{{ rows.length }} 人</em>
+                    </span>
+                </template>
+                <div class="m-dkp-target-list">
+                    <a
                         v-for="row in rows"
                         :key="row.uid"
                         class="u-user-item"
+                        :href="authorLink(row.uid)"
+                        target="_blank"
                         :title="row.user_info && row.user_info.display_name"
                     >
-                        <a :href="authorLink(row.uid)" target="_blank">
-                            <img :src="renderAvatar(row.user_info)" class="u-user-avatar" />
-                            <span class="u-user-name">
-                                {{ row.user_info && row.user_info.display_name }}
-                            </span>
-                        </a>
-                    </el-col>
-                </el-row>
+                        <img :src="renderAvatar(row.user_info)" class="u-user-avatar" />
+                        <span class="u-user-name">
+                            {{ row.user_info && row.user_info.display_name }}
+                        </span>
+                    </a>
+                </div>
             </el-form-item>
 
-            <el-form-item label="指定角色" v-if="singleRow">
-                <el-select v-model="form.role_id" clearable>
+            <el-form-item v-if="singleRow">
+                <template #label>
+                    <span class="u-field-label">
+                        指定角色
+                        <em>选填</em>
+                    </span>
+                </template>
+                <el-select v-model="form.role_id" clearable placeholder="不指定角色则计入成员总分">
                     <el-option
                         v-for="(role, index) in singleRow.roles"
                         :key="index"
                         :label="role.roleInfo.name"
                         :value="role.relation.ID"
                     >
-                        <div style="display: inline-flex; align-items: center">
-                            <img
-                                style="margin-right: 8px"
-                                width="24"
-                                height="24"
-                                :src="showSchoolIcon(role.roleInfo.mount)"
-                            />
+                        <div class="m-dkp-role-option">
+                            <img :src="showSchoolIcon(role.roleInfo.mount)" />
                             <span>{{ role.roleInfo.name }}</span>
                         </div>
                     </el-option>
                 </el-select>
-                <span class="u-tip">（非必选）</span>
             </el-form-item>
 
-            <el-form-item label="调整原因">
-                <el-radio-group v-model="form.reason" @change="turnScorePM">
-                    <el-radio value="manual" size="small" border>手动设置</el-radio>
-                    <el-radio value="drop" size="small" border v-if="singleRow">分配物品</el-radio>
-                    <!-- <el-radio value="penalty" size="small" border
-                        >犯错罚款</el-radio
-                    > -->
-                </el-radio-group>
-            </el-form-item>
+            <div class="m-dkp-dialog-form__row">
+                <el-form-item label="调整原因">
+                    <el-radio-group
+                        v-model="form.reason"
+                        :class="{ 'is-single-option': !singleRow }"
+                        @change="turnScorePM"
+                    >
+                        <el-radio value="manual" border>手动设置</el-radio>
+                        <el-radio value="drop" border v-if="singleRow">分配物品</el-radio>
+                    </el-radio-group>
+                </el-form-item>
 
-            <el-form-item label="物品（单选）" v-if="form.reason === 'drop'" prop="drop">
+                <el-form-item label="变动方向">
+                    <el-radio-group v-model="form.action">
+                        <el-radio :value="0" border>增加</el-radio>
+                        <el-radio :value="1" border>扣减</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+            </div>
+
+            <el-form-item label="分配物品" v-if="form.reason === 'drop'" prop="drop_item_id">
                 <el-select
                     v-model="form.drop_item_id"
                     filterable
@@ -81,31 +104,29 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="变动方向">
-                <el-radio-group v-model="form.action">
-                    <el-radio :value="0" size="small">增加</el-radio>
-                    <el-radio :value="1" size="small">扣减</el-radio>
-                </el-radio-group>
-            </el-form-item>
-
-            <el-form-item label="分值" required prop="score">
+            <el-form-item label="变动分值" required prop="score">
                 <el-input
                     v-model.number="form.score"
                     autocomplete="off"
                     min="1"
                     type="number"
                     pattern="[1-9][0-9]*"
+                    placeholder="请输入正整数"
                 ></el-input>
             </el-form-item>
 
             <el-form-item label="备注" prop="remark">
-                <el-input v-model="form.remark" autocomplete="off" placeholder=""></el-input>
+                <el-input
+                    v-model="form.remark"
+                    autocomplete="off"
+                    :placeholder="`选填，留空将自动记录为“${remarkPlaceholder}”`"
+                ></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
-            <div class="dialog-footer" v-if="!editFormLoading">
-                <el-button @click="handleCancel">取 消</el-button>
-                <el-button type="primary" @click="handleSubmitEdit" :loading="editFormLoading">确 定</el-button>
+            <div class="m-dkp-dialog-footer" v-if="!editFormLoading">
+                <el-button @click="handleCancel">取消</el-button>
+                <el-button type="primary" @click="handleSubmitEdit" :loading="editFormLoading">确认调整</el-button>
             </div>
         </template>
     </el-dialog>
@@ -315,7 +336,7 @@ export default {
 
         // 头像渲染
         renderAvatar: function (userinfo) {
-            return showAvatar(userinfo?.avatar);
+            return showAvatar(userinfo?.user_avatar || userinfo?.avatar);
         },
         // 取消
         handleCancel: function () {

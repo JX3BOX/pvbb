@@ -1,11 +1,13 @@
 <template>
     <div class="m-snapshot-box" v-loading="loading">
         <div class="m-snapshot-search">
-            <el-input placeholder="输入关键词.." v-model="search" size="large">
-                <template #prepend><i class="el-icon-search"></i> 搜索</template>
-                <template #append>
-                    <el-button icon="Position"></el-button>
-                </template>
+            <el-input
+                placeholder="搜索快照标题、上传人员或备注"
+                aria-label="搜索快照"
+                v-model="search"
+                clearable
+            >
+                <template #prefix><i class="el-icon-search"></i></template>
             </el-input>
         </div>
         <div class="m-snapshot-list" v-if="list && list.length">
@@ -17,6 +19,7 @@
                 @dropSnapshot="dropSnapshot(i)"
                 :readOnly="readOnly"
                 :supportDkpSync="supportDkpSync"
+                @editSnapshot="openEditDialog"
             />
             <el-pagination
                 class="m-snapshot-pages"
@@ -35,18 +38,21 @@
                 <a href="/tool/23783" target="_blank">帮助文档</a>
             </template>
         </el-alert>
+        <EditSnapshotDialog v-model="editVisible" :snapshot-id="editingId" @saved="loadSnapshots" />
     </div>
 </template>
 
 <script>
 import snapshotItem from "@/components/team/snapshot/snapshotItem.vue";
 import { getSnapshots } from "@/service/team/snapshot.js";
+import EditSnapshotDialog from "@/components/team/snapshot/EditSnapshotDialog.vue";
 
 export default {
     name: "snapshot_list",
     props: ["org", "readOnly", "supportDkpSync"],
     components: {
         "snapshot-item": snapshotItem,
+        EditSnapshotDialog,
     },
     data: function () {
         return {
@@ -56,6 +62,8 @@ export default {
             total: 1,
             loading: false,
             search: "",
+            editingId: null,
+            editVisible: false,
         };
     },
     computed: {
@@ -82,6 +90,10 @@ export default {
         },
     },
     methods: {
+        openEditDialog(id) {
+            this.editingId = id;
+            this.editVisible = true;
+        },
         dropSnapshot: function (i) {
             this.list.splice(i, 1);
         },

@@ -138,8 +138,174 @@
     }
 }
 
+.u-member-total-skeleton.el-skeleton__item {
+    width: 70px;
+    height: 28px;
+    flex: none;
+    border-radius: 9999px;
+}
+
+.m-member-skeleton-card {
+    height: 100%;
+
+    .el-skeleton__template {
+        height: 100%;
+    }
+}
+
+.u-member-skeleton {
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    align-items: center;
+    padding: 10px @team-space-3;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: @team-surface;
+    box-shadow: @team-shadow-xs;
+    gap: @team-space-2;
+
+    .u-skeleton-avatar.el-skeleton__item {
+        width: 46px;
+        height: 46px;
+        flex: none;
+        border-radius: 13px;
+    }
+
+    .u-skeleton-copy {
+        display: flex;
+        min-width: 52px;
+        flex: 1;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .u-skeleton-name.el-skeleton__item {
+        width: 72%;
+        height: 14px;
+    }
+
+    .u-skeleton-uid.el-skeleton__item {
+        width: 48%;
+        height: 10px;
+    }
+
+    .u-skeleton-role.el-skeleton__item {
+        width: 52px;
+        height: 24px;
+        flex: none;
+        border-radius: 9999px;
+    }
+
+    .u-skeleton-action.el-skeleton__item {
+        width: 32px;
+        height: 32px;
+        flex: none;
+        border-radius: 9px;
+    }
+}
+
 .m-pending-card-grid {
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.m-pending-skeleton-card {
+    min-width: 0;
+
+    .el-skeleton__template {
+        height: 100%;
+    }
+}
+
+.u-pending-skeleton {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 60px minmax(0, 1fr);
+    grid-template-rows: minmax(84px, auto) auto;
+    column-gap: @team-space-3;
+    padding: @team-space-3;
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: @team-surface;
+    box-shadow: @team-shadow-xs;
+
+    .u-skeleton-avatar.el-skeleton__item {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+    }
+
+    .u-skeleton-main {
+        min-width: 0;
+    }
+
+    .u-skeleton-title,
+    .u-skeleton-tags,
+    .u-skeleton-actions {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+    }
+
+    .u-skeleton-title {
+        margin-bottom: 9px;
+        gap: 6px;
+    }
+
+    .u-skeleton-name.el-skeleton__item {
+        width: 92px;
+        height: 14px;
+    }
+
+    .u-skeleton-verified.el-skeleton__item {
+        width: 52px;
+        height: 22px;
+        border-radius: 9999px;
+    }
+
+    .u-skeleton-tags {
+        margin-bottom: 9px;
+        gap: 5px;
+
+        .el-skeleton__item {
+            width: 54px;
+            height: 24px;
+            border-radius: 7px;
+
+            &:nth-child(2) {
+                width: 66px;
+            }
+
+            &:nth-child(3) {
+                width: 46px;
+            }
+        }
+    }
+
+    .u-skeleton-meta.el-skeleton__item {
+        width: 76%;
+        height: 11px;
+    }
+
+    .u-skeleton-actions {
+        grid-column: 1 / -1;
+        margin-top: @team-space-3;
+        padding-top: @team-space-3;
+        border-top: 1px solid @team-border-light;
+        gap: @team-space-2;
+
+        .el-skeleton__item {
+            width: auto;
+            height: 38px;
+            flex: 0.72;
+            border-radius: @team-radius-small;
+
+            &:last-child {
+                flex: 1.28;
+            }
+        }
+    }
 }
 
 .m-member-users,
@@ -561,6 +727,37 @@
 
     .m-member-card-grid {
         grid-auto-rows: 72px;
+    }
+
+    .u-member-skeleton {
+        padding: 8px @team-space-2;
+
+        .u-skeleton-avatar.el-skeleton__item {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+        }
+
+        .u-skeleton-role.el-skeleton__item {
+            width: 46px;
+        }
+
+        .u-skeleton-action.el-skeleton__item {
+            width: 28px;
+            height: 28px;
+        }
+    }
+
+    .u-pending-skeleton {
+        grid-template-columns: 52px minmax(0, 1fr);
+        padding: @team-space-2;
+        column-gap: @team-space-2;
+
+        .u-skeleton-avatar.el-skeleton__item {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+        }
     }
 
     .m-member-users,

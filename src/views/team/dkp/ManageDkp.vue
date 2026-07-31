@@ -73,14 +73,12 @@
                     <span>快照关联</span>
                 </button>
             </nav>
-            <keep-alive>
-                <component
-                    :is="componentsMaps[activeTab]"
-                    :org="org"
-                    :readOnly="activeTab === 'snapshot'"
-                    :supportDkpSync="true"
-                />
-            </keep-alive>
+            <component
+                :is="componentsMaps[activeTab]"
+                :org="org"
+                :readOnly="activeTab === 'snapshot'"
+                :supportDkpSync="true"
+            />
         </div>
         <el-alert v-else title="你当前没有任何团队的DKP管理权限" type="info" show-icon></el-alert>
     </div>

@@ -2,25 +2,24 @@
     <div class="m-snapshot-item" :class="{ isOpen: collapse }">
         <div class="m-snapshot-item-header">
             <h4 class="u-title" @click="foldItem">
-                <i :class="collapse ? 'el-icon-caret-top' : 'el-icon-caret-right'"></i>
-                {{ data.title || autoname }}
+                <span class="u-toggle" aria-hidden="true">
+                    <i :class="collapse ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
+                </span>
+                <span class="u-title-text">{{ data.title || autoname }}</span>
             </h4>
             <div class="u-meta">
                 <time class="u-meta-item u-time">
                     <i class="el-icon-date"></i>
-                    <em>上传日期</em>
                     {{ showTime(data.created_at) }}
                 </time>
                 <span class="u-meta-item u-reporter">
                     <i class="el-icon-user"></i>
-                    <em>上传人员</em>
                     <a :href="authorLink(data.user_id)" target="_blank">{{
                         data.user_data ? data.user_data.display_name : "未知"
                     }}</a>
                 </span>
                 <div class="u-meta-item u-desc">
                     <i class="el-icon-tickets"></i>
-                    <em>备注说明</em>
                     {{ data.desc || "无" }}
                 </div>
             </div>
@@ -28,7 +27,7 @@
 
         <div class="m-snapshot-item-content" :class="{ isOpen: collapse }">
             <div class="m-snapshot-flags" v-if="groups == 5">
-                <i v-for="group of groups" :key="group">{{ group }}</i>
+                <i v-for="group of 5" :key="group">{{ group }} 队</i>
             </div>
             <snapshot-body :data="list" :class="'row-' + groups"></snapshot-body>
             <div class="m-snapshot-dkp" v-if="supportDkpSync">
@@ -49,8 +48,8 @@
         <div class="m-snapshot-item-op">
             <span class="u-dkp-status" v-if="supportDkpSync">{{ data.dkp ? "✔️DKP已同步" : "" }}</span>
             <template v-if="!readOnly">
-                <el-button type="primary" size="small" plain icon="Edit" @click="edit(data.id)">编辑</el-button>
-                <el-button type="info" plain size="small" icon="Delete" @click="del(data.id)">删除</el-button>
+                <el-button class="u-edit" size="small" plain icon="Edit" @click="edit(data.id)">编辑</el-button>
+                <el-button class="u-delete" plain size="small" icon="Delete" @click="del(data.id)">删除</el-button>
             </template>
         </div>
     </div>
@@ -102,7 +101,7 @@ export default {
     },
     methods: {
         edit(id) {
-            this.$router.push("/snapshot/edit/" + id);
+            this.$emit("editSnapshot", id);
         },
         del(id) {
             this.$alert("确定删除这条记录吗？", "消息", {

@@ -1,33 +1,44 @@
 <template>
     <div class="m-snapshot-chart">
         <div class="m-snapshot-chart-search">
-            <el-button link :disabled="active === 0" @click="setDefault">默认</el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button link :disabled="active === 7" @click="quickSelect(7)">7天</el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button link :disabled="active === 30" @click="quickSelect(30)">30天</el-button>
-            <el-divider direction="vertical"></el-divider>
+            <div class="m-snapshot-chart-period" role="group" aria-label="快照统计日期范围">
+                <button type="button" :class="{ 'is-active': active === 0 }" @click="setDefault">全部</button>
+                <button type="button" :class="{ 'is-active': active === 7 }" @click="quickSelect(7)">近 7 天</button>
+                <button type="button" :class="{ 'is-active': active === 30 }" @click="quickSelect(30)">近 30 天</button>
+            </div>
             <el-date-picker
+                class="m-snapshot-chart-date"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 v-model="rangeDate"
-                style="width: 250px"
                 type="daterange"
-                size="small"
+                range-separator="至"
                 :picker-options="pickerOptions"
             ></el-date-picker>
         </div>
 
         <div class="m-snapshot-chart-content" v-show="hasSnapshot" v-loading="loading">
-            <div class="m-chart-line">
-                <div id="snapshot-line"></div>
-            </div>
-            <div class="m-chart-pie">
-                <div id="snapshot-pie"></div>
-            </div>
-            <div class="m-chart-bar">
-                <div id="snapshot-bar"></div>
-            </div>
+            <section class="m-snapshot-chart-card m-chart-line">
+                <header class="u-chart-heading">
+                    <h3>每日开团次数</h3>
+                    <p>查看所选日期范围内每天创建的团队快照数量</p>
+                </header>
+                <div ref="lineChart" id="snapshot-line"></div>
+            </section>
+            <section class="m-snapshot-chart-card m-chart-pie">
+                <header class="u-chart-heading">
+                    <h3>心法比例</h3>
+                    <p>统计所有参团记录中的心法构成</p>
+                </header>
+                <div ref="pieChart" id="snapshot-pie"></div>
+            </section>
+            <section class="m-snapshot-chart-card m-chart-bar">
+                <header class="u-chart-heading">
+                    <h3>角色出勤次数</h3>
+                    <p>对比各角色在所选范围内的参团次数</p>
+                </header>
+                <div ref="barChart" id="snapshot-bar"></div>
+            </section>
         </div>
         <el-alert
             class="u-alert"
@@ -66,6 +77,7 @@ export default {
                 pie: "",
                 bar: "",
             },
+            requestId: 0,
 
             pickerMinDate: null,
             pickerMaxDate: null,
@@ -127,17 +139,19 @@ export default {
             this.rangeDate = [];
             this.loadSnapShot();
         },
-        loadSnapShot({ start = "", end = "" } = {}) {
+        async loadSnapShot({ start = "", end = "" } = {}) {
             if (!this.org) return;
+            const requestId = ++this.requestId;
             this.loading = true;
 
-            getSnapshotByTime(this.org, {
-                start: start,
-                end: end,
-            }).then((res) => {
-                let list = res.data.data.list || [];
+            try {
+                const res = await getSnapshotByTime(this.org, {
+                    start: start,
+                    end: end,
+                });
+                if (requestId !== this.requestId) return;
 
-                list = list.reverse();
+                const list = [...(res.data.data.list || [])].reverse();
 
                 this.hasSnapshot = !!list.length;
 
@@ -176,26 +190,29 @@ export default {
                     });
                 });
 
+                if (!this.hasSnapshot) return;
+
+                await this.$nextTick();
+                if (requestId !== this.requestId) return;
+
                 this.drawLine(lineData);
-
                 this.drawPie(pieData);
-
                 this.drawBar(barData);
-
-                this.loading = false;
-            });
+            } finally {
+                if (requestId === this.requestId) {
+                    this.loading = false;
+                }
+            }
         },
         drawLine(data) {
-            const dom = document.querySelector("#snapshot-line");
             const option = cloneDeep(lineOptions);
 
             option.xAxis.data = Object.keys(data);
             option.series[0].data = Object.values(data);
 
-            this.drawChart(dom, option, "line");
+            this.drawChart(this.$refs.lineChart, option, "line");
         },
         drawPie(data) {
-            const dom = document.querySelector("#snapshot-pie");
             const pieData = [];
             Object.entries(data).forEach(([key, value]) => {
                 const item = {
@@ -210,67 +227,229 @@ export default {
             const option = cloneDeep(pieOptions);
             option.series[0].data = pieData;
 
-            this.drawChart(dom, option, "pie");
+            this.drawChart(this.$refs.pieChart, option, "pie");
         },
         drawBar(data) {
-            const dom = document.querySelector("#snapshot-bar");
             const option = cloneDeep(barOptions);
             option.xAxis.data = Object.keys(data);
             option.series[0].data = Object.values(data);
 
-            this.drawChart(dom, option, "bar");
+            this.drawChart(this.$refs.barChart, option, "bar");
         },
         drawChart(dom, option, type) {
+            if (!dom || !dom.isConnected) return;
+
             if (!this.charts[type]) {
-                this.charts[type] = echarts.init(dom);
+                this.charts[type] = echarts.getInstanceByDom(dom) || echarts.init(dom);
             }
 
-            option && this.charts[type].setOption(option);
+            option && this.charts[type].setOption(option, { notMerge: true });
         },
+        resizeCharts() {
+            Object.values(this.charts).forEach((chart) => chart && chart.resize());
+        },
+        disposeCharts() {
+            Object.values(this.charts).forEach((chart) => chart && chart.dispose());
+            this.charts = {
+                line: "",
+                pie: "",
+                bar: "",
+            };
+        },
+    },
+    mounted() {
+        window.addEventListener("resize", this.resizeCharts);
+    },
+    activated() {
+        window.addEventListener("resize", this.resizeCharts);
+        this.$nextTick(this.resizeCharts);
+    },
+    deactivated() {
+        window.removeEventListener("resize", this.resizeCharts);
+    },
+    beforeUnmount() {
+        window.removeEventListener("resize", this.resizeCharts);
+        this.disposeCharts();
     },
 };
 </script>
 
 <style lang="less">
+@import (reference) "@/assets/css/team/design-system/_tokens.less";
+
 .m-snapshot-chart {
-    .m-chart-line {
-        margin-top: 20px;
-        width: 100%;
-        height: 400px;
-        #snapshot-line {
-            width: 100%;
-            height: 100%;
-        }
+    min-width: 0;
+
+    .m-snapshot-chart-search {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: @team-space-4;
+        padding: @team-space-2;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        gap: @team-space-2;
     }
-    .m-chart-pie {
-        margin-top: 20px;
-        width: 100%;
-        height: 400px;
-        #snapshot-pie {
-            width: 100%;
-            height: 100%;
-        }
-    }
-    .m-chart-bar {
-        margin-top: 20px;
-        width: 100%;
-        height: 400px;
-        #snapshot-bar {
-            width: 100%;
-            height: 100%;
+
+    .m-snapshot-chart-period {
+        display: inline-flex;
+        min-width: max-content;
+        align-items: center;
+        padding: 3px;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        gap: 2px;
+
+        button {
+            min-height: 32px;
+            padding: 0 @team-space-2;
+            border: 0;
+            border-radius: 7px;
+            background: transparent;
+            color: @team-text-secondary;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            transition: color @team-duration-fast @team-ease-standard,
+                background-color @team-duration-fast @team-ease-standard,
+                box-shadow @team-duration-fast @team-ease-standard;
+
+            &:hover {
+                color: @team-primary;
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: @team-shadow-focus;
+            }
+
+            &.is-active {
+                background: @team-primary-soft;
+                color: @team-primary;
+            }
         }
     }
 
+    .m-snapshot-chart-date {
+        --el-date-editor-width: 250px;
+        width: 250px !important;
+        max-width: 250px;
+        min-height: 40px;
+        flex: 0 0 250px;
+        padding: 0 @team-space-2;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        box-shadow: none;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            box-shadow @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+
+        &.is-active,
+        &.is-focus {
+            border-color: @team-primary;
+            box-shadow: @team-shadow-focus;
+        }
+    }
+
+    .m-snapshot-chart-content {
+        display: grid;
+        min-width: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: @team-space-4;
+    }
+
+    .m-snapshot-chart-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-control;
+        background: @team-surface;
+        box-shadow: @team-shadow-xs;
+    }
+
+    .m-chart-line {
+        grid-column: 1 / -1;
+    }
+
+    .u-chart-heading {
+        padding: @team-space-3 @team-space-4 0;
+
+        h3 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 22px;
+        }
+
+        p {
+            margin: 4px 0 0;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    #snapshot-line,
+    #snapshot-pie,
+    #snapshot-bar {
+        width: 100%;
+        height: 360px;
+    }
+
     .u-alert {
-        margin-top: 20px;
+        margin-top: 0;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-control;
     }
 }
-@media screen and (max-width: @phone) {
-    .m-chart-pie {
-        overflow-x: auto;
+
+@media screen and (max-width: 1100px) {
+    .m-snapshot-chart {
+        .m-snapshot-chart-content {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .m-chart-line {
+            grid-column: auto;
+        }
     }
-    #snapshot-pie {
-        min-width: 1000px;
+}
+
+@media screen and (max-width: 760px) {
+    .m-snapshot-chart {
+        .m-snapshot-chart-search {
+            align-items: stretch;
+        }
+
+        .m-snapshot-chart-period {
+            width: 100%;
+
+            button {
+                flex: 1;
+            }
+        }
+
+        .m-snapshot-chart-date {
+            --el-date-editor-width: 100%;
+            width: 100% !important;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+
+        #snapshot-line,
+        #snapshot-pie,
+        #snapshot-bar {
+            height: 320px;
+        }
     }
 }
 </style>

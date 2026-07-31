@@ -36,15 +36,18 @@
                                     :alt="showMountName(member['mount'])"
                                 />
                                 <span class="u-member-role">
-                                    <router-link
-                                        class="u-member-name-link"
-                                        target="_blank"
+                                    <button
+                                        class="u-member-role-trigger"
+                                        type="button"
                                         v-if="member.role_id && linkVisible"
-                                        :to="`/role/${member.role_id}`"
+                                        :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                        @mousedown.stop
+                                        @click.stop="openRoleDialog(member)"
                                     >
                                         <i class="el-icon-link"></i>
-                                    </router-link>
-                                    <span class="u-member-name">{{ showMemberName(member["name"]) }}</span>
+                                        <span>{{ showMemberName(member["name"]) }}</span>
+                                    </button>
+                                    <span v-else class="u-member-name">{{ showMemberName(member["name"]) }}</span>
                                 </span>
                                 <span class="u-member-remark" v-if="member['remark']">[{{ member["remark"] }}]</span>
                             </span>
@@ -55,18 +58,22 @@
                             <i class="u-member-setting el-icon-setting" @click="handleSetting(member, i)"></i>
                         </el-tooltip>
                         <el-tooltip clss="item" effect="dark" content="转为正式成员" placement="top-start">
-                            <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
-                                <template #reference>
-                                    <i class="u-member-reset el-icon-check"></i>
-                                </template>
-                            </el-popconfirm>
+                            <span>
+                                <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
+                                    <template #reference>
+                                        <i class="u-member-reset el-icon-check"></i>
+                                    </template>
+                                </el-popconfirm>
+                            </span>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="删除" placement="top-start">
-                            <el-popconfirm title="是否删除该角色？" @confirm="remove(member, i)">
-                                <template #reference>
-                                    <i class="u-member-delete el-icon-delete"></i>
-                                </template>
-                            </el-popconfirm>
+                            <span>
+                                <el-popconfirm title="是否删除该角色？" @confirm="remove(member, i)">
+                                    <template #reference>
+                                        <i class="u-member-delete el-icon-delete"></i>
+                                    </template>
+                                </el-popconfirm>
+                            </span>
                         </el-tooltip>
                     </span>
                 </div>
@@ -83,23 +90,32 @@
             @close="handleDialogCancel"
             @updateRole="handleSave"
         />
+        <raid-role-dialog
+            v-model="roleDialogVisible"
+            :role-id="roleDialogMember && roleDialogMember.role_id"
+            :member="roleDialogMember || {}"
+        />
     </div>
 </template>
 
 <script>
 import { addSubMember, covertSub2Normal, removeMember } from "@/service/team/raid.js";
 import MemberSetting from "@/components/team/raid/RaidMemberSetting.vue";
+import RaidRoleDialog from "@/components/team/raid/RaidRoleDialog.vue";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import cloneDeep from "lodash/cloneDeep";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import { getRoles } from "@/service/team/raid.js";
 import MemberPop from "./MemberPop.vue";
 import { showMountIcon, showMountName } from "@/utils/filters";
+import bus from "@/utils/bus";
 export default {
     name: "RaidSub",
     props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace"],
+    emits: ["pass"],
     components: {
         MemberSetting,
+        RaidRoleDialog,
         "member-pop": MemberPop,
     },
     data() {
@@ -108,6 +124,8 @@ export default {
             // 弹层
             visible: false,
             title: "新增替补",
+            roleDialogVisible: false,
+            roleDialogMember: null,
 
             // 右键菜单
             selectedMember: null,
@@ -178,6 +196,10 @@ export default {
         },
     },
     methods: {
+        openRoleDialog(member) {
+            this.roleDialogMember = member;
+            this.roleDialogVisible = true;
+        },
         // 单项
         // ===============================
         // 设置
@@ -216,18 +238,18 @@ export default {
 
                         if (targetMember) {
                             let replaceId = targetMember?.id;
-                            this.$emit("pass", { member, from: "sub", isReplace: true });
                             await covertSub2Normal(this.raid_id, apply_id, replaceId);
                             this.data.splice(i, 1);
+                            this.$emit("pass", { member, from: "sub", isReplace: true });
                         } else {
-                            this.$emit("pass", { member, from: "sub", isReplace: false });
                             await covertSub2Normal(this.raid_id, apply_id);
                             this.data.splice(i, 1);
+                            this.$emit("pass", { member, from: "sub", isReplace: false });
                         }
                     } else {
-                        this.$emit("pass", { member, from: "sub" });
                         await covertSub2Normal(this.raid_id, apply_id);
                         this.data.splice(i, 1);
+                        this.$emit("pass", { member, from: "sub" });
                     }
                 } else {
                     this.$notify({
@@ -392,25 +414,26 @@ export default {
         },
         showMountIcon,
         showMountName,
-    },
-    mounted: function () {
-        this.$bus.$on("withoutPos", (from) => {
+        handleWithoutPos(from) {
             if (from !== "sub") return;
             this.$notify({
                 type: "warning",
                 title: "提醒",
                 message: "此角色职能位已不足，请检查后再试",
             });
-            // 职能已满
             this.isMax = true;
-        });
-        this.$bus.$on("pending", (data) => {
+        },
+        handlePending(data) {
             this.data = [...this.data, data];
-        });
+        },
+    },
+    mounted: function () {
+        bus.on("withoutPos", this.handleWithoutPos);
+        bus.on("pending", this.handlePending);
     },
     beforeUnmount() {
-        this.$bus.$off("withoutPos");
-        this.$bus.$off("pending");
+        bus.off("withoutPos", this.handleWithoutPos);
+        bus.off("pending", this.handlePending);
     },
 };
 </script>

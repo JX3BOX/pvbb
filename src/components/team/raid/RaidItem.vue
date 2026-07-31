@@ -1,79 +1,55 @@
 <template>
-    <div class="m-raid-item">
+    <article class="m-raid-item">
         <div class="m-raid-item-header">
-            <h4 class="u-title">
-                <img
-                    class="u-icon"
-                    v-if="data.is_public"
-                    src="@/assets/img/team/raid/broadcast.png"
-                    alt="活动大厅广播"
-                />
-                <i
-                    class="u-top el-icon-top u-normal"
-                    :class="{ 'u-sticky': data.sticky }"
-                    :title="data.sticky ? '取消置顶' : '置顶'"
-                    @click.stop="setSticky"
-                ></i>
-                <router-link :to="'/raid/' + data.id" target="_blank">
-                    <span class="u-team">【{{ data.team_name }}】</span>
-                    <span class="u-name">{{ data.name }}</span>
-                </router-link>
-            </h4>
-            <div class="u-meta u-meta-hover">
-                <time class="u-time">
-                    <i class="el-icon-date"></i>
-                    <em>开团时间</em>
-                    <b>{{ showTime(data.start_time) }}（{{ showRaidWeek(data.start_time) }}）</b>
-                </time>
-                <span class="u-auth">
-                    <i :class="data.auth ? 'el-icon-lock' : 'el-icon-unlock'"></i>
-                    <em>报名权限</em>
-                    {{ showAuth(data.auth) }}
-                </span>
-                <div class="u-desc">
-                    <i class="el-icon-data-analysis"></i>
-                    <em>活动标题</em>
-                    <b class="u-recruit">{{ data.title || "无" }}</b>
+            <div class="u-main">
+                <div class="u-title-row">
+                    <button
+                        type="button"
+                        class="u-sticky-button"
+                        :class="{ 'is-sticky': data.sticky }"
+                        :title="data.sticky ? '取消置顶' : '置顶活动'"
+                        @click.stop="setSticky"
+                    >
+                        <i class="el-icon-top"></i>
+                    </button>
+                    <router-link
+                        class="u-title"
+                        :to="{ name: 'view_raid', params: { id: data.id } }"
+                        target="_blank"
+                    >
+                        <span class="u-name">{{ data.name }}</span>
+                        <span v-if="data.is_public" class="u-public"><i class="el-icon-position"></i> 活动大厅</span>
+                    </router-link>
                 </div>
-                <div class="u-desc u-remark" v-if="data.remark">
-                    <i class="el-icon-tickets"></i>
-                    <em>备注说明</em>
-                    {{ data.remark || "无" }}
-                </div>
-                <div class="u-desc u-misc">
-                    <span class="u-misc-item">
-                        <i class="el-icon-user"></i>
-                        <em>创建人 :</em>
-                        <a @click.stop :href="toAuthPage(data.user_id)" target="_blank">
-                            <img class="u-user-avatar" :src="getUserAvatar(data.raid_creator_info)" />
-                            <span class="u-user-name">{{ getUserName(data.raid_creator_info) }}</span>
-                        </a>
-                    </span>
-
-                    <span class="u-misc-item" v-if="data.last_edit">
-                        <i class="el-icon-edit"></i>
-                        <em>最后修改 :</em>
-                        <a @click.stop :href="toAuthPage(data.user_id)" target="_blank">
-                            <img class="u-user-avatar" :src="getUserAvatar(data.raid_editor_info)" />
-                            <span class="u-user-name">{{ getUserName(data.raid_editor_info) }}</span>
-                        </a>
-                    </span>
+                <p class="u-recruit" :title="data.title">{{ data.title || "暂未填写活动标题" }}</p>
+                <div class="u-meta">
+                    <time><i class="el-icon-date"></i>{{ showTime(data.start_time) }} · {{ showRaidWeek(data.start_time) }}</time>
+                    <span><i :class="data.auth ? 'el-icon-lock' : 'el-icon-unlock'"></i>{{ showAuth(data.auth) }}</span>
+                    <span><i class="el-icon-user"></i>{{ getUserName(data.raid_creator_info) }}</span>
+                    <span v-if="data.count_total"><i class="el-icon-s-custom"></i>{{ data.count_normal || 0 }}/{{ data.count_total }} 人</span>
                 </div>
             </div>
             <div class="u-op">
-                <el-button type="primary" size="small" plain icon="Edit" @click="edit(data.id)">编辑</el-button>
-                <el-button type="info" plain size="small" icon="Delete" @click="del(data)">删除</el-button>
+                <el-button class="u-view" size="small" @click="viewRaidDetail">查看排表</el-button>
+                <el-button class="u-edit" type="primary" size="small" plain icon="Edit" @click="edit(data.id)">编辑</el-button>
+                <el-dropdown trigger="click" @command="handleCommand">
+                    <el-button class="u-more" size="small" aria-label="更多操作"><i class="el-icon-more"></i></el-button>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="delete"><i class="el-icon-delete"></i>删除活动</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
-    </div>
+    </article>
 </template>
 
 <script>
 import raidAuthMap from "@/assets/data/team/raid_auth.json";
 import { deleteRaid, setRaidSticky } from "@/service/team/raid.js";
 import { moment } from "@jx3box/jx3box-common/js/moment";
-import { authorLink, showRaidWeek, showTime } from "@/utils/filters";
-import { showAvatar } from "@jx3box/jx3box-common/js/utils";
+import { showRaidWeek, showTime } from "@/utils/filters";
 export default {
     name: "RaidItem",
     props: ["team_id", "data"],
@@ -90,7 +66,10 @@ export default {
     },
     methods: {
         edit: function (id) {
-            this.$router.push("/raid/edit/" + id);
+            this.$emit("edit", id);
+        },
+        handleCommand(command) {
+            if (command === "delete") this.del(this.data);
         },
         del: function (data) {
             this.$alert("确定删除这条记录吗？", "消息", {
@@ -110,17 +89,11 @@ export default {
         },
         // 跳转至 raid 详情
         viewRaidDetail() {
-            window.open(`/raid/${this.data.id}`, "_blank");
-            // this.$router.push(`/raid/${this.data.id}`);
-        },
-        /**
-         * 跳转至用户页面
-         */
-        toAuthPage(id) {
-            return authorLink(id);
-        },
-        getUserAvatar(user) {
-            return showAvatar(user?.user_avatar);
+            const { href } = this.$router.resolve({
+                name: "view_raid",
+                params: { id: this.data.id },
+            });
+            window.open(href, "_blank");
         },
         getUserName(user) {
             return user?.display_name || "未知";

@@ -26,7 +26,12 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(userList, /class="m-member-card-grid"/);
     assert.match(userList, /<h2>正式团员<\/h2>/);
     assert.doesNotMatch(userList, /按账号查看成员及其所属角色/);
-    assert.match(userList, /per:\s*12/);
+    assert.doesNotMatch(userList, /v-loading/);
+    assert.match(userList, /v-if="loading"/);
+    assert.match(userList, /class="m-member-card-grid m-member-skeleton-grid"/);
+    assert.match(userList, /v-for="index in per"/);
+    assert.match(userList, /class="u-member-skeleton"/);
+    assert.match(userList, /per:\s*20/);
     assert.match(memberItem, /class="u-member-card-trigger"/);
     assert.match(memberItem, /@click="roleDialogVisible = true"/);
     assert.match(memberItem, /class="u-role-count"/);
@@ -41,6 +46,10 @@ test("member management uses the current workspace tabs and compact account card
     assert.doesNotMatch(memberItem, /height:\s*170px/);
     assert.match(pendingList, /class="m-pending-card-grid"/);
     assert.match(pendingList, /<h2>加入申请<\/h2>/);
+    assert.doesNotMatch(pendingList, /v-loading/);
+    assert.match(pendingList, /class="m-pending-card-grid m-pending-skeleton-grid"/);
+    assert.match(pendingList, /v-for="index in per"/);
+    assert.match(pendingList, /class="u-pending-skeleton"/);
     assert.match(pendingList, /class="u-btn u-pass"/);
     assert.match(pendingList, /this\.\$emit\("pending-count-change", this\.total\)/);
     assert.match(pendingList, /this\.\$confirm\("确定拒绝该角色的加入申请/);
@@ -51,6 +60,11 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(listStyles, /\.u-subnav-count[\s\S]*background:\s*rgba\(239,\s*68,\s*68,\s*0\.1\)/);
     assert.match(listStyles, /\.m-member-card-grid[\s\S]*grid-template-columns:\s*repeat\(auto-fill/);
     assert.match(listStyles, /grid-auto-rows:\s*80px/);
+    assert.match(listStyles, /\.u-member-total-skeleton\.el-skeleton__item/);
+    assert.match(listStyles, /\.u-member-skeleton[\s\S]*height:\s*100%/);
+    assert.match(listStyles, /\.u-skeleton-avatar\.el-skeleton__item[\s\S]*width:\s*46px/);
+    assert.match(listStyles, /\.u-pending-skeleton[\s\S]*grid-template-columns:\s*60px minmax\(0,\s*1fr\)/);
+    assert.match(listStyles, /\.u-skeleton-actions[\s\S]*grid-column:\s*1 \/ -1/);
     assert.match(listStyles, /@media screen and \(max-width:\s*620px\)[\s\S]*grid-auto-rows:\s*72px/);
     assert.doesNotMatch(listStyles, /grid-auto-rows:\s*(?:360|400)px/);
     assert.match(listStyles, /\.m-archive-pages\.el-pagination[\s\S]*border-radius:\s*@team-radius-control/);

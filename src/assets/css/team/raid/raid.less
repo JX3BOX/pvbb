@@ -1,16 +1,55 @@
+@import (reference) "../design-system/_tokens.less";
+
 @raid-font: #7a96b5;
 @raid-color: #e6f0fb;
 .m-raid-core {
     .u-title {
-        .fz(14px, 2);
-        border-left: 5px solid @v4primary;
-        padding: 6px 10px;
-        background-color: #fafbfc;
-        margin: 20px 0 0 0;
-
         display: flex;
-        align-items: baseline;
+        min-height: 48px;
+        align-items: center;
         justify-content: space-between;
+        margin: @team-space-4 0 0;
+        padding: 8px @team-space-3;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-control;
+        background: @team-surface-muted;
+        color: @team-text-primary;
+        font-size: 14px;
+        line-height: 22px;
+        gap: @team-space-2;
+
+        > span {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        > span > i {
+            display: inline-flex;
+            width: 30px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: @team-primary-soft;
+            color: @team-primary;
+        }
+
+        .u-count {
+            color: @team-text-muted;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .el-button {
+            min-height: 34px;
+            padding: 0 13px;
+            border-radius: 9px;
+            font-weight: 600;
+            line-height: 32px;
+        }
     }
 }
 
@@ -19,242 +58,318 @@
 
     padding: 0;
     margin: 0;
-    line-height: 32px;
+    line-height: 22px;
 
     .u-member {
-        .w(20%);
-        .fl;
+        position: relative;
+        width: 20%;
+        height: 56px;
         box-sizing: border-box;
-        padding: 5px 10px;
-        border: 2px solid @raid-color;
-        .pr;
-        .h(48px);
+        padding: 12px 40px 10px 12px;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        box-shadow: @team-shadow-xs;
+        transition:
+            border-color @team-duration-fast @team-ease-standard,
+            box-shadow @team-duration-fast @team-ease-standard,
+            transform @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            z-index: 2;
+            border-color: @team-border-focus;
+            box-shadow: @team-shadow-focus;
+        }
     }
+
     .u-member-primary {
-        .db;
-        .nobreak;
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        overflow: hidden;
+        gap: 7px;
+        white-space: nowrap;
     }
+
     .u-member-icon {
-        .size(24px);
-        padding: 5px;
-        .y;
-        .mr(3px);
+        width: 30px;
+        height: 30px;
+        flex: none;
+        padding: 0;
+        border-radius: 8px;
+        background: @team-surface-muted;
     }
-    // .u-member-handler {
-    //     .pa;
-    //     .lt(0);
-    //     cursor: move;
-    //     padding: 5px;
-    //     color: #aaa;
-    // }
+
+    .u-member-role {
+        display: inline-flex;
+        min-width: 0;
+        align-items: center;
+        overflow: hidden;
+        gap: 4px;
+    }
+
     .u-member-name {
-        .fz(14px);
+        overflow: hidden;
+        color: @team-text-primary;
+        font-size: 13px;
+        font-weight: 600;
+        text-overflow: ellipsis;
         cursor: text !important;
     }
-    .u-member-name-link {
+
+    .u-member-role-trigger {
+        display: inline-flex;
+        min-width: 0;
+        align-items: center;
+        padding: 2px 4px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: @team-text-primary;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        gap: 5px;
+
+        i {
+            flex: none;
+            color: @team-primary;
+        }
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         &:hover {
-            color: @pink;
+            background: @team-primary-soft;
+            color: @team-primary-hover;
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: @team-shadow-focus;
         }
     }
+
     .u-member-remark {
-        .fz(12px, 2);
-        color: #999;
-        .ml(5px);
+        overflow: hidden;
+        color: @team-text-muted;
+        font-size: 11px;
+        line-height: 18px;
+        text-overflow: ellipsis;
     }
+
     .u-member-op {
-        .pa;
-        .rt(0);
-        .pointer;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: inline-flex;
+        align-items: center;
+        padding: 3px;
+        border: 1px solid @team-border-light;
+        border-radius: 8px;
+        background: fade(@team-surface, 94%);
+        color: @team-text-muted;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 1;
+        gap: 2px;
+
         i {
-            padding: 0 2px;
+            display: inline-flex;
+            width: 20px;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border-radius: 6px;
+
             &:hover {
-                color: @pink;
+                background: @team-primary-soft;
+                color: @team-primary;
             }
         }
-        font-size: 13px;
-        line-height: 1;
-        color: #035cc1;
-        background: #f2f6fc;
-        padding: 4px;
     }
+
     .u-member-pending {
-        .pa;
-        .rb(5px);
-        .lh(1);
-        color: #49c10f;
+        position: absolute;
+        right: 8px;
+        bottom: 6px;
+        color: #10b981;
+        line-height: 1;
     }
+
     .u-member-func {
-        .pa;
-        left: 0;
-        font-size: 12px;
+        position: absolute;
+        right: 10px;
+        bottom: 4px;
+        color: @team-text-muted;
+        font-size: 10px;
     }
+
     .u-member-leader {
-        .pa;
-        .lt(0);
-        .size(12px);
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        width: 16px;
+        height: 16px;
+        padding: 2px;
+        border-radius: 50%;
+        background: @team-surface;
+        box-shadow: @team-shadow-xs;
     }
 
     .u-member-core {
-        .pa;
-        // .lt(50%,-6px);.z(2);
-        // transform: translateX(-50%);
-        .rb(0);
-        .size(12px);
+        position: absolute;
+        right: 7px;
+        bottom: 5px;
+        width: 14px;
+        height: 14px;
     }
 
     .u-member-add {
-        // .w(20%);
-        border: 2px dashed @raid-color !important;
-        color: #afc1d4;
-        .bold;
-        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed @team-border-focus !important;
+        background: fade(@team-primary-soft, 35%);
+        color: @team-primary;
+        font-weight: 600;
         text-align: center;
         cursor: pointer;
+
+        &:hover {
+            background: @team-primary-soft;
+        }
     }
 }
+
 .m-raid-normal .m-raid-members {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    overflow-x: auto;
-    .pr;
+    position: relative;
+    display: grid;
+    width: 100%;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: @team-surface;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(var(--raid-columns, 5), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--raid-rows, 5), 68px);
+    gap: 0;
 
     .u-group-start {
-        background-color: @raid-color;
-        .x;
-        .size(100%, 16px);
-        .db;
-        .pa;
-        .lb(-4px, 100%);
-        .mt(-4px);
-        .fz(12px, 16px);
-        padding: 0 4px;
-        color: @raid-font;
+        display: none;
         font-style: normal;
-        .none;
     }
 
-    // @h:58px;
-    @h: 48px;
-    &.row-0 {
-        .h(@h*5);
-    } //旧数据
-    &.row-1 {
-        .h(@h*1);
-    }
-    &.row-2 {
-        .h(@h*2);
-    }
-    &.row-3 {
-        .h(@h*3);
-    }
-    &.row-4 {
-        .h(@h*4);
-    }
-    &.row-5 {
-        .h(@h*5);
-    }
-    &.row-6 {
-        .h(@h*6);
-    }
-    &.row-7 {
-        .h(@h*7);
-    }
-    &.row-8 {
-        .h(@h*8);
-    }
-    &.row-9 {
-        .h(@h*9);
-    }
-    &.row-10 {
-        .h(@h*10);
-    }
+    .u-member {
+        width: auto;
+        min-width: 0;
+        height: 68px;
+        padding: 16px 52px 16px 22px;
+        border: 0;
+        border-right: 1px solid @team-border;
+        border-bottom: 1px solid @team-border;
+        border-radius: 0;
+        box-shadow: none;
 
-    &.row-0,
-    &.row-5 {
-        border: 2px solid @raid-color;
-        border-top: none;
+        &:hover {
+            border-color: @team-border-focus;
+            background: fade(@team-primary-soft, 28%);
+            box-shadow: inset 0 0 0 1px @team-border-focus;
+        }
     }
 }
+
 .m-raid-corebox.qkmode .m-raid-members {
     .u-member {
         cursor: move;
     }
 }
-@media screen and (max-width: @phone) {
-    .m-raid-core .m-raid-members {
-        .db;
-        margin: 0;
-        .u-member {
-            float: none;
-            .w(auto);
-        }
-
-        .is-group-start {
-            margin-top: 12px * 2;
-        }
-    }
-}
 .m-raid-null {
-    .x;
-    margin: 20px 0;
-    .fz(13px);
-    color: #999;
+    margin: @team-space-2 0 0;
+    padding: @team-space-4;
+    border: 1px dashed @team-border;
+    border-radius: @team-radius-control;
+    background: @team-surface-muted;
+    color: @team-text-muted;
+    font-size: 12px;
+    text-align: center;
 }
 
 .m-raid-flag {
-    // .pa;.lt(0);.z(2);
     display: flex;
-    @h: 14px;
-    .h(@h);
-    .w(100%);
+    width: 100%;
+    height: 48px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-bottom: 1px solid @team-border;
+    gap: 0;
 
     .i-flag {
-        background-color: @raid-color;
-        .x;
-        .size(20%, @h);
-        .db;
-        .fz(12px, @h);
+        display: flex;
+        width: auto;
+        height: 48px;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 0;
+        border: 0;
+        border-right: 1px solid @team-border;
+        border-radius: 0;
+        background: #edf4fb;
         color: @raid-font;
+        font-size: 16px;
+        font-weight: 700;
         font-style: normal;
-        // margin-left:-12px;
-    }
-}
-@media screen and (max-width: @phone) {
-    .m-raid-flag {
-        .none;
-    }
 
-    .m-raid-normal .m-raid-members {
-        height: auto !important;
-        .u-group-start {
-            .db;
-            .size(16px);
-            .mt(0);
-            top: 0;
+        &:last-child {
+            border-right: 0;
         }
     }
 }
-.m-raid-corebox {
-    .pr;
-    .mt(10px);
-}
-@media screen and (max-width: @phone) {
-    .m-raid-corebox {
-        margin: 0 40px;
+
+.m-raid-subbox,
+.m-raid-tobebox {
+    .m-raid-members {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: @team-space-1;
+
+        .u-member {
+            width: auto;
+            min-width: 0;
+        }
     }
 }
 
+.m-raid-corebox {
+    position: relative;
+    margin-top: @team-space-2;
+}
+
+.m-raid-corebox.m-raid-normal {
+    overflow: hidden;
+    border: 1px solid @team-border;
+    border-radius: 18px;
+    background: @team-surface;
+}
+
 .m-raid-contextmenu {
-    border-radius: none;
+    border-radius: @team-radius-small;
+
     .item {
         padding: 0 1em;
         cursor: pointer;
         font-size: 14px;
         line-height: 32px;
+
         &:hover {
-            background-color: @raid-color;
+            background-color: @team-primary-soft;
         }
     }
 }
@@ -270,13 +385,56 @@
         padding: 4px;
         cursor: pointer;
         .dbi;
+        border-radius: 8px;
 
         &:hover {
-            background-color: @raid-color;
+            background-color: @team-primary-soft;
         }
     }
 
     .u-selected-member-icon {
-        background-color: @raid-color;
+        background-color: @team-primary-soft;
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .m-raid-core .u-title {
+        align-items: stretch;
+        flex-direction: column;
+
+        .el-button {
+            width: 100%;
+        }
+    }
+
+    .m-raid-flag {
+        display: none;
+    }
+
+    .m-raid-core .m-raid-members,
+    .m-raid-normal .m-raid-members {
+        display: grid;
+        height: auto !important;
+        margin: 0;
+        padding: @team-space-1;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-control;
+        grid-auto-flow: row;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        gap: @team-space-1;
+
+        .u-member {
+            width: auto;
+            min-height: 56px;
+            float: none;
+            padding: 12px 40px 10px 12px;
+            border: 1px solid @team-border;
+            border-radius: @team-radius-small;
+        }
+
+        .u-group-start {
+            display: none;
+        }
     }
 }

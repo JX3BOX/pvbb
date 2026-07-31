@@ -1,0 +1,254 @@
+@import (reference) "../design-system/_tokens.less";
+
+.m-raid-role-dialog.el-dialog {
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: 18px;
+    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+
+    .el-dialog__header {
+        margin: 0;
+        padding: 22px 56px 18px 24px;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__headerbtn {
+        top: 20px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+
+        &:hover {
+            background: @team-surface-muted;
+        }
+    }
+
+    .el-dialog__body {
+        min-height: 280px;
+        padding: 22px 24px;
+    }
+
+    .el-dialog__footer {
+        padding: 14px 24px 18px;
+        border-top: 1px solid @team-border-light;
+        background: @team-surface-muted;
+    }
+
+    .el-button {
+        min-height: 38px;
+        padding: 0 20px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+}
+
+.m-raid-role-dialog__title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    .u-title-icon {
+        display: inline-flex;
+        width: 38px;
+        height: 38px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border-radius: 11px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 18px;
+    }
+
+    > div {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    strong {
+        color: @team-text-primary;
+        font-size: 17px;
+        line-height: 24px;
+    }
+
+    span:last-child {
+        color: @team-text-muted;
+        font-size: 12px;
+        line-height: 18px;
+    }
+}
+
+.m-raid-role-dialog__body {
+    display: flex;
+    min-height: 236px;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.m-raid-role-profile {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: linear-gradient(135deg, @team-primary-soft 0%, @team-surface 72%);
+    gap: 14px;
+
+    .u-role-icon {
+        width: 54px;
+        height: 54px;
+        flex: none;
+        border-radius: 14px;
+        background: @team-surface;
+        box-shadow: @team-shadow-xs;
+        object-fit: contain;
+    }
+
+    .u-role-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 4px;
+
+        > span {
+            color: @team-text-muted;
+            font-size: 12px;
+        }
+    }
+
+    .u-name-line {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+
+        strong {
+            overflow: hidden;
+            color: @team-text-primary;
+            font-size: 18px;
+            line-height: 26px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .u-verified {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        font-size: 11px;
+        font-weight: 600;
+        gap: 3px;
+    }
+}
+
+.m-raid-role-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+
+    > div {
+        display: flex;
+        min-width: 0;
+        min-height: 62px;
+        justify-content: center;
+        flex-direction: column;
+        padding: 10px 12px;
+        border: 1px solid @team-border-light;
+        border-radius: @team-radius-small;
+        background: @team-surface-muted;
+        gap: 3px;
+    }
+
+    span {
+        color: @team-text-muted;
+        font-size: 11px;
+    }
+
+    strong {
+        overflow: hidden;
+        color: @team-text-primary;
+        font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.m-raid-role-owner,
+.m-raid-role-note {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .u-section-label {
+        color: @team-text-regular;
+        font-size: 12px;
+        font-weight: 700;
+    }
+}
+
+.m-raid-role-owner .u-owner-card {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: @team-radius-small;
+    background: @team-surface-muted;
+    gap: 10px;
+
+    img {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+
+    > div {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    strong {
+        color: @team-text-primary;
+        font-size: 13px;
+    }
+
+    span {
+        color: @team-text-muted;
+        font-size: 11px;
+    }
+}
+
+.m-raid-role-note p {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: @team-radius-small;
+    background: @team-surface-muted;
+    color: @team-text-regular;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.m-raid-role-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media screen and (max-width: @phone) {
+    .m-raid-role-dialog.el-dialog {
+        width: calc(100% - 20px) !important;
+        margin: 10px auto !important;
+    }
+
+    .m-raid-role-meta {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

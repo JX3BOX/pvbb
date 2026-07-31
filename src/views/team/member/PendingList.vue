@@ -1,14 +1,45 @@
 <template>
-    <div class="v-member-pending" v-loading="loading">
+    <div class="v-member-pending">
         <header class="m-member-panel-header">
             <div>
                 <h2>加入申请</h2>
                 <p>核对角色资料后批准加入，待处理申请会集中显示在这里。</p>
             </div>
-            <span class="u-member-total">{{ total }} 项待处理</span>
+            <el-skeleton-item
+                v-if="loading"
+                variant="text"
+                class="u-member-total-skeleton"
+                aria-hidden="true"
+            />
+            <span v-else class="u-member-total">{{ total }} 项待处理</span>
         </header>
 
-        <div class="m-pending-list" v-if="data && data.length">
+        <div v-if="loading" class="m-pending-card-grid m-pending-skeleton-grid" aria-hidden="true">
+            <el-skeleton v-for="index in per" :key="index" animated class="m-pending-skeleton-card">
+                <template #template>
+                    <div class="u-pending-skeleton">
+                        <el-skeleton-item variant="image" class="u-skeleton-avatar" />
+                        <div class="u-skeleton-main">
+                            <div class="u-skeleton-title">
+                                <el-skeleton-item variant="text" class="u-skeleton-name" />
+                                <el-skeleton-item variant="text" class="u-skeleton-verified" />
+                            </div>
+                            <div class="u-skeleton-tags">
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                            </div>
+                            <el-skeleton-item variant="text" class="u-skeleton-meta" />
+                        </div>
+                        <div class="u-skeleton-actions">
+                            <el-skeleton-item variant="button" />
+                            <el-skeleton-item variant="button" />
+                        </div>
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+        <div class="m-pending-list" v-else-if="data && data.length">
             <ul class="m-pending-card-grid">
                 <li class="u-item m-pending-card" v-for="(item, i) in data" :key="item.relation.role_id || i">
                     <span class="u-pic u-pending-avatar">
@@ -76,7 +107,7 @@
                 @current-change="changePage"
             ></el-pagination>
         </div>
-        <div v-else-if="!loading" class="m-member-empty">
+        <div v-else class="m-member-empty">
             <span class="u-empty-icon" aria-hidden="true">
                 <el-icon><Finished /></el-icon>
             </span>

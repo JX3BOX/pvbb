@@ -263,7 +263,14 @@ export default {
             return ["list_raid", "view_raid"].includes(this.$route.name);
         },
         workspaceMode: function () {
+            if (this.$route.name === "view_raid") {
+                return this.$store.state.canManage ? "manage" : "member";
+            }
             return this.$route.meta.workspaceMode || "member";
+        },
+        activeTeamId: function () {
+            if (this.$route.name === "view_raid") return this.$store.state.team?.ID;
+            return ["view_my_org", "manage_my_org"].includes(this.$route.name) ? this.$route.params.id : "";
         },
         workspaceTeamCount: function () {
             return this.uniqueTeams([...this.teams, ...this.managedTeams]).length;
@@ -273,7 +280,12 @@ export default {
         workspaceMode: {
             immediate: true,
             handler: function (mode) {
-                if (!this.isLogin || !["view_my_org", "manage_my_org"].includes(this.$route.name)) return;
+                if (!this.isLogin || !["view_my_org", "manage_my_org", "view_raid"].includes(this.$route.name)) return;
+                if (this.$route.name === "view_raid") {
+                    this.expandedGroups.manage = mode === "manage";
+                    this.expandedGroups.member = mode === "member";
+                    return;
+                }
                 this.expandedGroups[mode] = true;
             },
         },
@@ -333,8 +345,8 @@ export default {
         },
         isActiveTeam: function (team, mode) {
             return (
-                ["view_my_org", "manage_my_org"].includes(this.$route.name) &&
-                String(team.ID) === String(this.$route.params.id) &&
+                ["view_my_org", "manage_my_org", "view_raid"].includes(this.$route.name) &&
+                String(team.ID) === String(this.activeTeamId) &&
                 this.workspaceMode === mode
             );
         },

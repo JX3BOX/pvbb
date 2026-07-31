@@ -5,15 +5,10 @@
             <span class="u-txt">团队活动</span>
             <div class="u-op">
                 <a href="/tool/23805" class="u-help" target="_blank"> <i class="el-icon-info"></i> 帮助文档 </a>
-                <router-link
-                    target="_blank"
-                    to="/raid/add"
-                    class="el-button el-button--primary el-button--mini"
-                    v-if="orgs.length"
-                >
+                <el-button type="primary" size="small" v-if="orgs.length" @click="openCreateDialog">
                     <i class="el-icon-circle-plus-outline"></i>
                     创建活动
-                </router-link>
+                </el-button>
             </div>
         </h1>
         <header v-else class="m-raid-embedded-header">
@@ -21,10 +16,10 @@
                 <h2>排表管理</h2>
                 <p>创建和维护当前团队的活动排表。</p>
             </div>
-            <router-link target="_blank" to="/raid/add" class="el-button el-button--primary el-button--small">
+            <el-button v-if="orgs.length" type="primary" @click="openCreateDialog">
                 <i class="el-icon-circle-plus-outline"></i>
                 创建活动
-            </router-link>
+            </el-button>
         </header>
         <div class="m-raid-box" v-if="orgs.length">
             <div v-if="!embedded && orgs.length > 1" class="m-raid-tab">
@@ -39,13 +34,19 @@
                 </el-tabs>
             </div>
 
-            <div class="m-raid-search">
-                <el-input placeholder="输入关键词.." v-model="search">
-                    <template #prepend><i class="el-icon-search"></i> 搜索</template>
-                    <template #append>
-                        <el-button icon="Position"></el-button>
-                    </template>
+            <div class="m-raid-toolbar">
+                <el-input
+                    v-model="searchDraft"
+                    placeholder="搜索活动名称、标题或创建人"
+                    clearable
+                    aria-label="搜索活动"
+                    @clear="submitSearch"
+                    @keyup.enter="submitSearch"
+                >
+                    <template #prefix><i class="el-icon-search"></i></template>
                 </el-input>
+                <el-button type="primary" plain @click="submitSearch">搜索</el-button>
+                <span class="u-raid-total">共 {{ total }} 个活动</span>
             </div>
 
             <div class="m-raid-container" v-loading="loading">
@@ -57,6 +58,7 @@
                         :team_id="team_id"
                         @dropItem="deleteItem(i)"
                         @sticky="setSticky"
+                        @edit="openEditDialog"
                     />
                     <el-pagination
                         class="m-raid-pages"
@@ -70,15 +72,22 @@
                     ></el-pagination>
                 </div>
 
-                <el-alert class="m-raid-null" type="info" show-icon v-else>
-                    <template #title>
-                        暂无任何记录，点击查看
-                        <a href="/tool/23805" target="_blank">帮助文档</a>
-                    </template>
-                </el-alert>
+                <div class="m-raid-empty" v-else-if="!loading">
+                    <span class="u-empty-icon" aria-hidden="true"><i class="el-icon-date"></i></span>
+                    <h3>{{ search ? "没有找到匹配的活动" : "还没有团队活动" }}</h3>
+                    <p>{{ search ? "尝试更换关键词后重新搜索。" : "创建活动后，可在这里维护排表和报名规则。" }}</p>
+                    <el-button v-if="!search" type="primary" @click="openCreateDialog">创建第一个活动</el-button>
+                </div>
             </div>
         </div>
         <el-alert v-else title="你当前没有任何团队的排表管理权限" type="info" show-icon></el-alert>
+        <RaidFormDialog
+            v-model="formVisible"
+            :raid-id="editingId"
+            :teams="orgs"
+            :default-team-id="team_id"
+            @saved="handleSaved"
+        />
     </div>
 </template>
 
@@ -87,7 +96,7 @@ import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { manageRaid } from "@/service/team/raid.js";
 import { getMyPowerTeams } from "@/service/team/team.js";
 import RaidItem from "@/components/team/raid/RaidItem.vue";
-import { showBodyType, showSchoolIcon, showSchoolName } from "@/utils/filters";
+import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
 
 import localforage from "localforage";
 
@@ -115,6 +124,9 @@ export default {
             loading: false,
 
             search: "",
+            searchDraft: "",
+            formVisible: false,
+            editingId: "",
         };
     },
     computed: {
@@ -153,12 +165,38 @@ export default {
         },
         deleteItem: function (i) {
             this.list.splice(i, 1);
+            this.total = Math.max(0, this.total - 1);
+        },
+        openCreateDialog() {
+            this.editingId = "";
+            this.formVisible = true;
+        },
+        openEditDialog(id) {
+            this.editingId = id;
+            this.formVisible = true;
+        },
+        handleSaved() {
+            this.loadData();
+        },
+        submitSearch() {
+            const value = this.searchDraft.trim();
+            if (this.page !== 1) this.page = 1;
+            if (this.search === value) this.loadData();
+            else this.search = value;
         },
         changeTeam: function () {
             // 将当前团队的信息保存在localStorage
             const currentTeam = this.orgs.find((org) => String(org.ID) === String(this.team_id));
             if (currentTeam) {
-                localforage.setItem("currentTeam", currentTeam);
+                // Vue 3 的响应式对象是 Proxy，IndexedDB 无法直接进行结构化克隆。
+                const cachedTeam = {
+                    ID: currentTeam.ID,
+                    name: currentTeam.name,
+                    server: currentTeam.server,
+                    status: currentTeam.status,
+                    logo: currentTeam.logo,
+                };
+                localforage.setItem("currentTeam", cachedTeam).catch(() => {});
             }
         },
         changePage: function () {
@@ -193,12 +231,17 @@ export default {
         },
         team_id: {
             handler: function (val) {
-                if (val) this.loadData();
+                if (val) {
+                    this.changeTeam();
+                    if (this.page !== 1) this.page = 1;
+                    else this.loadData();
+                }
             },
         },
     },
     components: {
         RaidItem,
+        RaidFormDialog,
     },
 };
 </script>

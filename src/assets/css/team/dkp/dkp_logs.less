@@ -46,8 +46,11 @@
         }
 
         .el-radio-button__inner {
-            min-height: 34px;
-            padding: 9px 13px;
+            display: inline-flex;
+            height: 34px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 13px;
             border-color: @team-border;
             background: @team-surface;
             color: @team-text-secondary;
@@ -110,8 +113,22 @@
             height: 28px;
         }
 
-        .u-user-name {
+        .u-user {
+            display: inline-flex;
+            max-width: 100%;
+            min-width: 0;
+            align-items: center;
             color: @team-text-regular;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .u-user-name {
+            min-width: 0;
+            overflow: hidden;
+            color: @team-text-regular;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             &:hover {
                 color: @team-primary;
@@ -121,10 +138,9 @@
         .u-user-avatar {
             width: 28px;
             height: 28px;
-            margin-right: 6px;
+            flex: none;
             border-radius: 8px;
             object-fit: cover;
-            vertical-align: middle;
         }
 
         .u-table-score {

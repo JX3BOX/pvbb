@@ -1,16 +1,243 @@
-.m-dkp-dialog-modify {
-    .u-user-item {
-        .nobreak;
+@import (reference) "../design-system/_tokens.less";
+
+.m-dkp-dialog-modify.el-dialog {
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: @team-surface;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16);
+
+    .el-dialog__header {
+        margin: 0;
+        padding: @team-space-4 56px @team-space-3 @team-space-4;
+        border-bottom: 1px solid @team-border-light;
     }
-    .u-user-name {
+
+    .el-dialog__title {
+        color: @team-text-primary;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 26px;
+    }
+
+    .el-dialog__headerbtn {
+        top: 16px;
+        right: 16px;
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+
         &:hover {
-            color: @pink;
+            background: @team-surface-muted;
+        }
+
+        .el-dialog__close {
+            color: @team-text-muted;
+        }
+    }
+
+    .el-dialog__body {
+        max-height: calc(100vh - 190px);
+        padding: @team-space-4;
+        overflow-y: auto;
+    }
+
+    .el-dialog__footer {
+        padding: @team-space-3 @team-space-4 @team-space-4;
+        border-top: 1px solid @team-border-light;
     }
 }
-.u-user-avatar{
-    .size(24px);
-    .y;
-    .mr(3px);
-    .r(2px);
+
+.m-dkp-dialog-form {
+    display: grid;
+    gap: @team-space-3;
+
+    .el-form-item {
+        margin: 0;
+    }
+
+    .el-form-item__label {
+        height: auto;
+        padding: 0 0 7px;
+        color: @team-text-secondary;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+    }
+
+    .u-field-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        em {
+            padding: 0 7px;
+            border-radius: 999px;
+            background: @team-primary-soft;
+            color: @team-primary;
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 18px;
+        }
+    }
+
+    .el-select,
+    .el-input {
+        width: 100%;
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper {
+        min-height: 42px;
+        padding: 0 @team-space-2;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        box-shadow: none;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            box-shadow @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+    }
+
+    .el-input__wrapper.is-focus,
+    .el-select__wrapper.is-focused {
+        border-color: @team-primary;
+        box-shadow: @team-shadow-focus;
+    }
+
+    .el-radio-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: @team-space-2;
+        width: 100%;
+
+        &.is-single-option {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .el-radio.is-bordered {
+        width: 100%;
+        height: 42px;
+        margin: 0;
+        padding: 0 @team-space-2;
+        border-color: @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+
+        &.is-checked {
+            border-color: @team-primary;
+            background: @team-primary-soft;
+        }
+    }
 }
+
+.m-dkp-dialog-form__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: @team-space-3;
+}
+
+.m-dkp-target-list {
+    display: grid;
+    max-height: 120px;
+    padding: @team-space-2;
+    overflow-y: auto;
+    border: 1px solid @team-border-light;
+    border-radius: 12px;
+    background: @team-surface-muted;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: @team-space-2;
+
+    .u-user-item {
+        display: flex;
+        min-width: 0;
+        min-height: 44px;
+        align-items: center;
+        padding: 6px 8px;
+        border: 1px solid transparent;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        color: @team-text-regular;
+        gap: 9px;
+        text-decoration: none;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            color @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+            color: @team-primary;
+        }
+    }
+
+    .u-user-avatar {
+        width: 32px;
+        height: 32px;
+        flex: none;
+        border-radius: 9px;
+        object-fit: cover;
+    }
+
+    .u-user-name {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 13px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.m-dkp-role-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.m-dkp-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: @team-space-2;
+
+    .el-button {
+        min-width: 88px;
+        min-height: 38px;
+        margin: 0;
+        border-radius: @team-radius-small;
+        font-weight: 600;
+    }
+}
+
+@media screen and (max-width: 620px) {
+    .m-dkp-dialog-modify.el-dialog {
+        width: calc(100% - 24px) !important;
+        height: auto !important;
+        margin: 12px auto !important;
+
+        .el-dialog__header,
+        .el-dialog__body,
+        .el-dialog__footer {
+            padding-left: @team-space-3;
+            padding-right: @team-space-3;
+        }
+    }
+
+    .m-dkp-dialog-form__row,
+    .m-dkp-target-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }

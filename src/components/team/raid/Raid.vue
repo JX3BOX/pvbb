@@ -14,7 +14,7 @@
                 v-if="content"
                 header="正式队员"
                 mode="normal"
-                v-model="members"
+                :data="members"
                 :teamId="teamId"
                 :leader="leader"
                 :row="row"
@@ -26,7 +26,7 @@
                 v-else
                 header="正式队员"
                 mode="normal"
-                v-model="members"
+                :data="members"
                 :teamId="teamId"
                 :leader="leader"
                 :row="row"
@@ -82,6 +82,7 @@ import { getRaidMembers } from "@/service/team/raid.js";
 export default {
     name: "Raid",
     props: ["preset", "count", "teamId", "leader", "templateId", "content", "row", "col", "isPublic", "isForceMatch"],
+    emits: ["updateMembers"],
     components: {
         "raid-normal-v1": RaidNormalV1,
         "raid-normal-v2": RaidNormalV2,
@@ -123,6 +124,7 @@ export default {
             },
         },
         content: {
+            immediate: true,
             deep: true,
             handler(val) {
                 if (val?.length) this.members = val || [];
@@ -180,61 +182,9 @@ export default {
          * @param from
          * @param isReplace
          */
-        handlePass({ member, from, isReplace }) {
-            const { canAdd, canReplace } = this;
-            /**
-             * 逻辑梳理
-             * 1. 如果可以添加 canAdd=true
-             *     1.1 如果可以替补 canReplace=true
-             *        1.1.1 如果是替补 from=sub
-             *          1.1.1.1 是替换模式，则替换正式队伍里的人 isReplace=true
-             *          1.1.1.2 是添加模式，则添加到正式队伍里
-             *       1.1.2 如果是申请 from=tobe
-             *          1.1.2.1 是替换模式，则替换正式队伍里的人 isReplace=true
-             *          1.1.2.2 是添加模式，则添加到正式队伍里
-             *    1.2 如果不能替补 canReplace=false
-             *      1.2.1 是替换模式，则替换正式队伍里的人
-             *      1.2.2 是添加模式，则添加到正式队伍里
-             * 2. 如果不能添加，提示 canAdd=false
-             *
-             */
-            if (canAdd) {
-                if (canReplace) {
-                    if (from === "sub") {
-                        this.subMembers = this.subMembers.filter(m => m.id !== member.id);
-                        if (isReplace) {
-                            this.handleReplace(member)
-                        } else {
-                            this.members.push(member);
-                            this.notify(`【${member.name}】已成为正式队员`)
-                        }
-                    } else if (from === "tobe") {
-                        this.tobeMembers = this.tobeMembers.filter(m => m.id !== member.id);
-                        if (isReplace) {
-                            this.handleReplace(member)
-                        } else {
-                            this.members.push(member);
-                            this.notify(`【${member.name}】已成为正式队员`)
-                        }
-                    }
-                } else {
-                    if (from === "sub") {
-                        this.subMembers = this.subMembers.filter(m => m.id !== member.id);
-                        this.members.push(member);
-                        this.notify(`【${member.name}】已成为正式队员`)
-                    } else if (from === "tobe") {
-                        this.tobeMembers = this.tobeMembers.filter(m => m.id !== member.id);
-                        this.members.push(member);
-                        this.notify(`【${member.name}】已成为正式队员`)
-                    }
-                }
-            } else {
-                this.$notify({
-                    title: "提示",
-                    message: "正式队员已满",
-                    type: "warning",
-                });
-            }
+        handlePass({ member }) {
+            this.loadMembers();
+            this.notify(`【${member.name}】已成为正式队员`);
         },
         handleReplace(member) {
             const index = this.members.findIndex(m => m.mount == member.mount && !m.is_valid);

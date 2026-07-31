@@ -6,6 +6,13 @@ async function read(path) {
     return readFile(new URL(path, import.meta.url), "utf8");
 }
 
+test("team bootstrap avoids duplicate component and plugin registration", async () => {
+    const entry = await read("../src/pages/team/index.js");
+
+    assert.match(entry, /if \(!app\.component\(key\)\)/);
+    assert.equal(entry.match(/app\.use\(VueSvgInlinePlugin/g)?.length, 1);
+});
+
 test("team home uses a personal workbench beside the discovery workspace", async () => {
     const [app, page, sidebar, list, shell] = await Promise.all([
         read("../src/pages/team/App.vue"),
@@ -21,6 +28,7 @@ test("team home uses a personal workbench beside the discovery workspace", async
     assert.doesNotMatch(page, /TeamHomeSidebar/);
     assert.match(page, /class="u-team-home-action is-primary" to="\/org\/add"/);
     assert.match(sidebar, /getAllMyTeams\(\)/);
+    assert.match(sidebar, /to="\/raid\/list"/);
     assert.match(sidebar, /getMyManageTeams\(\)/);
     assert.match(sidebar, /User\.isLogin\(\)/);
     assert.match(sidebar, /<strong>团队管理<\/strong>/);
@@ -455,26 +463,96 @@ test("team role table follows the archive certification table language", async (
 });
 
 test("DKP tables follow the archive certification table language", async () => {
-    const [manager, managerStyles, list, logs, listStyles, logStyles] = await Promise.all([
-        read("../src/views/team/dkp/ManageDkp.vue"),
-        read("../src/assets/css/team/dkp/list_dkp.less"),
-        read("../src/components/team/dkp/dkp_list.vue"),
-        read("../src/components/team/dkp/dkp_logs.vue"),
-        read("../src/assets/css/team/dkp/dkp_list.less"),
-        read("../src/assets/css/team/dkp/dkp_logs.less"),
-    ]);
+    const [manager, managerStyles, list, logs, listStyles, logStyles, characterStyles, dialog, dialogStyles] =
+        await Promise.all([
+            read("../src/views/team/dkp/ManageDkp.vue"),
+            read("../src/assets/css/team/dkp/list_dkp.less"),
+            read("../src/components/team/dkp/dkp_list.vue"),
+            read("../src/components/team/dkp/dkp_logs.vue"),
+            read("../src/assets/css/team/dkp/dkp_list.less"),
+            read("../src/assets/css/team/dkp/dkp_logs.less"),
+            read("../src/assets/css/team/dkp/character.less"),
+            read("../src/components/team/dkp/dkp_dialog.vue"),
+            read("../src/assets/css/team/dkp/dkp_dialog.less"),
+        ]);
 
     assert.match(manager, /class="m-dkp-manage-nav"/);
     assert.doesNotMatch(manager, /<el-tabs type="card"/);
+    assert.doesNotMatch(manager, /<keep-alive>/);
     assert.match(managerStyles, /\.m-dkp-manage-nav[\s\S]*button[\s\S]*&\.is-active/);
     assert.doesNotMatch(list, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(list, /type="selection" width="52" align="center"/);
+    assert.match(list, /label="操作" width="120" v-if="!readOnly"/);
     assert.doesNotMatch(logs, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(listStyles, /\.m-dkp-list[\s\S]*border-radius:\s*12px/);
     assert.match(listStyles, /--el-table-border-color:\s*@team-border-light/);
     assert.match(logStyles, /\.m-dkp-logs-container[\s\S]*border-radius:\s*12px/);
     assert.match(logStyles, /--el-table-border-color:\s*@team-border-light/);
+    assert.match(logs, /class="u-user" :href="authorLink\(scope\.row\.user_id\)"/);
+    assert.match(logStyles, /\.u-user\s*\{[\s\S]*display:\s*inline-flex[\s\S]*align-items:\s*center/);
     assert.doesNotMatch(listStyles, /content:\s*"全选"/);
+    assert.match(list, /popper-class="m-dkp-role-popover"/);
+    assert.match(list, /class="m-dkp-role-grid"/);
+    assert.match(characterStyles, /\.m-team-character_wrapper\s*\{[\s\S]*display:\s*flex/);
+    assert.match(characterStyles, /\.m-dkp-role-grid\s*\{[\s\S]*grid-template-columns:\s*repeat\(2/);
+    assert.match(characterStyles, /\.u-character-name\s*\{[\s\S]*min-width:\s*0[\s\S]*flex:\s*1/);
+    assert.doesNotMatch(characterStyles, /\.u-character-name\s*\{[\s\S]*\.w\(160px\)/);
+    assert.match(dialog, /width="620px"/);
+    assert.match(dialog, /label-position="top"/);
+    assert.match(dialog, /class="m-dkp-target-list"/);
+    assert.match(dialogStyles, /\.m-dkp-dialog-modify\.el-dialog/);
+    assert.match(dialogStyles, /\.m-dkp-dialog-form__row[\s\S]*grid-template-columns:\s*repeat\(2/);
+});
+
+test("DKP snapshot association reuses the five-team roster styling", async () => {
+    const [item, itemStyles, bodyStyles, list, listStyles, stat, statStyles, chart, chartData] = await Promise.all([
+        read("../src/components/team/snapshot/snapshotItem.vue"),
+        read("../src/assets/css/team/snapshot/item.less"),
+        read("../src/assets/css/team/snapshot/body.less"),
+        read("../src/components/team/snapshot/snapshotList.vue"),
+        read("../src/assets/css/team/snapshot/list.less"),
+        read("../src/components/team/snapshot/snapshotStat.vue"),
+        read("../src/assets/css/team/snapshot/stat.less"),
+        read("../src/components/team/snapshot/snapshotChart.vue"),
+        read("../src/assets/data/team/snapshot_chart.json"),
+    ]);
+
+    assert.match(item, /v-for="group of 5"[\s\S]*\{\{ group \}\} 队/);
+    assert.match(itemStyles, /\.m-snapshot-flags[\s\S]*grid-template-columns:\s*repeat\(5/);
+    assert.match(itemStyles, /\.m-snapshot-dkp[\s\S]*grid-template-columns:\s*minmax\(160px/);
+    assert.match(
+        itemStyles,
+        /\.u-delete\s*\{[\s\S]*&:hover,[\s\S]*background:\s*fade\(#ef4444, 6%\)[\s\S]*color:\s*#dc2626/
+    );
+    assert.match(bodyStyles, /&\.row-5\s*\{[\s\S]*border-radius:\s*0 0 12px 12px/);
+    assert.match(bodyStyles, /@row-height:\s*48px/);
+    assert.match(bodyStyles, /background:\s*@team-primary-soft/);
+    assert.match(list, /aria-label="搜索快照"/);
+    assert.match(listStyles, /\.m-snapshot-box > \.m-snapshot-search[\s\S]*background:\s*@team-surface-muted/);
+    assert.match(listStyles, /\.el-input\s*\{[\s\S]*width:\s*420px[\s\S]*max-width:\s*100%/);
+    assert.match(
+        listStyles,
+        /:deep\(\.el-input__wrapper\)[\s\S]*&:hover\s*\{[\s\S]*border-color:\s*@team-border-focus[\s\S]*&\.is-focus\s*\{[\s\S]*border-color:\s*@team-primary[\s\S]*box-shadow:\s*@team-shadow-focus/
+    );
+    assert.match(stat, /m-snapshot-search[\s\S]*m-snapshot-period[\s\S]*m-snapshot-date/);
+    assert.match(stat, /class="u-count">\{\{ scope\.row\.count \}\} 次/);
+    assert.match(statStyles, /\.m-snapshot-toolbar[\s\S]*background:\s*@team-surface-muted/);
+    assert.match(statStyles, /\.m-snapshot-search[\s\S]*width:\s*320px/);
+    assert.match(
+        statStyles,
+        /\.m-snapshot-date\s*\{[\s\S]*--el-date-editor-width:\s*250px[\s\S]*flex:\s*0 0 250px/
+    );
+    assert.match(statStyles, /--el-table-row-hover-bg-color:\s*fade\(@team-primary, 3%\)/);
+    assert.match(statStyles, /\.u-view-snapshot[\s\S]*background:\s*@team-primary-soft/);
+    assert.match(chart, /m-snapshot-chart-period[\s\S]*m-snapshot-chart-date/);
+    assert.match(chart, /m-snapshot-chart-card m-chart-line/);
+    assert.match(chart, /ref="lineChart" id="snapshot-line"/);
+    assert.match(chart, /requestId !== this\.requestId/);
+    assert.match(chart, /setOption\(option, \{ notMerge: true \}\)/);
+    assert.match(chart, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+    assert.match(chart, /--el-date-editor-width:\s*250px/);
+    assert.match(chartData, /"smooth":\s*true/);
+    assert.match(chartData, /"radius":\s*\["40%", "66%"\]/);
 });
 
 test("team feature, other and advanced settings keep their business sections separate", async () => {
@@ -532,6 +610,11 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.doesNotMatch(config, /"advanced"/);
     assert.match(config, /showDisplaySettings:[\s\S]*?\["all", "other"\]/);
     assert.match(password, /m-archive-field-label">快照密码/);
+    assert.match(password, /class="u-password-heading"/);
+    assert.match(password, /class="u-password-notice"/);
+    assert.match(password, /class="u-password-meta"/);
+    assert.match(password, /\.u-password-box\s*\{[\s\S]*width:\s*680px[\s\S]*border-radius:\s*@team-radius-control/);
+    assert.match(password, /:deep\(\.el-input__wrapper\)[\s\S]*&\.is-focus[\s\S]*box-shadow:\s*@team-shadow-focus/);
     assert.match(password, /\^\\d\{6\}\$/);
     assert.match(password, /@input="formatPassword"/);
     assert.match(banner, /m-archive-field-label">团队海报/);

@@ -71,9 +71,14 @@
             <el-table class="m-dkp-logs-table" :data="logs" size="small" empty-text="暂无分值变更记录">
                 <el-table-column label="人员" v-if="!user_id">
                     <template #default="scope">
-                        <a :href="authorLink(scope.row.user_id)" target="_blank">
+                        <a class="u-user" :href="authorLink(scope.row.user_id)" target="_blank">
                             <img
-                                :src="showAvatar(scope.row.user_info && scope.row.user_info.avatar)"
+                                :src="
+                                    showAvatar(
+                                        scope.row.user_info &&
+                                            (scope.row.user_info.user_avatar || scope.row.user_info.avatar)
+                                    )
+                                "
                                 class="u-user-avatar"
                             />
                             <span class="u-user-name">{{

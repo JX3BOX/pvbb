@@ -23,13 +23,25 @@
             </el-table-column>
             <el-table-column label="角色">
                 <template #default="scope">
-                    <el-popover v-if="scope.row.roles.length" placement="right" width="200" trigger="hover">
-                        <character
-                            v-for="(role, roleIndex) of scope.row.roles"
-                            :key="roleIndex"
-                            :xf="role.roleInfo.mount"
-                            :name="role.roleInfo.name"
-                        ></character>
+                    <el-popover
+                        v-if="scope.row.roles.length"
+                        placement="right"
+                        width="360"
+                        trigger="hover"
+                        popper-class="m-dkp-role-popover"
+                    >
+                        <div class="m-dkp-role-popover__header">
+                            <strong>绑定角色</strong>
+                            <span>{{ scope.row.roles.length }} 个</span>
+                        </div>
+                        <div class="m-dkp-role-grid">
+                            <character
+                                v-for="(role, roleIndex) of scope.row.roles"
+                                :key="roleIndex"
+                                :xf="role.roleInfo.mount"
+                                :name="role.roleInfo.name"
+                            ></character>
+                        </div>
                         <template #reference>
                             <span class="u-role-list">
                                 <router-link
@@ -49,7 +61,7 @@
             </el-table-column>
             <el-table-column prop="total" label="历史累计" sortable> </el-table-column>
             <el-table-column prop="score" label="当前分值" sortable sort-by="score"> </el-table-column>
-            <el-table-column label="操作" v-if="!readOnly">
+            <el-table-column label="操作" width="120" v-if="!readOnly">
                 <template #default="scope">
                     <el-button size="small" @click="handleEdit(scope.row)" type="primary" icon="Sort">调整</el-button>
                 </template>

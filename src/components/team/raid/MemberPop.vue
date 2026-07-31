@@ -38,7 +38,6 @@ export default {
             return authorLink(member?.user_id);
         },
     },
-    filters: {},
     created: function () {},
     mounted: function () {},
 };

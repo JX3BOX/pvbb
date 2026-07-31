@@ -1,14 +1,12 @@
 <template>
     <div class="v-snapshot-list">
-        <div class="m-snapshot-box">
-            <div class="m-filter">
-                <el-radio-group v-model="tab">
-                    <el-radio-button value="list">全部快照</el-radio-button>
-                    <el-radio-button value="stat">团员印象</el-radio-button>
-                    <el-radio-button value="chart">快照统计</el-radio-button>
-                    <el-radio-button value="password">密码配置</el-radio-button>
-                </el-radio-group>
-            </div>
+        <div class="m-snapshot-workspace">
+            <nav class="m-snapshot-subnav" aria-label="快照管理功能">
+                <button type="button" :class="{ 'is-active': tab === 'list' }" @click="tab = 'list'">全部快照</button>
+                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="tab = 'stat'">团员印象</button>
+                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="tab = 'chart'">快照统计</button>
+                <button type="button" :class="{ 'is-active': tab === 'password' }" @click="tab = 'password'">密码配置</button>
+            </nav>
             <keep-alive>
                 <component :is="componentsMap[tab]" :org="org" />
             </keep-alive>
@@ -71,10 +69,63 @@ export default {
 </script>
 
 <style lang="less">
-.m-snapshot-box {
-    .m-filter {
-        .x;
-        margin-bottom: 20px;
+@import (reference) "@/assets/css/team/design-system/_tokens.less";
+
+.v-snapshot-list {
+    min-width: 0;
+
+    .m-snapshot-workspace {
+        min-width: 0;
+    }
+
+    .m-snapshot-subnav {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        margin-bottom: @team-space-4;
+        padding: 4px;
+        overflow-x: auto;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        gap: 4px;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        button {
+            min-width: max-content;
+            min-height: 34px;
+            padding: 0 @team-space-3;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: @team-text-secondary;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color @team-duration-fast @team-ease-standard,
+                background-color @team-duration-fast @team-ease-standard,
+                box-shadow @team-duration-fast @team-ease-standard;
+
+            &:hover {
+                color: @team-primary;
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: @team-shadow-focus;
+            }
+
+            &.is-active {
+                background: @team-surface;
+                color: @team-primary;
+                box-shadow: @team-shadow-xs;
+            }
+        }
     }
 }
 </style>

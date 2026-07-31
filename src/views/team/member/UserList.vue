@@ -1,13 +1,34 @@
 <template>
-    <div class="m-member-users" v-loading="loading">
+    <div class="m-member-users">
         <header class="m-member-panel-header">
             <div>
                 <h2>正式团员</h2>
             </div>
-            <span class="u-member-total">{{ total }} 名成员</span>
+            <el-skeleton-item
+                v-if="loading"
+                variant="text"
+                class="u-member-total-skeleton"
+                aria-hidden="true"
+            />
+            <span v-else class="u-member-total">{{ total }} 名成员</span>
         </header>
 
-        <div class="m-member-list-users" v-if="data && data.length">
+        <div v-if="loading" class="m-member-card-grid m-member-skeleton-grid" aria-hidden="true">
+            <el-skeleton v-for="index in per" :key="index" animated class="m-member-skeleton-card">
+                <template #template>
+                    <div class="u-member-skeleton">
+                        <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                        <div class="u-skeleton-copy">
+                            <el-skeleton-item variant="text" class="u-skeleton-name" />
+                            <el-skeleton-item variant="text" class="u-skeleton-uid" />
+                        </div>
+                        <el-skeleton-item variant="text" class="u-skeleton-role" />
+                        <el-skeleton-item variant="circle" class="u-skeleton-action" />
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+        <div class="m-member-list-users" v-else-if="data && data.length">
             <div class="m-member-card-grid">
                 <div class="u-list-item" v-for="(item, index) in data" :key="item.uid || index">
                     <MemberItem :item="item" :id="id" @remove="onRemoveAccount" />
@@ -24,7 +45,7 @@
                 @current-change="changePage"
             ></el-pagination>
         </div>
-        <div v-else-if="!loading" class="m-member-empty">
+        <div v-else class="m-member-empty">
             <span class="u-empty-icon" aria-hidden="true">
                 <el-icon><UserFilled /></el-icon>
             </span>

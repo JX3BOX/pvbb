@@ -1,20 +1,34 @@
 <template>
-    <div class="v-raid-list">
-        <h1 class="m-title">
-            <i class="el-icon-date"></i>
-            <span class="u-txt">活动大厅</span>
-            <div class="u-op">
-                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回首页</el-button>
+    <main class="v-raid-list p-team-activity-center">
+        <header class="m-activity-center-hero">
+            <div class="u-activity-center-icon" aria-hidden="true">
+                <el-icon><Calendar /></el-icon>
             </div>
-        </h1>
-        <div class="m-raid-index" v-loading="loading">
+            <div class="m-activity-center-heading">
+                <span>PUBLIC EVENTS</span>
+                <h1>活动中心</h1>
+                <p>浏览近期公开活动，找到合适的团队并预约参与。</p>
+            </div>
+            <div class="m-activity-center-actions">
+                <el-button class="u-create-activity" type="primary" :loading="loadingTeams" @click="openCreateDialog">
+                    <el-icon><Plus /></el-icon>
+                    <span>新建活动</span>
+                </el-button>
+            </div>
+        </header>
+
+        <section class="m-activity-center-panel" aria-labelledby="activity-center-list-title">
             <div class="m-raid-filter">
-                <el-form ref="form" label-width="100px" label-position="left">
+                <div class="m-activity-filter-heading">
+                    <div>
+                        <h2 id="activity-center-list-title">近期活动</h2>
+                        <p>按活动、服务器或日期筛选</p>
+                    </div>
+                    <span v-if="!loading">共 {{ total }} 个结果</span>
+                </div>
+                <el-form ref="form" label-position="top" class="m-activity-filter-form">
                     <el-form-item label="活动名称" class="u-name">
-                        <template #label>
-                            <span class="u-label"> <i class="el-icon-data-analysis"></i>活动名称 </span>
-                        </template>
-                        <el-select v-model="name" placeholder="请选择">
+                        <el-select v-model="name" placeholder="全部活动">
                             <el-option key="name-all" label="全部" value=""></el-option>
                             <el-option
                                 v-for="(item, i) in raidsWithClient"
@@ -25,10 +39,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="服务器" class="u-server">
-                        <template #label>
-                            <span class="u-label"> <i class="el-icon-map-location"></i>服务器 </span>
-                        </template>
-                        <el-select v-model="server" placeholder="请选择">
+                        <el-select v-model="server" placeholder="全部服务器">
                             <el-option
                                 :label="item"
                                 v-for="item in serversWithClient"
@@ -37,82 +48,61 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="活动时间" class="u-time">
-                        <template #label>
-                            <span class="u-label"> <i class="el-icon-date"></i>活动时间 </span>
-                        </template>
-                        <template v-if="isMobile">
-                            <el-select v-model="time" placeholder="请选择">
-                                <el-option label="全部" key="all" value="-1"></el-option>
-                                <el-option
-                                    :label="showTimeLable(item)"
-                                    v-for="(item, i) in dates"
-                                    :key="i"
-                                    :value="item.offset"
-                                >
-                                    <b class="u-sp" v-if="!item.offset">今天</b>
-                                    <b class="u-sp" v-if="item.offset == 1">明天</b>
-                                    {{ item.date }}
-                                    <span class="u-week">({{ item.week }})</span>
-                                </el-option>
-                            </el-select>
-                        </template>
-                        <template v-else>
-                            <el-radio-group v-model="time" size="small">
-                                <el-radio-button label="-1" class="u-radio" border size="small">全部</el-radio-button>
-                                <el-radio-button
-                                    :label="item.offset"
-                                    v-for="(item, i) in dates"
-                                    :key="i"
-                                    class="u-radio"
-                                    border
-                                    size="small"
-                                >
-                                    <b class="u-sp" v-if="!item.offset">今天</b>
-                                    <b class="u-sp" v-if="item.offset == 1">明天</b>
-                                    {{ item.date }}
-                                    <span class="u-week">({{ item.week }})</span>
-                                </el-radio-button>
-                            </el-radio-group>
-                        </template>
-                    </el-form-item>
                     <el-form-item label="搜索活动" class="u-title">
-                        <template #label>
-                            <span class="u-label"> <i class="el-icon-search"></i>搜索活动 </span>
-                        </template>
-                        <el-input v-model="search" placeholder="输入关键词...">
-                            <template #append>
-                                <i class="el-icon-position"></i>
+                        <el-input v-model="search" clearable placeholder="搜索活动名称或招募说明">
+                            <template #prefix>
+                                <el-icon><Search /></el-icon>
                             </template>
                         </el-input>
                     </el-form-item>
+                    <el-form-item label="活动日期" class="u-time">
+                        <el-select v-model="time" placeholder="全部日期">
+                            <el-option label="全部日期" key="all" value="-1"></el-option>
+                            <el-option
+                                :label="showTimeLable(item)"
+                                v-for="(item, i) in dates"
+                                :key="i"
+                                :value="item.offset"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
                 </el-form>
             </div>
-            <template v-if="data && data.length">
-                <div v-loading="loading">
-                    <raid-list :data="data" :time="time" />
+            <div class="m-raid-index" v-loading="loading">
+                <template v-if="data && data.length">
+                    <div class="m-activity-center-list">
+                        <raid-list :data="data" :time="time" modern />
+                    </div>
+                    <el-pagination
+                        class="m-raid-pages"
+                        background
+                        layout="total, prev, pager, next, jumper"
+                        :hide-on-single-page="true"
+                        :page-size="per"
+                        :total="total"
+                        :current-page="page"
+                        @current-change="changePage"
+                    ></el-pagination>
+                </template>
+                <div v-else-if="!loading" class="m-activity-center-empty">
+                    <span aria-hidden="true"><el-icon><Calendar /></el-icon></span>
+                    <h2>没有找到符合条件的活动</h2>
+                    <p>试试调整活动、服务器或日期筛选。</p>
                 </div>
-                <el-pagination
-                    class="m-raid-pages"
-                    background
-                    layout="total, prev, pager, next,jumper"
-                    :hide-on-single-page="true"
-                    :page-size="per"
-                    :total="total"
-                    :current-page="page"
-                    @current-change="changePage"
-                ></el-pagination>
-            </template>
-            <el-alert v-else title="没有找到符合条件的记录" type="info" show-icon></el-alert>
-        </div>
-    </div>
+            </div>
+        </section>
+        <RaidFormDialog v-model="formVisible" :teams="teams" @saved="handleCreated" />
+    </main>
 </template>
 
 <script>
 import serverMap from "@jx3box/jx3box-data/data/server/server_map.json";
 import { moment } from "@jx3box/jx3box-common/js/moment";
 import { searchRaids, getRaidPresets } from "@/service/team/raid.js";
+import { getMyPowerTeams } from "@/service/team/team.js";
 import RaidList from "@/components/team/raid/RaidList.vue";
+import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
+import User from "@jx3box/jx3box-common/js/user";
 export default {
     name: "Listraid",
     props: [],
@@ -128,13 +118,14 @@ export default {
             data: [],
             per: 20,
             page: 1,
-            total: 1,
+            total: 0,
             loading: false,
-
-            position: window.innerWidth < 768 ? "top" : "left",
-            isMobile: window.innerWidth < 768,
+            requestId: 0,
 
             raids: [],
+            teams: [],
+            loadingTeams: false,
+            formVisible: false,
         };
     },
     computed: {
@@ -188,20 +179,20 @@ export default {
             this.dates = dates;
         },
         loadRaids: function () {
+            const requestId = ++this.requestId;
             this.loading = true;
             searchRaids(this.params)
                 .then((res) => {
+                    if (requestId !== this.requestId) return;
                     this.data = res.data.data.list || [];
                     this.total = res.data.data.total;
                 })
                 .finally(() => {
-                    this.loading = false;
+                    if (requestId === this.requestId) this.loading = false;
                 });
         },
-        goBack: function () {
-            this.$router.push("/");
-        },
-        changePage: function () {
+        changePage: function (page) {
+            this.page = page;
             window.scrollTo(0, 0);
         },
         init: function () {
@@ -213,6 +204,34 @@ export default {
             getRaidPresets(this.client).then((res) => {
                 this.raids = res.data.data;
             });
+        },
+        loadTeams: function () {
+            if (!User.isLogin()) return Promise.resolve();
+            this.loadingTeams = true;
+            return getMyPowerTeams("r_raid")
+                .then((res) => {
+                    this.teams = res?.data?.data?.list || [];
+                })
+                .finally(() => {
+                    this.loadingTeams = false;
+                });
+        },
+        openCreateDialog: async function () {
+            if (!User.isLogin()) {
+                window.location.href = `/account/login?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
+            if (!this.teams.length) await this.loadTeams();
+            if (!this.teams.length) {
+                this.$message.warning("你还没有可创建活动的团队权限");
+                return;
+            }
+            this.formVisible = true;
+        },
+        handleCreated: function () {
+            this.formVisible = false;
+            this.page = 1;
+            this.loadRaids();
         },
         showTimeLable: function (item) {
             let str = "";
@@ -229,6 +248,7 @@ export default {
     },
     mounted: function () {
         this.init();
+        this.loadTeams();
     },
     watch: {
         params: {
@@ -237,9 +257,22 @@ export default {
                 this.loadRaids();
             },
         },
+        name: function () {
+            this.page = 1;
+        },
+        server: function () {
+            this.page = 1;
+        },
+        time: function () {
+            this.page = 1;
+        },
+        search: function () {
+            this.page = 1;
+        },
     },
     components: {
         "raid-list": RaidList,
+        RaidFormDialog,
     },
 };
 </script>

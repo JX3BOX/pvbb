@@ -1,0 +1,330 @@
+@import (reference) "../design-system/_tokens.less";
+
+.m-raid-member-setting {
+    --el-color-primary: @team-primary;
+
+    &.el-dialog {
+        max-width: calc(100vw - 32px);
+        overflow: hidden;
+        border: 1px solid @team-border-light;
+        border-radius: 18px;
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+    }
+
+    .el-dialog__header {
+        margin: 0;
+        padding: 22px 56px 18px 24px;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__headerbtn {
+        top: 20px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+
+        &:hover {
+            background: @team-surface-muted;
+        }
+    }
+
+    .el-dialog__body {
+        max-height: min(68vh, 640px);
+        padding: 20px 24px 24px;
+        overflow-y: auto;
+    }
+
+    .el-dialog__footer {
+        padding: 14px 24px 18px;
+        border-top: 1px solid @team-border-light;
+        background: @team-surface-muted;
+    }
+
+    .el-button {
+        min-height: 38px;
+        padding: 0 20px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+}
+
+.m-raid-member-setting__title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    .u-title-icon {
+        display: inline-flex;
+        width: 38px;
+        height: 38px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border-radius: 11px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 18px;
+    }
+
+    > div {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    strong {
+        color: @team-text-primary;
+        font-size: 17px;
+        line-height: 24px;
+    }
+
+    span:last-child {
+        color: @team-text-muted;
+        font-size: 12px;
+        line-height: 18px;
+    }
+}
+
+.m-raid-member-setting__form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .el-form-item {
+        margin-bottom: 0;
+    }
+
+    .el-form-item__label {
+        height: auto;
+        padding: 0 0 8px;
+        color: @team-text-regular;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+    }
+
+    .el-input,
+    .el-select {
+        width: 100%;
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper,
+    .el-textarea__inner {
+        border: 1px solid @team-border;
+        border-radius: 10px;
+        box-shadow: none;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper {
+        min-height: 42px;
+    }
+
+    .el-input__wrapper.is-focus,
+    .el-select__wrapper.is-focused,
+    .el-textarea__inner:focus {
+        border-color: @team-primary;
+        box-shadow: @team-shadow-focus;
+    }
+
+    .el-textarea__inner {
+        min-height: 76px !important;
+        padding: 11px 13px;
+        line-height: 1.6;
+    }
+}
+
+.m-raid-member-setting__section {
+    padding: 16px;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background: @team-surface;
+
+    > header {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 14px;
+        gap: 9px;
+
+        strong {
+            display: inline-flex;
+            align-items: center;
+            color: @team-text-primary;
+            font-size: 14px;
+
+            &::before {
+                width: 3px;
+                height: 16px;
+                margin-right: 8px;
+                border-radius: 999px;
+                background: @team-primary;
+                content: "";
+            }
+        }
+
+        span {
+            color: @team-text-muted;
+            font-size: 11px;
+        }
+
+        strong,
+        span {
+            margin: 0;
+        }
+    }
+
+    .el-form-item + .el-form-item {
+        margin-top: 16px;
+    }
+}
+
+.m-raid-member-source {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.m-raid-selected-role {
+    display: flex;
+    min-height: 62px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid @team-border-focus;
+    border-radius: 12px;
+    background: linear-gradient(135deg, @team-primary-soft 0%, @team-surface 78%);
+    gap: 11px;
+
+    img {
+        width: 38px;
+        height: 38px;
+        flex: none;
+        object-fit: contain;
+    }
+
+    > div {
+        display: flex;
+        min-width: 0;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    strong {
+        overflow: hidden;
+        color: @team-text-primary;
+        font-size: 14px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    span {
+        color: @team-text-muted;
+        font-size: 11px;
+    }
+
+    .el-button {
+        min-height: 32px;
+        padding: 0 8px;
+        flex: none;
+    }
+}
+
+.m-raid-member-divider {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    color: @team-text-muted;
+    font-size: 11px;
+    gap: 10px;
+
+    &::before,
+    &::after {
+        height: 1px;
+        flex: 1;
+        background: @team-border-light;
+        content: "";
+    }
+}
+
+.m-raid-member-setting__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.m-raid-pop-member-select {
+    min-width: 280px;
+
+    .el-select-dropdown__wrap {
+        max-height: 240px;
+    }
+}
+
+.m-raid-member-option {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+
+    img {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        object-fit: contain;
+    }
+
+    span {
+        min-width: 0;
+        overflow: hidden;
+        flex: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    small {
+        color: @team-text-muted;
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .m-raid-member-setting {
+        .el-dialog__header {
+            padding: 18px 48px 16px 18px;
+        }
+
+        .el-dialog__headerbtn {
+            top: 16px;
+            right: 14px;
+        }
+
+        .el-dialog__body {
+            padding: 16px;
+        }
+
+        .el-dialog__footer {
+            padding: 12px 16px 16px;
+        }
+    }
+
+    .m-raid-member-setting__section {
+        padding: 14px;
+
+        > header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 3px;
+        }
+    }
+
+    .m-raid-selected-role span {
+        display: none;
+    }
+}
