@@ -17,19 +17,6 @@
             <span class="u-role-count">{{ localRoles.length }} 个角色</span>
             <el-icon class="u-open-icon" aria-hidden="true"><ArrowRight /></el-icon>
         </button>
-
-        <el-tooltip effect="dark" content="移除该账号及全部角色" placement="top">
-            <button
-                v-if="item.uid"
-                class="u-remove-account"
-                type="button"
-                :aria-label="`移除成员 ${(item.user_info && item.user_info.display_name) || item.uid}`"
-                :disabled="removingAccount"
-                @click.stop="removeAccount"
-            >
-                <el-icon><Delete /></el-icon>
-            </button>
-        </el-tooltip>
     </article>
 
     <el-dialog
@@ -97,7 +84,18 @@
 
         <template #footer>
             <div class="m-member-role-dialog-footer">
-                <button type="button" @click="roleDialogVisible = false">完成</button>
+                <button
+                    v-if="item.uid"
+                    class="u-remove-account"
+                    type="button"
+                    :aria-label="`移除成员 ${(item.user_info && item.user_info.display_name) || item.uid}`"
+                    :disabled="removingAccount"
+                    @click="removeAccount"
+                >
+                    <el-icon><Delete /></el-icon>
+                    <span>{{ removingAccount ? "正在移除" : "移除成员" }}</span>
+                </button>
+                <button class="u-dialog-done" type="button" @click="roleDialogVisible = false">完成</button>
             </div>
         </template>
     </el-dialog>

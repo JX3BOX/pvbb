@@ -128,6 +128,95 @@ test("team management uses a canonical route without the mode query", async () =
     assert.match(namespace, /name:\s*"manage_my_org"/);
 });
 
+test("team join dialog uses an isolated responsive role picker without changing the join contract", async () => {
+    const [dialog, styles, service, raidDialog] = await Promise.all([
+        read("../src/components/team/member/joinpop.vue"),
+        read("../src/assets/css/team/member/joinpop.less"),
+        read("../src/service/team/member.js"),
+        read("../src/components/team/raid/JoinPop.vue"),
+    ]);
+
+    assert.match(dialog, /class="m-team-joinpop m-team-member-join-dialog"/);
+    assert.match(dialog, /width="820px"[\s\S]*?align-center/);
+    assert.match(dialog, /class="m-team-joinpop-header"/);
+    assert.match(dialog, /class="m-team-joinpop-toolbar"/);
+    assert.match(dialog, /class="u-role-card" border/);
+    assert.match(dialog, /class="u-footer-actions"/);
+    assert.match(dialog, /:disabled="loading \|\| !roles\.length"/);
+    assert.match(dialog, /:loading="submitting"/);
+    assert.match(dialog, /v-loading="loading"/);
+    assert.match(dialog, /this\.isIndeterminate = value\.length > 0 && value\.length < total/);
+    assert.match(dialog, /if \(!this\.roles\.length \|\| this\.submitting\) return/);
+    assert.match(dialog, /version !== this\.loadVersion \|\| !this\.visible/);
+    assert.match(service, /get\(`\/api\/team\/relation\/my\/\$\{team_id\}\/roles\/not-at-team`\)/);
+    assert.match(service, /post\(`\/api\/team\/relation\/my\/\$\{team_id\}\/join`,\s*\{[\s\S]*?roles:\s*list/);
+    assert.match(styles, /\.m-team-member-join-dialog\.el-dialog\s*\{[\s\S]*?border-radius:\s*18px/);
+    assert.match(styles, /\.u-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
+    assert.match(styles, /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?&\.is-checked/);
+    assert.match(
+        styles,
+        /\.el-checkbox__input\.is-checked \.el-checkbox__inner::after[\s\S]*?translate\(-50%, -58%\)/,
+    );
+    assert.match(
+        styles,
+        /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?\.el-checkbox__label[\s\S]*?background:\s*transparent/,
+    );
+    assert.match(styles, /\.dialog-footer[\s\S]*?justify-content:\s*space-between/);
+    assert.match(styles, /@media screen and \(max-width: 520px\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+    assert.doesNotMatch(raidDialog, /m-team-member-join-dialog/);
+});
+
+test("team public members use grouped profile cards with compact responsive states", async () => {
+    const [page, styles] = await Promise.all([
+        read("../src/views/team/member/ViewMember.vue"),
+        read("../src/assets/css/team/member/view_member.less"),
+    ]);
+
+    for (const section of ["is-leaders", "is-birthday", "is-members"]) {
+        assert.match(page, new RegExp(`class="m-public-member-section ${section}"`));
+    }
+    assert.match(page, /class="m-public-member-grid is-user-grid"/);
+    assert.match(page, /class="m-public-member-grid is-role-grid"/);
+    assert.match(page, /<h2 id="team-leaders-title">团队管理员<\/h2>/);
+    assert.match(page, /\{\{ total \}\} 个角色/);
+    assert.match(page, /class="u-public-member-card is-role"/);
+    assert.match(page, /class="m-public-member-state is-birthday-empty"/);
+    assert.match(page, /class="m-public-member-state is-locked"/);
+    assert.match(page, /class="m-team-member-pages"/);
+    assert.match(page, /return !this\.v \|\| ~~this\.authority\.authority >= ~~this\.v/);
+    assert.match(page, /getLeaders\(this\.team_id\)/);
+    assert.match(page, /getTeamMembers\(this\.team_id, this\.params\)/);
+    assert.match(page, /getTeamBirthDay\(this\.team_id\)/);
+    assert.match(styles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
+    assert.match(styles, /\.m-public-member-section[\s\S]*border-radius:\s*@team-radius-control/);
+    assert.match(styles, /\.m-public-member-grid[\s\S]*grid-template-columns:\s*repeat\(auto-fill/);
+    assert.match(styles, /\.u-public-member-card[\s\S]*min-height:\s*68px/);
+    assert.match(styles, /@media screen and \(max-width: 620px\)[\s\S]*grid-template-columns:\s*repeat\(2/);
+});
+
+test("member account removal lives in the role dialog footer", async () => {
+    const [member, styles, service] = await Promise.all([
+        read("../src/views/team/member/MemberItem.vue"),
+        read("../src/assets/css/team/member/member_item.less"),
+        read("../src/service/team/admin.js"),
+    ]);
+
+    const memberCard = member.slice(0, member.indexOf("<el-dialog"));
+    const memberCardStyles = styles.slice(0, styles.indexOf(".m-member-role-dialog.el-dialog"));
+
+    assert.doesNotMatch(memberCard, /u-remove-account|<Delete \/>/);
+    assert.doesNotMatch(memberCardStyles, /\.u-remove-account/);
+    assert.match(
+        member,
+        /<template #footer>[\s\S]*?class="m-member-role-dialog-footer"[\s\S]*?class="u-remove-account"[\s\S]*?class="u-dialog-done"/,
+    );
+    assert.match(member, /this\.\$confirm\("此操作会将该账号下所有角色移除/);
+    assert.match(member, /removeTeamRoleAll\(this\.team_id, this\.item\.uid\)/);
+    assert.match(styles, /\.m-member-role-dialog-footer[\s\S]*?\.u-remove-account[\s\S]*?color:\s*#dc2626/);
+    assert.match(styles, /\.u-dialog-done[\s\S]*?margin-left:\s*auto/);
+    assert.match(service, /function removeTeamRoleAll\(team_id, user_id\)/);
+});
+
 test("team edit action opens the basic settings section in the workbench", async () => {
     const panel = await read("../src/components/team/org/team_panel.vue");
 

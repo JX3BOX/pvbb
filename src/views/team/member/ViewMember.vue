@@ -1,62 +1,122 @@
 <template>
     <div class="v-member-view">
-        <el-divider content-position="left"> <i class="el-icon-star-off"></i> 团队管理 </el-divider>
-        <div class="m-member-leaders">
-            <div class="u-list" v-if="leaders && leaders.length">
-                <div class="u-item-wrapper" v-for="(item, i) in leaders" :key="i">
-                    <a class="u-item" target="_blank" :href="authorLink(item.uid)">
-                        <el-tooltip class="item" effect="dark" :content="item.display_name" placement="top">
-                            <div>
-                                <img class="u-item-avatar" :src="showUserAvatar(item.user_avatar)" />
-                                <span class="u-item-name">{{ item.display_name.slice(0, 6) }}</span>
-                            </div>
-                        </el-tooltip>
+        <section class="m-public-member-section is-leaders" aria-labelledby="team-leaders-title" v-loading="leadersLoading">
+            <header class="m-public-member-heading">
+                <span class="u-section-icon is-leader" aria-hidden="true">
+                    <el-icon><UserFilled /></el-icon>
+                </span>
+                <h2 id="team-leaders-title">团队管理员</h2>
+                <span class="u-section-count">{{ leaders.length }} 人</span>
+            </header>
+
+            <div v-if="leaders.length" class="m-public-member-grid is-user-grid">
+                <a
+                    v-for="(item, i) in leaders"
+                    :key="item.uid || i"
+                    class="u-public-member-card is-user"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :href="authorLink(item.uid)"
+                    :title="leaderName(item)"
+                >
+                    <img
+                        class="u-public-member-avatar"
+                        :src="showUserAvatar(item.user_avatar)"
+                        :alt="leaderName(item)"
+                        loading="lazy"
+                    />
+                    <span class="u-public-member-name">{{ leaderName(item) }}</span>
+                </a>
+            </div>
+            <div v-else-if="leadersError" class="m-public-member-state is-error">
+                <el-icon><WarningFilled /></el-icon>
+                <span>团队管理成员加载失败</span>
+            </div>
+            <div v-else-if="!leadersLoading" class="m-public-member-state">
+                <el-icon><UserFilled /></el-icon>
+                <span>暂无公开的管理成员</span>
+            </div>
+        </section>
+
+        <section class="m-public-member-section is-birthday" aria-labelledby="team-birthday-title" v-loading="birthLoading">
+            <header class="m-public-member-heading">
+                <span class="u-section-icon is-birthday" aria-hidden="true">
+                    <el-icon><Present /></el-icon>
+                </span>
+                <h2 id="team-birthday-title">今日寿星</h2>
+                <span v-if="hasRight" class="u-section-count">{{ births.length }} 人</span>
+            </header>
+
+            <template v-if="hasRight">
+                <div v-if="births.length" class="m-public-member-grid is-user-grid">
+                    <a
+                        v-for="item in births"
+                        :key="item.id"
+                        class="u-public-member-card is-user is-birthday"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :href="authorLink(item.id)"
+                        :title="birthdayName(item)"
+                    >
+                        <img
+                            class="u-public-member-avatar"
+                            :src="showUserAvatar(item.avatar)"
+                            :alt="birthdayName(item)"
+                            loading="lazy"
+                        />
+                        <span class="u-public-member-name">{{ birthdayName(item) }}</span>
+                        <el-icon class="u-birthday-mark" aria-hidden="true"><Present /></el-icon>
                     </a>
                 </div>
-            </div>
-        </div>
-
-        <el-divider content-position="left"> <i class="el-icon-present"></i> 今日寿星 </el-divider>
-        <div class="m-member-leaders">
-            <template v-if="hasRight">
-                <div class="u-list" v-if="births && births.length">
-                    <div class="u-item-wrapper" v-for="item in births" :key="item.id">
-                        <a class="u-item" target="_blank" :href="authorLink(item.id)">
-                            <el-tooltip class="item" effect="dark" :content="item.displayName" placement="top">
-                                <div>
-                                    <img class="u-item-avatar" :src="showUserAvatar(item.avatar)" />
-                                    <span class="u-item-name">{{ item.displayName.slice(0, 6) }}</span>
-                                </div>
-                            </el-tooltip>
-                        </a>
-                    </div>
+                <div v-else-if="birthError" class="m-public-member-state is-error">
+                    <el-icon><WarningFilled /></el-icon>
+                    <span>寿星信息加载失败</span>
                 </div>
-                <div class="u-lock" v-else><i class="el-icon-warning-outline"></i>今日无寿星</div>
+                <div v-else-if="!birthLoading" class="m-public-member-state is-birthday-empty">
+                    <el-icon><Present /></el-icon>
+                    <span>今天暂无寿星，祝大家江湖顺意</span>
+                </div>
             </template>
-            <template v-else>
-                <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
-            </template>
-        </div>
+            <div v-else class="m-public-member-state is-locked">
+                <el-icon><Lock /></el-icon>
+                <span>当前没有查看权限</span>
+            </div>
+        </section>
 
-        <el-divider content-position="left"> <i class="el-icon-user"></i> 团队成员 </el-divider>
-        <div class="m-member-teammates" v-loading="loading">
+        <section class="m-public-member-section is-members" aria-labelledby="team-members-title" v-loading="loading">
+            <header class="m-public-member-heading">
+                <span class="u-section-icon is-member" aria-hidden="true">
+                    <el-icon><User /></el-icon>
+                </span>
+                <h2 id="team-members-title">团队成员</h2>
+                <span v-if="hasRight" class="u-section-count">{{ total }} 个角色</span>
+            </header>
+
             <template v-if="hasRight">
-                <div class="u-list" v-if="data && data.length">
-                    <div class="u-item-wrapper" v-for="(item, i) in data" :key="i">
-                        <router-link class="u-item" target="_blank" :to="'/role/' + item.roles.ID">
-                            <el-tooltip class="item" effect="dark" :content="item.roles.name" placement="top">
-                                <div>
-                                    <el-avatar
-                                        class="u-item-avatar"
-                                        :src="showRoleAvatar(item.roles.mount, item.roles.body_type)"
-                                    ></el-avatar>
-                                    <span class="u-item-name">{{
-                                        item.roles.name && item.roles.name.slice(0, 6)
-                                    }}</span>
-                                </div>
-                            </el-tooltip>
-                        </router-link>
-                    </div>
+                <div v-if="data.length" class="m-public-member-grid is-role-grid">
+                    <router-link
+                        v-for="(item, i) in data"
+                        :key="item.roles?.ID || i"
+                        class="u-public-member-card is-role"
+                        target="_blank"
+                        :to="'/role/' + item.roles.ID"
+                        :title="roleName(item)"
+                    >
+                        <el-avatar
+                            class="u-public-member-avatar"
+                            shape="square"
+                            :src="showRoleAvatar(item.roles.mount, item.roles.body_type)"
+                        />
+                        <span class="u-public-member-name">{{ roleName(item) }}</span>
+                    </router-link>
+                </div>
+                <div v-else-if="memberError" class="m-public-member-state is-error">
+                    <el-icon><WarningFilled /></el-icon>
+                    <span>团队成员加载失败</span>
+                </div>
+                <div v-else-if="!loading" class="m-public-member-state">
+                    <el-icon><User /></el-icon>
+                    <span>暂无公开的团队成员</span>
                 </div>
                 <el-pagination
                     class="m-team-member-pages"
@@ -66,12 +126,13 @@
                     v-model:current-page="page"
                     layout="total, prev, pager, next, jumper"
                     :total="total"
-                ></el-pagination>
+                />
             </template>
-            <template v-else>
-                <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
-            </template>
-        </div>
+            <div v-else class="m-public-member-state is-locked">
+                <el-icon><Lock /></el-icon>
+                <span>当前没有查看权限</span>
+            </div>
+        </section>
     </div>
 </template>
 
@@ -80,6 +141,8 @@ import { __imgPath } from "@/utils/config";
 import { authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getLeaders } from "@/service/team/admin.js";
 import { getTeamMembers, getTeamBirthDay } from "@/service/team/member.js";
+import { Lock, Present, User, UserFilled, WarningFilled } from "@element-plus/icons-vue";
+
 export default {
     name: "ViewMember",
     props: ["v", "super", "authority"],
@@ -88,9 +151,14 @@ export default {
             data: [],
             leaders: [],
             page: 1,
-            total: 1,
+            total: 0,
             per: 100,
             loading: false,
+            leadersLoading: false,
+            birthLoading: false,
+            memberError: false,
+            leadersError: false,
+            birthError: false,
             births: [],
         };
     },
@@ -113,25 +181,47 @@ export default {
             return __imgPath + "image/roles/" + mount + "-" + body_type + ".png";
         },
         loadLeaders: function () {
-            getLeaders(this.team_id).then((res) => {
-                this.leaders = res.data.data.list;
-            });
+            this.leadersLoading = true;
+            this.leadersError = false;
+            return getLeaders(this.team_id)
+                .then((res) => {
+                    this.leaders = res?.data?.data?.list || [];
+                })
+                .catch(() => {
+                    this.leadersError = true;
+                })
+                .finally(() => {
+                    this.leadersLoading = false;
+                });
         },
         loadMembers: function () {
             this.loading = true;
-            getTeamMembers(this.team_id, this.params)
+            this.memberError = false;
+            return getTeamMembers(this.team_id, this.params)
                 .then((res) => {
-                    this.data = res.data.data.list;
-                    this.total = res.data.data.page.total;
+                    this.data = res?.data?.data?.list || [];
+                    this.total = res?.data?.data?.page?.total || 0;
+                })
+                .catch(() => {
+                    this.memberError = true;
                 })
                 .finally(() => {
                     this.loading = false;
                 });
         },
         loadBirth: function () {
-            getTeamBirthDay(this.team_id).then((res) => {
-                this.births = res?.data?.data?.list || [];
-            });
+            this.birthLoading = true;
+            this.birthError = false;
+            return getTeamBirthDay(this.team_id)
+                .then((res) => {
+                    this.births = res?.data?.data?.list || [];
+                })
+                .catch(() => {
+                    this.birthError = true;
+                })
+                .finally(() => {
+                    this.birthLoading = false;
+                });
         },
         init: function () {
             this.loadLeaders();
@@ -139,6 +229,15 @@ export default {
                 this.loadMembers();
                 this.loadBirth();
             }
+        },
+        leaderName: function (item) {
+            return item?.display_name || "未知用户";
+        },
+        birthdayName: function (item) {
+            return item?.displayName || "未知用户";
+        },
+        roleName: function (item) {
+            return item?.roles?.name || "未知角色";
         },
         authorLink,
         showUserAvatar: function (val) {
@@ -156,7 +255,13 @@ export default {
     mounted: function () {
         this.init();
     },
-    components: {},
+    components: {
+        Lock,
+        Present,
+        User,
+        UserFilled,
+        WarningFilled,
+    },
 };
 </script>
 

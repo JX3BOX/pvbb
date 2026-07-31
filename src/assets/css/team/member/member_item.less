@@ -39,7 +39,7 @@
         flex: 1;
         grid-template-columns: minmax(0, 1fr) auto auto;
         gap: @team-space-2;
-        padding: 10px 48px 10px @team-space-3;
+        padding: 10px @team-space-3;
         border: 0;
         background: transparent;
         color: inherit;
@@ -117,44 +117,6 @@
             transform @team-duration-fast @team-ease-standard;
     }
 
-    .u-remove-account {
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        right: @team-space-3;
-        display: inline-flex;
-        width: 32px;
-        height: 32px;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        border: 1px solid @team-border-light;
-        border-radius: 9px;
-        background: @team-surface;
-        color: @team-text-muted;
-        cursor: pointer;
-        font-size: 15px;
-        transform: translateY(-50%);
-        transition: border-color @team-duration-fast @team-ease-standard,
-            background-color @team-duration-fast @team-ease-standard,
-            color @team-duration-fast @team-ease-standard;
-
-        &:hover:not(:disabled) {
-            border-color: #fecaca;
-            background: #fff7f7;
-            color: #dc2626;
-        }
-
-        &:focus-visible {
-            outline: none;
-            box-shadow: @team-shadow-focus;
-        }
-
-        &:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-    }
 }
 
 .m-member-role-dialog.el-dialog {
@@ -419,7 +381,6 @@
 .m-member-role-dialog-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: @team-space-3;
 
     button {
@@ -435,8 +396,32 @@
         text-decoration: none;
     }
 
-    button {
+    .u-remove-account {
+        min-width: 104px;
+        padding: 0 @team-space-3;
+        border: 1px solid #fecaca;
+        background: #fff7f7;
+        color: #dc2626;
+        cursor: pointer;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard,
+            color @team-duration-fast @team-ease-standard;
+
+        &:hover:not(:disabled) {
+            border-color: #fca5a5;
+            background: #fff1f2;
+            color: #b91c1c;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+
+    .u-dialog-done {
         min-width: 76px;
+        margin-left: auto;
         padding: 0 @team-space-3;
         border: 1px solid @team-primary;
         background: @team-primary;
@@ -459,7 +444,7 @@
     .u-member-item {
         .u-member-card-trigger {
             grid-template-columns: minmax(0, 1fr) auto;
-            padding: 8px 44px 8px @team-space-2;
+            padding: 8px @team-space-2;
         }
 
         .u-avatar {
@@ -470,10 +455,6 @@
 
         .u-open-icon {
             display: none;
-        }
-
-        .u-remove-account {
-            right: @team-space-2;
         }
     }
 
