@@ -1,6 +1,6 @@
 <template>
     <div class="v-member-list">
-        <nav class="m-member-subnav" aria-label="成员管理分类">
+        <nav class="m-member-subnav" :aria-label="$t('team.member.categories')">
             <button
                 v-for="item in tabs"
                 :key="item.value"
@@ -28,13 +28,15 @@ export default {
     data: function () {
         return {
             tab: "user",
-            tabs: [
-                { label: "正式团员", value: "user" },
-                { label: "加入申请", value: "pending" },
-            ],
         };
     },
     computed: {
+        tabs() {
+            return [
+                { label: this.$t("team.member.officialMembers"), value: "user" },
+                { label: this.$t("team.member.joinRequests"), value: "pending" },
+            ];
+        },
         activeComponent() {
             return this.tab === "pending" ? PendingList : UserList;
         },

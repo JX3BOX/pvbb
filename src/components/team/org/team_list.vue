@@ -3,17 +3,17 @@
         <div class="m-team-list-header">
             <div class="m-filter">
                 <router-link v-if="!homeMode" to="/org/add" class="el-button el-button--primary el-button--large"
-                    ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
+                    ><i class="el-icon-circle-plus-outline"></i>&nbsp; {{ $t("team.homeFilters.createTeam") }}</router-link
                 >
                 <el-select
                     v-if="homeMode"
                     class="u-home-server u-filter"
                     v-model="server"
-                    placeholder="选择服务器"
+                    :placeholder="$t('team.homeFilters.selectServer')"
                     filterable
                     @change="changeServer"
                 >
-                    <el-option key="all" label="全部服务器" value=""></el-option>
+                    <el-option key="all" :label="$t('team.homeFilters.allServers')" value=""></el-option>
                     <el-option
                         v-for="(item, i) in serversWithClient"
                         :key="item + i"
@@ -24,7 +24,7 @@
                 <el-input
                     class="u-name u-filter"
                     v-model="name"
-                    placeholder="查找团队"
+                    :placeholder="$t('team.homeFilters.searchTeams')"
                     size="large"
                     @change="searchTeam"
                     style="width: 100%"
@@ -33,11 +33,11 @@
                         <el-select
                             style="width: 120px"
                             v-model="server"
-                            placeholder="选择服务器"
+                            :placeholder="$t('team.homeFilters.selectServer')"
                             filterable
                             @change="changeServer"
                         >
-                            <el-option key="all" label="全部服务器" value=""></el-option>
+                            <el-option key="all" :label="$t('team.homeFilters.allServers')" value=""></el-option>
                             <el-option
                                 v-for="(item, i) in serversWithClient"
                                 :key="item + i"
@@ -57,24 +57,24 @@
                         class="u-isVerified u-filter"
                         v-model="isVerified"
                     >
-                        只看认证
+                        {{ $t("team.homeFilters.verifiedOnly") }}
                     </el-checkbox>
                     <el-checkbox-group v-model="tag">
-                        <el-checkbox v-for="item in tags" :key="item" :label="item" :value="item"></el-checkbox>
+                        <el-checkbox v-for="item in tags" :key="item" :label="tagLabel(item)" :value="item"></el-checkbox>
                     </el-checkbox-group>
                     <button v-if="hasActiveFilters" class="u-filter-clear" type="button" @click="clearFilters">
-                        清空
+                        {{ $t("team.homeFilters.clear") }}
                     </button>
                 </template>
                 <router-link
                     class="u-more el-button el-button--primary is-plain el-button--mini"
                     to="/org/list"
                     v-if="isIndex"
-                    >查看更多&raquo;</router-link
+                    >{{ $t("team.homeFilters.more") }}&raquo;</router-link
                 >
             </div>
         </div>
-        <div v-if="loading" class="u-list m-team-list-skeleton" aria-label="团队列表加载中">
+        <div v-if="loading" class="u-list m-team-list-skeleton" :aria-label="$t('team.homeFilters.loading')">
             <div class="u-item u-skeleton-item" v-for="index in skeletonCount" :key="index" aria-hidden="true">
                 <span class="u-skeleton-block u-skeleton-logo"></span>
                 <span class="u-skeleton-content">
@@ -97,7 +97,7 @@
                 :to="'/org/' + item.ID"
                 v-for="item in data"
                 :key="item.ID"
-                :aria-label="'查看团队：' + item.name"
+                :aria-label="$t('team.homeFilters.viewTeam', { name: item.name })"
                 target="_blank"
             >
                 <span class="u-pic">
@@ -106,7 +106,7 @@
                 </span>
                 <span class="u-name">
                     <span class="u-name-text" :title="item.name || ''">{{ formatTeamName(item.name) }}</span>
-                    <i class="u-status" v-if="item.status == 1" title="已认证">
+                    <i class="u-status" v-if="item.status == 1" :title="$t('team.homeFilters.verified')">
                         <img svg-inline src="@/assets/img/team/verify.svg" />
                     </i>
                     <span class="u-medals">
@@ -121,11 +121,11 @@
                 </span>
                 <span class="u-meta">
                     <span class="u-meta-item u-server">
-                        <em>服务器</em>
+                        <em>{{ $t("team.homeFilters.server") }}</em>
                         {{ item.server }}
                     </span>
                     <span class="u-meta-item u-leader">
-                        <em>团长</em>
+                        <em>{{ $t("team.homeFilters.leader") }}</em>
                         <a class="u-super" :href="authorLink(item.super)" target="_blank">
                             <img
                                 class="u-user-avatar"
@@ -138,26 +138,26 @@
                 <span class="u-tag-list" :class="{ 'is-empty': !item.tags || !item.tags.length }">
                     <span
                         class="u-tag-item"
-                        :class="{ love: tag == '可教学' }"
+                        :class="{ love: tag == '\u53ef\u6559\u5b66' }"
                         v-for="(tag, i) in item.tags"
                         :key="i"
-                        >{{ tag }}</span
+                        >{{ tagLabel(tag) }}</span
                     >
-                    <span v-if="!item.tags || !item.tags.length" class="u-tag-item">类型待补充</span>
+                    <span v-if="!item.tags || !item.tags.length" class="u-tag-item">{{ $t("team.homeFilters.typePending") }}</span>
                 </span>
                 <span class="u-recruit u-meta">
                     <div class="u-meta-item">
-                        <em>招募公告</em>
+                        <em>{{ $t("team.homeFilters.recruitment") }}</em>
                         <span
                             :class="{ 'is-empty': !item.recruit && !item.desc }"
-                            :title="item.recruit || item.desc || '暂未发布招募公告'"
-                            >{{ item.recruit || item.desc || "暂未发布招募公告" }}</span
+                            :title="item.recruit || item.desc || $t('team.homeFilters.noRecruitment')"
+                            >{{ item.recruit || item.desc || $t("team.homeFilters.noRecruitment") }}</span
                         >
                     </div>
                 </span>
             </router-link>
         </div>
-        <el-alert v-else class="m-team-list-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
+        <el-alert v-else class="m-team-list-null" :title="$t('team.homeFilters.empty')" type="info" center show-icon></el-alert>
         <div
             v-if="!isIndex && loading"
             class="m-team-pagination-skeleton"
@@ -251,6 +251,18 @@ export default {
     methods: {
         showAvatar,
         authorLink,
+        tagLabel: function (tag) {
+            const keys = {
+                "\u53ef\u6559\u5b66": "teachable",
+                "\u56fa\u5b9a\u56e2": "fixed",
+                "\u6210\u5c31\u56e2": "achievement",
+                "\u5b66\u751f\u515a": "student",
+                "\u4e0a\u73ed\u515a": "worker",
+                "\u7206\u809d\u5e1d": "hardcore",
+                "\u65f6\u5dee\u515a": "timezone",
+            };
+            return keys[tag] ? this.$t(`team.teamTags.${keys[tag]}`) : tag;
+        },
         formatTeamName: function (value) {
             const name = String(value || "");
             const characters = Array.from(name);

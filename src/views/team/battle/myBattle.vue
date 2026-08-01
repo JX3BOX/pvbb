@@ -6,8 +6,11 @@
                     <span class="u-notice-copy">
                         <span>{{ $t("pages.team.battle.myNotice") }}</span>
                         <small>{{ $t("pages.team.battle.mySource") }}</small>
+                        <a class="u-battle-guide" href="/tool/109317" target="_blank" rel="noopener noreferrer">
+                            {{ $t("pages.team.battle.reportGuide") }}
+                        </a>
                     </span>
-                    <el-switch v-model="filterRanking" active-text="只看活动数据" />
+                    <el-switch v-model="filterRanking" :active-text="$t('pages.team.battle.activityOnly')" />
                 </div>
             </template>
         </el-alert>
@@ -26,7 +29,7 @@
                 ></BattleItem>
             </div>
             <div class="m-battle-list_null" v-else>
-                <el-alert title="当前页暂无榜单数据" type="info" show-icon></el-alert>
+                <el-alert :title="$t('pages.team.battle.noActivityRecordsOnPage')" type="info" show-icon></el-alert>
             </div>
             <el-pagination
                 v-if="list.length"

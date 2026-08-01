@@ -1,6 +1,6 @@
 <template>
     <section class="m-team-banner" :class="{ 'is-archive': variant === 'archive' }">
-        <div v-if="variant === 'archive'" class="m-archive-field-label">团队海报</div>
+        <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.settingSections.banner") }}</div>
         <el-divider v-else content-position="left"> <i class="el-icon-picture-outline"></i> 团队海报 </el-divider>
         <div class="m-banner-editor">
             <uploadImage
@@ -9,9 +9,9 @@
                 info="团队海报推荐尺寸为920*120，画面主体尽量靠右，用于微信小程序团队主页与活动等作为主题展示。"
             ></uploadImage>
             <div v-if="variant === 'archive'" class="m-banner-editor__actions">
-                <p>建议上传 920 × 120 的 JPG 或 PNG 图片，画面主体尽量靠右。</p>
+                <p>{{ $t("team.settingSections.bannerHint") }}</p>
                 <el-button class="u-submit-btn" type="primary" icon="Upload" @click="submitBanner" :loading="saving"
-                    >保存海报</el-button
+                    >{{ $t("team.settingSections.saveBanner") }}</el-button
                 >
             </div>
         </div>
@@ -23,7 +23,7 @@
             icon="Upload"
             @click="submitBanner"
             :loading="saving"
-            >提交海报</el-button
+            >{{ $t("team.settingSections.submitBanner") }}</el-button
         >
     </section>
 </template>
@@ -75,7 +75,7 @@ export default {
                 banner: this.banner,
             })
                 .then(() => {
-                    this.$message.success(this.variant === "archive" ? "团队海报保存成功" : "海报上传成功");
+                    this.$message.success(this.variant === "archive" ? this.$t("team.settingSections.bannerSaved") : this.$t("team.settingSections.bannerUploaded"));
                 })
                 .finally(() => {
                     this.saving = false;

@@ -3,22 +3,22 @@
         <div v-if="supportDkpSync" class="m-snapshot-dkp-guide">
             <span class="u-guide-icon" aria-hidden="true"><i class="el-icon-connection"></i></span>
             <div class="u-guide-content">
-                <h3>按快照批量记录考勤 DKP</h3>
-                <p>选择一次活动快照，可为快照名单中的所有成员快速增加相同的考勤分值。</p>
-                <ol class="u-guide-steps" aria-label="快照关联操作步骤">
-                    <li><b>1</b> 找到对应快照</li>
-                    <li><b>2</b> 展开确认名单</li>
-                    <li><b>3</b> 填写分值与备注后提交</li>
+                <h3>{{ $t("team.snapshotGuide.title") }}</h3>
+                <p>{{ $t("team.snapshotGuide.description") }}</p>
+                <ol class="u-guide-steps" :aria-label="$t('team.snapshotGuide.aria')">
+                    <li><b>1</b> {{ $t("team.snapshotGuide.step1") }}</li>
+                    <li><b>2</b> {{ $t("team.snapshotGuide.step2") }}</li>
+                    <li><b>3</b> {{ $t("team.snapshotGuide.step3") }}</li>
                 </ol>
             </div>
         </div>
         <div class="m-snapshot-search">
             <el-button v-if="!readOnly" class="u-manual-add" type="primary" icon="Plus" @click="openCreateDialog">
-                手动补录
+                {{ $t("team.snapshot.manualAdd") }}
             </el-button>
             <el-input
-                placeholder="搜索快照标题、上传人员或备注"
-                aria-label="搜索快照"
+                :placeholder="$t('team.snapshot.search')"
+                :aria-label="$t('team.snapshot.searchAria')"
                 v-model="search"
                 clearable
             >
@@ -49,8 +49,8 @@
         </div>
         <el-alert class="m-snapshot-null" type="info" show-icon v-else>
             <template #title>
-                暂无任何记录，点击查看
-                <a href="/tool/23783" target="_blank">帮助文档</a>
+                {{ $t("team.snapshot.empty") }}
+                <a href="/tool/23783" target="_blank">{{ $t("team.snapshot.help") }}</a>
             </template>
         </el-alert>
         <EditSnapshotDialog

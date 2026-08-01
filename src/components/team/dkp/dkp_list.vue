@@ -11,7 +11,7 @@
             @selection-change="handleSelectionChange"
         >
             <el-table-column type="selection" width="52" align="center" v-if="!readOnly"> </el-table-column>
-            <el-table-column label="人员">
+            <el-table-column :label="$t('team.dkp.person')">
                 <template #default="scope">
                     <a class="u-user" :href="authorLink(scope.row.uid)" target="_blank">
                         <img :src="renderAvatar(scope.row.user_info)" class="u-user-avatar" />
@@ -21,7 +21,7 @@
                     </a>
                 </template>
             </el-table-column>
-            <el-table-column label="角色">
+            <el-table-column :label="$t('team.dkp.role')">
                 <template #default="scope">
                     <el-popover
                         v-if="scope.row.roles.length"
@@ -31,8 +31,8 @@
                         popper-class="m-dkp-role-popover"
                     >
                         <div class="m-dkp-role-popover__header">
-                            <strong>绑定角色</strong>
-                            <span>{{ scope.row.roles.length }} 个</span>
+                            <strong>{{ $t("team.dkp.boundRoles") }}</strong>
+                            <span>{{ $t("team.dkp.roleCount", { count: scope.row.roles.length }) }}</span>
                         </div>
                         <div class="m-dkp-role-grid">
                             <character
@@ -56,14 +56,14 @@
                             </span>
                         </template>
                     </el-popover>
-                    <span v-else>没有绑定角色</span>
+                    <span v-else>{{ $t("team.dkp.noRole") }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="total" label="历史累计" sortable> </el-table-column>
-            <el-table-column prop="score" label="当前分值" sortable sort-by="score"> </el-table-column>
-            <el-table-column label="操作" width="120" v-if="!readOnly">
+            <el-table-column prop="total" :label="$t('team.dkp.total')" sortable> </el-table-column>
+            <el-table-column prop="score" :label="$t('team.dkp.current')" sortable sort-by="score"> </el-table-column>
+            <el-table-column :label="$t('team.dkp.operation')" width="120" v-if="!readOnly">
                 <template #default="scope">
-                    <el-button size="small" @click="handleEdit(scope.row)" type="primary" icon="Sort">调整</el-button>
+                    <el-button size="small" @click="handleEdit(scope.row)" type="primary" icon="Sort">{{ $t("team.dkp.adjust") }}</el-button>
                 </template>
             </el-table-column>
         </el-table>

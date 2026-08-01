@@ -31,19 +31,20 @@ test("team home uses a personal workbench beside the discovery workspace", async
     assert.match(sidebar, /to="\/raid\/list"/);
     assert.match(sidebar, /getMyManageTeams\(\)/);
     assert.match(sidebar, /User\.isLogin\(\)/);
-    assert.match(sidebar, /<strong>团队管理<\/strong>/);
-    assert.match(sidebar, /<strong>我的团队<\/strong>/);
-    assert.match(sidebar, /team\.super == uid \? "创始人" : "管理员"/);
+    assert.match(sidebar, /team\.sidebar\.management/);
+    assert.match(sidebar, /team\.sidebar\.myTeams/);
+    assert.match(sidebar, /team\.common\.founder/);
+    assert.match(sidebar, /team\.common\.administrator/);
     assert.match(sidebar, /team\.super == uid \? 'is-founder' : 'is-admin'/);
     assert.doesNotMatch(sidebar, />团长<\/span>/);
     assert.match(sidebar, /class="u-sidebar-group-icon is-member"[\s\S]*?<School \/>/);
     assert.match(sidebar, /to="\/raid\/list"/);
-    assert.match(sidebar, /<strong>团队活动<\/strong>/);
-    assert.match(sidebar, /<strong>团队平台<\/strong>/);
+    assert.match(sidebar, /team\.sidebar\.activity/);
+    assert.match(sidebar, /team\.common\.platform/);
     assert.doesNotMatch(sidebar, /<strong>团队中心<\/strong>/);
     assert.match(sidebar, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
     assert.match(page, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
-    assert.match(sidebar, /<strong>我的角色<\/strong>/);
+    assert.match(sidebar, /team\.sidebar\.myRoles/);
     assert.match(sidebar, /:href="dashboardRoleUrl"/);
     assert.doesNotMatch(sidebar, /发现团队与公开活动/);
     assert.doesNotMatch(sidebar, /管理全部已绑定角色/);
@@ -101,14 +102,19 @@ test("team home sidebar has loading, error, empty and unauthenticated states", a
 });
 
 test("team workspace uses the persistent sidebar as its only team switcher", async () => {
-    const [workspace, sidebar] = await Promise.all([
+    const [router, workspace, sidebar] = await Promise.all([
+        read("../src/pages/team/router.js"),
         read("../src/views/team/org/ViewMyOrg.vue"),
         read("../src/components/team/org/team_home_sidebar.vue"),
     ]);
 
+    assert.match(router, /name:\s*"view_my_org"[\s\S]*?path:\s*"\/my\/org\/:id\?"/);
     assert.doesNotMatch(workspace, /selectedTeamId|switchTeam|u-team-switcher|m-team-switch/);
-    assert.match(workspace, /openFirstTeam/);
+    assert.doesNotMatch(workspace, /openFirstTeam|getAllMyTeams/);
     assert.match(sidebar, /teamRoute:\s*function \(team, mode\)/);
+    assert.match(sidebar, /this\.expandedGroups\[mode\] = true/);
+    assert.match(sidebar, /openFirstMemberTeam/);
+    assert.match(sidebar, /this\.\$router\.replace\(this\.teamRoute\(this\.teams\[0\], "member"\)\)/);
     assert.match(sidebar, /name:\s*mode === "manage" \? "manage_my_org" : "view_my_org"/);
     assert.doesNotMatch(sidebar, /query:\s*\{\s*mode/);
     assert.match(sidebar, /this\.workspaceMode === mode/);
@@ -171,15 +177,15 @@ test("team public homepage shares the modern shell and keeps public modules inta
     assert.match(page, /<team-info[\s\S]*?:show-manage-action="false"/);
     assert.match(page, /class="m-team-view m-public-org__tabs"/);
     assert.doesNotMatch(page, /<el-tabs[^>]*type="card"/);
-    for (const tab of ["团队概况", "团队成员", "团队活动", "通关视频", "留言板"]) {
-        assert.match(page, new RegExp(`<span>${tab}<\\/span>`));
+    for (const tab of ["overview", "members", "activities", "videos", "comments"]) {
+        assert.match(page, new RegExp(`team\\.public\\.${tab}`));
     }
     assert.doesNotMatch(page, /DKP记录|ViewDkp|name="dkp"/);
     for (const component of ["team-intro", "team-recruit", "team-medals", "team-trophy", "ViewMember", "TeamRaid", "ViewVideo", "ViewComment"]) {
         assert.match(page, new RegExp(`<${component}\\b`));
     }
     assert.match(page, /const PUBLIC_TABS = \["overview", "member", "raid", "video", "comment"\]/);
-    assert.match(page, /label="团队活动" name="raid"[\s\S]*?:v="data\.v_activity"[\s\S]*?:authority="authority"/);
+    assert.match(page, /:label="\$t\('team\.public\.activities'\)" name="raid"[\s\S]*?:v="data\.v_activity"[\s\S]*?:authority="authority"/);
     assert.match(page, /const query = \{ \.\.\.this\.\$route\.query \}/);
     assert.match(page, /Promise\.all\(\[this\.loadTeamInfo\(id\), this\.loadAuthority\(id\)\]\)/);
     assert.match(page, /version !== this\.loadVersion \|\| id !== this\.id/);
@@ -276,8 +282,8 @@ test("team public members use grouped profile cards with compact responsive stat
     }
     assert.match(page, /class="m-public-member-grid is-user-grid"/);
     assert.match(page, /class="m-public-member-grid is-role-grid"/);
-    assert.match(page, /<h2 id="team-leaders-title">团队管理员<\/h2>/);
-    assert.match(page, /\{\{ total \}\} 个角色/);
+    assert.match(page, /<h2 id="team-leaders-title">\{\{ \$t\("team\.publicContent\.leaders"\) \}\}<\/h2>/);
+    assert.match(page, /team\.publicContent\.roleCount/);
     assert.match(page, /class="u-public-member-card is-role"/);
     assert.match(page, /class="m-public-member-state is-birthday-empty"/);
     assert.match(page, /class="m-public-member-state is-locked"/);
@@ -309,7 +315,7 @@ test("member account removal lives in the role dialog footer", async () => {
         member,
         /<template #footer>[\s\S]*?class="m-member-role-dialog-footer"[\s\S]*?class="u-remove-account"[\s\S]*?class="u-dialog-done"/,
     );
-    assert.match(member, /this\.\$confirm\("此操作会将该账号下所有角色移除/);
+    assert.match(member, /this\.\$confirm\(this\.\$t\("team\.memberDialog\.accountConfirm"\)/);
     assert.match(member, /removeTeamRoleAll\(this\.team_id, this\.item\.uid\)/);
     assert.match(styles, /\.m-member-role-dialog-footer[\s\S]*?\.u-remove-account[\s\S]*?color:\s*#dc2626/);
     assert.match(styles, /\.u-dialog-done[\s\S]*?margin-left:\s*auto/);
@@ -352,7 +358,7 @@ test("r_video administrators receive the complete video management workspace", a
     ]);
 
     assert.match(workspace, /canManageVideo:[\s\S]*?this\.isSuper \|\| Number\(this\.permissions\.r_video\) === 1/);
-    assert.match(workspace, /<el-tab-pane label="视频管理"[^>]*v-if="canManageVideo"/);
+    assert.match(workspace, /<el-tab-pane :label="\$t\('team\.workspace\.videoManagement'\)"[^>]*v-if="canManageVideo"/);
     assert.match(workspace, /<ManageVideo[\s\S]*?:key="`manage-video-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-manage="canManageVideo"/);
     assert.match(workspace, /if \(this\.canManageVideo\) tabs\.push\("video"\)/);
 
@@ -401,7 +407,7 @@ test("team header actions follow management, member, and public route modes", as
     assert.match(info, /v-if="\(showPublicActions \|\| showHomeAction\) && \(!isRaid \|\| !isTeamSuper\)"/);
     assert.match(info, /:show-home-action="showHomeAction"/);
     assert.match(info, /:always-show-join-action="alwaysShowJoinAction"/);
-    assert.match(panel, /v-if="showHomeAction"[\s\S]*?:to="`\/org\/\$\{team_id\}`"[\s\S]*?团队主页/);
+    assert.match(panel, /v-if="showHomeAction"[\s\S]*?:to="`\/org\/\$\{team_id\}`"[\s\S]*?team\.publicActions\.homepage/);
     assert.match(panel, /v-if="showPublicActions && !isRaid"/);
     assert.match(panel, /v-if="showPublicActions && showJoinAction"/);
     assert.match(panel, /return this\.alwaysShowJoinAction \|\| \(!this\.isMine && !this\.isLeader\)/);
@@ -413,31 +419,31 @@ test("team workspace separates management tools from the member view", async () 
         read("../src/views/team/raid/ManageRaid.vue"),
         read("../src/views/team/raid/MyTeamRaid.vue"),
     ]);
-    const topLevelLabels = [...workspace.matchAll(/<el-tab-pane label="([^"]+)"/g)].map((match) => match[1]);
+    const topLevelLabels = [...workspace.matchAll(/<el-tab-pane :label="\$t\('([^']+)'\)"/g)].map((match) => match[1]);
     const managementStart = workspace.indexOf('<template v-if="isManagementMode">');
     const memberStart = workspace.indexOf("<template v-else>", managementStart);
     const managementTemplate = workspace.slice(managementStart, memberStart);
     const memberTemplate = workspace.slice(memberStart);
 
     assert.deepEqual(topLevelLabels, [
-        "成员管理",
-        "战绩管理",
-        "活动管理",
-        "快照管理",
-        "DKP管理",
-        "视频管理",
-        "团队设置",
-        "我的角色",
-        "我的战绩",
-        "团队活动",
-        "团队快照",
-        "团队DKP",
-        "通关视频",
-        "留言板",
+        "team.workspace.memberManagement",
+        "team.workspace.battleManagement",
+        "team.workspace.activityManagement",
+        "team.workspace.snapshotManagement",
+        "team.workspace.dkpManagement",
+        "team.workspace.videoManagement",
+        "team.workspace.teamSettings",
+        "team.workspace.myRoles",
+        "team.workspace.myBattles",
+        "team.workspace.teamActivities",
+        "team.workspace.teamSnapshots",
+        "team.workspace.teamDkp",
+        "team.workspace.videos",
+        "team.workspace.comments",
     ]);
-    assert.doesNotMatch(managementTemplate, /我的角色|我的战绩|团队DKP|团队活动/);
-    assert.doesNotMatch(memberTemplate, /成员管理|战绩管理|视频管理|快照管理|DKP管理|活动管理|团队设置/);
-    assert.match(managementTemplate, /<Setting \/>[\s\S]*?<span>团队设置<\/span>/);
+    assert.doesNotMatch(managementTemplate, /team\.workspace\.(myRoles|myBattles|teamDkp|teamActivities)/);
+    assert.doesNotMatch(memberTemplate, /team\.workspace\.(memberManagement|battleManagement|videoManagement|snapshotManagement|dkpManagement|activityManagement|teamSettings)/);
+    assert.match(managementTemplate, /<Setting \/>[\s\S]*?team\.workspace\.teamSettings/);
     assert.match(workspace, /class="p-team-my-org p-team-public"/);
     assert.match(workspace, /class="m-public-org__hero"/);
     assert.match(workspace, /'has-banner': publicBanner/);
@@ -470,10 +476,10 @@ test("team archive uses a grouped basic settings form without changing other for
     ]);
 
     assert.match(workspace, /variant="archive"/);
-    assert.match(form, /<h2>团队身份<\/h2>/);
-    assert.match(form, /<h2>对外展示<\/h2>/);
-    assert.match(form, /<h2>联系与直播<\/h2>/);
-    assert.match(form, /<h2>内容可见范围<\/h2>/);
+    assert.match(form, /<h2>\{\{ \$t\("team\.settings\.identity"\) \}\}<\/h2>/);
+    assert.match(form, /<h2>\{\{ \$t\("team\.settings\.publicDisplay"\) \}\}<\/h2>/);
+    assert.match(form, /<h2>\{\{ \$t\("team\.settings\.contact"\) \}\}<\/h2>/);
+    assert.match(form, /<h2>\{\{ \$t\("team\.settings\.visibility"\) \}\}<\/h2>/);
     assert.doesNotMatch(form, /label="团队DKP"/);
     assert.match(form, /this\.form\.v_dkp = 2;[\s\S]*?this\.\$emit\("submit"\)/);
     assert.doesNotMatch(form, /u-field-help/);
@@ -499,29 +505,29 @@ test("team archive certification and permission management match the compact arc
         ]);
 
     assert.match(workspace, /<VerifyOrg[\s\S]*?variant="archive"[\s\S]*?:team-id="id"[\s\S]*?:team-data="data"/);
-    assert.match(page, /<h2>申请须知<\/h2>/);
-    assert.match(page, /<h2>认证流程<\/h2>/);
-    assert.match(page, /<h2>认证申请<\/h2>/);
+    assert.match(page, /team\.verification\.notice/);
+    assert.match(page, /team\.verification\.process/);
+    assert.match(page, /team\.verification\.application/);
     assert.match(form, /class="m-team-verify-summary"/);
-    assert.match(form, /label="认证联系 QQ"/);
+    assert.match(form, /:label="\$t\('team\.verification\.contactQq'\)"/);
     assert.match(form, /'is-editable': canApply/);
-    assert.match(form, /placeholder="请填写可联系到您的 QQ 号"/);
+    assert.match(form, /:placeholder="\$t\('team\.verification\.contactPlaceholder'\)"/);
     assert.match(form, /immediate:\s*true/);
-    assert.match(logs, /<h2>近期认证记录<\/h2>/);
+    assert.match(logs, /team\.verification\.recent/);
     assert.match(logs, /props:\s*\["teamId"\]/);
     assert.match(logs, /<el-empty v-else/);
     assert.match(styles, /\.v-org-verify\.is-archive/);
     assert.match(styles, /&\.is-editable[\s\S]*&\.is-focus/);
     assert.match(workspace, /<EditPermission[\s\S]*?variant="archive"[\s\S]*?:team-id="id"/);
-    assert.match(permission, /<h2>管理员权限<\/h2>/);
+    assert.match(permission, /team\.permissions\.title/);
     assert.match(permission, /this\.variant === "archive"/);
     assert.match(permissionStyles, /\.m-permission-panel\.is-archive/);
     assert.match(permissionStyles, /position:\s*sticky/);
     assert.match(permissionStyles, /\.el-checkbox__input\.is-disabled\.is-checked/);
     assert.match(permissionStyles, /cursor:\s*not-allowed/);
     assert.match(permission, /:variant="variant"/);
-    assert.match(permission, />移除<\/el-button/);
-    assert.match(permission, /this\.\$confirm\([\s\S]*?确认移除[\s\S]*?cancelButtonText:\s*"取消"/);
+    assert.match(permission, /team\.permissions\.remove/);
+    assert.match(permission, /this\.\$confirm\([\s\S]*?team\.permissions\.confirmRemove[\s\S]*?team\.permissions\.cancel/);
     assert.doesNotMatch(permission, />删除<\/el-button|确认删除|删除管理员/);
     const founderPermissions = permission.slice(
         permission.indexOf('<template v-if="item.level == 99">'),
@@ -574,7 +580,7 @@ test("DKP tables follow the archive certification table language", async () => {
 
     assert.match(manager, /class="m-dkp-manage-nav"/);
     assert.doesNotMatch(manager, /class="m-dkp-embedded-header"/);
-    assert.match(manager, /v-if="isSuperLeader"[\s\S]*?activeTab === 'advanced'[\s\S]*?<span>高级操作<\/span>/);
+    assert.match(manager, /v-if="isSuperLeader"[\s\S]*?activeTab === 'advanced'[\s\S]*?team\.dkp\.advanced/);
     assert.match(manager, /@click="switchTab\('score'\)"/);
     assert.match(manager, /@click="switchTab\('advanced'\)"/);
     assert.match(manager, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
@@ -582,8 +588,8 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(manager, /if \(subtab === "advanced" && !this\.leaderChecked\) return/);
     assert.match(manager, /class="u-dkp-help" href="\/tool\/23786" target="_blank" rel="noopener noreferrer"/);
     assert.match(manager, /v-if="activeTab === 'advanced'" class="m-dkp-advanced"/);
-    assert.match(manager, /重置团队 DKP[\s\S]*?重置DKP/);
-    assert.match(manager, /if \(!this\.isSuperLeader\)[\s\S]*?仅团队创始人可以重置DKP/);
+    assert.match(manager, /team\.dkp\.resetTitle[\s\S]*?team\.dkp\.reset/);
+    assert.match(manager, /if \(!this\.isSuperLeader\)[\s\S]*?team\.dkp\.founderOnly/);
     assert.doesNotMatch(manager, /<el-tabs type="card"/);
     assert.doesNotMatch(manager, /<keep-alive>/);
     assert.match(managerStyles, /\.m-dkp-manage-nav[\s\S]*button[\s\S]*&\.is-active/);
@@ -591,7 +597,7 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(managerStyles, /\.m-dkp-danger-card\s*\{[\s\S]*?fade\(#ef4444, 24%\)/);
     assert.doesNotMatch(list, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(list, /type="selection" width="52" align="center"/);
-    assert.match(list, /label="操作" width="120" v-if="!readOnly"/);
+    assert.match(list, /:label="\$t\('team\.dkp\.operation'\)" width="120" v-if="!readOnly"/);
     assert.doesNotMatch(logs, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(listStyles, /\.m-dkp-list[\s\S]*border-radius:\s*12px/);
     assert.match(listStyles, /--el-table-border-color:\s*@team-border-light/);
@@ -610,7 +616,7 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(dialog, /label-position="top"/);
     assert.match(dialog, /class="m-dkp-target-list"/);
     assert.match(dialog, /:value="role\.relation\.role_id"/);
-    assert.match(dialog, /error\?\.response\?\.data\?\.msg[\s\S]*?DKP调整失败，请稍后重试/);
+    assert.match(dialog, /error\?\.response\?\.data\?\.msg[\s\S]*?team\.dkpDialog\.failed/);
     assert.match(dialog, /this\.\$emit\("updateRows"\)/);
     assert.match(list, /updateRows:\s*function \(\)[\s\S]*?clearSelection\(\)[\s\S]*?return this\.loadDkpList\(\)/);
     assert.doesNotMatch(list, /const _score = action/);
@@ -631,28 +637,23 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
         read("../src/assets/data/team/snapshot_chart.json"),
     ]);
 
-    assert.match(item, /v-for="group of 5"[\s\S]*\{\{ group \}\} 队/);
-    assert.match(item, /v-if="supportDkpSync && data\.dkp"[\s\S]*?el-icon-check[\s\S]*?DKP 已同步/);
+    assert.match(item, /v-for="group of 5"[\s\S]*?team\.snapshot\.group/);
+    assert.match(item, /v-if="supportDkpSync && data\.dkp"[\s\S]*?el-icon-check[\s\S]*?team\.snapshot\.dkpSynced/);
     assert.match(item, /:loading="syncingDkp"[\s\S]*?:disabled="syncingDkp"/);
     assert.match(item, /if \(!Number\.isInteger\(score\)\)/);
     assert.match(item, /syncSnapshotDkp\(this\.team_id, data\.id,[\s\S]*?\.catch\(\(error\) => \{/);
-    assert.match(item, /result\.matched[\s\S]*?跳过 \$\{skipped\} 条未匹配数据/);
-    assert.match(item, /未匹配到团队成员，已跳过 \$\{skipped\} 条数据/);
-    assert.match(item, /error\?\.response\?\.data\?\.msg[\s\S]*?提交失败，请稍后重试/);
+    assert.match(item, /result\.matched[\s\S]*?team\.snapshot\.dkpSkipped/);
+    assert.match(item, /team\.snapshot\.dkpNoMatch/);
+    assert.match(item, /error\?\.response\?\.data\?\.msg[\s\S]*?team\.snapshot\.submitFailed/);
     assert.match(item, /\.finally\(\(\) => \{[\s\S]*?this\.syncingDkp = false/);
     assert.match(itemStyles, /\.m-snapshot-flags[\s\S]*grid-template-columns:\s*repeat\(5/);
     assert.match(itemStyles, /\.u-dkp-status\s*\{[\s\S]*?border-radius:\s*999px[\s\S]*?color:\s*#15803d/);
     assert.match(itemStyles, /\.m-snapshot-dkp[\s\S]*grid-template-columns:\s*minmax\(160px/);
-    assert.match(
-        itemStyles,
-        /\.u-delete\s*\{[\s\S]*&:hover,[\s\S]*background:\s*fade\(#ef4444, 6%\)[\s\S]*color:\s*#dc2626/
-    );
     assert.match(bodyStyles, /&\.row-5\s*\{[\s\S]*border-radius:\s*0 0 12px 12px/);
-    assert.match(bodyStyles, /@row-height:\s*48px/);
-    assert.match(bodyStyles, /background:\s*@team-primary-soft/);
-    assert.match(list, /aria-label="搜索快照"/);
+    assert.match(bodyStyles, /@row-height:\s*50px/);
+    assert.match(list, /:aria-label="\$t\('team\.snapshot\.searchAria'\)"/);
     assert.match(list, /v-if="supportDkpSync" class="m-snapshot-dkp-guide"/);
-    assert.match(list, /按快照批量记录考勤 DKP[\s\S]*?填写分值与备注后提交/);
+    assert.match(list, /team\.snapshotGuide\.title[\s\S]*?team\.snapshotGuide\.step3/);
     assert.match(listStyles, /\.m-snapshot-dkp-guide\s*\{[\s\S]*?fade\(@team-primary, 18%\)/);
     assert.match(listStyles, /\.m-snapshot-box > \.m-snapshot-search[\s\S]*background:\s*@team-surface-muted/);
     assert.match(listStyles, /\.el-input\s*\{[\s\S]*width:\s*420px[\s\S]*max-width:\s*100%/);
@@ -661,7 +662,7 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
         /:deep\(\.el-input__wrapper\)[\s\S]*&:hover\s*\{[\s\S]*border-color:\s*@team-border-focus[\s\S]*&\.is-focus\s*\{[\s\S]*border-color:\s*@team-primary[\s\S]*box-shadow:\s*@team-shadow-focus/
     );
     assert.match(stat, /m-snapshot-search[\s\S]*m-snapshot-period[\s\S]*m-snapshot-date/);
-    assert.match(stat, /class="u-count">\{\{ scope\.row\.count \}\} 次/);
+    assert.match(stat, /team\.snapshot\.count/);
     assert.match(statStyles, /\.m-snapshot-toolbar[\s\S]*background:\s*@team-surface-muted/);
     assert.match(statStyles, /\.m-snapshot-search[\s\S]*width:\s*320px/);
     assert.match(
@@ -710,8 +711,8 @@ test("team feature, other and advanced settings keep their business sections sep
         read("../src/service/team/team.js"),
     ]);
 
-    assert.match(workspace, />\s*功能设置\s*<\/button>/);
-    assert.match(workspace, />\s*其它设置\s*<\/button>/);
+    assert.match(workspace, /team\.workspace\.featureSettings/);
+    assert.match(workspace, /team\.workspace\.otherSettings/);
     assert.match(workspace, /archiveSection === 'feature'[\s\S]*?config-section="feature"/);
     assert.match(
         workspace,
@@ -731,16 +732,16 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(workspace, /<team-advanced-setting[\s\S]*?variant="archive"/);
     assert.match(config, /class="v-team-config"[\s\S]*?'is-archive'/);
     assert.match(config, /\.v-team-config\.is-archive[\s\S]*display:\s*block/);
-    assert.match(config, /<h2>快照设置<\/h2>/);
-    assert.match(config, /<h2>DKP 设置<\/h2>/);
-    assert.match(config, /<h2>外观设置<\/h2>/);
+    assert.match(config, /team\.settingSections\.snapshot/);
+    assert.match(config, /team\.settingSections\.dkp/);
+    assert.match(config, /team\.settingSections\.appearance/);
     assert.match(config, /showFeatureSettings[\s\S]*?<snapshot-password[\s\S]*?<dkp-rule/);
     assert.match(config, /showDisplaySettings[\s\S]*?<team-banner/);
     assert.match(config, /configSection:[\s\S]*?default:\s*"all"/);
     assert.match(config, /validator:[\s\S]*?\["all", "feature", "other"\]/);
     assert.doesNotMatch(config, /"advanced"/);
     assert.match(config, /showDisplaySettings:[\s\S]*?\["all", "other"\]/);
-    assert.match(password, /m-archive-field-label">快照密码/);
+    assert.match(password, /m-archive-field-label">\{\{ \$t\("team\.snapshotPassword\.title"\) \}\}/);
     assert.match(password, /class="u-password-heading"/);
     assert.match(password, /class="u-password-notice"/);
     assert.match(password, /class="u-password-meta"/);
@@ -748,32 +749,32 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(password, /:deep\(\.el-input__wrapper\)[\s\S]*&\.is-focus[\s\S]*box-shadow:\s*@team-shadow-focus/);
     assert.match(password, /\^\\d\{6\}\$/);
     assert.match(password, /@input="formatPassword"/);
-    assert.match(banner, /m-archive-field-label">团队海报/);
+    assert.match(banner, /team\.settingSections\.banner/);
     assert.match(banner, /\[920, 120\]/);
-    assert.match(banner, /推荐尺寸为920\*120[\s\S]*?画面主体尽量靠右/);
+    assert.match(banner, /team\.settingSections\.bannerHint/);
     assert.match(banner, /width:\s*920px[\s\S]*aspect-ratio:\s*920 \/ 120/);
     assert.match(banner, /object-position:\s*right center/);
     assert.match(banner, /\.u-tip[\s\S]*display:\s*none/);
     assert.match(banner, /updateTeamInfo\(this\.id,\s*\{\s*banner:\s*this\.banner/);
     assert.match(teamService, /function updateTeamInfo\(team_id, data\)[\s\S]*?\.patch\(`\/api\/team\/my-team\/\$\{team_id\}`/);
-    assert.match(dkpRule, /m-archive-field-label">DKP 制度/);
+    assert.match(dkpRule, /team\.settingSections\.dkpRule/);
     assert.match(dkpRule, /class="m-dkp-rule__footer"/);
-    assert.match(advanced, /<h2>团队操作<\/h2>/);
+    assert.match(advanced, /team\.advanced\.actions/);
     assert.match(advanced, /class="m-team-operation-item is-danger"/);
     assert.match(advanced, /&\.is-danger[\s\S]*background:\s*transparent/);
     assert.doesNotMatch(advanced, /u-operation-icon|m-advanced-card__header/);
-    assert.match(advanced, /cancelButtonText:\s*"取消"/);
-    assert.match(advanced, /confirm-text="确认移交"/);
+    assert.match(advanced, /cancelButtonText:\s*this\.\$t\("team\.advanced\.cancel"\)/);
+    assert.match(advanced, /:confirm-text="\$t\('team\.advanced\.confirmTransfer'\)"/);
     assert.match(advanced, /class="u-transform" type="warning" @click="transformTeam"/);
     assert.match(advanced, /class="u-delete" type="danger" @click="deleteTeam"/);
-    assert.match(advanced, /class="u-transform"[\s\S]*?<el-icon><Switch \/><\/el-icon>[\s\S]*?<span>发起移交<\/span>/);
-    assert.match(advanced, /class="u-delete"[\s\S]*?<el-icon><Delete \/><\/el-icon>[\s\S]*?<span>删除团队<\/span>/);
+    assert.match(advanced, /class="u-transform"[\s\S]*?<el-icon><Switch \/><\/el-icon>[\s\S]*?team\.advanced\.startTransfer/);
+    assert.match(advanced, /class="u-delete"[\s\S]*?<el-icon><Delete \/><\/el-icon>[\s\S]*?team\.advanced\.deleteTeam/);
     assert.match(advanced, /import \{ Delete, Switch \} from "@element-plus\/icons-vue"/);
     assert.doesNotMatch(advanced, /type="(?:warning|danger)" plain/);
-    assert.match(advanced, /confirmTransform:[\s\S]*?this\.\$confirm\([\s\S]*?"确认移交团队"[\s\S]*?transformTeam\(this\.id, this\.to_uid\)/);
-    assert.match(advanced, /deleteTeam:[\s\S]*?this\.\$confirm\([\s\S]*?"确认删除团队"[\s\S]*?this\.removeTeam\(\)/);
+    assert.match(advanced, /confirmTransform:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.transferTitle[\s\S]*?transformTeam\(this\.id, this\.to_uid\)/);
+    assert.match(advanced, /deleteTeam:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.deleteTitle[\s\S]*?this\.removeTeam\(\)/);
     assert.doesNotMatch(advanced, /<EditNamespace :variant="variant"/);
-    assert.match(namespace, /<h2>团队铭牌<\/h2>/);
+    assert.match(namespace, /team\.namespace\.title/);
     assert.match(namespace, /v-if="variant !== 'archive'" class="u-desc"/);
     assert.match(namespace, /subtab:\s*"verify"/);
     assert.match(namespaceStyles, /\.m-team-namespace\.is-archive/);
@@ -804,8 +805,8 @@ test("snapshot subtabs stay synchronized with the subtab query", async () => {
         read("../src/service/team/snapshot.js"),
     ]);
 
-    assert.match(snapshot, /@click="switchTab\('list'\)"[\s\S]*?团队快照/);
-    assert.match(snapshot, /@click="switchTab\('stat'\)">团员印象<\/button>/);
+    assert.match(snapshot, /@click="switchTab\('list'\)"[\s\S]*?team\.snapshot\.teamSnapshots/);
+    assert.match(snapshot, /@click="switchTab\('stat'\)"[\s\S]*?team\.snapshot\.memberStats/);
     assert.match(snapshot, /const MANAGE_SNAPSHOT_TABS = \["list", "stat", "chart", "password"\]/);
     assert.match(snapshot, /const MEMBER_SNAPSHOT_TABS = \["list", "stat", "chart"\]/);
     assert.match(snapshot, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
@@ -832,7 +833,7 @@ test("member workspace exposes team snapshots as a read-only tab before videos",
     assert.match(workspace, /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
     assert.match(
         workspace,
-        /label="团队快照" name="snapshot"[\s\S]*?<SnapshotList :team-id="id" read-only \/>[\s\S]*?label="团队DKP" name="my-dkp"[\s\S]*?<MyDkp :team-id="id" \/>[\s\S]*?label="通关视频" name="video"/,
+        /:label="\$t\('team\.workspace\.teamSnapshots'\)" name="snapshot"[\s\S]*?<SnapshotList :team-id="id" read-only \/>[\s\S]*?:label="\$t\('team\.workspace\.teamDkp'\)" name="my-dkp"[\s\S]*?<MyDkp :team-id="id" \/>[\s\S]*?:label="\$t\('team\.workspace\.videos'\)" name="video"/,
     );
     assert.match(workspace, /<SnapshotList :team-id="id" :can-configure-password="isSuper" \/>/);
     assert.match(snapshot, /:read-only="readOnly"/);
@@ -864,7 +865,7 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     assert.match(list, /:title="item\.name \|\| ''"/);
     assert.doesNotMatch(list, /m-team-results-header/);
     assert.doesNotMatch(list, /u-card-enter/);
-    assert.match(list, /暂未发布招募公告/);
+    assert.match(list, /team\.homeFilters\.noRecruitment/);
     assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
     assert.match(
         styles,

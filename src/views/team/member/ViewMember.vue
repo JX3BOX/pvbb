@@ -5,8 +5,8 @@
                 <span class="u-section-icon is-leader" aria-hidden="true">
                     <el-icon><UserFilled /></el-icon>
                 </span>
-                <h2 id="team-leaders-title">团队管理员</h2>
-                <span class="u-section-count">{{ leaders.length }} 人</span>
+                <h2 id="team-leaders-title">{{ $t("team.publicContent.leaders") }}</h2>
+                <span class="u-section-count">{{ $t("team.publicContent.people", { count: leaders.length }) }}</span>
             </header>
 
             <div v-if="leaders.length" class="m-public-member-grid is-user-grid">
@@ -30,11 +30,11 @@
             </div>
             <div v-else-if="leadersError" class="m-public-member-state is-error">
                 <el-icon><WarningFilled /></el-icon>
-                <span>团队管理成员加载失败</span>
+                <span>{{ $t("team.publicContent.leadersFailed") }}</span>
             </div>
             <div v-else-if="!leadersLoading" class="m-public-member-state">
                 <el-icon><UserFilled /></el-icon>
-                <span>暂无公开的管理成员</span>
+                <span>{{ $t("team.publicContent.noLeaders") }}</span>
             </div>
         </section>
 
@@ -43,8 +43,8 @@
                 <span class="u-section-icon is-birthday" aria-hidden="true">
                     <el-icon><Present /></el-icon>
                 </span>
-                <h2 id="team-birthday-title">今日寿星</h2>
-                <span v-if="hasRight" class="u-section-count">{{ births.length }} 人</span>
+                <h2 id="team-birthday-title">{{ $t("team.publicContent.birthdays") }}</h2>
+                <span v-if="hasRight" class="u-section-count">{{ $t("team.publicContent.people", { count: births.length }) }}</span>
             </header>
 
             <template v-if="hasRight">
@@ -70,16 +70,16 @@
                 </div>
                 <div v-else-if="birthError" class="m-public-member-state is-error">
                     <el-icon><WarningFilled /></el-icon>
-                    <span>寿星信息加载失败</span>
+                    <span>{{ $t("team.publicContent.birthdaysFailed") }}</span>
                 </div>
                 <div v-else-if="!birthLoading" class="m-public-member-state is-birthday-empty">
                     <el-icon><Present /></el-icon>
-                    <span>今天暂无寿星，祝大家江湖顺意</span>
+                    <span>{{ $t("team.publicContent.noBirthdays") }}</span>
                 </div>
             </template>
             <div v-else class="m-public-member-state is-locked">
                 <el-icon><Lock /></el-icon>
-                <span>当前没有查看权限</span>
+                <span>{{ $t("team.publicContent.noPermission") }}</span>
             </div>
         </section>
 
@@ -88,8 +88,8 @@
                 <span class="u-section-icon is-member" aria-hidden="true">
                     <el-icon><User /></el-icon>
                 </span>
-                <h2 id="team-members-title">团队成员</h2>
-                <span v-if="hasRight" class="u-section-count">{{ total }} 个角色</span>
+                <h2 id="team-members-title">{{ $t("team.publicContent.members") }}</h2>
+                <span v-if="hasRight" class="u-section-count">{{ $t("team.publicContent.roleCount", { count: total }) }}</span>
             </header>
 
             <template v-if="hasRight">
@@ -112,11 +112,11 @@
                 </div>
                 <div v-else-if="memberError" class="m-public-member-state is-error">
                     <el-icon><WarningFilled /></el-icon>
-                    <span>团队成员加载失败</span>
+                    <span>{{ $t("team.publicContent.membersFailed") }}</span>
                 </div>
                 <div v-else-if="!loading" class="m-public-member-state">
                     <el-icon><User /></el-icon>
-                    <span>暂无公开的团队成员</span>
+                    <span>{{ $t("team.publicContent.noMembers") }}</span>
                 </div>
                 <el-pagination
                     class="m-team-member-pages"
@@ -130,7 +130,7 @@
             </template>
             <div v-else class="m-public-member-state is-locked">
                 <el-icon><Lock /></el-icon>
-                <span>当前没有查看权限</span>
+                <span>{{ $t("team.publicContent.noPermission") }}</span>
             </div>
         </section>
     </div>
@@ -231,13 +231,13 @@ export default {
             }
         },
         leaderName: function (item) {
-            return item?.display_name || "未知用户";
+            return item?.display_name || this.$t("team.publicContent.unknownUser");
         },
         birthdayName: function (item) {
-            return item?.displayName || "未知用户";
+            return item?.displayName || this.$t("team.publicContent.unknownUser");
         },
         roleName: function (item) {
-            return item?.roles?.name || "未知角色";
+            return item?.roles?.name || this.$t("team.publicContent.unknownRole");
         },
         authorLink,
         showUserAvatar: function (val) {

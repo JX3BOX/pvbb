@@ -4,30 +4,30 @@
             <div class="m-permission-header">
                 <div class="m-permission-heading" v-if="isArchive">
                     <span class="u-heading-mark" aria-hidden="true"></span>
-                    <h2>管理员权限</h2>
+                    <h2>{{ $t("team.permissions.title") }}</h2>
                     <span class="u-admin-count">{{ len }} / {{ limit }}</span>
                 </div>
                 <el-button class="u-btn-add" type="primary" icon="Plus" @click="openDialog" :disabled="len >= limit"
-                    >添加管理员
+                    >{{ $t("team.permissions.add") }}
                     <span class="u-limit" :class="{ limit: len >= limit }">({{ len }}/{{ limit }})</span></el-button
                 >
             </div>
             <div class="m-permission-box m-permission-table">
                 <div class="m-permission-list">
                     <el-row :gutter="10" class="m-permission-list-header" type="flex">
-                        <el-col :span="2" class="u-leader">用户</el-col>
-                        <el-col :span="1">基础设置</el-col>
-                        <el-col :span="1">权限管理</el-col>
-                        <el-col :span="1">赛事报名</el-col>
-                        <el-col :span="1">成员管理</el-col>
+                        <el-col :span="2" class="u-leader">{{ $t("team.permissions.user") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.basic") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.permission") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.race") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.member") }}</el-col>
                         <!-- <el-col :span="1">活动规划</el-col> -->
-                        <el-col :span="1">快照管理</el-col>
-                        <el-col :span="1">视频管理</el-col>
-                        <el-col :span="1">战绩管理</el-col>
-                        <el-col :span="1">DKP管理</el-col>
-                        <el-col :span="1">金团账目</el-col>
-                        <el-col :span="1">团队活动</el-col>
-                        <el-col :span="1">操作</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.snapshot") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.video") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.battle") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.dkp") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.ledger") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.activity") }}</el-col>
+                        <el-col :span="1">{{ $t("team.permissions.operation") }}</el-col>
                     </el-row>
                     <el-row
                         :gutter="10"
@@ -43,7 +43,7 @@
                                     ><img class="u-leader-img" :src="showAvatar(item.user_avatar)" /><span
                                         class="u-leader-name"
                                         >{{ item.display_name }}</span
-                                    ><em v-if="isArchive" class="u-leader-role">创建者</em></a
+                                    ><em v-if="isArchive" class="u-leader-role">{{ $t("team.permissions.creator") }}</em></a
                                 >
                             </el-col>
                             <el-col :span="1"><el-checkbox checked disabled></el-checkbox></el-col>
@@ -65,7 +65,7 @@
                                         ><img class="u-leader-img" :src="showAvatar(item.user_avatar)" /><span
                                             class="u-leader-name"
                                             >{{ item.display_name }}</span
-                                        ><em v-if="isArchive" class="u-leader-role">管理员</em></a
+                                        ><em v-if="isArchive" class="u-leader-role">{{ $t("team.permissions.administrator") }}</em></a
                                     >
                                 </div>
                             </el-col>
@@ -145,7 +145,7 @@
                                     size="small"
                                     plain
                                     @click="removeLeader(item)"
-                                    >移除</el-button
+                                    >{{ $t("team.permissions.remove") }}</el-button
                                 ></el-col
                             >
                         </template>
@@ -156,24 +156,23 @@
         <div class="m-team-limit" v-else>
             <p class="u-title">
                 <img class="u-icon" svg-inline src="@/assets/img/team/icons/warning.svg" />
-                权限不足
+                {{ $t("team.permissions.insufficient") }}
             </p>
             <div>
-                该功能仅对<a href="/vip/premium?from=team_permission" target="_blank">专业版</a
-                >账号开放，用于添加团队的管理员及详细权限设置。
+                {{ $t("team.permissions.premiumHint") }}
             </div>
             <a class="u-buy el-button el-button--primary" href="/vip/premium?from=team_permission" target="_blank"
-                ><i class="el-icon-shopping-cart-2"></i> 升级专业版账号</a
+                ><i class="el-icon-shopping-cart-2"></i> {{ $t("team.permissions.upgrade") }}</a
             >
         </div>
         <userpop
-            title="添加管理员"
+            :title="$t('team.permissions.addTitle')"
             :data="leader"
             :variant="variant"
             class="m-team-leader-dialog"
             v-model="user_pop_status"
             @confirm="addLeader"
-            ><i class="el-icon-warning-outline"></i> 用户UID可在用户主页查看</userpop
+            ><i class="el-icon-warning-outline"></i> {{ $t("team.permissions.uidHint") }}</userpop
         >
     </div>
 </template>
@@ -231,28 +230,28 @@ export default {
             if (this.leader && !isNaN(this.leader) && !this.leaders.includes(this.leader)) {
                 addAdmin(this.id, uid).then((res) => {
                     this.$notify({
-                        title: "成功",
-                        message: "管理员添加成功",
+                        title: this.$t("team.permissions.success"),
+                        message: this.$t("team.permissions.added"),
                         type: "success",
                     });
                     location.reload();
                 });
             } else {
-                this.$alert("用户已存在", "提醒", {
-                    confirmButtonText: "确定",
+                this.$alert(this.$t("team.permissions.exists"), this.$t("team.permissions.reminder"), {
+                    confirmButtonText: this.$t("team.permissions.confirm"),
                 });
             }
         },
         removeLeader: function (item) {
-            this.$confirm(`确定要移除管理员“${item.display_name}”吗？移除后该用户将失去当前团队的管理权限。`, "移除管理员", {
-                confirmButtonText: "确认移除",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("team.permissions.removeConfirm", { name: item.display_name }), this.$t("team.permissions.removeTitle"), {
+                confirmButtonText: this.$t("team.permissions.confirmRemove"),
+                cancelButtonText: this.$t("team.permissions.cancel"),
                 type: "warning",
             })
                 .then(() => delAdmin(this.id, item.user_id))
                 .then((res) => {
                     this.$notify({
-                        title: "成功",
+                        title: this.$t("team.permissions.success"),
                         message: res.data.msg,
                         type: "success",
                     });
@@ -261,8 +260,8 @@ export default {
                 .catch((reason) => {
                     if (reason === "cancel" || reason === "close") return;
                     this.$notify({
-                        title: "移除失败",
-                        message: reason?.response?.data?.msg || "请稍后重试",
+                        title: this.$t("team.permissions.removeFailed"),
+                        message: reason?.response?.data?.msg || this.$t("team.permissions.retry"),
                         type: "error",
                     });
                 });
@@ -273,8 +272,8 @@ export default {
                 [type]: value,
             }).then(() => {
                 this.$notify({
-                    title: "用户权限已更新",
-                    message: value ? "授权成功" : "取消授权成功",
+                    title: this.$t("team.permissions.updated"),
+                    message: value ? this.$t("team.permissions.authorized") : this.$t("team.permissions.revoked"),
                     type: "success",
                 });
             });

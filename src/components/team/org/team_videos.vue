@@ -1,18 +1,18 @@
 <template>
     <div class="m-team-videos">
         <div class="m-team-videos-summary" v-if="isMaster">
-            <span>视频列表</span>
-            <em>共 {{ total }} 条</em>
+            <span>{{ $t("team.video.list") }}</span>
+            <em>{{ $t("team.video.total", { count: total }) }}</em>
         </div>
 
         <div class="u-list" v-if="list && list.length">
             <article class="u-video" v-for="item in list" :key="item.ID || item.url">
                 <a class="u-video-link" :href="item.url" target="_blank" rel="noopener noreferrer">
                     <span class="u-cover">
-                        <img :src="showVideoCover(item.aid)" :alt="item.title || '赛季视频封面'" loading="lazy" />
+                        <img :src="showVideoCover(item.aid)" :alt="item.title || $t('team.video.coverAlt')" loading="lazy" />
                         <span class="u-play" aria-hidden="true"><el-icon><VideoPlay /></el-icon></span>
                     </span>
-                    <span class="u-title">{{ item.title || "未命名视频" }}</span>
+                    <span class="u-title">{{ item.title || $t("team.video.untitled") }}</span>
                 </a>
 
                 <template v-if="data.isMaster">
@@ -29,18 +29,18 @@
                         <span>{{ statusText(item.status) }}</span>
                     </button>
                     <div class="u-card-actions" v-if="isMine">
-                        <button type="button" class="u-edit" :aria-label="`编辑视频 ${item.title}`" @click="toEmit({ item })">
+                        <button type="button" class="u-edit" :aria-label="$t('team.video.editAria', { title: item.title })" @click="toEmit({ item })">
                             <el-icon><Edit /></el-icon>
-                            <span>编辑</span>
+                            <span>{{ $t("team.video.edit") }}</span>
                         </button>
                         <button
                             type="button"
                             class="u-del"
-                            :aria-label="`删除视频 ${item.title}`"
+                            :aria-label="$t('team.video.deleteAria', { title: item.title })"
                             @click="toEmit({ del: item.ID })"
                         >
                             <el-icon><Delete /></el-icon>
-                            <span>删除</span>
+                            <span>{{ $t("team.video.delete") }}</span>
                         </button>
                     </div>
                 </template>
@@ -49,11 +49,11 @@
 
         <div class="m-team-videos-empty" v-else>
             <span class="u-empty-icon" aria-hidden="true"><el-icon><VideoCamera /></el-icon></span>
-            <h3>暂无赛季视频</h3>
-            <p>{{ isMine ? "添加首条通关录像，沉淀团队的赛季历程。" : "该团队暂未发布赛季视频。" }}</p>
+            <h3>{{ $t("team.video.empty") }}</h3>
+            <p>{{ isMine ? $t("team.video.emptyMine") : $t("team.video.emptyPublic") }}</p>
             <el-button v-if="isMine && isMaster" type="primary" @click="toEmit({ add: true })">
                 <el-icon><Plus /></el-icon>
-                添加通关视频
+                {{ $t("team.video.add") }}
             </el-button>
         </div>
 
@@ -130,7 +130,7 @@ export default {
             return __imgPath + "image/rank/videos/" + aid + ".png";
         },
         statusText(status) {
-            return Number(status) === 2 ? "审核驳回" : "审核中";
+            return Number(status) === 2 ? this.$t("team.video.rejected") : this.$t("team.video.pending");
         },
         statusClass(status) {
             return Number(status) === 2 ? "is-rejected" : "is-pending";

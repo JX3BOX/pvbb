@@ -1,16 +1,16 @@
 <template>
     <div class="v-snapshot-list">
         <div class="m-snapshot-workspace">
-            <nav class="m-snapshot-subnav" aria-label="快照管理功能">
+            <nav class="m-snapshot-subnav" :aria-label="$t('team.snapshot.aria')">
                 <button type="button" :class="{ 'is-active': tab === 'list' }" @click="switchTab('list')">
-                    团队快照
+                    {{ $t("team.snapshot.teamSnapshots") }}
                 </button>
-                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="switchTab('stat')">团员印象</button>
-                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="switchTab('chart')">快照统计</button>
-                <button v-if="canConfigurePassword" type="button" :class="{ 'is-active': tab === 'password' }" @click="switchTab('password')">密码配置</button>
+                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="switchTab('stat')">{{ $t("team.snapshot.memberStats") }}</button>
+                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="switchTab('chart')">{{ $t("team.snapshot.snapshotStats") }}</button>
+                <button v-if="canConfigurePassword" type="button" :class="{ 'is-active': tab === 'password' }" @click="switchTab('password')">{{ $t("team.snapshot.password") }}</button>
                 <a class="u-snapshot-help" href="/tool/23783" target="_blank" rel="noopener noreferrer">
                     <i class="el-icon-document" aria-hidden="true"></i>
-                    <span>帮助文档</span>
+                    <span>{{ $t("team.snapshot.help") }}</span>
                 </a>
             </nav>
             <keep-alive>

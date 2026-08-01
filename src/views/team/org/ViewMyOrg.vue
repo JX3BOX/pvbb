@@ -4,11 +4,11 @@
             class="m-public-org__hero"
             :class="{ 'has-banner': publicBanner }"
             :style="publicBanner ? { '--team-banner-image': `url('${publicBanner}')` } : null"
-            aria-label="团队信息"
+            :aria-label="$t('team.common.teamInfo')"
         >
             <div v-if="loadError" class="m-my-org__error">
-                <span>团队信息加载失败，请稍后重试。</span>
-                <button type="button" @click="loadData">重新加载</button>
+                <span>{{ $t("team.workspace.loadFailed") }}</span>
+                <button type="button" @click="loadData">{{ $t("team.common.retry") }}</button>
             </div>
             <team-info
                 v-else-if="done"
@@ -24,51 +24,51 @@
         <section v-if="!loadError" class="m-my-org__workspace" :aria-label="workspaceAriaLabel">
             <el-tabs v-model="tab" class="m-team-view">
                 <template v-if="isManagementMode">
-                    <el-tab-pane label="成员管理" name="manage-member" lazy v-if="permissions.r_member || isSuper">
+                    <el-tab-pane :label="$t('team.workspace.memberManagement')" name="manage-member" lazy v-if="permissions.r_member || isSuper">
                         <template #label>
                             <el-icon><Avatar /></el-icon>
-                            <span>成员管理</span>
+                            <span>{{ $t("team.workspace.memberManagement") }}</span>
                             <i class="u-count" v-if="pendingCount">{{ pendingCount }}</i>
                         </template>
                         <ListMember :id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="战绩管理" name="manage-battle" lazy v-if="permissions.r_race || isSuper">
+                    <el-tab-pane :label="$t('team.workspace.battleManagement')" name="manage-battle" lazy v-if="permissions.r_race || isSuper">
                         <template #label>
                             <el-icon><Trophy /></el-icon>
-                            <span>战绩管理</span>
+                            <span>{{ $t("team.workspace.battleManagement") }}</span>
                         </template>
                         <ManageBattle :team-id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="活动管理" name="manage-raid" lazy v-if="permissions.r_raid || isSuper">
+                    <el-tab-pane :label="$t('team.workspace.activityManagement')" name="manage-raid" lazy v-if="permissions.r_raid || isSuper">
                         <template #label>
                             <el-icon><Calendar /></el-icon>
-                            <span>活动管理</span>
+                            <span>{{ $t("team.workspace.activityManagement") }}</span>
                         </template>
                         <ManageRaid :team-id="id" embedded />
                     </el-tab-pane>
 
-                    <el-tab-pane label="快照管理" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
+                    <el-tab-pane :label="$t('team.workspace.snapshotManagement')" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
                         <template #label>
                             <el-icon><Camera /></el-icon>
-                            <span>快照管理</span>
+                            <span>{{ $t("team.workspace.snapshotManagement") }}</span>
                         </template>
                         <SnapshotList :team-id="id" :can-configure-password="isSuper" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="DKP管理" name="manage-dkp" lazy v-if="permissions.r_dkp || isSuper">
+                    <el-tab-pane :label="$t('team.workspace.dkpManagement')" name="manage-dkp" lazy v-if="permissions.r_dkp || isSuper">
                         <template #label>
                             <el-icon><Coin /></el-icon>
-                            <span>DKP管理</span>
+                            <span>{{ $t("team.workspace.dkpManagement") }}</span>
                         </template>
                         <ManageDkp :team-id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="视频管理" name="video" lazy v-if="canManageVideo">
+                    <el-tab-pane :label="$t('team.workspace.videoManagement')" name="video" lazy v-if="canManageVideo">
                         <template #label>
                             <el-icon><VideoCamera /></el-icon>
-                            <span>视频管理</span>
+                            <span>{{ $t("team.workspace.videoManagement") }}</span>
                         </template>
                         <ManageVideo
                             :key="`manage-video-${id}`"
@@ -77,54 +77,54 @@
                         />
                     </el-tab-pane>
 
-                    <el-tab-pane label="团队设置" name="setting" lazy v-if="isSuper">
+                    <el-tab-pane :label="$t('team.workspace.teamSettings')" name="setting" lazy v-if="isSuper">
                         <template #label>
                             <el-icon><Setting /></el-icon>
-                            <span>团队设置</span>
+                            <span>{{ $t("team.workspace.teamSettings") }}</span>
                         </template>
 
-                        <nav class="m-workspace-subnav" aria-label="团队设置">
+                        <nav class="m-workspace-subnav" :aria-label="$t('team.workspace.teamSettings')">
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'basic' }"
                                 @click="switchSection('basic')"
                             >
-                                基本设置
+                                {{ $t("team.workspace.basicSettings") }}
                             </button>
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'verify' }"
                                 @click="switchSection('verify')"
                             >
-                                团队认证
+                                {{ $t("team.workspace.verification") }}
                             </button>
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'permission' }"
                                 @click="switchSection('permission')"
                             >
-                                权限管理
+                                {{ $t("team.workspace.permissions") }}
                             </button>
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'feature' }"
                                 @click="switchSection('feature')"
                             >
-                                功能设置
+                                {{ $t("team.workspace.featureSettings") }}
                             </button>
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'other' }"
                                 @click="switchSection('other')"
                             >
-                                其它设置
+                                {{ $t("team.workspace.otherSettings") }}
                             </button>
                             <button
                                 type="button"
                                 :class="{ 'is-active': archiveSection === 'advanced' }"
                                 @click="switchSection('advanced')"
                             >
-                                高级设置
+                                {{ $t("team.workspace.advancedSettings") }}
                             </button>
                         </nav>
 
@@ -133,7 +133,7 @@
                             ref="teamForm"
                             variant="archive"
                             :data="data"
-                            btn_txt="更新"
+                            :btn_txt="$t('team.common.update')"
                             :processing="processing"
                             @submit="submit"
                         />
@@ -176,58 +176,58 @@
                 </template>
 
                 <template v-else>
-                    <el-tab-pane label="我的角色" name="overview" lazy>
+                    <el-tab-pane :label="$t('team.workspace.myRoles')" name="overview" lazy>
                         <template #label>
                             <el-icon><User /></el-icon>
-                            <span>我的角色</span>
+                            <span>{{ $t("team.workspace.myRoles") }}</span>
                         </template>
                         <team-role v-if="isLogin" :team_id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="我的战绩" name="battle" lazy>
+                    <el-tab-pane :label="$t('team.workspace.myBattles')" name="battle" lazy>
                         <template #label>
                             <el-icon><Trophy /></el-icon>
-                            <span>我的战绩</span>
+                            <span>{{ $t("team.workspace.myBattles") }}</span>
                         </template>
                         <myBattle :team-id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="团队活动" name="my-raid" lazy>
+                    <el-tab-pane :label="$t('team.workspace.teamActivities')" name="my-raid" lazy>
                         <template #label>
                             <el-icon><Calendar /></el-icon>
-                            <span>团队活动</span>
+                            <span>{{ $t("team.workspace.teamActivities") }}</span>
                         </template>
                         <MyTeamRaid :team-id="id" embedded />
                     </el-tab-pane>
 
-                    <el-tab-pane label="团队快照" name="snapshot" lazy>
+                    <el-tab-pane :label="$t('team.workspace.teamSnapshots')" name="snapshot" lazy>
                         <template #label>
                             <el-icon><Camera /></el-icon>
-                            <span>团队快照</span>
+                            <span>{{ $t("team.workspace.teamSnapshots") }}</span>
                         </template>
                         <SnapshotList :team-id="id" read-only />
                     </el-tab-pane>
 
-                    <el-tab-pane label="团队DKP" name="my-dkp" lazy>
+                    <el-tab-pane :label="$t('team.workspace.teamDkp')" name="my-dkp" lazy>
                         <template #label>
                             <el-icon><Coin /></el-icon>
-                            <span>团队DKP</span>
+                            <span>{{ $t("team.workspace.teamDkp") }}</span>
                         </template>
                         <MyDkp :team-id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="通关视频" name="video" lazy>
+                    <el-tab-pane :label="$t('team.workspace.videos')" name="video" lazy>
                         <template #label>
                             <el-icon><VideoPlay /></el-icon>
-                            <span>通关视频</span>
+                            <span>{{ $t("team.workspace.videos") }}</span>
                         </template>
                         <ViewVideo v-if="done" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="留言板" name="comment" lazy>
+                    <el-tab-pane :label="$t('team.workspace.comments')" name="comment" lazy>
                         <template #label>
                             <el-icon><ChatLineSquare /></el-icon>
-                            <span>留言板</span>
+                            <span>{{ $t("team.workspace.comments") }}</span>
                         </template>
                         <ViewComment
                             v-if="done"
@@ -267,7 +267,7 @@ import MyTeamRaid from "../raid/MyTeamRaid.vue";
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
 import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
-import { getAllMyTeams, getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
+import { getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
 import { checkMyAuthority, getPendingCount } from "@/service/team/member.js";
 import {
     Avatar,
@@ -307,22 +307,19 @@ export default {
             tab: "overview",
             archiveSection: "basic",
             syncingRoute: false,
-            teams: [],
-            teamsLoading: false,
-            teamsLoaded: false,
             loadError: false,
             accessGranted: false,
             data: {
                 status: 0,
-                name: "团队名称",
-                server: "服务器名称",
+                name: this.$t("team.common.teamName"),
+                server: this.$t("team.common.serverName"),
                 logo: "",
-                desc: "团队介绍",
+                desc: this.$t("team.common.teamDescription"),
                 uid: 0,
                 recruit: "",
                 honors: [],
                 medals: [],
-                tags: ["可教学", "固定团"],
+                tags: [this.$t("team.common.teachable"), this.$t("team.common.fixedTeam")],
                 v_member: 0,
                 v_activity: 0,
                 v_dkp: 2,
@@ -392,7 +389,9 @@ export default {
             return this.workspaceMode === "manage";
         },
         workspaceAriaLabel: function () {
-            return this.isManagementMode ? "团队管理功能" : "我的团队信息";
+            return this.isManagementMode
+                ? this.$t("team.workspace.managementAria")
+                : this.$t("team.workspace.memberAria");
         },
         publicBanner: function () {
             return this.data.banner ? resolveImagePath(this.data.banner) : "";
@@ -410,10 +409,7 @@ export default {
         id: {
             immediate: true,
             handler: function (value) {
-                if (!value) {
-                    this.openFirstTeam();
-                    return;
-                }
+                if (!value) return;
                 this.init();
             },
         },
@@ -496,41 +492,6 @@ export default {
                 if (!isCurrentWorkspace || this.id !== requestedId) return;
                 this.loading = false;
                 this.applyRouteState();
-            });
-        },
-        loadTeams: function () {
-            if (this.teamsLoaded) return Promise.resolve(this.teams);
-            if (this.teamsLoading) return Promise.resolve([]);
-            this.teamsLoading = true;
-
-            return getAllMyTeams()
-                .then((res) => {
-                    this.teams = res.data.data || [];
-                    this.teams.sort((a, b) => {
-                        return a.super == this.uid ? -1 : b.super == this.uid ? 1 : 0;
-                    });
-                    this.teamsLoaded = true;
-                    return this.teams;
-                })
-                .catch(() => {
-                    this.teams = [];
-                    return this.teams;
-                })
-                .finally(() => {
-                    this.teamsLoading = false;
-                });
-        },
-        openFirstTeam: function () {
-            if (!User.isLogin()) return;
-
-            this.loadTeams().then((teams) => {
-                if (this.id || !teams.length) return;
-                this.$router.replace({
-                    name: "view_my_org",
-                    params: {
-                        id: teams[0].ID,
-                    },
-                });
             });
         },
         loadPendingCount: function () {
@@ -642,7 +603,7 @@ export default {
             updateTeam(this.id, this.data)
                 .then((res) => {
                     this.$message({
-                        message: "更新成功",
+                        message: this.$t("team.common.updated"),
                         type: "success",
                     });
                     this.data = res.data.data;

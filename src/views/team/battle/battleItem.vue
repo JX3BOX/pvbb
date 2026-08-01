@@ -197,7 +197,7 @@ export default {
         },
         showTC: function (val) {
             let s = val / 1000;
-            return ~~(s / 60) + "分" + ~~(s % 60) + "秒";
+            return this.$t("pages.team.battle.duration", { minutes: ~~(s / 60), seconds: ~~(s % 60) });
         },
         uploadBattle(item) {
             this.$emit("uploadBattle", item);

@@ -1,5 +1,5 @@
 <template>
-    <el-button class="u-btn-goback" plain icon="ArrowLeft" size="small" @click="goback">返回</el-button>
+    <el-button class="u-btn-goback" plain icon="ArrowLeft" size="small" @click="goback">{{ $t("team.action.back") }}</el-button>
 </template>
 
 <script>

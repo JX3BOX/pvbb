@@ -2,7 +2,7 @@
     <div class="p-team">
         <CommonHeader></CommonHeader>
         <Breadcrumb
-            name="团队平台"
+            :name="$t('team.common.platform')"
             slug="team"
             root="/team"
             :publishEnable="false"
@@ -40,27 +40,41 @@
                             <span class="u-team-login-icon" aria-hidden="true">
                                 <el-icon><Lock /></el-icon>
                             </span>
-                            <h1 id="team-login-title">登录后管理我的团队</h1>
-                            <p>查看已加入的团队与关联角色，并管理角色在团队主页的展示状态。</p>
+                            <h1 id="team-login-title">{{ $t("team.shell.loginTitle") }}</h1>
+                            <p>{{ $t("team.shell.loginDescription") }}</p>
                             <div class="m-team-login-actions">
                                 <a class="u-team-login-primary" :href="loginUrl">
-                                    <span>登录后查看</span>
+                                    <span>{{ $t("team.shell.loginAction") }}</span>
                                     <el-icon><ArrowRight /></el-icon>
                                 </a>
-                                <router-link class="u-team-login-secondary" to="/">先逛团队广场</router-link>
+                                <router-link class="u-team-login-secondary" to="/">{{
+                                    $t("team.shell.browseAction")
+                                }}</router-link>
                             </div>
                         </section>
                     </div>
                 </div>
                 <router-view v-else-if="isPublic || isLogin" />
-                <el-alert v-else title="请先登录" type="warning" description="使用本功能请先登录" show-icon />
+                <el-alert
+                    v-else
+                    :title="$t('team.common.loginRequired')"
+                    type="warning"
+                    :description="$t('team.common.loginRequiredDescription')"
+                    show-icon
+                />
             </div>
             <CommonFooter></CommonFooter>
         </Main>
         <template v-if="isCreateTeam">
             <div class="m-create-team">
                 <router-view v-if="isPublic || isLogin" />
-                <el-alert v-else title="请先登录" type="warning" description="使用本功能请先登录" show-icon> </el-alert>
+                <el-alert
+                    v-else
+                    :title="$t('team.common.loginRequired')"
+                    type="warning"
+                    :description="$t('team.common.loginRequiredDescription')"
+                    show-icon
+                ></el-alert>
             </div>
         </template>
     </div>

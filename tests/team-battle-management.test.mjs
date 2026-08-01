@@ -40,7 +40,7 @@ test("battle cards keep combat and linked data columns aligned when ranking data
 test("battle relevance dialog uses guided empty states and the team dialog design", async () => {
     const dialog = await read("../src/views/team/battle/relevance.vue");
 
-    assert.match(dialog, /<b>关联战斗数据<\/b>/);
+    assert.match(dialog, /pages\.team\.battle\.linkDialog/);
     assert.match(dialog, /\{\{ subjectType \}\}：\{\{ subjectName \}\}/);
     assert.match(dialog, /:remote-method="loadBattle"/);
     assert.match(dialog, /:remote-method="loadJcl"/);
@@ -71,7 +71,7 @@ test("personal battle ranking links target the DPS ladder for the record mount",
 test("personal battle records can hide non-ranking records without removing pagination", async () => {
     const page = await read("../src/views/team/battle/myBattle.vue");
 
-    assert.match(page, /v-model="filterRanking" active-text="只看活动数据"/);
+    assert.match(page, /v-model="filterRanking" :active-text="\$t\('pages\.team\.battle\.activityOnly'\)"/);
     assert.match(page, /m-battle-notice--filter"[^>]*:closable="false"/);
     assert.match(page, /v-for="item in displayList"/);
     assert.match(
@@ -88,13 +88,25 @@ test("personal battle records can hide non-ranking records without removing pagi
 test("team battle management exposes the same persisted activity filter", async () => {
     const page = await read("../src/views/team/battle/index.vue");
 
-    assert.match(page, /v-model="filterRanking" active-text="只看活动数据"/);
+    assert.match(page, /v-model="filterRanking" :active-text="\$t\('pages\.team\.battle\.activityOnly'\)"/);
     assert.match(page, /m-battle-notice--filter"[^>]*:closable="false"/);
     assert.match(page, /v-for="\(item, i\) in displayList"/);
     assert.match(page, /item\.boss_info\?\.is_rank_boss > 0 \|\| Boolean\(item\.aid_info\?\.event_id\)/);
     assert.match(page, /localStorage\.getItem\(RANKING_FILTER_STORAGE_KEY\) === "1"/);
     assert.match(page, /localStorage\.setItem\(RANKING_FILTER_STORAGE_KEY, value \? "1" : "0"\)/);
     assert.match(page, /pages\.team\.battle\.teamSource/);
+});
+
+test("battle notices link to the report guide in a new tab", async () => {
+    const [personalPage, managementPage] = await Promise.all([
+        read("../src/views/team/battle/myBattle.vue"),
+        read("../src/views/team/battle/index.vue"),
+    ]);
+
+    for (const page of [personalPage, managementPage]) {
+        assert.match(page, /class="u-battle-guide" href="\/tool\/109317" target="_blank" rel="noopener noreferrer"/);
+        assert.match(page, /pages\.team\.battle\.reportGuide/);
+    }
 });
 
 test("season video management uses the modern workspace, cards, empty state and dialog", async () => {

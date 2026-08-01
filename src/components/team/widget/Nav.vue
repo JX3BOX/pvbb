@@ -15,23 +15,23 @@
             </router-link> -->
         </div>
 
-        <h5 class="u-title">团员操作</h5>
+        <h5 class="u-title">{{ $t("team.legacyNav.memberActions") }}</h5>
         <div class="m-nav-group m-nav-data">
             <a href="/dashboard/role">
                 <i class="u-icon el-icon-user"></i>
-                <span class="u-txt">我的角色</span>
+                <span class="u-txt">{{ $t("team.workspace.myRoles") }}</span>
             </a>
             <a href="/dashboard/role/bind">
                 <i class="u-icon el-icon-connection"></i>
-                <span class="u-txt">绑定角色</span>
+                <span class="u-txt">{{ $t("team.legacyNav.bindRole") }}</span>
             </a>
             <router-link to="/org/list">
                 <i class="u-icon el-icon-office-building"></i>
-                <span class="u-txt">全部团队</span>
+                <span class="u-txt">{{ $t("team.legacyNav.allTeams") }}</span>
             </router-link>
             <router-link to="/role/group">
                 <i class="u-icon el-icon-school"></i>
-                <span class="u-txt">我的团队</span>
+                <span class="u-txt">{{ $t("team.sidebar.myTeams") }}</span>
             </router-link>
             <!-- <router-link to="/dkp/my">
                 <i class="u-icon el-icon-coin"></i>
@@ -43,40 +43,40 @@
             </router-link> -->
             <router-link to="/myBattle">
                 <i class="u-icon el-icon-tickets"></i>
-                <span class="u-txt">我的成绩</span>
+                <span class="u-txt">{{ $t("team.legacyNav.myResults") }}</span>
             </router-link>
         </div>
-        <h5 class="u-title">团长操作</h5>
+        <h5 class="u-title">{{ $t("team.legacyNav.leaderActions") }}</h5>
         <div class="m-nav-group m-nav-data">
             <router-link to="/org/manage">
                 <i class="u-icon el-icon-setting"></i>
-                <span class="u-txt">团队管理</span>
+                <span class="u-txt">{{ $t("team.sidebar.management") }}</span>
             </router-link>
             <router-link to="/member/list">
                 <i class="u-icon el-icon-user"></i>
-                <span class="u-txt">团员管理</span>
+                <span class="u-txt">{{ $t("team.legacyNav.memberManagement") }}</span>
                 <i class="u-count" v-if="pendingMememberCount">{{ pendingMememberCount }}</i>
             </router-link>
 
             <router-link to="/battle">
                 <i class="u-icon el-icon-document-copy"></i>
-                <span class="u-txt">成绩管理</span>
+                <span class="u-txt">{{ $t("team.legacyNav.resultManagement") }}</span>
             </router-link>
             <router-link to="/snapshot/list">
                 <i class="u-icon el-icon-camera"></i>
-                <span class="u-txt">快照管理</span>
+                <span class="u-txt">{{ $t("team.workspace.snapshotManagement") }}</span>
             </router-link>
             <router-link to="/raid/manage">
                 <i class="u-icon el-icon-date"></i>
-                <span class="u-txt">活动管理</span>
+                <span class="u-txt">{{ $t("team.workspace.activityManagement") }}</span>
             </router-link>
             <router-link to="/dkp/manage">
                 <i class="u-icon el-icon-coin"></i>
-                <span class="u-txt">DKP管理</span>
+                <span class="u-txt">{{ $t("team.workspace.dkpManagement") }}</span>
             </router-link>
             <router-link to="/apply/list">
                 <i class="u-icon el-icon-present"></i>
-                <span class="u-txt">福利申请</span>
+                <span class="u-txt">{{ $t("team.legacyNav.welfareApplications") }}</span>
             </router-link>
         </div>
     </nav>

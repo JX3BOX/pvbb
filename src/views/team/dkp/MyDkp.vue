@@ -5,14 +5,14 @@
                 <el-icon><Coin /></el-icon>
             </span>
             <div>
-                <h1>我的DKP</h1>
-                <p>查看你在各团队的当前分值、排名与历史变更记录。</p>
+                <h1>{{ $t("team.myDkp.title") }}</h1>
+                <p>{{ $t("team.myDkp.allTeamsDescription") }}</p>
             </div>
         </header>
         <header v-else class="m-dkp-embedded-header">
             <div>
-                <h2>我的DKP</h2>
-                <p>查看你在当前团队的分值、排名、历史累计与每次变更记录。</p>
+                <h2>{{ $t("team.myDkp.title") }}</h2>
+                <p>{{ $t("team.myDkp.teamDescription") }}</p>
             </div>
         </header>
         <div class="m-dkp-box">
@@ -25,7 +25,7 @@
                             v-if="item.team_info && item.team_info.logo"
                         />
                         <img class="u-org-logo" src="@/assets/img/team/null.png" v-else />
-                        <span class="u-org-name">{{ (item.team_info && item.team_info.name) || "未知" }}</span>
+                        <span class="u-org-name">{{ (item.team_info && item.team_info.name) || $t("team.myDkp.unknownTeam") }}</span>
                     </template>
                 </el-tab-pane>
             </el-tabs>
@@ -33,12 +33,12 @@
                 <section class="m-dkp-all-scores" v-loading="allScoresLoading">
                     <header class="m-dkp-all-scores__header">
                         <div>
-                            <h3>全团成绩</h3>
-                            <p>查看当前团队所有成员的历史累计与当前分值。</p>
+                            <h3>{{ $t("team.myDkp.teamScores") }}</h3>
+                            <p>{{ $t("team.myDkp.teamScoresDescription") }}</p>
                         </div>
                         <button type="button" class="u-back-my-dkp" @click="showAllScores = false">
                             <el-icon><ArrowLeft /></el-icon>
-                            <span>返回我的DKP</span>
+                            <span>{{ $t("team.myDkp.back") }}</span>
                         </button>
                     </header>
                     <dkp-list :org="~~org" :read-only="true" />
@@ -49,34 +49,34 @@
                     <div class="u-dkp-stat">
                         <span class="u-stat-icon is-score"><el-icon><TrendCharts /></el-icon></span>
                         <div class="u-stat-content">
-                            <span class="u-stat-label">当前分数</span>
+                            <span class="u-stat-label">{{ $t("team.myDkp.currentScore") }}</span>
                             <b :class="{ isNegative: overview.score < 0 }">{{ overview.score }}</b>
                         </div>
                     </div>
                     <div class="u-dkp-stat">
                         <span class="u-stat-icon is-rank"><el-icon><Trophy /></el-icon></span>
                         <div class="u-stat-content">
-                            <span class="u-stat-label">当前排名</span>
+                            <span class="u-stat-label">{{ $t("team.myDkp.currentRank") }}</span>
                             <b>{{ rank || "-" }}</b>
                         </div>
                     </div>
                     <div class="u-dkp-stat">
                         <span class="u-stat-icon is-total"><el-icon><Timer /></el-icon></span>
                         <div class="u-stat-content">
-                            <span class="u-stat-label">历史累计</span>
+                            <span class="u-stat-label">{{ $t("team.myDkp.historicalTotal") }}</span>
                             <b>{{ overview.total }}</b>
                         </div>
                     </div>
                     <button type="button" class="u-all-score" @click="showAllTeamScores">
-                        <span>查看全团成绩</span>
+                        <span>{{ $t("team.myDkp.viewTeamScores") }}</span>
                         <el-icon><ArrowRight /></el-icon>
                     </button>
                 </div>
                 <div class="m-dkp-my-history">
                     <div class="m-dkp-section-heading">
                         <div>
-                            <h3>分值记录</h3>
-                            <p>按角色或分数变动类型筛选历史明细</p>
+                            <h3>{{ $t("team.myDkp.scoreHistory") }}</h3>
+                            <p>{{ $t("team.myDkp.scoreHistoryDescription") }}</p>
                         </div>
                     </div>
                     <dkp-logs :user_id="user_id" :org="~~org" :my-roles="orgs" />

@@ -3,19 +3,19 @@
         <template v-if="variant === 'archive'">
             <template v-if="showFeatureSettings">
                 <header class="m-team-form-section">
-                    <h2>快照设置</h2>
+                    <h2>{{ $t("team.settingSections.snapshot") }}</h2>
                 </header>
                 <snapshot-password :variant="variant" />
 
                 <header class="m-team-form-section">
-                    <h2>DKP 设置</h2>
+                    <h2>{{ $t("team.settingSections.dkp") }}</h2>
                 </header>
                 <dkp-rule :variant="variant" />
             </template>
 
             <template v-if="showDisplaySettings">
                 <header class="m-team-form-section">
-                    <h2>外观设置</h2>
+                    <h2>{{ $t("team.settingSections.appearance") }}</h2>
                 </header>
                 <team-banner :team-info="teamInfo" :variant="variant" />
             </template>

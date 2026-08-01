@@ -6,13 +6,13 @@
                 <el-icon><Coin /></el-icon>
             </span>
             <div class="u-dkp-page-heading">
-                <h1>DKP管理</h1>
-                <p>维护团队当前分值、历史记录与快照关联。</p>
+                <h1>{{ $t("team.dkp.title") }}</h1>
+                <p>{{ $t("team.dkp.description") }}</p>
             </div>
             <el-select
                 class="m-select-org"
                 v-model.number="org"
-                placeholder="请选择团队"
+                :placeholder="$t('team.dkp.selectTeam')"
                 popper-class="m-select-org-options"
                 v-if="orgs.length"
             >
@@ -23,7 +23,7 @@
                 </el-option>
             </el-select>
             <div class="u-op">
-                <a href="/tool/23786" class="u-help" target="_blank"> <i class="el-icon-info"></i> 帮助文档 </a>
+                <a href="/tool/23786" class="u-help" target="_blank"> <i class="el-icon-info"></i> {{ $t("team.dkp.help") }} </a>
                 <el-button
                     v-if="orgs.length"
                     type="warning"
@@ -32,19 +32,19 @@
                     icon="RefreshLeft"
                     :disabled="!isSuperLeader"
                     @click="resetAllDkp"
-                    >全部重置</el-button
+                    >{{ $t("team.dkp.resetAll") }}</el-button
                 >
             </div>
         </header>
         <div v-if="org" class="m-dkp-box">
-            <nav class="m-dkp-manage-nav" aria-label="DKP管理功能">
+            <nav class="m-dkp-manage-nav" :aria-label="$t('team.dkp.aria')">
                 <button type="button" :class="{ 'is-active': activeTab === 'score' }" @click="switchTab('score')">
                     <i class="el-icon-tickets"></i>
-                    <span>当前分值</span>
+                    <span>{{ $t("team.dkp.current") }}</span>
                 </button>
                 <button type="button" :class="{ 'is-active': activeTab === 'logs' }" @click="switchTab('logs')">
                     <i class="el-icon-time"></i>
-                    <span>历史记录</span>
+                    <span>{{ $t("team.dkp.history") }}</span>
                 </button>
                 <button
                     type="button"
@@ -52,7 +52,7 @@
                     @click="switchTab('snapshot')"
                 >
                     <i class="el-icon-camera"></i>
-                    <span>快照关联</span>
+                    <span>{{ $t("team.dkp.snapshot") }}</span>
                 </button>
                 <button
                     v-if="isSuperLeader"
@@ -61,28 +61,28 @@
                     @click="switchTab('advanced')"
                 >
                     <i class="el-icon-setting"></i>
-                    <span>高级操作</span>
+                    <span>{{ $t("team.dkp.advanced") }}</span>
                 </button>
                 <a class="u-dkp-help" href="/tool/23786" target="_blank" rel="noopener noreferrer">
                     <i class="el-icon-document" aria-hidden="true"></i>
-                    <span>帮助文档</span>
+                    <span>{{ $t("team.dkp.help") }}</span>
                 </a>
             </nav>
             <section v-if="activeTab === 'advanced'" class="m-dkp-advanced" aria-labelledby="dkp-advanced-title">
                 <div class="m-dkp-advanced-heading">
                     <span class="u-advanced-icon" aria-hidden="true"><i class="el-icon-setting"></i></span>
                     <div>
-                        <h2 id="dkp-advanced-title">高级操作</h2>
-                        <p>管理影响整个团队 DKP 数据的高风险操作。</p>
+                        <h2 id="dkp-advanced-title">{{ $t("team.dkp.advanced") }}</h2>
+                        <p>{{ $t("team.dkp.advancedDescription") }}</p>
                     </div>
                 </div>
                 <div class="m-dkp-danger-card">
                     <div class="u-danger-content">
-                        <h3>重置团队 DKP</h3>
-                        <p>将所有成员的当前 DKP 分值统一归零，已有历史记录仍会保留，可用于后续查询和追溯。</p>
+                        <h3>{{ $t("team.dkp.resetTitle") }}</h3>
+                        <p>{{ $t("team.dkp.resetDescription") }}</p>
                         <div class="u-danger-notice">
                             <i class="el-icon-warning-outline" aria-hidden="true"></i>
-                            <span>此操作会影响全体成员，执行后无法直接恢复当前分值。</span>
+                            <span>{{ $t("team.dkp.resetNotice") }}</span>
                         </div>
                     </div>
                     <el-button
@@ -91,7 +91,7 @@
                         :disabled="!isSuperLeader"
                         @click="resetAllDkp"
                     >
-                        重置DKP
+                        {{ $t("team.dkp.reset") }}
                     </el-button>
                 </div>
             </section>
@@ -103,7 +103,7 @@
                 :supportDkpSync="true"
             />
         </div>
-        <el-alert v-else title="你当前没有任何团队的DKP管理权限" type="info" show-icon></el-alert>
+        <el-alert v-else :title="$t('team.dkp.noPermission')" type="info" show-icon></el-alert>
     </div>
 </template>
 
@@ -214,12 +214,12 @@ export default {
         // 清空重置
         resetAllDkp: function () {
             if (!this.isSuperLeader) {
-                this.$message.warning("仅团队创始人可以重置DKP");
+                this.$message.warning(this.$t("team.dkp.founderOnly"));
                 return;
             }
-            this.$alert("重置后，团队所有成员的当前 DKP 分值将归零，历史记录仍会保留。确定继续吗？", "重置团队DKP", {
-                confirmButtonText: "确认重置",
-                cancelButtonText: "取消",
+            this.$alert(this.$t("team.dkp.resetConfirm"), this.$t("team.dkp.resetTitle"), {
+                confirmButtonText: this.$t("team.dkp.confirmReset"),
+                cancelButtonText: this.$t("team.dkp.cancel"),
                 showCancelButton: true,
                 type: "warning",
                 callback: (action) => {
@@ -227,7 +227,7 @@ export default {
                         resetDkp(this.org).then(() => {
                             bus.$emit("resetAllDkp");
                             this.$message({
-                                message: "重置成功",
+                                message: this.$t("team.dkp.resetSuccess"),
                                 type: "success",
                             });
                         });

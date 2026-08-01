@@ -1,7 +1,7 @@
 <template>
     <div class="m-team-comment">
         <CommonComment :id="id" category="team" :normal="hasRight" />
-        <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon v-if="!hasRight"> </el-alert>
+        <el-alert class="u-tip" :title="$t('team.publicContent.noPermission')" type="warning" show-icon v-if="!hasRight"></el-alert>
     </div>
 </template>
 

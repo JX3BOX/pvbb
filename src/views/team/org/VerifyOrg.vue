@@ -4,44 +4,44 @@
             <div class="m-verify-overview">
                 <section class="m-verify-card">
                     <header class="m-verify-section-title">
-                        <h2>申请须知</h2>
+                        <h2>{{ $t("team.verification.notice") }}</h2>
                     </header>
                     <ul class="m-verify-points">
-                        <li><i></i><span>仅受理真实、合规的玩家团队，工作室不予认证。</span></li>
-                        <li><i></i><span>认证团队可参与部分专属赛事、活动及平台功能。</span></li>
-                        <li><i></i><span>审核结果以魔盒公证团队的最终结论为准。</span></li>
+                        <li><i></i><span>{{ $t("team.verification.notice1") }}</span></li>
+                        <li><i></i><span>{{ $t("team.verification.notice2") }}</span></li>
+                        <li><i></i><span>{{ $t("team.verification.notice3") }}</span></li>
                     </ul>
                 </section>
 
                 <section class="m-verify-card">
                     <header class="m-verify-section-title">
-                        <h2>认证流程</h2>
+                        <h2>{{ $t("team.verification.process") }}</h2>
                     </header>
                     <ol class="m-verify-steps">
-                        <li><i>1</i><span>填写并提交申请</span></li>
-                        <li><i>2</i><span>等待公证团队审核</span></li>
-                        <li><i>3</i><span>加入认证通知群</span></li>
+                        <li><i>1</i><span>{{ $t("team.verification.step1") }}</span></li>
+                        <li><i>2</i><span>{{ $t("team.verification.step2") }}</span></li>
+                        <li><i>3</i><span>{{ $t("team.verification.step3") }}</span></li>
                     </ol>
                     <div class="m-verify-groups">
-                        <span>认证团长群</span>
+                        <span>{{ $t("team.verification.leaderGroup") }}</span>
                         <a href="https://qm.qq.com/q/O3fXaqtAwS" target="_blank">915477780</a>
-                        <em>必加</em>
+                        <em>{{ $t("team.verification.required") }}</em>
                     </div>
                     <div class="m-verify-groups is-optional">
-                        <span>团长交流群</span>
-                        <a href="https://jq.qq.com/?_wv=1027&k=MglORFXo" target="_blank">正式服 785597424</a>
-                        <a href="https://jq.qq.com/?_wv=1027&k=MXEj10bv" target="_blank">怀旧服 528707506</a>
+                        <span>{{ $t("team.verification.exchangeGroup") }}</span>
+                        <a href="https://jq.qq.com/?_wv=1027&k=MglORFXo" target="_blank">{{ $t("team.verification.retail") }}</a>
+                        <a href="https://jq.qq.com/?_wv=1027&k=MXEj10bv" target="_blank">{{ $t("team.verification.legacy") }}</a>
                     </div>
                 </section>
             </div>
 
             <section class="m-verify-application">
                 <header class="m-verify-section-title">
-                    <h2>认证申请</h2>
+                    <h2>{{ $t("team.verification.application") }}</h2>
                 </header>
                 <el-alert
                     v-if="done"
-                    title="提交成功，请等待审核"
+                    :title="$t('team.verification.submitted')"
                     type="success"
                     show-icon
                     :closable="false"
@@ -53,7 +53,7 @@
                     @submit="submit"
                     :done="done"
                     :has-applied="hasApplied"
-                    btn_txt="提交认证"
+                    :btn_txt="$t('team.verification.submit')"
                 />
             </section>
 
@@ -169,8 +169,8 @@ export default {
             auditTeam(this.form.name).then((res) => {
                 let result = res.data.data.is_exist;
                 if (result) {
-                    this.$alert("存在同名工作室名称无法认证", "消息", {
-                        confirmButtonText: "确定",
+                    this.$alert(this.$t("team.verification.duplicateStudio"), this.$t("team.verification.message"), {
+                        confirmButtonText: this.$t("team.verification.confirm"),
                     });
                 } else {
                     verifyTeam(this.id, this.data).then((res) => {

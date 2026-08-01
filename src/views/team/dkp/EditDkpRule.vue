@@ -1,18 +1,18 @@
 <template>
     <section class="m-team-dkp-rule" :class="{ 'is-archive': variant === 'archive' }" v-loading="loading">
-        <div v-if="variant === 'archive'" class="m-archive-field-label">DKP 制度</div>
+        <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.settingSections.dkpRule") }}</div>
         <el-divider v-else content-position="left">
             <i class="el-icon-document"></i> DKP制度
         </el-divider>
         <el-input
             type="textarea"
             :rows="variant === 'archive' ? 6 : 8"
-            :placeholder="variant === 'archive' ? '请输入 DKP 制度内容' : '请输入内容'"
+            :placeholder="variant === 'archive' ? $t('team.settingSections.rulePlaceholder') : $t('team.settingSections.contentPlaceholder')"
             v-model="data"
         ></el-input>
         <div v-if="variant === 'archive'" class="m-dkp-rule__footer">
-            <span>制度内容将展示在团队 DKP 页面</span>
-            <el-button class="u-btn" type="primary" @click="handleSubmitDkpRule">保存制度</el-button>
+            <span>{{ $t("team.settingSections.ruleHint") }}</span>
+            <el-button class="u-btn" type="primary" @click="handleSubmitDkpRule">{{ $t("team.settingSections.saveRule") }}</el-button>
         </div>
         <el-button v-else class="u-btn" type="primary" @click="handleSubmitDkpRule">提交</el-button>
     </section>
@@ -46,7 +46,7 @@ export default {
         handleSubmitDkpRule() {
             if (this.data.replace(/[\ \n]/g, "") === "") {
                 this.$message({
-                    message: "DKP制度不能为空",
+                    message: this.$t("team.settingSections.ruleRequired"),
                     type: "warning",
                 });
                 return false;
@@ -55,7 +55,7 @@ export default {
             return updateDkpRule(this.id, this.data)
                 .then((res) => {
                     this.$message({
-                        message: 'DKP制度更新成功',
+                        message: this.$t("team.settingSections.ruleUpdated"),
                         type: "success",
                     });
                 })

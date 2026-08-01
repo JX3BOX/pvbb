@@ -4,13 +4,13 @@
             <div class="u-header-copy">
                 <span class="u-header-icon" aria-hidden="true"><el-icon><VideoCamera /></el-icon></span>
                 <span>
-                    <h2>赛季视频</h2>
-                    <p>管理团队在各赛季活动中的首领通关录像。</p>
+                    <h2>{{ $t("team.video.title") }}</h2>
+                    <p>{{ $t("team.video.description") }}</p>
                 </span>
             </div>
             <el-button class="u-add" type="primary" v-if="canManage" @click="openDialog">
                 <el-icon><Plus /></el-icon>
-                <span>添加通关视频</span>
+                <span>{{ $t("team.video.add") }}</span>
             </el-button>
         </header>
 
@@ -31,7 +31,7 @@
                     </span>
                     <span class="u-dialog-copy">
                         <b>{{ dialogTitle }}</b>
-                        <em>补充活动、首领和视频信息，提交后将进入审核。</em>
+                        <em>{{ $t("team.video.dialogHint") }}</em>
                     </span>
                 </div>
             </template>
@@ -39,13 +39,13 @@
             <div class="m-rank-video-form">
                 <div class="u-form-notice">
                     <el-icon aria-hidden="true"><WarningFilled /></el-icon>
-                    <span>请填写与当前团队和首领对应的公开视频地址，避免提交无关内容。</span>
+                    <span>{{ $t("team.video.notice") }}</span>
                 </div>
 
                 <el-form ref="form" :model="video" label-position="top" :rules="rules">
                     <div class="u-form-grid">
-                        <el-form-item label="赛事活动" prop="event_id">
-                            <el-select v-model.number="video.event_id" placeholder="请选择赛事活动">
+                        <el-form-item :label="$t('team.video.event')" prop="event_id">
+                            <el-select v-model.number="video.event_id" :placeholder="$t('team.video.selectEvent')">
                                 <el-option
                                     v-for="item of eventsList"
                                     :key="item.ID"
@@ -55,11 +55,11 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="首领名称" prop="aid">
+                        <el-form-item :label="$t('team.video.boss')" prop="aid">
                             <el-select
                                 v-model.number="video.aid"
                                 :disabled="!video.event_id"
-                                :placeholder="video.event_id ? '请选择首领' : '请先选择赛事活动'"
+                                :placeholder="video.event_id ? $t('team.video.selectBoss') : $t('team.video.selectEventFirst')"
                             >
                                 <el-option
                                     v-for="item of eventsBoss"
@@ -71,27 +71,27 @@
                             </el-select>
                         </el-form-item>
                     </div>
-                    <el-form-item label="视频标题" prop="title">
-                        <el-input v-model.trim="video.title" maxlength="80" show-word-limit placeholder="例如：XX 视角" />
+                    <el-form-item :label="$t('team.video.videoTitle')" prop="title">
+                        <el-input v-model.trim="video.title" maxlength="80" show-word-limit :placeholder="$t('team.video.titlePlaceholder')" />
                     </el-form-item>
-                    <el-form-item label="视频链接" prop="url">
-                        <el-input v-model.trim="video.url" placeholder="请输入完整视频网址">
+                    <el-form-item :label="$t('team.video.link')" prop="url">
+                        <el-input v-model.trim="video.url" :placeholder="$t('team.video.linkPlaceholder')">
                             <template #prefix><el-icon><Link /></el-icon></template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item class="u-superstar-field" label="门派天团" prop="is_superstar">
+                    <el-form-item class="u-superstar-field" :label="$t('team.video.superstar')" prop="is_superstar">
                         <div class="u-switch-row">
                             <span>
-                                <b>标记为门派天团视频</b>
-                                <em>开启后将在相关榜单中显示特殊标记。</em>
+                                <b>{{ $t("team.video.superstarLabel") }}</b>
+                                <em>{{ $t("team.video.superstarHint") }}</em>
                             </span>
                             <el-switch
                                 v-model="video.is_superstar"
                                 :active-value="1"
                                 :inactive-value="0"
                                 inline-prompt
-                                active-text="是"
-                                inactive-text="否"
+                                :active-text="$t('team.video.yes')"
+                                :inactive-text="$t('team.video.no')"
                             />
                         </div>
                     </el-form-item>
@@ -99,9 +99,9 @@
             </div>
             <template #footer>
                 <div class="m-rank-video-dialog-footer">
-                    <el-button :disabled="submitting" @click="dialogVisible = false">取消</el-button>
+                    <el-button :disabled="submitting" @click="dialogVisible = false">{{ $t("team.video.cancel") }}</el-button>
                     <el-button type="primary" :loading="submitting" @click="submit">
-                        {{ video.ID ? "保存修改" : "提交视频" }}
+                        {{ video.ID ? $t("team.video.save") : $t("team.video.submit") }}
                     </el-button>
                 </div>
             </template>
@@ -145,10 +145,10 @@ export default {
             video: {},
             eventsList: [],
             rules: {
-                title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
-                url: [{ required: true, message: "视频链接不能为空", trigger: "blur" }],
-                event_id: [{ required: true, message: "请选择赛事", trigger: "change" }],
-                aid: [{ required: true, message: "请选择首领", trigger: "change" }],
+                title: [{ required: true, message: this.$t("team.video.titleRequired"), trigger: "blur" }],
+                url: [{ required: true, message: this.$t("team.video.linkRequired"), trigger: "blur" }],
+                event_id: [{ required: true, message: this.$t("team.video.eventRequired"), trigger: "change" }],
+                aid: [{ required: true, message: this.$t("team.video.bossRequired"), trigger: "change" }],
             },
         };
     },
@@ -170,7 +170,7 @@ export default {
             return event?.boss_map || [];
         },
         dialogTitle() {
-            return this.video.ID ? "编辑赛季视频" : "添加赛季视频";
+            return this.video.ID ? this.$t("team.video.editTitle") : this.$t("team.video.addTitle");
         },
     },
     watch: {
@@ -245,15 +245,15 @@ export default {
         },
         // 删除
         del(id) {
-            this.$alert("确认删除吗", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.video.deleteConfirm"), this.$t("team.video.message"), {
+                confirmButtonText: this.$t("team.video.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
                         return deleteVideo(id)
                             .then(() => {
                                 this.$message({
                                     type: "success",
-                                    message: `删除成功`,
+                                    message: this.$t("team.video.deleted"),
                                 });
                                 this.videos_list = this.videos_list.filter((item) => item.ID !== id);
                             })
@@ -277,7 +277,7 @@ export default {
                 this.submitting = true;
                 request
                     .then(() => {
-                        this.$message.success(isEditing ? "更新成功" : "发布成功");
+                        this.$message.success(isEditing ? this.$t("team.video.updated") : this.$t("team.video.published"));
                         this.dialogVisible = false;
                         this.loadVideos();
                     })

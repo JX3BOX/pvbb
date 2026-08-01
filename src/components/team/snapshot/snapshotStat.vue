@@ -2,24 +2,24 @@
     <div class="m-snapshot-stat">
         <div class="m-snapshot-toolbar">
             <div class="m-snapshot-search">
-                <el-input v-model.trim="search" placeholder="搜索角色名" clearable aria-label="搜索角色名">
+                <el-input v-model.trim="search" :placeholder="$t('team.snapshot.searchRole')" clearable :aria-label="$t('team.snapshot.searchRole')">
                     <template #prefix><i class="el-icon-search"></i></template>
                 </el-input>
             </div>
 
-            <div class="m-snapshot-period" role="group" aria-label="快照日期范围">
-                <button type="button" :class="{ 'is-active': active === 0 }" @click="setDefault">全部</button>
-                <button type="button" :class="{ 'is-active': active === 7 }" @click="quickSelect(7)">近 7 天</button>
-                <button type="button" :class="{ 'is-active': active === 30 }" @click="quickSelect(30)">近 30 天</button>
+            <div class="m-snapshot-period" role="group" :aria-label="$t('team.snapshot.dateRangeAria')">
+                <button type="button" :class="{ 'is-active': active === 0 }" @click="setDefault">{{ $t("team.snapshot.all") }}</button>
+                <button type="button" :class="{ 'is-active': active === 7 }" @click="quickSelect(7)">{{ $t("team.snapshot.last7") }}</button>
+                <button type="button" :class="{ 'is-active': active === 30 }" @click="quickSelect(30)">{{ $t("team.snapshot.last30") }}</button>
             </div>
 
             <el-date-picker
                 class="m-snapshot-date"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
+                :start-placeholder="$t('team.snapshot.startDate')"
+                :end-placeholder="$t('team.snapshot.endDate')"
                 v-model="rangeDate"
                 type="daterange"
-                range-separator="至"
+                :range-separator="$t('team.snapshot.to')"
                 :picker-options="pickerOptions"
             ></el-date-picker>
         </div>
@@ -30,11 +30,11 @@
                 :data="data.filter((d) => !search || d.name.includes(search))"
                 size="small"
             >
-                <el-table-column label="角色" prop="name">
+                <el-table-column :label="$t('team.snapshot.role')" prop="name">
                     <template #default="scope">
                         <div class="u-item">
                             <span class="u-avatar-frame">
-                                <img class="u-avatar" :src="showMountIcon(scope.row.mount)" alt="心法" />
+                                <img class="u-avatar" :src="showMountIcon(scope.row.mount)" :alt="$t('team.snapshot.mountTitle')" />
                             </span>
                             <span class="u-name" :title="scope.row.name">{{ scope.row.name }}</span>
                             <div class="u-bar-box">
@@ -49,22 +49,22 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="参团次数" prop="count" width="120" align="center">
+                <el-table-column :label="$t('team.snapshot.attendance')" prop="count" width="120" align="center">
                     <template #default="scope">
-                        <span class="u-count">{{ scope.row.count }} 次</span>
+                        <span class="u-count">{{ $t("team.snapshot.count", { count: scope.row.count }) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="140" align="right" header-align="right">
+                <el-table-column :label="$t('team.snapshot.operation')" width="140" align="right" header-align="right">
                     <template #default="scope">
                         <el-button class="u-view-snapshot" plain @click="rowView(scope.row)" icon="Camera" size="small"
-                            >相关快照</el-button
+                            >{{ $t("team.snapshot.related") }}</el-button
                         >
                     </template>
                 </el-table-column>
             </el-table>
         </div>
 
-        <el-alert class="m-snapshot-null" v-else show-icon type="warning" title="该日期范围内不存在快照"></el-alert>
+        <el-alert class="m-snapshot-null" v-else show-icon type="warning" :title="$t('team.snapshot.noRangeData')"></el-alert>
 
         <snapshot-detail v-model="showDetail" :data="currentRow"></snapshot-detail>
     </div>

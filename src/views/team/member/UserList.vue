@@ -2,7 +2,7 @@
     <div class="m-member-users">
         <header class="m-member-panel-header">
             <div>
-                <h2>正式团员</h2>
+                <h2>{{ $t("team.member.officialMembers") }}</h2>
             </div>
             <el-skeleton-item
                 v-if="loading"
@@ -10,7 +10,7 @@
                 class="u-member-total-skeleton"
                 aria-hidden="true"
             />
-            <span v-else class="u-member-total">{{ total }} 名成员</span>
+            <span v-else class="u-member-total">{{ $t("team.member.memberCount", { count: total }) }}</span>
         </header>
 
         <div v-if="loading" class="m-member-card-grid m-member-skeleton-grid" aria-hidden="true">
@@ -49,8 +49,8 @@
             <span class="u-empty-icon" aria-hidden="true">
                 <el-icon><UserFilled /></el-icon>
             </span>
-            <h3>暂无正式团员</h3>
-            <p>通过加入申请的成员会显示在这里。</p>
+            <h3>{{ $t("team.member.noMembers") }}</h3>
+            <p>{{ $t("team.member.noMembersHint") }}</p>
         </div>
     </div>
 </template>

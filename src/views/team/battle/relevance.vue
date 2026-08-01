@@ -2,7 +2,7 @@
     <el-dialog
         class="m-rank-relevance-dialog"
         v-model="dialogVisible"
-        title="关联战斗数据"
+        :title="$t('pages.team.battle.linkDialog')"
         width="600px"
         append-to-body
         destroy-on-close
@@ -13,7 +13,7 @@
                     <el-icon><Connection /></el-icon>
                 </span>
                 <span class="u-header-copy">
-                    <b>关联战斗数据</b>
+                    <b>{{ $t("pages.team.battle.linkDialog") }}</b>
                     <em>{{ subjectType }}：{{ subjectName }}</em>
                 </span>
             </div>
@@ -21,7 +21,7 @@
 
         <div class="m-rank-relevance-notice">
             <el-icon aria-hidden="true"><WarningFilled /></el-icon>
-            <span>关联结果将用于战绩统计与日志展示，请确认所选数据与本次出战一致。</span>
+            <span>{{ $t("pages.team.battle.linkNotice") }}</span>
         </div>
 
         <el-form class="m-rank-relevance-form" label-position="top">
@@ -30,15 +30,15 @@
                     <span class="u-field-label">
                         <span class="u-field-icon" aria-hidden="true"><el-icon><DataAnalysis /></el-icon></span>
                         <span>
-                            <b>战斗统计</b>
-                            <em>关联本次战斗的统计记录</em>
+                            <b>{{ $t("pages.team.battle.battleStats") }}</b>
+                            <em>{{ $t("pages.team.battle.battleStatsDescription") }}</em>
                         </span>
                     </span>
                 </template>
                 <el-select
                     class="u-select"
                     v-model="form.jx3box_battle_id"
-                    placeholder="请选择关联的战斗统计"
+                    :placeholder="$t('pages.team.battle.battleStatsPlaceholder')"
                     size="large"
                     clearable
                     filterable
@@ -46,7 +46,7 @@
                     :remote-method="loadBattle"
                     :default-first-option="true"
                     :loading="battleQuery.BattleLoading"
-                    no-data-text="暂无可关联的战斗统计"
+                    :no-data-text="$t('pages.team.battle.noBattleStats')"
                 >
                     <el-option v-for="item in battleList" :key="item.id" :label="item.title" :value="item.id">
                     </el-option>
@@ -63,15 +63,15 @@
                     <span class="u-field-label">
                         <span class="u-field-icon" aria-hidden="true"><el-icon><Document /></el-icon></span>
                         <span>
-                            <b>日志 JCL</b>
-                            <em>关联本次战斗的日志分析</em>
+                            <b>{{ $t("pages.team.battle.jcl") }}</b>
+                            <em>{{ $t("pages.team.battle.jclDescription") }}</em>
                         </span>
                     </span>
                 </template>
                 <el-select
                     class="u-select"
                     v-model="form.jx3box_jcl_id"
-                    placeholder="请选择关联的日志分析"
+                    :placeholder="$t('pages.team.battle.jclPlaceholder')"
                     size="large"
                     clearable
                     filterable
@@ -79,7 +79,7 @@
                     :remote-method="loadJcl"
                     :default-first-option="true"
                     :loading="jclQuery.JclLoading"
-                    no-data-text="暂无可关联的日志分析"
+                    :no-data-text="$t('pages.team.battle.noJcl')"
                 >
                     <el-option v-for="item in jclList" :key="item.id" :label="item.title" :value="item.id"> </el-option>
                     <ElSelectLoading
@@ -93,8 +93,10 @@
         </el-form>
         <template #footer>
             <div class="m-rank-relevance-footer">
-                <el-button :disabled="submitting" @click="close">取消</el-button>
-                <el-button type="primary" :loading="submitting" @click="submit">确认关联</el-button>
+                <el-button :disabled="submitting" @click="close">{{ $t("pages.team.battle.cancel") }}</el-button>
+                <el-button type="primary" :loading="submitting" @click="submit">{{
+                    $t("pages.team.battle.confirmLink")
+                }}</el-button>
             </div>
         </template>
     </el-dialog>
@@ -164,12 +166,14 @@ export default {
             return this.data.ID;
         },
         subjectType() {
-            return this.role ? "角色" : "团队";
+            return this.role
+                ? this.$t("pages.team.battle.characterSubject")
+                : this.$t("pages.team.battle.teamSubject");
         },
         subjectName() {
             return this.role
-                ? this.data.role || "未知角色"
-                : this.data.team_info?.name || this.data.team || "未知团队";
+                ? this.data.role || this.$t("pages.team.battle.unknownCharacter")
+                : this.data.team_info?.name || this.data.team || this.$t("pages.team.battle.unknownTeam");
         },
     },
     watch: {
@@ -250,7 +254,7 @@ export default {
             this.submitting = true;
             setBattleJcL(this.id, this.form)
                 .then(() => {
-                    this.$message.success("关联审核提交成功");
+                    this.$message.success(this.$t("pages.team.battle.linkSubmitted"));
                     this.close();
                 })
                 .finally(() => {

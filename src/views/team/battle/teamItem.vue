@@ -13,23 +13,23 @@
                 <i class="el-icon-link"></i>
                 {{ item.team_info.name && item.team_info.name.slice(0, 6) }}
             </a>
-            <span class="u-teamname u-teamname-null" v-else>未知</span>
+            <span class="u-teamname u-teamname-null" v-else>{{ $t("pages.team.battle.unknown") }}</span>
             <span class="u-server">{{ item.team_info.server }}</span>
         </div>
         <!-- 时间 -->
         <div class="u-time" @click="copy(showTime(item.created))">
             <span class="u-time-fight">
-                用时 :
+                {{ $t("pages.team.battle.durationLabel") }}
                 <b>{{ showTC(item.fight_time) }}</b>
             </span>
             <span class="u-time-finish">{{ showTime(item.created) }}</span>
         </div>
         <!-- 队长 -->
         <div class="u-leader" v-if="item.leaders">
-            <span class="u-leader-label">团长 :</span>
+            <span class="u-leader-label">{{ $t("pages.team.battle.leader") }} :</span>
             <img loading="lazy" class="u-mount" :src="showMount(item.leaders.XFId)" v-if="item.leaders.XFId" />
             <span class="u-username">
-                {{ item.leaders.Name || "未知" }}
+                {{ item.leaders.Name || $t("pages.team.battle.unknown") }}
             </span>
         </div>
         <!-- 队员 -->
@@ -37,7 +37,9 @@
             <el-col class="u-member" :span="4" v-for="(member, j) in item.members" :key="j">
                 <div class="u-member-content">
                     <img loading="lazy" class="u-mount" :src="showMount(member.XFId)" />
-                    <span class="u-username" :title="member.Name">{{ member.Name || "未知" }}</span>
+                    <span class="u-username" :title="member.Name">{{
+                        member.Name || $t("pages.team.battle.unknown")
+                    }}</span>
                 </div>
             </el-col>
         </el-row>
@@ -76,7 +78,7 @@ export default {
         },
         showTC: function (val) {
             let s = val / 1000;
-            return ~~(s / 60) + "分" + ~~(s % 60) + "秒";
+            return this.$t("pages.team.battle.duration", { minutes: ~~(s / 60), seconds: ~~(s % 60) });
         },
         showMount: function (member) {
             let mountIcon = __imgPath + "image/xf/" + member + ".png";
