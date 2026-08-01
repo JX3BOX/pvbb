@@ -1,7 +1,7 @@
 <template>
     <div class="m-team-trophy">
         <el-divider content-position="left">
-            <i class="el-icon-trophy"></i> 团队成绩
+            <i class="el-icon-trophy"></i> {{ $t("team.publicContent.achievements") }}
         </el-divider>
         <ul class="u-list" v-if="data && data.length">
             <li class="u-trophy" v-for="(item, i) in data" :key="i">
@@ -16,7 +16,7 @@
             </li>
         </ul>
         <div class="u-null" v-else>
-            <i class="el-icon-warning-outline"></i> 还没有相关记录
+            <i class="el-icon-warning-outline"></i> {{ $t("team.publicContent.empty") }}
         </div>
     </div>
 </template>
@@ -40,7 +40,7 @@ export default {
             return getLink("rank", event_id, achieve_id);
         },
         showHonor : function (item){
-            return this.events[item.event_id] + '·' + this.aidmap[item.achieve_id] + '第' + item.ranking + '名'
+            return this.events[item.event_id] + "·" + this.aidmap[item.achieve_id] + this.$t("team.publicContent.rank", { rank: item.ranking });
         },
         loadConfig: async function(){
             await getEvent().then((res) => {

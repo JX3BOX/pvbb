@@ -1,104 +1,127 @@
-@raid-color: #e6f0fb;
+@import (reference) "../design-system/_tokens.less";
+
 .m-snapshot-body {
-    border: 2px solid @raid-color;
-    .w(100%);
-    .clearfix;
-
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 20%;
+    width: 100%;
     align-content: start;
-    overflow-x: hidden;
+    overflow: hidden;
+    border: 1px solid fade(@team-primary, 18%);
+    border-radius: 12px;
+    background: @team-surface;
+    grid-auto-columns: 20%;
+    grid-auto-flow: column;
 
-    @h: 46px;
+    @row-height: 50px;
+
     &.row-0 {
-        grid-template-rows: repeat(5, @h);
-    } //旧数据
-    &.row-1 {
-        grid-template-rows: repeat(1, @h);
-    }
-    &.row-2 {
-        grid-template-rows: repeat(2, @h);
-    }
-    &.row-3 {
-        grid-template-rows: repeat(3, @h);
-    }
-    &.row-4 {
-        grid-template-rows: repeat(4, @h);
-    }
-    &.row-5 {
-        grid-template-rows: repeat(5, @h);
-    }
-    &.row-6 {
-        grid-template-rows: repeat(6, @h);
-    }
-    &.row-7 {
-        grid-template-rows: repeat(7, @h);
-    }
-    &.row-8 {
-        grid-template-rows: repeat(8, @h);
-    }
-    &.row-9 {
-        grid-template-rows: repeat(9, @h);
-    }
-    &.row-10 {
-        grid-template-rows: repeat(10, @h);
+        grid-template-rows: repeat(5, @row-height);
     }
 
-    &.row-0,
+    &.row-1 {
+        grid-template-rows: repeat(1, @row-height);
+    }
+
+    &.row-2 {
+        grid-template-rows: repeat(2, @row-height);
+    }
+
+    &.row-3 {
+        grid-template-rows: repeat(3, @row-height);
+    }
+
+    &.row-4 {
+        grid-template-rows: repeat(4, @row-height);
+    }
+
     &.row-5 {
-        border: 2px solid @raid-color;
-        border-top: none;
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        grid-template-rows: repeat(5, @row-height);
+    }
+
+    &.row-6 {
+        grid-template-rows: repeat(6, @row-height);
+    }
+
+    &.row-7 {
+        grid-template-rows: repeat(7, @row-height);
+    }
+
+    &.row-8 {
+        grid-template-rows: repeat(8, @row-height);
+    }
+
+    &.row-9 {
+        grid-template-rows: repeat(9, @row-height);
+    }
+
+    &.row-10 {
+        grid-template-rows: repeat(10, @row-height);
     }
 
     .u-col {
         min-width: 0;
+        min-height: @row-height;
     }
+
     .u-item {
+        display: flex;
+        position: relative;
         box-sizing: border-box;
-        .h(100%);
-        padding: 5px 10px;
-        border: 2px solid @raid-color;
-        .pr;
-        .lh(32px);
-        .flex;
+        height: 100%;
+        min-width: 0;
         align-items: center;
+        padding: 0 @team-space-3;
+        border-right: 1px solid fade(@team-primary, 14%);
+        border-bottom: 1px solid fade(@team-primary, 12%);
+        background: @team-surface;
+        cursor: pointer;
+        gap: @team-space-2;
+        transition: background-color @team-duration-fast @team-ease-standard;
 
         &:hover {
-            cursor: pointer;
-            background-color: @bg-gray;
+            background: fade(@team-primary, 5%);
         }
     }
+
     .u-icon {
-        .size(24px);
-        .mr(8px);
-        .y;
+        width: 28px;
+        height: 28px;
+        flex: none;
+        object-fit: contain;
     }
+
     .u-name {
-        box-sizing: border-box;
-        .clip;
+        min-width: 0;
         overflow: hidden;
+        color: @team-text-regular;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
         text-overflow: ellipsis;
         white-space: nowrap;
-        .fz(13px, 24px);
     }
+
 }
+
 @media screen and (max-width: @phone) {
     .m-snapshot-body {
-        display: block;
-        .u-col {
-            .w(50%);
-        }
+        gap: 0;
+        border-radius: 12px;
+        grid-auto-columns: auto;
+        grid-auto-flow: row;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: none !important;
 
-        &.row-0,
-        &.row-5 {
-            border: 2px solid @raid-color;
+        .u-item {
+            height: 48px;
+            border-right: 1px solid fade(@team-primary, 14%);
+            border-bottom: 1px solid fade(@team-primary, 12%);
+            border-radius: 0;
         }
-
-        .h(auto) !important;
     }
 }
 
 .m-snapshot-preview {
-    width: 1004px;
+    width: min(1004px, calc(100vw - 32px));
 }

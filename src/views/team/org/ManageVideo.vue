@@ -1,46 +1,108 @@
 <template>
     <div class="m-team-play" v-loading="loading">
-        <div class="u-add" @click="openDialog" v-if="isMaster">
-            <i class="el-icon-video-camera-solid"></i> 添加赛季通关视频
-        </div>
-        <!-- 视频 -->
-        <team-videos :data="videos" @toEmit="isEmit" :isMine="true" />
-        <!-- 添加视频表单 -->
-        <el-dialog class="m-rank-video-dialog" title="添加/编辑视频" v-model="dialogVisible" :append-to-body="true">
+        <header class="m-team-play-header">
+            <div class="u-header-copy">
+                <span class="u-header-icon" aria-hidden="true"><el-icon><VideoCamera /></el-icon></span>
+                <span>
+                    <h2>{{ $t("team.video.title") }}</h2>
+                    <p>{{ $t("team.video.description") }}</p>
+                </span>
+            </div>
+            <el-button class="u-add" type="primary" v-if="canManage" @click="openDialog">
+                <el-icon><Plus /></el-icon>
+                <span>{{ $t("team.video.add") }}</span>
+            </el-button>
+        </header>
+
+        <team-videos :data="videos" @toEmit="isEmit" :isMine="canManage" />
+
+        <el-dialog
+            class="m-rank-video-dialog"
+            v-model="dialogVisible"
+            :title="dialogTitle"
+            width="640px"
+            append-to-body
+            destroy-on-close
+        >
+            <template #header>
+                <div class="m-rank-video-dialog-header">
+                    <span class="u-dialog-icon" aria-hidden="true">
+                        <el-icon><Film /></el-icon>
+                    </span>
+                    <span class="u-dialog-copy">
+                        <b>{{ dialogTitle }}</b>
+                        <em>{{ $t("team.video.dialogHint") }}</em>
+                    </span>
+                </div>
+            </template>
+
             <div class="m-rank-video-form">
-                <el-form ref="form" :model="video" label-width="80px" :rules="rules">
-                    <el-form-item label="赛事活动" prop="event_id">
-                        <el-select v-model.number="video.event_id" placeholder="请选择">
-                            <el-option v-for="(item, key) of eventsList" :key="key" :label="item.name" :value="item.ID">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="门派天团" prop="is_superstar">
-                        <el-checkbox v-model="video.is_superstar" :true-value="1" :false-value="0"></el-checkbox>
-                    </el-form-item>
-                    <el-form-item label="首领名称" v-if="video.event_id" prop="aid">
-                        <el-select v-model.number="video.aid" placeholder="请选择">
-                            <el-option
-                                v-for="(item, key) of eventsBoss"
-                                :key="key"
-                                :label="item.name"
-                                :value="item.achievement_id"
+                <div class="u-form-notice">
+                    <el-icon aria-hidden="true"><WarningFilled /></el-icon>
+                    <span>{{ $t("team.video.notice") }}</span>
+                </div>
+
+                <el-form ref="form" :model="video" label-position="top" :rules="rules">
+                    <div class="u-form-grid">
+                        <el-form-item :label="$t('team.video.event')" prop="event_id">
+                            <el-select v-model.number="video.event_id" :placeholder="$t('team.video.selectEvent')">
+                                <el-option
+                                    v-for="item of eventsList"
+                                    :key="item.ID"
+                                    :label="item.name"
+                                    :value="item.ID"
+                                >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('team.video.boss')" prop="aid">
+                            <el-select
+                                v-model.number="video.aid"
+                                :disabled="!video.event_id"
+                                :placeholder="video.event_id ? $t('team.video.selectBoss') : $t('team.video.selectEventFirst')"
                             >
-                            </el-option>
-                        </el-select>
+                                <el-option
+                                    v-for="item of eventsBoss"
+                                    :key="item.achievement_id"
+                                    :label="item.name"
+                                    :value="item.achievement_id"
+                                >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </div>
+                    <el-form-item :label="$t('team.video.videoTitle')" prop="title">
+                        <el-input v-model.trim="video.title" maxlength="80" show-word-limit :placeholder="$t('team.video.titlePlaceholder')" />
                     </el-form-item>
-                    <el-form-item label="视频链接" prop="url">
-                        <el-input v-model="video.url" placeholder="请输入视频网址"></el-input>
+                    <el-form-item :label="$t('team.video.link')" prop="url">
+                        <el-input v-model.trim="video.url" :placeholder="$t('team.video.linkPlaceholder')">
+                            <template #prefix><el-icon><Link /></el-icon></template>
+                        </el-input>
                     </el-form-item>
-                    <el-form-item label="视频标题" prop="title">
-                        <el-input v-model="video.title" placeholder="请注明XX视角"></el-input>
+                    <el-form-item class="u-superstar-field" :label="$t('team.video.superstar')" prop="is_superstar">
+                        <div class="u-switch-row">
+                            <span>
+                                <b>{{ $t("team.video.superstarLabel") }}</b>
+                                <em>{{ $t("team.video.superstarHint") }}</em>
+                            </span>
+                            <el-switch
+                                v-model="video.is_superstar"
+                                :active-value="1"
+                                :inactive-value="0"
+                                inline-prompt
+                                :active-text="$t('team.video.yes')"
+                                :inactive-text="$t('team.video.no')"
+                            />
+                        </div>
                     </el-form-item>
                 </el-form>
             </div>
             <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="submit">确 定</el-button>
+                <div class="m-rank-video-dialog-footer">
+                    <el-button :disabled="submitting" @click="dialogVisible = false">{{ $t("team.video.cancel") }}</el-button>
+                    <el-button type="primary" :loading="submitting" @click="submit">
+                        {{ video.ID ? $t("team.video.save") : $t("team.video.submit") }}
+                    </el-button>
                 </div>
             </template>
         </el-dialog>
@@ -48,7 +110,6 @@
 </template>
 <script>
 import {
-    getBoss,
     getTeamsList,
     getVideos,
     getVideosMaster,
@@ -57,17 +118,25 @@ import {
     addVideo,
 } from "@/service/team/team.js";
 import team_videos from "@/components/team/org/team_videos.vue";
-import rank_event_boss from "@/assets/data/team/rank_event_boss.json";
-import User from "@jx3box/jx3box-common/js/user";
+import { Film, Link, Plus, VideoCamera, WarningFilled } from "@element-plus/icons-vue";
 export default {
-    name: "ViewVideo",
-    props: ["super"],
-    components: { "team-videos": team_videos },
+    name: "ManageVideo",
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: 0,
+        },
+        canManage: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    components: { Film, Link, Plus, VideoCamera, WarningFilled, "team-videos": team_videos },
     data: function () {
         return {
             loading: false,
+            submitting: false,
             dialogVisible: false,
-            bossList: [],
             page: 1,
             per: 16,
             total: 0,
@@ -76,16 +145,16 @@ export default {
             video: {},
             eventsList: [],
             rules: {
-                title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
-                url: [{ required: true, message: "视频链接不能为空", trigger: "blur" }],
-                event_id: [{ required: true, message: "请选择赛事", trigger: " change" }],
-                aid: [{ required: true, message: "请选择BOSS", trigger: " change" }],
+                title: [{ required: true, message: this.$t("team.video.titleRequired"), trigger: "blur" }],
+                url: [{ required: true, message: this.$t("team.video.linkRequired"), trigger: "blur" }],
+                event_id: [{ required: true, message: this.$t("team.video.eventRequired"), trigger: "change" }],
+                aid: [{ required: true, message: this.$t("team.video.bossRequired"), trigger: "change" }],
             },
         };
     },
     computed: {
         id: function () {
-            return this.$route.params.id;
+            return ~~this.teamId;
         },
         videos() {
             return {
@@ -93,24 +162,18 @@ export default {
                 page: this.page,
                 per: this.per,
                 total: this.total,
-                isMaster: this.isMaster,
+                isMaster: this.canManage,
             };
         },
-        isMaster() {
-            return User.getInfo().uid == this.super;
-        },
-        rank_event_boss() {
-            return rank_event_boss;
-        },
         eventsBoss() {
-            const index = this.eventsList.findIndex((item) => this.video.event_id == item.ID);
-            return this.eventsList[index].boss_map || [];
+            const event = this.eventsList.find((item) => this.video.event_id == item.ID);
+            return event?.boss_map || [];
+        },
+        dialogTitle() {
+            return this.video.ID ? this.$t("team.video.editTitle") : this.$t("team.video.addTitle");
         },
     },
     watch: {
-        dialogVisible(val) {
-            val && !this.bossList.length ? this.getBossList() : "";
-        },
         page() {
             this.loadVideos();
         },
@@ -119,55 +182,51 @@ export default {
         },
     },
     methods: {
-        // 加载视频列表，团长显示可编辑删除等功能
+        // 加载视频列表，有管理权限时加载包含审核状态的完整列表
         loadVideos() {
             this.loading = true;
-            let _params = {
+            const params = {
                 pageIndex: this.page,
                 pageSize: this.per,
             };
-            this.isMaster
-                ? getVideosMaster(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      })
-                : getVideos(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      });
+            const request = this.canManage ? getVideosMaster(this.id, params) : getVideos(this.id, params);
+
+            return request
+                .then((res) => {
+                    this.videos_list = res.data.data.list || [];
+                    this.total = res.data.data.page.total;
+                })
+                .catch(() => {
+                    this.videos_list = [];
+                    this.total = 0;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 加载赛事和 boss
         loadEvents() {
-            getTeamsList().then((res) => {
-                this.eventsList = res.data.data.list;
-            });
-        },
-        // 获取boss列表
-        getBossList() {
-            getBoss().then((res) => {
-                this.bossList = res.data.data.list.reverse();
-            });
+            return getTeamsList()
+                .then((res) => {
+                    this.eventsList = res.data.data.list;
+                })
+                .catch(() => {
+                    this.eventsList = [];
+                });
         },
         // 子组件提交数据
         isEmit(data) {
             if (data.page) this.page = data.page;
             if (data.item) {
-                let { ID, event_id, aid, title, url } = data.item;
-                this.restVideo(ID, event_id, aid, title, url);
+                let { ID, event_id, aid, title, url, is_superstar, status } = data.item;
+                this.restVideo(ID, event_id, aid, title, url, is_superstar, status);
                 this.dialogVisible = true;
             }
+            if (data.add) this.openDialog();
             if (data.del) this.del(data.del);
         },
         // 重置视频信息填写信息
-        restVideo(ID, event_id, aid, title, url, status = 0) {
+        restVideo(ID, event_id, aid, title, url, is_superstar = 0, status = 0) {
             this.video = {
                 team_id: ~~this.id,
                 event_id,
@@ -175,17 +234,9 @@ export default {
                 aid,
                 title,
                 url,
+                is_superstar,
                 status,
             };
-        },
-        // 获取对应活动id
-        eventID(id, str = "") {
-            if (!id) return str;
-            const _obj = this.rank_event_boss;
-            for (const key in _obj) {
-                if (_obj[key].indexOf(id) !== -1) str = key;
-            }
-            return str;
         },
         // 重置填写内容并打开弹窗
         openDialog() {
@@ -194,17 +245,21 @@ export default {
         },
         // 删除
         del(id) {
-            this.$alert("确认删除吗", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.video.deleteConfirm"), this.$t("team.video.message"), {
+                confirmButtonText: this.$t("team.video.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
-                        deleteVideo(id).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `删除成功`,
+                        return deleteVideo(id)
+                            .then(() => {
+                                this.$message({
+                                    type: "success",
+                                    message: this.$t("team.video.deleted"),
+                                });
+                                this.videos_list = this.videos_list.filter((item) => item.ID !== id);
+                            })
+                            .catch(() => {
+                                // 公共请求拦截器已展示业务错误，这里只消费拒绝，避免触发运行时遮罩。
                             });
-                            this.videos_list = this.videos_list.filter((item) => item.ID !== id);
-                        });
                     }
                 },
             });
@@ -212,34 +267,26 @@ export default {
         // 提交
         submit: function () {
             this.$refs.form.validate((valid, fields) => {
-                if (valid) {
-                    if (this.video.ID) {
-                        updateVideo(this.video.ID, this.video).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `更新成功`,
-                            });
-                            this.dialogVisible = false;
-                            this.videos_list.forEach((item, key) => {
-                                if (this.video.ID == item.ID) {
-                                    item = this.video;
-                                    this.videos_list[key] = item;
-                                }
-                            });
-                        });
-                    } else {
-                        addVideo(this.video).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `发布成功`,
-                            });
-                            this.dialogVisible = false;
-                            location.reload();
-                        });
-                    }
-                } else {
+                if (!valid) {
                     console.log("error submit!!!", fields);
+                    return;
                 }
+
+                const isEditing = Boolean(this.video.ID);
+                const request = isEditing ? updateVideo(this.video.ID, this.video) : addVideo(this.video);
+                this.submitting = true;
+                request
+                    .then(() => {
+                        this.$message.success(isEditing ? this.$t("team.video.updated") : this.$t("team.video.published"));
+                        this.dialogVisible = false;
+                        this.loadVideos();
+                    })
+                    .catch(() => {
+                        // 公共请求拦截器已展示业务错误，这里只消费拒绝，避免触发运行时遮罩。
+                    })
+                    .finally(() => {
+                        this.submitting = false;
+                    });
             });
         },
     },

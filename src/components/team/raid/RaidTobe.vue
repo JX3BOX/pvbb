@@ -35,15 +35,18 @@
                                     :alt="showMountName(member['mount'])"
                                 />
                                 <span class="u-member-role">
-                                    <router-link
-                                        class="u-member-name-link"
-                                        target="_blank"
+                                    <button
+                                        class="u-member-role-trigger"
+                                        type="button"
                                         v-if="member.role_id && linkVisible"
-                                        :to="`/role/${member.role_id}`"
+                                        :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                        @mousedown.stop
+                                        @click.stop="openRoleDialog(member)"
                                     >
                                         <i class="el-icon-link"></i>
-                                    </router-link>
-                                    <span
+                                        <span>{{ showMemberName(member["name"]) }}</span>
+                                    </button>
+                                    <span v-else
                                         class="u-member-name"
                                         @click="handleCopy(showMemberName(member['name']))"
                                         >{{ showMemberName(member["name"]) }}</span
@@ -56,32 +59,42 @@
                     </el-popover>
                     <span class="u-member-op" v-if="canManage">
                         <el-tooltip class="item" effect="dark" content="设为正式队员" placement="top-start">
-                            <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
-                                <template #reference>
-                                    <i class="u-member-reset el-icon-check"></i>
-                                </template>
-                            </el-popconfirm>
+                            <span>
+                                <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
+                                    <template #reference>
+                                        <i class="u-member-reset el-icon-check"></i>
+                                    </template>
+                                </el-popconfirm>
+                            </span>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="设为替补队员" placement="top-start">
-                            <el-popconfirm title="是否将该角色转为替补成员？" @confirm="pending(member, i)">
-                                <template #reference>
-                                    <i class="u-member-reset el-icon-first-aid-kit"></i>
-                                </template>
-                            </el-popconfirm>
+                            <span>
+                                <el-popconfirm title="是否将该角色转为替补成员？" @confirm="pending(member, i)">
+                                    <template #reference>
+                                        <i class="u-member-reset el-icon-first-aid-kit"></i>
+                                    </template>
+                                </el-popconfirm>
+                            </span>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="拒绝申请" placement="top-start">
-                            <el-popconfirm title="是否拒绝申请？" @confirm="reject(member, i)">
-                                <template #reference>
-                                    <i class="u-member-delete el-icon-close"></i>
-                                </template>
-                            </el-popconfirm>
+                            <span>
+                                <el-popconfirm title="是否拒绝申请？" @confirm="reject(member, i)">
+                                    <template #reference>
+                                        <i class="u-member-delete el-icon-close"></i>
+                                    </template>
+                                </el-popconfirm>
+                            </span>
                         </el-tooltip>
                     </span>
                 </div>
             </ul>
         </div>
         <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> 当前没有任何名单</div>
-
+        <raid-role-dialog
+            v-model="roleDialogVisible"
+            :role-id="roleDialogMember && roleDialogMember.role_id"
+            :member="roleDialogMember || {}"
+        />
     </div>
 </template>
 
@@ -90,11 +103,15 @@ import { rejectMember, covertTobe2Sub, covertTobe2Normal } from "@/service/team/
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import MemberPop from "./MemberPop.vue";
+import RaidRoleDialog from "@/components/team/raid/RaidRoleDialog.vue";
 import { showMountIcon, showMountName } from "@/utils/filters";
+import bus from "@/utils/bus";
 export default {
     name: "RaidTobe",
     props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace"],
+    emits: ["pass", "pending"],
     components: {
+        RaidRoleDialog,
         "member-pop": MemberPop,
     },
     data() {
@@ -105,6 +122,8 @@ export default {
             // 右键菜单
             selectedMember: null,
             selectedIndex: undefined,
+            roleDialogVisible: false,
+            roleDialogMember: null,
 
             // 预设、杂项
             xf_map,
@@ -140,14 +159,19 @@ export default {
         },
     },
     mounted() {
-        this.$bus.$on("updateTobe", (data) => {
-            this.data = [...this.data, data];
-        });
+        bus.on("updateTobe", this.handleUpdateTobe);
     },
     beforeUnmount() {
-        this.$bus.$off("updateTobe");
+        bus.off("updateTobe", this.handleUpdateTobe);
     },
     methods: {
+        openRoleDialog(member) {
+            this.roleDialogMember = member;
+            this.roleDialogVisible = true;
+        },
+        handleUpdateTobe(data) {
+            this.data = [...this.data, data];
+        },
         // 操作
         // ===============================
         // 转为正式队员
@@ -174,18 +198,18 @@ export default {
 
                         if (targetMember) {
                             let replaceId = targetMember?.id;
-                            this.$emit("pass", { member, from: "tobe", isReplace: true });
                             await covertTobe2Normal(this.raid_id, apply_id, replaceId);
                             this.data.splice(i, 1);
+                            this.$emit("pass", { member, from: "tobe", isReplace: true });
                         } else {
-                            this.$emit("pass", { member, from: "tobe", isReplace: false });
                             await covertTobe2Normal(this.raid_id, apply_id);
                             this.data.splice(i, 1);
+                            this.$emit("pass", { member, from: "tobe", isReplace: false });
                         }
                     } else {
-                        this.$emit("pass", { member, from: "tobe" });
                         await covertTobe2Normal(this.raid_id, apply_id);
                         this.data.splice(i, 1);
+                        this.$emit("pass", { member, from: "tobe" });
                     }
                 } else {
                     this.$notify({

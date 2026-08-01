@@ -1,9 +1,9 @@
 <template>
     <div class="m-dkp-logs" v-loading="loading">
         <div class="m-dkp-logs-filters">
-            <el-form :form="form" inline>
-                <el-form-item label="人员" v-if="!user_id">
-                    <el-select placeholder="选择人员进行筛选" v-model="form.user_id" size="small" clearable>
+            <el-form :model="form" inline>
+                <el-form-item :label="$t('team.dkp.person')" v-if="!user_id">
+                    <el-select :placeholder="$t('team.dkp.selectPerson')" v-model="form.user_id" size="small" clearable>
                         <el-option
                             v-for="(item, index) in teamMembers"
                             :key="index"
@@ -12,9 +12,9 @@
                         ></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="角色" v-if="!user_id">
+                <el-form-item :label="$t('team.dkp.role')" v-if="!user_id">
                     <el-select
-                        placeholder="请选择或输入团员名"
+                        :placeholder="$t('team.dkp.selectRole')"
                         v-model="form.role_id"
                         filterable
                         remote
@@ -38,8 +38,8 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="角色" v-else>
-                    <el-select placeholder="过滤角色" v-model="form.role_id" filterable clearable size="small">
+                <el-form-item :label="$t('team.dkp.role')" v-else>
+                    <el-select :placeholder="$t('team.dkp.filterRole')" v-model="form.role_id" filterable clearable size="small">
                         <el-option
                             v-for="(role, index) in myRolesInThisTeam"
                             :key="index"
@@ -58,22 +58,27 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="分数变动">
+                <el-form-item :label="$t('team.dkp.scoreChange')">
                     <el-radio-group v-model="form.action" size="small">
-                        <el-radio-button label="all">全部</el-radio-button>
-                        <el-radio-button label="plus">只看加分</el-radio-button>
-                        <el-radio-button label="minus">只看扣分</el-radio-button>
+                        <el-radio-button label="all">{{ $t("team.dkp.all") }}</el-radio-button>
+                        <el-radio-button label="plus">{{ $t("team.dkp.plusOnly") }}</el-radio-button>
+                        <el-radio-button label="minus">{{ $t("team.dkp.minusOnly") }}</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
             </el-form>
         </div>
         <div class="m-dkp-logs-container">
-            <el-table class="m-dkp-logs-table" :data="logs" size="small">
-                <el-table-column label="人员" v-if="!user_id">
+            <el-table class="m-dkp-logs-table" :data="logs" size="small" :empty-text="$t('team.dkp.noLogs')">
+                <el-table-column :label="$t('team.dkp.person')" v-if="!user_id">
                     <template #default="scope">
-                        <a :href="authorLink(scope.row.user_id)" target="_blank">
+                        <a class="u-user" :href="authorLink(scope.row.user_id)" target="_blank">
                             <img
-                                :src="showAvatar(scope.row.user_info && scope.row.user_info.avatar)"
+                                :src="
+                                    showAvatar(
+                                        scope.row.user_info &&
+                                            (scope.row.user_info.user_avatar || scope.row.user_info.avatar)
+                                    )
+                                "
                                 class="u-user-avatar"
                             />
                             <span class="u-user-name">{{
@@ -82,7 +87,7 @@
                         </a>
                     </template>
                 </el-table-column>
-                <el-table-column label="角色">
+                <el-table-column :label="$t('team.dkp.role')">
                     <template #default="scope">
                         <router-link
                             v-if="scope.row.role_id && scope.row.role_info"
@@ -96,16 +101,18 @@
                         <span v-else>-</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="drop" label="关联物品">
-                    <template #default="scope" v-if="scope.row.drop_item_id">
+                <el-table-column prop="drop" :label="$t('team.dkp.linkedItem')">
+                    <template #default="scope">
                         <drop-item
+                            v-if="scope.row.drop_item_id"
                             :id="scope.row.drop_item_id"
                             :icon="scope.row.drop_item_icon"
                             :name="scope.row.drop_item_name"
                         />
+                        <span v-else>-</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="分数变动">
+                <el-table-column :label="$t('team.dkp.scoreChange')">
                     <template #default="scope">
                         <span
                             class="u-table-score"
@@ -114,8 +121,8 @@
                         >
                     </template>
                 </el-table-column>
-                <el-table-column label="备注" prop="remark"></el-table-column>
-                <el-table-column prop="created_at" label="时间">
+                <el-table-column :label="$t('team.dkp.remark')" prop="remark"></el-table-column>
+                <el-table-column prop="created_at" :label="$t('team.dkp.time')">
                     <template #default="scope">{{ showTime(scope.row.created_at) }}</template>
                 </el-table-column>
             </el-table>
@@ -203,9 +210,10 @@ export default {
             let matched = this.myRoles.filter((item) => {
                 return item.team_info.ID == this.org;
             });
-            let list = matched[0]?.roles.map((item) => {
-                return item.info;
-            });
+            let list =
+                matched[0]?.roles?.map((item) => {
+                    return item.info;
+                }) || [];
             return list;
         },
     },

@@ -1,5 +1,33 @@
 <template>
-    <div class="m-activity-item" @click="subscribe(activity.id)">
+    <article v-if="variant === 'center'" class="m-activity-item is-center" @click="subscribe(activity.id)">
+        <div class="u-center-date" aria-hidden="true">
+            <strong>{{ showRaidDate(activity.start_time) }}</strong>
+            <span>{{ $t("team.publicContent.month", { month: showRaidMonth(activity.start_time) }) }}</span>
+        </div>
+        <div class="u-center-content">
+            <div class="u-center-heading">
+                <div>
+                    <span v-if="isToday(activity.start_time)" class="u-center-today">{{ $t("team.publicContent.today") }}</span>
+                    <h2>{{ activity.name || $t("team.publicContent.activityFallback") }}</h2>
+                </div>
+                <span class="u-center-time">{{ showRaidTime(activity.start_time) }}</span>
+            </div>
+            <p class="u-center-desc">{{ activity.title || $t("team.publicContent.activityPending") }}</p>
+            <div class="u-center-meta">
+                <router-link class="u-center-team" :to="'/org/' + activity.team_id" @click.stop>
+                    <img :src="getTeamLogo(activity.team_logo || teamInfo.logo)" alt="" />
+                    <span>{{ activity.team_name || $t("team.publicContent.teamFallback") }}</span>
+                </router-link>
+                <span><el-icon><Location /></el-icon>{{ activity.server || $t("team.publicContent.serverPending") }}</span>
+                <span><el-icon><Calendar /></el-icon>{{ showRaidWeek(activity.start_time) }}</span>
+            </div>
+        </div>
+        <button class="u-center-action" type="button" @click.stop="subscribe(activity.id)">
+            <span>{{ $t("team.publicContent.viewActivity") }}</span>
+            <el-icon><ArrowRight /></el-icon>
+        </button>
+    </article>
+    <div v-else class="m-activity-item" @click="subscribe(activity.id)">
         <router-link v-if="!isHomePage" class="u-logo" :to="'/org/' + activity.team_id" target="_blank" @click.stop>
             <img class="u-team-logo" :src="getTeamLogo(activity.team_logo || teamInfo.logo)" alt="" />
         </router-link>
@@ -62,6 +90,10 @@ export default {
         isHomePage: {
             type: Boolean,
             default: false,
+        },
+        variant: {
+            type: String,
+            default: "default",
         },
     },
     name: "ActivityItem",

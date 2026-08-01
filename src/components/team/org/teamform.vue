@@ -1,13 +1,23 @@
 <template>
-    <div class="m-team-teamform">
-        <el-form ref="form" :model="form" label-width="90px" size="large" :label-position="position">
-            <el-form-item label="队徽">
+    <div class="m-team-teamform" :class="{ 'is-archive': isArchive }">
+        <el-form
+            ref="form"
+            :model="form"
+            :label-width="isArchive ? 'auto' : '90px'"
+            size="large"
+            :label-position="isArchive ? 'top' : position"
+        >
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>{{ $t("team.settings.identity") }}</h2>
+            </header>
+
+            <el-form-item :label="$t('team.settings.logo')" class="m-team-field is-logo">
                 <UploadLogo v-model="form.logo" />
             </el-form-item>
-            <el-form-item label="团队名称">
+            <el-form-item :label="$t('team.settings.name')" class="m-team-field is-name">
                 <el-input
                     v-model="form.name"
-                    placeholder="请输入团队名称,不能为纯数字"
+                    :placeholder="$t('team.settings.namePlaceholder')"
                     show-word-limit
                     :minlength="2"
                     :maxlength="12"
@@ -15,23 +25,23 @@
                 ></el-input>
                 <div class="u-warning" v-if="isExist">
                     <i class="el-icon-warning-outline"></i>
-                    本服已有同名团队，请更换名称
+                    {{ $t("team.settings.duplicateName") }}
                 </div>
                 <div class="u-warning" v-if="isNumber">
                     <i class="el-icon-warning-outline"></i>
-                    团队名称不能为纯数字
+                    {{ $t("team.settings.numericName") }}
                 </div>
             </el-form-item>
-            <el-form-item label="服务器" class="m-team-server">
+            <el-form-item :label="$t('team.settings.server')" class="m-team-field m-team-server is-server">
                 <el-select
-                    placeholder="选择客户端"
+                    :placeholder="$t('team.settings.selectClient')"
                     v-model="form.client"
                     style="margin-right: 10px"
                     @change="changeClient"
                 >
                     <el-option v-for="(label, value) in clients" :key="value" :value="value" :label="label"></el-option>
                 </el-select>
-                <el-select v-model="form.server" placeholder="请选择服务器" @change="checkTeamName">
+                <el-select v-model="form.server" :placeholder="$t('team.settings.selectServer')" @change="checkTeamName">
                     <el-option
                         v-for="(server, i) in servers"
                         :key="i"
@@ -42,38 +52,46 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队类型">
-                <el-select class="u-select-tags" v-model="form.tags" multiple placeholder="请选择（可多选）">
+            <el-form-item :label="$t('team.settings.type')" class="m-team-field is-tags">
+                <el-select class="u-select-tags" v-model="form.tags" multiple :placeholder="$t('team.settings.multiSelect')">
                     <el-option v-for="tag in tags" :key="tag" :label="tag" :value="tag"> </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队简介">
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>{{ $t("team.settings.publicDisplay") }}</h2>
+            </header>
+
+            <el-form-item :label="$t('team.settings.intro')" class="m-team-field is-description">
                 <el-input
                     v-model="form.desc"
                     type="textarea"
-                    placeholder="可填写团队介绍、福利、平时活动时间等"
+                    :placeholder="$t('team.settings.introPlaceholder')"
                     show-word-limit
                     :maxlength="200"
                     :rows="5"
                 ></el-input>
             </el-form-item>
-            <el-form-item label="招募信息">
+            <el-form-item :label="$t('team.settings.recruit')" class="m-team-field is-recruit">
                 <el-input
                     v-model="form.recruit"
                     type="textarea"
-                    placeholder="可填写团队当前需要招募的职业和联系方式等"
+                    :placeholder="$t('team.settings.recruitPlaceholder')"
                     show-word-limit
                     :maxlength="200"
                     :rows="5"
                 ></el-input>
             </el-form-item>
-            <el-form-item label="YY频道">
-                <el-input v-model="form.yy_channel" placeholder="YY频道（非必填）"></el-input>
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>{{ $t("team.settings.contact") }}</h2>
+            </header>
+
+            <el-form-item :label="$t('team.settings.yy')" class="m-team-field is-contact">
+                <el-input v-model="form.yy_channel" :placeholder="$t('team.settings.yyPlaceholder')"></el-input>
             </el-form-item>
-            <el-form-item label="QQ群号">
-                <el-input v-model="form.qq_group" placeholder="QQ群号（非必填）"></el-input>
+            <el-form-item :label="$t('team.settings.qq')" class="m-team-field is-contact">
+                <el-input v-model="form.qq_group" :placeholder="$t('team.settings.qqPlaceholder')"></el-input>
             </el-form-item>
-            <el-form-item label="直播间">
+            <el-form-item :label="$t('team.settings.live')" class="m-team-field is-tv">
                 <div class="m-tv-list">
                     <el-row class="m-tv-item" v-for="(item, index) in tv_list" :key="index + ''">
                         <el-col :span="6"
@@ -86,12 +104,12 @@
                                     :plain="item.main ? false : true"
                                     @click="setMain(item)"
                                     size="small"
-                                    title="在主页显示"
+                                    :title="$t('team.settings.showOnHome')"
                                 />
                                 <el-select
                                     class="u-tv_type"
                                     v-model="item.tv_type"
-                                    placeholder="请选择直播平台"
+                                    :placeholder="$t('team.settings.livePlatform')"
                                     popper-append-to-body
                                     style="width: 200px"
                                 >
@@ -106,14 +124,14 @@
                         ></el-col>
                         <el-col :span="18">
                             <div class="u-desc">
-                                <el-input class="u-tv" v-model="item.tv" placeholder="房间号"></el-input>
-                                <el-input v-model="item.role_name" placeholder="角色名"></el-input>
+                                <el-input class="u-tv" v-model="item.tv" :placeholder="$t('team.settings.room')"></el-input>
+                                <el-input v-model="item.role_name" :placeholder="$t('team.settings.roleName')"></el-input>
                                 <el-button
                                     type="info"
                                     icon="Delete"
                                     circle
                                     plain
-                                    title="移除"
+                                    :title="$t('team.settings.remove')"
                                     size="small"
                                     @click="removeTv(index)"
                                     :disabled="tv_list && tv_list.length == 1"
@@ -121,11 +139,15 @@
                             </div>
                         </el-col>
                     </el-row>
-                    <el-button type="primary" class="u-add" @click="addTv" icon="Plus">添加直播间</el-button>
+                    <el-button type="primary" class="u-add" @click="addTv" icon="Plus">{{ $t("team.settings.addLive") }}</el-button>
                 </div>
             </el-form-item>
-            <el-form-item label="团队成员">
-                <el-select v-model.number="form.v_member" placeholder="请选择">
+            <header v-if="isArchive" class="m-team-form-section">
+                <h2>{{ $t("team.settings.visibility") }}</h2>
+            </header>
+
+            <el-form-item :label="$t('team.settings.members')" class="m-team-field is-visibility">
+                <el-select v-model.number="form.v_member" :placeholder="$t('team.settings.select')">
                     <el-option
                         v-for="item in vismap"
                         :key="item.value"
@@ -134,8 +156,8 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队活动">
-                <el-select v-model.number="form.v_activity" placeholder="请选择">
+            <el-form-item :label="$t('team.settings.activities')" class="m-team-field is-visibility">
+                <el-select v-model.number="form.v_activity" :placeholder="$t('team.settings.select')">
                     <el-option
                         v-for="item in vismap"
                         :key="item.value"
@@ -144,8 +166,8 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队DKP">
-                <el-select v-model.number="form.v_dkp" placeholder="请选择">
+            <el-form-item :label="$t('team.settings.comments')" class="m-team-field is-visibility">
+                <el-select v-model.number="form.v_comment" :placeholder="$t('team.settings.select')">
                     <el-option
                         v-for="item in vismap"
                         :key="item.value"
@@ -154,20 +176,15 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="留言板">
-                <el-select v-model.number="form.v_comment" placeholder="请选择">
-                    <el-option
-                        v-for="item in vismap"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button class="u-btn" type="primary" @click="submit" :disabled="building || !ready">{{
-                    btn_txt
-                }}</el-button>
+            <el-form-item class="m-team-form-actions">
+                <el-button
+                    class="u-btn"
+                    type="primary"
+                    :loading="building"
+                    :disabled="building || !ready"
+                    @click="submit"
+                    >{{ btn_txt }}</el-button
+                >
             </el-form-item>
         </el-form>
     </div>
@@ -196,7 +213,7 @@ const default_tv = {
 };
 
 export default {
-    props: ["data", "btn_txt", "processing"],
+    props: ["data", "btn_txt", "processing", "variant"],
     data: function () {
         return {
             position: window.innerWidth < 768 ? "top" : "left",
@@ -213,7 +230,7 @@ export default {
                 tv_type: "",
                 tv: "",
                 v_member: 99,
-                v_dkp: 99,
+                v_dkp: 2,
                 v_activity: 99,
                 v_comment: 99,
                 yy_channel: "",
@@ -255,6 +272,9 @@ export default {
         },
     },
     computed: {
+        isArchive: function () {
+            return this.variant === "archive";
+        },
         id: function () {
             return this.$route.params.id;
         },
@@ -268,12 +288,13 @@ export default {
     methods: {
         submit: function () {
             if (!this.form.name || !this.form.server) {
-                this.$alert("团队名和服务器不能为空", "提醒", {
-                    confirmButtonText: "确定",
+                this.$alert(this.$t("team.settings.required"), this.$t("team.settings.reminder"), {
+                    confirmButtonText: this.$t("team.settings.confirm"),
                 });
                 return;
             }
 
+            this.form.v_dkp = 2;
             this.$emit("submit");
         },
         checkTeamName: function () {

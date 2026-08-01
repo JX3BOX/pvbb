@@ -6,9 +6,14 @@
                 正式队员
             </span>
         </h5>
-        <div class="m-raid-corebox" :class="{ qkmode: canManage }" v-if="members && members.length">
+        <div
+            class="m-raid-corebox m-raid-normal"
+            :class="{ qkmode: canManage }"
+            :style="{ '--raid-columns': col, '--raid-rows': row }"
+            v-if="members && members.length"
+        >
             <div class="m-raid-flag">
-                <i class="i-flag" v-for="f in col" :key="f">{{ f }}</i>
+                <i class="i-flag" v-for="f in col" :key="f">{{ f }} 队</i>
             </div>
             <VueDraggable
                 tag="div"
@@ -80,15 +85,18 @@
                             :alt="showMountName(member['mount'])"
                         />
                         <span class="u-member-role">
-                            <router-link
-                                class="u-member-name-link"
-                                target="_blank"
+                            <button
+                                class="u-member-role-trigger"
+                                type="button"
                                 v-if="member.role_id && !editing[i] && linkVisible"
-                                :to="`/role/${member.role_id}`"
+                                :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                @mousedown.stop
+                                @click.stop="openRoleDialog(member)"
                             >
                                 <i class="el-icon-link"></i>
-                            </router-link>
-                            <span v-if="!editing[i]" class="u-member-name">{{ showMemberName(member["name"]) }}</span>
+                                <span>{{ showMemberName(member["name"]) }}</span>
+                            </button>
+                            <span v-else-if="!editing[i]" class="u-member-name">{{ showMemberName(member["name"]) }}</span>
                             <!-- @click.stop="handleChangeName(member, i)" -->
                             <el-select
                                 v-show="editing[i]"
@@ -149,12 +157,18 @@
             @close="handleDialogCancel"
             @updateRole="handleSave"
         />
+        <raid-role-dialog
+            v-model="roleDialogVisible"
+            :role-id="roleDialogMember && roleDialogMember.role_id"
+            :member="roleDialogMember || {}"
+        />
     </div>
 </template>
 
 <script>
 import { getRoles } from "@/service/team/raid.js";
 import MemberSetting from "@/components/team/raid/RaidMemberSetting.vue";
+import RaidRoleDialog from "@/components/team/raid/RaidRoleDialog.vue";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import school_mount from "@jx3box/jx3box-data/data/xf/schoolid.json";
 import { VueDraggable } from "vue-draggable-plus";
@@ -162,6 +176,7 @@ import cloneDeep from "lodash/cloneDeep";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import { ensureDragKey } from "@/utils/draggable";
 import { showMountIcon, showMountName, showSchoolIcon } from "@/utils/filters";
+import bus from "@/utils/bus";
 const item_demo = {
     role_func: "",
     name: "",
@@ -175,8 +190,10 @@ const item_demo = {
 export default {
     name: "RaidNormal",
     props: ["data", "teamId", "leader", "row", "col"],
+    emits: ["updateMembers"],
     components: {
         MemberSetting,
+        RaidRoleDialog,
         VueDraggable,
     },
     data() {
@@ -185,6 +202,8 @@ export default {
 
             // 弹层
             visible: false,
+            roleDialogVisible: false,
+            roleDialogMember: null,
             title: "新增队员",
 
             // 右键菜单
@@ -239,6 +258,10 @@ export default {
         showMountIcon,
         showMountName,
         showSchoolIcon,
+        openRoleDialog(member) {
+            this.roleDialogMember = member;
+            this.roleDialogVisible = true;
+        },
         // 单项
         // ===============================
         // 设置
@@ -263,7 +286,7 @@ export default {
         },
         // 设为替补
         pending: function (member, index) {
-            this.$bus.$emit("pending", member);
+            bus.emit("pending", member);
             this.members[index] = cloneDeep(item_demo);
         },
 
@@ -465,10 +488,6 @@ export default {
             this.selectedMember = null;
             this.visible = false;
         },
-    },
-    model: {
-        prop: "data",
-        event: "updateMembers",
     },
     watch: {
         data: {

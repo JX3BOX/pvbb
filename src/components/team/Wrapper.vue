@@ -2,7 +2,7 @@
     <div id="app">
         <CommonHeader></CommonHeader>
         <Breadcrumb
-            name="团队平台"
+            :name="$t('team.common.platform')"
             slug="team"
             root="/team"
             :publishEnable="false"
@@ -22,7 +22,13 @@
                 <div v-if="isPublic || isLogin">
                     <slot></slot>
                 </div>
-                <el-alert v-else title="请先登录" type="warning" description="使用本功能请先登录" show-icon> </el-alert>
+                <el-alert
+                    v-else
+                    :title="$t('team.common.loginRequired')"
+                    type="warning"
+                    :description="$t('team.common.loginRequiredDescription')"
+                    show-icon
+                ></el-alert>
             </div>
             <Footer></Footer>
         </Main>

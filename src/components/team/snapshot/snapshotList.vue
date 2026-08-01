@@ -1,11 +1,28 @@
 <template>
     <div class="m-snapshot-box" v-loading="loading">
+        <div v-if="supportDkpSync" class="m-snapshot-dkp-guide">
+            <span class="u-guide-icon" aria-hidden="true"><i class="el-icon-connection"></i></span>
+            <div class="u-guide-content">
+                <h3>{{ $t("team.snapshotGuide.title") }}</h3>
+                <p>{{ $t("team.snapshotGuide.description") }}</p>
+                <ol class="u-guide-steps" :aria-label="$t('team.snapshotGuide.aria')">
+                    <li><b>1</b> {{ $t("team.snapshotGuide.step1") }}</li>
+                    <li><b>2</b> {{ $t("team.snapshotGuide.step2") }}</li>
+                    <li><b>3</b> {{ $t("team.snapshotGuide.step3") }}</li>
+                </ol>
+            </div>
+        </div>
         <div class="m-snapshot-search">
-            <el-input placeholder="输入关键词.." v-model="search" size="large">
-                <template #prepend><i class="el-icon-search"></i> 搜索</template>
-                <template #append>
-                    <el-button icon="Position"></el-button>
-                </template>
+            <el-button v-if="!readOnly" class="u-manual-add" type="primary" icon="Plus" @click="openCreateDialog">
+                {{ $t("team.snapshot.manualAdd") }}
+            </el-button>
+            <el-input
+                :placeholder="$t('team.snapshot.search')"
+                :aria-label="$t('team.snapshot.searchAria')"
+                v-model="search"
+                clearable
+            >
+                <template #prefix><i class="el-icon-search"></i></template>
             </el-input>
         </div>
         <div class="m-snapshot-list" v-if="list && list.length">
@@ -17,6 +34,7 @@
                 @dropSnapshot="dropSnapshot(i)"
                 :readOnly="readOnly"
                 :supportDkpSync="supportDkpSync"
+                @editSnapshot="openEditDialog"
             />
             <el-pagination
                 class="m-snapshot-pages"
@@ -31,22 +49,30 @@
         </div>
         <el-alert class="m-snapshot-null" type="info" show-icon v-else>
             <template #title>
-                暂无任何记录，点击查看
-                <a href="/tool/23783" target="_blank">帮助文档</a>
+                {{ $t("team.snapshot.empty") }}
+                <a href="/tool/23783" target="_blank">{{ $t("team.snapshot.help") }}</a>
             </template>
         </el-alert>
+        <EditSnapshotDialog
+            v-model="editVisible"
+            :snapshot-id="editingId"
+            :target-team-id="org"
+            @saved="loadSnapshots"
+        />
     </div>
 </template>
 
 <script>
 import snapshotItem from "@/components/team/snapshot/snapshotItem.vue";
 import { getSnapshots } from "@/service/team/snapshot.js";
+import EditSnapshotDialog from "@/components/team/snapshot/EditSnapshotDialog.vue";
 
 export default {
     name: "snapshot_list",
     props: ["org", "readOnly", "supportDkpSync"],
     components: {
         "snapshot-item": snapshotItem,
+        EditSnapshotDialog,
     },
     data: function () {
         return {
@@ -56,6 +82,8 @@ export default {
             total: 1,
             loading: false,
             search: "",
+            editingId: null,
+            editVisible: false,
         };
     },
     computed: {
@@ -82,6 +110,14 @@ export default {
         },
     },
     methods: {
+        openCreateDialog() {
+            this.editingId = null;
+            this.editVisible = true;
+        },
+        openEditDialog(id) {
+            this.editingId = id;
+            this.editVisible = true;
+        },
         dropSnapshot: function (i) {
             this.list.splice(i, 1);
         },
@@ -96,7 +132,8 @@ export default {
                     this.loading = false;
                 });
         },
-        changePage: function () {
+        changePage: function (page) {
+            this.page = page;
             window.scrollTo(0, 0);
         },
     },

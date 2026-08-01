@@ -1,109 +1,479 @@
+@import (reference) "../design-system/_tokens.less";
+
 .u-member-item {
-    padding: 20px;
-    border: 1px solid #eee;
-    .u-member-item-header {
-        text-align: center;
-        .u-avatar {
-            text-align: center;
-            width: 68px;
-            height: 68px;
-            border: 1px solid #eee;
-            background-color: #f5f7fa;
-            border-radius: 2px;
-            .db;.auto(x);
-            img{
-                .size(100%);
-                .r(4px);
-            }
+    position: relative;
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    align-items: stretch;
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-control;
+    background:
+        radial-gradient(circle at 100% 0, fade(@team-primary, 8%), transparent 42%),
+        @team-surface;
+    box-shadow: @team-shadow-xs;
+    transition: transform @team-duration-fast @team-ease-standard,
+        border-color @team-duration-fast @team-ease-standard,
+        box-shadow @team-duration-fast @team-ease-standard;
+
+    &:hover {
+        border-color: @team-border-focus;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+        transform: translateY(-2px);
+
+        .u-open-icon {
+            color: @team-primary;
+            transform: translateX(2px);
         }
+    }
+
+    &:focus-within {
+        border-color: @team-border-focus;
+    }
+
+    .u-member-card-trigger {
+        display: grid;
+        min-width: 0;
+        align-items: center;
+        flex: 1;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: @team-space-2;
+        padding: 10px @team-space-3;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        text-align: left;
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: inset 0 0 0 2px fade(@team-primary, 28%);
+        }
+    }
+
+    .u-member-profile {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: @team-space-2;
+    }
+
+    .u-avatar {
+        display: block;
+        width: 46px;
+        height: 46px;
+        flex: none;
+        border: 1px solid @team-border-light;
+        border-radius: 13px;
+        background: @team-surface-muted;
+        object-fit: cover;
+    }
+
+    .u-member-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+
         .u-name {
-            display: block;
-            margin: 10px 0;
-            border-bottom:1px dashed #eee;
-            padding-bottom: 10px;
+            overflow: hidden;
+            color: @team-text-primary;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 22px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        em {
+            color: @team-text-muted;
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 18px;
         }
     }
 
-    .u-member-item-content {
-        height: 170px;
-        overflow: auto;
+    .u-role-count {
+        display: inline-flex;
+        min-height: 24px;
+        align-items: center;
+        padding: 0 8px;
+        border-radius: 9999px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        white-space: nowrap;
+    }
 
-        .u-roles {
+    .u-open-icon {
+        color: @team-text-muted;
+        font-size: 14px;
+        transition: color @team-duration-fast @team-ease-standard,
+            transform @team-duration-fast @team-ease-standard;
+    }
 
-            .u-role {
-                display: flex;
-                align-items: center;
-                font-size: 12px;
-                // .mb(8px);
-                &-pic {
-                    .size(24px);
-                    .mr(2px);
-                }
+}
 
-                em {
-                    margin-right: 4px;
-                    padding: 2px 5px;
-                    border-radius: 2px;
-                    font-style: normal;
-                    background-color: #f2f6fc;
-                    color: #888;
-                }
+.m-member-role-dialog.el-dialog {
+    display: flex;
+    min-height: min(440px, calc(100vh - 48px));
+    max-height: min(600px, calc(100vh - 48px));
+    max-width: calc(100vw - 32px);
+    flex-direction: column;
+    margin-top: max(24px, calc((100vh - 600px) / 2));
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: 16px;
+    background: @team-surface;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16);
 
-                &-name {
-                    .nobreak;
-                }
+    .el-dialog__header {
+        flex: none;
+        margin: 0;
+        padding: @team-space-4 52px @team-space-3 @team-space-4;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__headerbtn {
+        top: 18px;
+        right: 18px;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+
+        &:hover {
+            background: @team-surface-muted;
+        }
+
+        .el-dialog__close {
+            color: @team-text-muted;
+        }
+    }
+
+    .el-dialog__body {
+        min-height: 0;
+        flex: 1;
+        overflow-y: auto;
+        padding: @team-space-3 @team-space-4;
+        scrollbar-color: @team-border @team-surface-muted;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 9999px;
+            background: @team-border;
+        }
+    }
+
+    .el-dialog__footer {
+        flex: none;
+        padding: @team-space-3 @team-space-4 @team-space-4;
+        border-top: 1px solid @team-border-light;
+    }
+}
+
+.m-member-role-dialog-header {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+
+    .u-dialog-member-link {
+        display: inline-flex;
+        min-width: 0;
+        align-items: center;
+        border-radius: 12px;
+        color: inherit;
+        gap: @team-space-2;
+        text-decoration: none;
+
+        &:hover {
+            .u-dialog-avatar {
+                border-color: @team-border-focus;
+            }
+
+            .u-dialog-member-copy b {
+                color: @team-primary;
             }
         }
 
-
-        /*控制整个滚动条*/
-    }
-    ::-webkit-scrollbar {
-        background-color: lightgray;
-        border-radius: 5px;
-        width: 5px;
-        height: 10px;
-        background-clip: padding-box;
-    }
-
-    // /*滚动条两端方向按钮*/
-    // ::-webkit-scrollbar-button {
-    //     background-color: pink;
-    // }
-
-    /*滚动条中间滑动部分*/
-    ::-webkit-scrollbar-thumb {
-        background-color: #A8A8A8;
-        border-radius: 5px;
-    }
-
-    // /*滚动条右下角区域*/
-    // ::-webkit-scrollbar-corner {
-    //     background-color: red;
-    // }
-
-    .pr;
-    .u-op{
-        .pa;.rt(10px);
-        .u-btn{
-            padding:5px 6px!important;
+        &:focus-visible {
+            outline: none;
+            box-shadow: @team-shadow-focus;
         }
     }
-    .u-del {
-        .pa;
-        right: 0;
-        font-size: 14px;
-        .none;
+
+    .u-dialog-avatar {
+        display: block;
+        width: 44px;
+        height: 44px;
+        flex: none;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        object-fit: cover;
+    }
+
+    .u-dialog-member-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+
+        b {
+            overflow: hidden;
+            color: @team-text-primary;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 23px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color @team-duration-fast @team-ease-standard;
+        }
+
+        em {
+            color: @team-text-muted;
+            font-size: 12px;
+            font-style: normal;
+            line-height: 18px;
+        }
+    }
+}
+
+.m-member-role-dialog-body {
+    .u-dialog-roles {
+        display: grid;
+        gap: @team-space-2;
+    }
+
+    .u-dialog-role-item {
+        display: flex;
+        min-width: 0;
+        min-height: 58px;
+        align-items: center;
+        padding: 7px 8px 7px 11px;
+        border: 1px solid transparent;
+        border-radius: @team-radius-small;
+        background: @team-surface-muted;
+        gap: @team-space-2;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border;
+            background: @team-surface;
+        }
     }
 
     .u-role {
-        .pr;
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        flex: 1;
+        color: inherit;
+        gap: 10px;
+        text-decoration: none;
 
-        &:hover {
-            .u-del {
-                .db;
-            }
+        &:hover .u-role-name {
+            color: @team-primary;
+        }
+
+        &:focus-visible {
+            border-radius: 7px;
+            outline: none;
+            box-shadow: @team-shadow-focus;
         }
     }
 
+    .u-role-pic {
+        display: block;
+        width: 34px;
+        height: 34px;
+        flex: none;
+        object-fit: contain;
+    }
+
+    .u-role-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+
+        .u-role-name {
+            overflow: hidden;
+            color: @team-text-regular;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 20px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color @team-duration-fast @team-ease-standard;
+        }
+
+        em {
+            color: @team-text-muted;
+            font-size: 11px;
+            font-style: normal;
+            line-height: 17px;
+        }
+    }
+
+    .u-remove-role {
+        display: inline-flex;
+        min-height: 32px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        gap: 3px;
+        padding: 0 9px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: @team-text-muted;
+        cursor: pointer;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        transition: background-color @team-duration-fast @team-ease-standard,
+            color @team-duration-fast @team-ease-standard;
+
+        &:hover:not(:disabled) {
+            background: #fff1f2;
+            color: #dc2626;
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: @team-shadow-focus;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+
+    .u-dialog-empty {
+        display: flex;
+        min-height: 260px;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface-muted;
+        color: @team-text-muted;
+        font-size: 13px;
+    }
+}
+
+.m-member-role-dialog-footer {
+    display: flex;
+    align-items: center;
+    gap: @team-space-3;
+
+    button {
+        display: inline-flex;
+        min-height: 36px;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border-radius: 9px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .u-remove-account {
+        min-width: 104px;
+        padding: 0 @team-space-3;
+        border: 1px solid #fecaca;
+        background: #fff7f7;
+        color: #dc2626;
+        cursor: pointer;
+        transition: border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard,
+            color @team-duration-fast @team-ease-standard;
+
+        &:hover:not(:disabled) {
+            border-color: #fca5a5;
+            background: #fff1f2;
+            color: #b91c1c;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+
+    .u-dialog-done {
+        min-width: 76px;
+        margin-left: auto;
+        padding: 0 @team-space-3;
+        border: 1px solid @team-primary;
+        background: @team-primary;
+        color: @team-text-inverse;
+        cursor: pointer;
+
+        &:hover {
+            border-color: @team-primary-hover;
+            background: @team-primary-hover;
+        }
+    }
+
+    button:focus-visible {
+        outline: none;
+        box-shadow: @team-shadow-focus;
+    }
+}
+
+@media screen and (max-width: 620px) {
+    .u-member-item {
+        .u-member-card-trigger {
+            grid-template-columns: minmax(0, 1fr) auto;
+            padding: 8px @team-space-2;
+        }
+
+        .u-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+        }
+
+        .u-open-icon {
+            display: none;
+        }
+    }
+
+    .m-member-role-dialog.el-dialog {
+        min-height: min(440px, calc(100vh - 32px));
+        max-height: calc(100vh - 32px);
+        margin-top: 16px;
+        margin-bottom: 16px;
+
+        .el-dialog__header {
+            padding: @team-space-3 48px @team-space-3 @team-space-3;
+        }
+
+        .el-dialog__body {
+            padding: @team-space-3;
+        }
+
+        .el-dialog__footer {
+            padding: @team-space-3;
+        }
+    }
 }

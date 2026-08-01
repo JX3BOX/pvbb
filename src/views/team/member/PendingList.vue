@@ -1,62 +1,98 @@
 <template>
-    <div class="v-member-pending" v-loading="loading">
-        <div class="m-team-rolelist" v-if="data && data.length">
-            <ul class="u-list">
-                <li class="u-item" v-for="(item, i) in data" :key="i">
-                    <span class="u-pic">
+    <div class="v-member-pending">
+        <header class="m-member-panel-header">
+            <div>
+                <h2>{{ $t("team.member.joinRequests") }}</h2>
+                <p>{{ $t("team.member.reviewHint") }}</p>
+            </div>
+            <el-skeleton-item
+                v-if="loading"
+                variant="text"
+                class="u-member-total-skeleton"
+                aria-hidden="true"
+            />
+            <span v-else class="u-member-total">{{ $t("team.member.pendingCount", { count: total }) }}</span>
+        </header>
+
+        <div v-if="loading" class="m-pending-card-grid m-pending-skeleton-grid" aria-hidden="true">
+            <el-skeleton v-for="index in per" :key="index" animated class="m-pending-skeleton-card">
+                <template #template>
+                    <div class="u-pending-skeleton">
+                        <el-skeleton-item variant="image" class="u-skeleton-avatar" />
+                        <div class="u-skeleton-main">
+                            <div class="u-skeleton-title">
+                                <el-skeleton-item variant="text" class="u-skeleton-name" />
+                                <el-skeleton-item variant="text" class="u-skeleton-verified" />
+                            </div>
+                            <div class="u-skeleton-tags">
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                            </div>
+                            <el-skeleton-item variant="text" class="u-skeleton-meta" />
+                        </div>
+                        <div class="u-skeleton-actions">
+                            <el-skeleton-item variant="button" />
+                            <el-skeleton-item variant="button" />
+                        </div>
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+        <div class="m-pending-list" v-else-if="data && data.length">
+            <ul class="m-pending-card-grid">
+                <li class="u-item m-pending-card" v-for="(item, i) in data" :key="item.relation.role_id || i">
+                    <span class="u-pic u-pending-avatar">
                         <RoleAvatar :mount="item.role.mount" :body_type="item.role.body_type" />
                     </span>
-                    <span class="u-title">
-                        <router-link class="u-rolename" :to="'/role/' + item.role.ID" target="_blank">{{
-                            item.role.name
-                        }}</router-link>
-                        <i class="u-status" v-if="!item.role.custom" title="已认证">
-                            <img svg-inline src="@/assets/img/team/verify.svg" />
-                        </i>
-                    </span>
-                    <span class="u-meta">
-                        <span class="u-server">
-                            <em>服务器</em>
-                            {{ item.role.server }}
+                    <div class="u-pending-main">
+                        <span class="u-title">
+                            <router-link class="u-rolename" :to="'/role/' + item.role.ID" target="_blank">{{
+                                item.role.name
+                            }}</router-link>
+                            <span class="u-verified" v-if="!item.role.custom">
+                                <el-icon><CircleCheckFilled /></el-icon>
+                                {{ $t("team.member.verified") }}
+                            </span>
                         </span>
-                        <span class="u-mount">
-                            <em>门派</em>
-                            <img class="u-icon" :src="showSchoolIcon(item.role.mount)" />
-                            {{ showSchoolName(item.role.mount) }}
+                        <span class="u-meta u-role-meta">
+                            <span>{{ item.role.server || $t("team.member.unknownServer") }}</span>
+                            <span class="u-mount">
+                                <img class="u-icon" :src="showSchoolIcon(item.role.mount)" />
+                                {{ showSchoolName(item.role.mount) }}
+                            </span>
+                            <span>{{ showBodyType(item.role.body_type) }}</span>
                         </span>
-                        <span class="u-body">
-                            <em>体型</em>
-                            {{ showBodyType(item.role.body_type) }}
-                        </span>
-                    </span>
-                    <div class="u-meta u-misc">
-                        <span class="u-team">
-                            <i class="el-icon-collection-tag"></i> 加入团队 :
-                            <router-link class="u-team-name" target="_blank" :to="'/org/' + item.relation.team_id">
-                                {{ item.team.name || "未知" }}
-                            </router-link>
-                        </span>
-                        <span class="u-time">
-                            <i class="el-icon-time"></i>
-                            申请时间 : {{ showTime(item.relation.created_at) }}
-                        </span>
+                        <div class="u-apply-meta">
+                            <span>
+                                <el-icon><OfficeBuilding /></el-icon>
+                                {{ (item.team && item.team.name) || $t("team.member.unknownTeam") }}
+                            </span>
+                            <span>
+                                <el-icon><Clock /></el-icon>
+                                {{ showTime(item.relation.created_at) }}
+                            </span>
+                        </div>
                     </div>
                     <div class="u-op">
-                        <el-button
-                            class="u-btn u-pass"
-                            type="success"
-                            @click="checkRole(item.relation.team_id, item.relation.role_id, i)"
-                            icon="Check"
-                            >通过</el-button
-                        >
-                        <el-button
+                        <button
                             class="u-btn u-reject"
-                            type="info"
-                            plain
-                            @click="rejectRole(item.relation.team_id, item.relation.role_id, i)"
-                            icon="Close"
-                            >拒绝</el-button
+                            type="button"
+                            :disabled="processingIds.includes(item.relation.role_id)"
+                            @click="rejectRole(item.relation.role_id)"
                         >
+                            <el-icon><Close /></el-icon>
+                            {{ $t("team.member.reject") }}
+                        </button>
+                        <button
+                            class="u-btn u-pass"
+                            type="button"
+                            :disabled="processingIds.includes(item.relation.role_id)"
+                            @click="checkRole(item.relation.role_id)"
+                        >
+                            <el-icon><Check /></el-icon>
+                            {{ $t("team.member.approve") }}
+                        </button>
                     </div>
                 </li>
             </ul>
@@ -71,25 +107,33 @@
                 @current-change="changePage"
             ></el-pagination>
         </div>
-        <el-alert v-else class="m-archive-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
+        <div v-else class="m-member-empty">
+            <span class="u-empty-icon" aria-hidden="true">
+                <el-icon><Finished /></el-icon>
+            </span>
+            <h3>{{ $t("team.member.allProcessed") }}</h3>
+            <p>{{ $t("team.member.newRequestsHint") }}</p>
+        </div>
     </div>
 </template>
 
 <script>
-import { getThumbnail, authorLink } from "@jx3box/jx3box-common/js/utils";
 import { getTeamPendingMembers, checkRole, deleteRole } from "@/service/team/member.js";
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
 import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
+import { Check, CircleCheckFilled, Clock, Close, Finished, OfficeBuilding } from "@element-plus/icons-vue";
 export default {
     name: "ListMemberPending",
+    emits: ["pending-count-change"],
     props: ["id"],
     data: function () {
         return {
             data: [],
-            per: 10,
+            per: 12,
             page: 1,
-            total: 1,
+            total: 0,
             loading: false,
+            processingIds: [],
         };
     },
     computed: {
@@ -103,46 +147,79 @@ export default {
             };
         },
     },
-    filters: {
-        authorLink,
-    },
     methods: {
         loadData: function () {
             this.loading = true;
             getTeamPendingMembers(this.team_id, this.params)
                 .then((res) => {
                     this.data = res.data.data.list || [];
-                    this.total = res.data.data.page.total;
+                    this.updateTotal(res.data.data.page.total);
                 })
                 .finally(() => {
                     this.loading = false;
                 });
         },
-        checkRole(team_id, role_id, i) {
-            checkRole(team_id, role_id).then(() => {
-                this.data.splice(i, 1);
-                this.$notify({
-                    title: "操作成功",
-                    message: "批准该成员加入",
-                    type: "success",
+        checkRole(role_id) {
+            if (this.processingIds.includes(role_id)) return;
+            const teamId = this.team_id;
+            this.processingIds.push(role_id);
+            checkRole(teamId, role_id)
+                .then(() => {
+                    if (!this.removePendingRole(teamId, role_id)) return;
+                    this.$notify({
+                        title: this.$t("team.member.operationSucceeded"),
+                        message: this.$t("team.member.approvedMessage"),
+                        type: "success",
+                    });
+                })
+                .finally(() => {
+                    this.processingIds = this.processingIds.filter((id) => id !== role_id);
                 });
-            });
         },
-        rejectRole(team_id, role_id, i) {
-            deleteRole(team_id, role_id).then(() => {
-                this.data.splice(i, 1);
-                this.$notify({
-                    title: "操作成功",
-                    message: "拒绝该成员加入",
-                    type: "success",
-                });
-            });
+        rejectRole(role_id) {
+            if (this.processingIds.includes(role_id)) return;
+            const teamId = this.team_id;
+            this.$confirm(this.$t("team.member.rejectConfirm"), this.$t("team.member.rejectTitle"), {
+                confirmButtonText: this.$t("team.member.confirmReject"),
+                cancelButtonText: this.$t("team.member.cancel"),
+                type: "warning",
+            })
+                .then(() => {
+                    if (String(this.team_id) !== String(teamId)) return;
+                    this.processingIds.push(role_id);
+                    return deleteRole(teamId, role_id)
+                        .then(() => {
+                            if (!this.removePendingRole(teamId, role_id)) return;
+                            this.$notify({
+                                title: this.$t("team.member.operationSucceeded"),
+                                message: this.$t("team.member.rejectedMessage"),
+                                type: "success",
+                            });
+                        })
+                        .finally(() => {
+                            this.processingIds = this.processingIds.filter((id) => id !== role_id);
+                        });
+                })
+                .catch(() => {});
+        },
+        removePendingRole(teamId, role_id) {
+            if (String(this.team_id) !== String(teamId)) return false;
+            const index = this.data.findIndex((item) => item.relation.role_id === role_id);
+            if (index !== -1) {
+                this.data.splice(index, 1);
+                this.updateTotal(this.total - 1);
+            }
+            return true;
         },
         changePage: function () {
             window.scrollTo(0, 0);
         },
         init: function () {
             this.loadData();
+        },
+        updateTotal: function (total) {
+            this.total = Math.max(0, Number(total) || 0);
+            this.$emit("pending-count-change", this.total);
         },
         showBodyType,
         showSchoolIcon,
@@ -164,11 +241,13 @@ export default {
         this.init();
     },
     components: {
+        Check,
+        CircleCheckFilled,
+        Clock,
+        Close,
+        Finished,
+        OfficeBuilding,
         RoleAvatar,
     },
 };
 </script>
-
-<style lang="less">
-@import "@/assets/css/team/role/list_role.less";
-</style>

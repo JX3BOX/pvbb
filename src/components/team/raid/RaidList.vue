@@ -75,7 +75,7 @@
             </tbody>
         </table> -->
         <template v-for="item in data" :key="item.id">
-            <activity-item :activity="item"></activity-item>
+            <activity-item :activity="item" :variant="modern ? 'center' : 'default'"></activity-item>
         </template>
     </div>
 </template>
@@ -86,7 +86,24 @@ import { showAvatar } from "@jx3box/jx3box-common/js/utils";
 import ActivityItem from "./ActivityItem.vue";
 export default {
     name: "RaidList",
-    props: ["data", "time", "isIndex"],
+    props: {
+        data: {
+            type: Array,
+            default: () => [],
+        },
+        time: {
+            type: [String, Number],
+            default: "-1",
+        },
+        isIndex: {
+            type: Boolean,
+            default: false,
+        },
+        modern: {
+            type: Boolean,
+            default: false,
+        },
+    },
     components: {
         ActivityItem,
     },

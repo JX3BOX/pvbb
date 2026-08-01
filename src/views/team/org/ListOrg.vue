@@ -1,33 +1,71 @@
 <template>
-    <div class="v-org-list">
-        <!-- <h1 class="m-title">
-            <span class="u-title">
-                <img class="u-logo" :src="getAppIcon('team')" />
-                <span class="u-txt">查找团队</span>
-            </span>
-            <div class="u-op">
-                <router-link to="/org/add" class="el-button el-button--primary el-button--mini"
-                    ><i class="el-icon-circle-plus-outline"></i>&nbsp; 创建团队</router-link
-                >
-            </div>
-        </h1> -->
-        <team-list @changePage="changePage" />
+    <div class="v-org-list" :class="{ 'p-team-home': isTeamHome }">
+        <template v-if="isTeamHome">
+            <section class="m-team-home__hero" aria-labelledby="team-home-title">
+                <header class="m-team-home__header">
+                    <div class="m-team-home__intro">
+                        <span class="u-team-home-icon" aria-hidden="true">
+                            <img :src="teamLogo" alt="" />
+                        </span>
+                        <div class="m-team-home__heading">
+                            <h1 id="team-home-title">{{ $t("team.home.title") }}</h1>
+                            <p>{{ $t("team.home.description") }}</p>
+                        </div>
+                    </div>
+                    <div
+                        class="m-team-home__summary"
+                        :class="{ 'is-loading': teamTotal === null }"
+                        :aria-busy="teamTotal === null"
+                        aria-live="polite"
+                    >
+                        <span>{{ $t("team.home.plaza") }}</span>
+                        <strong>{{ teamTotal === null ? "—" : formattedTeamTotal }}</strong>
+                        <small>{{ $t("team.home.teamCount") }}</small>
+                    </div>
+                    <nav class="m-team-home__actions" :aria-label="$t('team.home.quickActions')">
+                        <a class="u-team-home-action" href="/tool/21789" target="_blank" rel="noopener noreferrer">
+                            <el-icon><QuestionFilled /></el-icon>
+                            <span>{{ $t("team.home.guide") }}</span>
+                        </a>
+                        <router-link class="u-team-home-action is-primary" to="/org/add">
+                            <el-icon><Plus /></el-icon>
+                            <span>{{ $t("team.home.createTeam") }}</span>
+                        </router-link>
+                    </nav>
+                </header>
+            </section>
+            <team-list :home-mode="true" @changePage="changePage" @total-change="updateTeamTotal" />
+        </template>
+        <team-list v-else @changePage="changePage" />
     </div>
 </template>
 
 <script>
 import TeamList from "@/components/team/org/team_list.vue";
-import { getAppIcon } from "@jx3box/jx3box-common/js/utils";
+import { __cdn } from "@/utils/config";
+import { Plus, QuestionFilled } from "@element-plus/icons-vue";
 export default {
     name: "ListOrg",
     props: [],
     components: {
         "team-list": TeamList,
+        Plus,
+        QuestionFilled,
     },
     data: function () {
-        return {};
+        return {
+            teamTotal: null,
+            teamLogo: __cdn + "logo/logo-light/team.svg",
+        };
     },
-    computed: {},
+    computed: {
+        isTeamHome: function () {
+            return this.$route.name === "index";
+        },
+        formattedTeamTotal: function () {
+            return Number(this.teamTotal || 0).toLocaleString("zh-CN");
+        },
+    },
     methods: {
         goBack: function () {
             this.$router.push("/");
@@ -35,35 +73,12 @@ export default {
         changePage: function () {
             window.scrollTo(0, 0);
         },
-        getAppIcon,
+        updateTeamTotal: function (total) {
+            this.teamTotal = total;
+        },
     },
     filters: {},
     created: function () {},
     mounted: function () {},
 };
 </script>
-
-<style lang="less">
-.v-org-list {
-    .m-title {
-        .u-title {
-            .flex;
-            align-items: center;
-        }
-        .u-logo {
-            .size(32px);
-        }
-    }
-}
-// @media screen and (max-width: @phone) {
-//     .v-org-list {
-//         .m-team-list-header {
-//             border-bottom: 1px dashed @border-hr;
-//             .u-title {
-//                 .none;
-//             }
-//         }
-
-//     }
-// }
-</style>

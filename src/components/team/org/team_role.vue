@@ -1,15 +1,15 @@
 <template>
-    <div class="v-org-list">
+    <div class="v-org-list m-team-role">
         <div class="m-group-role-box" v-if="data && data.length">
             <table class="m-group-role-table">
                 <thead>
                     <tr>
-                        <th>角色名</th>
-                        <th>心法</th>
-                        <th>体型</th>
-                        <th>加入时间</th>
-                        <th>是否公开</th>
-                        <th>操作</th>
+                        <th>{{ $t("team.myRole.name") }}</th>
+                        <th>{{ $t("team.myRole.mount") }}</th>
+                        <th>{{ $t("team.myRole.bodyType") }}</th>
+                        <th>{{ $t("team.myRole.joinedAt") }}</th>
+                        <th>{{ $t("team.myRole.public") }}</th>
+                        <th>{{ $t("team.myRole.operation") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,8 +34,15 @@
                                 ></el-switch>
                             </td>
                             <td>
-                                <el-button type="info" size="small" plain @click="quitTeam(role.info.ID, data, i)"
-                                    >退出</el-button
+                                <el-button
+                                    class="u-quit-team"
+                                    type="info"
+                                    size="small"
+                                    plain
+                                    @click="confirmQuitTeam(role.info.ID, role.info.name, data, i)"
+                                >
+                                    <el-icon><SwitchButton /></el-icon>
+                                    {{ $t("team.myRole.quit") }}</el-button
                                 >
                             </td>
                         </tr>
@@ -43,15 +50,16 @@
                 </tbody>
             </table>
         </div>
-        <el-alert title="当前团队没有任何角色" type="info" show-icon v-else></el-alert>
+        <el-alert :title="$t('team.myRole.empty')" type="info" show-icon v-else></el-alert>
     </div>
 </template>
 
 <script>
-import { getMyJoinedTeams, changeRolePublic, quitTeam } from "@/service/team/member.js";
+import { getMyJoinedTeams, changeRolePublic, quitTeam as quitTeamRequest } from "@/service/team/member.js";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { showSchoolIcon, showSchoolName, showBodyType, showTime } from "@/utils/filters";
+import { SwitchButton } from "@element-plus/icons-vue";
 
 export default {
     name: "TeamRole",
@@ -95,17 +103,32 @@ export default {
         setPublic: function (role_id, isPublic) {
             changeRolePublic(this.team_id, role_id, isPublic).then((res) => {
                 this.$notify({
-                    title: "设置成功",
-                    message: "更新设置成功",
+                    title: this.$t("team.myRole.settingSuccess"),
+                    message: this.$t("team.myRole.settingUpdated"),
                     type: "success",
                 });
             });
         },
-        quitTeam: function (role_id, list, i) {
-            quitTeam(this.team_id, role_id).then((res) => {
+        confirmQuitTeam: async function (role_id, roleName, list, i) {
+            try {
+                await this.$confirm(
+                    this.$t("team.myRole.quitConfirm", { name: roleName || this.$t("team.myRole.unnamed") }),
+                    this.$t("team.myRole.quitTitle"),
+                    {
+                        confirmButtonText: this.$t("team.myRole.confirmQuit"),
+                        cancelButtonText: this.$t("team.myRole.cancel"),
+                        type: "warning",
+                        distinguishCancelAndClose: true,
+                    }
+                );
+            } catch {
+                return;
+            }
+
+            quitTeamRequest(this.team_id, role_id).then(() => {
                 this.$notify({
-                    title: "退出成功",
-                    message: "角色成功退出队伍",
+                    title: this.$t("team.myRole.quitSuccess"),
+                    message: this.$t("team.myRole.quitMessage"),
                     type: "success",
                 });
                 list.splice(i, 1);

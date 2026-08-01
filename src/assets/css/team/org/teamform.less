@@ -1,3 +1,5 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-team-form {
     max-width: 800px;
     .u-tv {
@@ -104,6 +106,214 @@
     }
 }
 
+.m-team-teamform.is-archive {
+    width: 100%;
+
+    > .el-form {
+        display: grid;
+        min-width: 0;
+        align-items: start;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: @team-space-3;
+    }
+
+    .m-team-form-section {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        grid-column: 1 / -1;
+        margin: @team-space-3 0 @team-space-2;
+        padding: 2px 0;
+        gap: 9px;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &::before {
+            width: 3px;
+            height: 15px;
+            flex: none;
+            border-radius: 999px;
+            background: @team-primary;
+            content: "";
+        }
+
+        h2 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 20px;
+        }
+
+    }
+
+    .m-team-field {
+        min-width: 0;
+        margin-bottom: @team-space-3;
+
+        .el-form-item__label {
+            height: auto;
+            padding: 0 0 7px;
+            color: @team-text-secondary;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 20px;
+        }
+
+        .el-form-item__content,
+        .el-input,
+        .el-select,
+        .el-textarea {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .el-input__wrapper,
+        .el-select__wrapper,
+        .el-textarea__inner {
+            border-radius: 10px;
+        }
+    }
+
+    .is-logo {
+        align-self: stretch;
+        grid-column: span 2;
+        grid-row: span 3;
+
+        .el-form-item__content {
+            align-items: flex-start;
+        }
+
+        .c-upload-logo {
+            .u-logo,
+            .u-upload {
+                overflow: hidden;
+                border-radius: 16px;
+                box-shadow: @team-shadow-xs;
+            }
+        }
+    }
+
+    .is-name,
+    .is-server,
+    .is-tags {
+        grid-column: span 10;
+    }
+
+    .is-server {
+        .el-form-item__content {
+            display: grid;
+            grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.2fr);
+            gap: @team-space-2;
+        }
+
+        .el-select:first-child {
+            margin-right: 0 !important;
+        }
+    }
+
+    .is-description,
+    .is-recruit,
+    .is-contact {
+        grid-column: span 6;
+    }
+
+    .is-description,
+    .is-recruit {
+        .el-textarea__inner {
+            min-height: 150px !important;
+            padding: 12px 14px 28px;
+            line-height: 1.7;
+        }
+    }
+
+    .is-tv {
+        grid-column: 1 / -1;
+
+        > .el-form-item__content {
+            display: block;
+        }
+
+        .m-tv-list {
+            width: 100%;
+
+            .m-tv-item {
+                display: grid;
+                align-items: center;
+                grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.5fr);
+                padding: @team-space-2;
+                border: 1px solid @team-border-light;
+                border-radius: 12px;
+                background: @team-surface-muted;
+                gap: @team-space-2;
+
+                &:not(:last-of-type) {
+                    margin-bottom: @team-space-2;
+                }
+
+                .el-col-6,
+                .el-col-18 {
+                    width: auto;
+                    max-width: none;
+                    flex: none;
+                }
+
+                .u-main {
+                    position: static;
+                    flex: none;
+                }
+
+                .u-type-select {
+                    margin-right: 0;
+                }
+
+                .u-tv_type {
+                    width: auto !important;
+                }
+
+                .u-desc .el-input {
+                    flex: 1;
+                }
+            }
+
+            .u-add {
+                position: static;
+                margin-top: @team-space-2;
+            }
+        }
+    }
+
+    .is-visibility {
+        grid-column: span 3;
+
+        .el-form-item__content {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+    }
+
+    .m-team-form-actions {
+        grid-column: 1 / -1;
+        margin: @team-space-2 0 0;
+        padding-top: @team-space-4;
+        border-top: 1px solid @team-border-light;
+
+        .el-form-item__content {
+            justify-content: flex-end;
+        }
+
+        .u-btn {
+            min-width: 144px;
+            min-height: 42px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    }
+}
+
 .m-tv-list {
     .pr;
     // max-height: 300px;
@@ -157,7 +367,65 @@
     }
 }
 
+@media screen and (max-width: 1000px) and (min-width: (@phone + 1px)) {
+    .m-team-teamform.is-archive {
+        .is-logo {
+            grid-column: span 3;
+        }
+
+        .is-name,
+        .is-server,
+        .is-tags {
+            grid-column: span 9;
+        }
+
+        .is-visibility {
+            grid-column: span 6;
+        }
+
+        .is-tv .m-tv-list .m-tv-item {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}
+
 @media screen and (max-width: @phone) {
+    .m-team-teamform.is-archive {
+        > .el-form {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .m-team-form-section,
+        .m-team-field,
+        .is-logo,
+        .is-name,
+        .is-server,
+        .is-tags,
+        .is-description,
+        .is-recruit,
+        .is-contact,
+        .is-tv,
+        .is-visibility,
+        .m-team-form-actions {
+            grid-column: 1;
+            grid-row: auto;
+        }
+
+        .is-server .el-form-item__content,
+        .is-tv .m-tv-list .m-tv-item {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .m-team-form-actions .el-form-item__content {
+            align-items: stretch;
+            flex-direction: column;
+
+            .u-btn {
+                width: 100%;
+            }
+        }
+    }
+
     .m-tv-list {
         .u-add {
             .pa;

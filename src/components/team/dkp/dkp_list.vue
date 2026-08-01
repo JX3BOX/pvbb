@@ -10,10 +10,10 @@
             :default-sort="defaultSort"
             @selection-change="handleSelectionChange"
         >
-            <el-table-column type="selection" width="70" v-if="!readOnly"> </el-table-column>
-            <el-table-column label="人员">
+            <el-table-column type="selection" width="52" align="center" v-if="!readOnly"> </el-table-column>
+            <el-table-column :label="$t('team.dkp.person')">
                 <template #default="scope">
-                    <a :href="authorLink(scope.row.uid)" target="_blank">
+                    <a class="u-user" :href="authorLink(scope.row.uid)" target="_blank">
                         <img :src="renderAvatar(scope.row.user_info)" class="u-user-avatar" />
                         <span class="u-user-name">
                             {{ scope.row.user_info && scope.row.user_info.display_name }}
@@ -21,15 +21,27 @@
                     </a>
                 </template>
             </el-table-column>
-            <el-table-column label="角色">
+            <el-table-column :label="$t('team.dkp.role')">
                 <template #default="scope">
-                    <el-popover v-if="scope.row.roles.length" placement="right" width="200" trigger="hover">
-                        <character
-                            v-for="(role, roleIndex) of scope.row.roles"
-                            :key="roleIndex"
-                            :xf="role.roleInfo.mount"
-                            :name="role.roleInfo.name"
-                        ></character>
+                    <el-popover
+                        v-if="scope.row.roles.length"
+                        placement="right"
+                        width="360"
+                        trigger="hover"
+                        popper-class="m-dkp-role-popover"
+                    >
+                        <div class="m-dkp-role-popover__header">
+                            <strong>{{ $t("team.dkp.boundRoles") }}</strong>
+                            <span>{{ $t("team.dkp.roleCount", { count: scope.row.roles.length }) }}</span>
+                        </div>
+                        <div class="m-dkp-role-grid">
+                            <character
+                                v-for="(role, roleIndex) of scope.row.roles"
+                                :key="roleIndex"
+                                :xf="role.roleInfo.mount"
+                                :name="role.roleInfo.name"
+                            ></character>
+                        </div>
                         <template #reference>
                             <span class="u-role-list">
                                 <router-link
@@ -44,14 +56,14 @@
                             </span>
                         </template>
                     </el-popover>
-                    <span v-else>没有绑定角色</span>
+                    <span v-else>{{ $t("team.dkp.noRole") }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="total" label="历史累计" sortable> </el-table-column>
-            <el-table-column prop="score" label="当前分值" sortable sort-by="score"> </el-table-column>
-            <el-table-column label="操作" v-if="!readOnly">
+            <el-table-column prop="total" :label="$t('team.dkp.total')" sortable> </el-table-column>
+            <el-table-column prop="score" :label="$t('team.dkp.current')" sortable sort-by="score"> </el-table-column>
+            <el-table-column :label="$t('team.dkp.operation')" width="120" v-if="!readOnly">
                 <template #default="scope">
-                    <el-button size="small" @click="handleEdit(scope.row)" type="primary" icon="Sort">调整</el-button>
+                    <el-button size="small" @click="handleEdit(scope.row)" type="primary" icon="Sort">{{ $t("team.dkp.adjust") }}</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -68,6 +80,7 @@ import character from "@/components/team/dkp/Character.vue";
 import { showAvatar } from "@jx3box/jx3box-common/js/utils";
 import dkp_dialog from "@/components/team/dkp/dkp_dialog.vue";
 import { showSchoolIcon, authorLink } from "@/utils/filters";
+import bus from "@/store/bus";
 export default {
     name: "dkpList",
     components: {
@@ -112,20 +125,19 @@ export default {
     },
     mounted() {
         this.init();
-        this.$bus.$on("resetAllDkp", this.handleRestAllDkp);
+        bus.$on("resetAllDkp", this.handleRestAllDkp);
     },
     beforeUnmount() {
-        this.$bus.$off("resetAllDkp");
+        bus.$off("resetAllDkp", this.handleRestAllDkp);
     },
     methods: {
-        showBodyType,
         showSchoolIcon,
         authorLink,
         // ===================数据获取=====================
         // 加载当前团队的DKP成绩
         loadDkpList: function () {
             this.loading = true;
-            getTeamDkpList(this.org)
+            return getTeamDkpList(this.org)
                 .then((res) => {
                     this.list = res.data.data;
                 })
@@ -153,19 +165,11 @@ export default {
             this.selectedRows = selection;
         },
 
-        // 更新rows
-        updateRows: function ({ action, score }) {
-            const rowIds = this.selectedRows.map((row) => row.uid);
-            this.list.forEach((row) => {
-                if (rowIds.includes(row.user_id)) {
-                    const _score = action ? Number(row.score) - score : Number(row.score) + score;
-                    const _total = action ? Number(row.total) : Number(row.total) + score;
-                    row["score"] = _score;
-                    row["total"] = _total;
-                }
-            });
+        // 调整成功后重新获取服务端最终结果
+        updateRows: function () {
             this.selectedRows = [];
             this.$refs.dkpTable.clearSelection();
+            return this.loadDkpList();
         },
         // 重置所有dkp
         handleRestAllDkp: function () {

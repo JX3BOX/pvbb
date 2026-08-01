@@ -1,39 +1,91 @@
 <template>
     <el-dialog
-        class="m-team-joinpop"
-        :title="title"
+        class="m-team-joinpop m-team-member-join-dialog"
+        :title="resolvedTitle"
         v-model="visible"
+        width="820px"
+        align-center
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="!submitting"
+        append-to-body
     >
-        <div class="m-team-joinpop-form" v-if="data && data.length">
-            <div class="u-msg">
-                <!-- <i class="el-icon-warning-outline"></i> -->
-                请选择需要加入该团队的角色
+        <template #header>
+            <div class="m-team-joinpop-header">
+                <span class="u-header-icon" aria-hidden="true">
+                    <el-icon><UserFilled /></el-icon>
+                </span>
+                <span class="u-header-copy">
+                    <strong>{{ resolvedTitle }}</strong>
+                    <small>{{ $t("team.joinDialog.description") }}</small>
+                </span>
             </div>
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="selectAll" class="u-all"
-                >全选</el-checkbox
-            >
-            <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
-                <el-checkbox v-for="item in data" :value="item.ID" :key="item.ID" class="u-item" border>
-                    <el-tooltip class="item" effect="dark" :content="item.note || item.name" placement="bottom">
-                        <div>
-                            <img class="u-item-avatar" :src="showAvatar(item.mount)" />
+        </template>
 
-                            <span class="u-item-name">{{ item.name }}</span>
-                            <span class="u-item-server">{{ item.server }}</span>
+        <div class="m-team-joinpop-content" v-loading="loading">
+            <template v-if="!loading && data.length">
+                <div class="m-team-joinpop-toolbar">
+                    <div class="u-selection-summary">
+                        <strong>{{ $t("team.joinDialog.selectRoles") }}</strong>
+                        <span>{{ $t("team.joinDialog.reviewHint") }}</span>
+                    </div>
+                    <el-checkbox
+                        :indeterminate="isIndeterminate"
+                        v-model="checkAll"
+                        @change="selectAll"
+                        class="u-all"
+                    >
+                        {{ $t("team.joinDialog.selectAll") }}
+                        <span class="u-count">{{ roles.length }}/{{ data.length }}</span>
+                    </el-checkbox>
+                </div>
+
+                <el-checkbox-group
+                    class="u-list"
+                    v-model="roles"
+                    @change="checkIsAll"
+                    :aria-label="$t('team.joinDialog.aria')"
+                >
+                    <el-checkbox v-for="item in data" :value="item.ID" :key="item.ID" class="u-role-card" border>
+                        <div class="u-role-card__content">
+                            <img
+                                class="u-item-avatar"
+                                :src="showAvatar(item.mount)"
+                                :alt="$t('team.joinDialog.mountAlt', { name: item.name || $t('team.joinDialog.roleFallback') })"
+                            />
+                            <span class="u-role-card__copy">
+                                <strong class="u-item-name" :title="item.note || item.name">{{ item.name }}</strong>
+                                <small class="u-item-server" :title="item.server">{{ item.server || $t("team.joinDialog.unknownServer") }}</small>
+                            </span>
                         </div>
-                    </el-tooltip>
-                </el-checkbox>
-            </el-checkbox-group>
+                    </el-checkbox>
+                </el-checkbox-group>
+            </template>
+
+            <div class="m-team-joinpop-null" v-else-if="!loading">
+                <el-empty :image-size="80" :description="$t('team.joinDialog.empty')">
+                    <span class="u-empty-tip">{{ $t("team.joinDialog.emptyHint") }}</span>
+                </el-empty>
+            </div>
         </div>
-        <div class="m-team-joinpop-null" v-else>
-            <el-alert title="暂无可用角色" type="warning" show-icon> </el-alert>
-        </div>
+
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="visible = false">取 消</el-button>
-                <el-button type="primary" @click="confirm">确 定</el-button>
+                <span class="u-footer-status" aria-live="polite">
+                    <template v-if="data.length">{{ $t("team.joinDialog.selected", { count: roles.length }) }}</template>
+                    <template v-else>{{ $t("team.joinDialog.selectHint") }}</template>
+                </span>
+                <div class="u-footer-actions">
+                    <el-button :disabled="submitting" @click="visible = false">{{ $t("team.joinDialog.cancel") }}</el-button>
+                    <el-button
+                        type="primary"
+                        :loading="submitting"
+                        :disabled="loading || !roles.length"
+                        @click="confirm"
+                    >
+                        {{ $t("team.joinDialog.submit") }}
+                    </el-button>
+                </div>
             </div>
         </template>
     </el-dialog>
@@ -42,17 +94,35 @@
 <script>
 import { __imgPath } from "@/utils/config";
 import { getMyPureRoles, joinTeam } from "@/service/team/member.js";
+import { UserFilled } from "@element-plus/icons-vue";
+
 export default {
-    name: "",
-    props: ["title", "show", "team_id"],
+    name: "TeamJoinPop",
+    props: {
+        title: {
+            type: String,
+            default: "",
+        },
+        show: {
+            type: Boolean,
+            default: false,
+        },
+        team_id: {
+            type: [Number, String],
+            default: 0,
+        },
+    },
+    emits: ["update:show"],
     data: function () {
         return {
             visible: false,
             data: [],
-
             roles: [],
             checkAll: false,
             isIndeterminate: false,
+            loading: false,
+            submitting: false,
+            loadVersion: 0,
         };
     },
     watch: {
@@ -62,59 +132,90 @@ export default {
         visible: function (newval) {
             this.$emit("update:show", newval);
             if (newval && this.team_id) {
-                getMyPureRoles(this.team_id).then((res) => {
-                    this.data = res.data.data || [];
-                }).catch((err) => {
-                    console.error("获取角色列表失败:", err);
-                    this.$message.error("获取角色列表失败，请稍后重试");
-                });
+                this.loadRoles();
             } else if (newval && !this.team_id) {
-                console.error("team_id 未传入");
-                this.$message.error("团队ID缺失");
+                console.error("team_id is required");
+                this.$message.error(this.$t("team.joinDialog.missingTeam"));
+            } else {
+                this.loadVersion += 1;
             }
         },
     },
     computed: {
-        params: function () {
-            return {
-                roles: this.roles,
-                team_id: this.$route.params.id,
-            };
+        resolvedTitle: function () {
+            return this.title || this.$t("team.joinDialog.title");
         },
         role_ids: function () {
-            let ids = [];
-            this.data.forEach((item) => {
-                ids.push(item.ID);
-            });
-            return ids;
+            return this.data.map((item) => item.ID);
         },
     },
     methods: {
+        resetSelection: function () {
+            this.roles = [];
+            this.checkAll = false;
+            this.isIndeterminate = false;
+        },
+        loadRoles: function () {
+            const version = ++this.loadVersion;
+            this.loading = true;
+            this.data = [];
+            this.resetSelection();
+
+            getMyPureRoles(this.team_id)
+                .then((res) => {
+                    if (version !== this.loadVersion || !this.visible) return;
+                    this.data = res.data.data || [];
+                })
+                .catch((err) => {
+                    if (version !== this.loadVersion || !this.visible) return;
+                    console.error("Failed to load team roles:", err);
+                    this.$message.error(this.$t("team.joinDialog.loadFailed"));
+                })
+                .finally(() => {
+                    if (version === this.loadVersion) {
+                        this.loading = false;
+                    }
+                });
+        },
         confirm: function () {
-            if (this.roles && this.roles.length) {
-                joinTeam(this.team_id, this.roles).then((res) => {
+            if (!this.roles.length || this.submitting) return;
+
+            this.submitting = true;
+            joinTeam(this.team_id, this.roles)
+                .then(() => {
                     this.$message({
-                        message: "申请成功，请等待团队管理审核",
+                        message: this.$t("team.joinDialog.success"),
                         type: "success",
                     });
                     this.visible = false;
+                })
+                .catch((err) => {
+                    console.error("Failed to submit team application:", err);
+                    this.$message.error(this.$t("team.joinDialog.submitFailed"));
+                })
+                .finally(() => {
+                    this.submitting = false;
                 });
-            }
         },
-        selectAll(status) {
-            this.roles = status ? this.role_ids : [];
+        selectAll: function (status) {
+            this.roles = status ? [...this.role_ids] : [];
             this.isIndeterminate = false;
         },
-        checkIsAll(value) {
-            this.checkAll = value.length === this.role_ids.length;
-            this.isIndeterminate = value.length > 0 && value.length < this.roles.length;
+        checkIsAll: function (value) {
+            const total = this.role_ids.length;
+            this.checkAll = total > 0 && value.length === total;
+            this.isIndeterminate = value.length > 0 && value.length < total;
         },
-        showAvatar: function (mount, body_type) {
+        showAvatar: function (mount) {
             return __imgPath + "image/school/" + mount + ".png";
         },
     },
-    mounted: function () {},
-    components: {},
+    beforeUnmount: function () {
+        this.loadVersion += 1;
+    },
+    components: {
+        UserFilled,
+    },
 };
 </script>
 

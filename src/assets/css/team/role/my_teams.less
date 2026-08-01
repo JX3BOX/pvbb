@@ -1,3 +1,5 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-group-role-tabs {
     .u-org-logo {
         .size(24px);
@@ -32,12 +34,57 @@
     .u-role__mount {
         .flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
     }
 }
 
 .m-group-role-box {
     overflow-x: auto;
+}
+
+.m-team-role {
+    .u-quit-team {
+        > span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .el-icon {
+            margin: 0;
+        }
+    }
+
+    .m-group-role-box {
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+    }
+
+    .m-group-role-table {
+        margin-top: 0;
+        overflow: hidden;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        th {
+            background: @team-surface-muted;
+            color: @team-text-secondary;
+            font-weight: 600;
+        }
+
+        td,
+        th {
+            padding: 10px @team-space-3;
+            border: 0;
+            border-bottom: 1px solid @team-border-light;
+            color: @team-text-regular;
+            text-align: left;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+    }
 }
 
 .v-org-list {

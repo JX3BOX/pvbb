@@ -1,21 +1,43 @@
 <template>
-    <div class="m-member-users" v-loading="loading">
-        <el-alert class="u-admin-pop" type="info" show-icon v-if="!isPRO">
-            <slot name="title"
-                >管理员设置仅<a href="/vip/premium/?from=team_member" target="_blank">专业版账号</a
-                >可用，最多只能添加20名管理员</slot
-            >
-        </el-alert>
-        <div class="m-member-list-users m-team-rolelist" v-if="data && data.length">
-            <div class="u-list">
-                <div class="u-list-item" v-for="(item, i) in data" :key="i">
+    <div class="m-member-users">
+        <header class="m-member-panel-header">
+            <div>
+                <h2>{{ $t("team.member.officialMembers") }}</h2>
+            </div>
+            <el-skeleton-item
+                v-if="loading"
+                variant="text"
+                class="u-member-total-skeleton"
+                aria-hidden="true"
+            />
+            <span v-else class="u-member-total">{{ $t("team.member.memberCount", { count: total }) }}</span>
+        </header>
+
+        <div v-if="loading" class="m-member-card-grid m-member-skeleton-grid" aria-hidden="true">
+            <el-skeleton v-for="index in per" :key="index" animated class="m-member-skeleton-card">
+                <template #template>
+                    <div class="u-member-skeleton">
+                        <el-skeleton-item variant="circle" class="u-skeleton-avatar" />
+                        <div class="u-skeleton-copy">
+                            <el-skeleton-item variant="text" class="u-skeleton-name" />
+                            <el-skeleton-item variant="text" class="u-skeleton-uid" />
+                        </div>
+                        <el-skeleton-item variant="text" class="u-skeleton-role" />
+                        <el-skeleton-item variant="circle" class="u-skeleton-action" />
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+        <div class="m-member-list-users" v-else-if="data && data.length">
+            <div class="m-member-card-grid">
+                <div class="u-list-item" v-for="(item, index) in data" :key="item.uid || index">
                     <MemberItem :item="item" :id="id" @remove="onRemoveAccount" />
                 </div>
             </div>
             <el-pagination
                 class="m-archive-pages"
                 background
-                layout="total, prev, pager, next,jumper"
+                layout="prev, pager, next, jumper"
                 :hide-on-single-page="true"
                 :page-size="per"
                 :total="total"
@@ -23,30 +45,34 @@
                 @current-change="changePage"
             ></el-pagination>
         </div>
-        <el-alert v-else class="m-archive-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
+        <div v-else class="m-member-empty">
+            <span class="u-empty-icon" aria-hidden="true">
+                <el-icon><UserFilled /></el-icon>
+            </span>
+            <h3>{{ $t("team.member.noMembers") }}</h3>
+            <p>{{ $t("team.member.noMembersHint") }}</p>
+        </div>
     </div>
 </template>
 
 <script>
-import { authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getMyTeamUsers } from "@/service/team/member.js";
-import { addAdmin } from "@/service/team/admin.js";
-import User from "@jx3box/jx3box-common/js/user.js";
+import { UserFilled } from "@element-plus/icons-vue";
 import MemberItem from "./MemberItem.vue";
 export default {
     name: "UserList",
     props: ["id"],
     components: {
         MemberItem,
+        UserFilled,
     },
     data: function () {
         return {
             data: [],
             per: 20,
             page: 1,
-            total: 1,
+            total: 0,
             loading: false,
-            isPRO: false,
         };
     },
     computed: {
@@ -72,30 +98,15 @@ export default {
                     this.loading = false;
                 });
         },
-        checkIsPro: function () {
-            User.isPRO().then((data) => {
-                this.isPRO = data;
-            });
-        },
-        setAdmin: function (team_id, user_id, item) {
-            addAdmin(team_id, user_id).then((res) => {
-                this.$notify({
-                    title: "添加成功",
-                    message: "请在权限管理中添加相应权限",
-                    type: "success",
-                });
-                item.isAdmin = true;
-            });
-        },
         changePage: function () {
             window.scrollTo(0, 0);
         },
         init: function () {
             this.loadData();
-            this.checkIsPro();
         },
         onRemoveAccount: function (uid) {
             this.data = this.data.filter((item) => item.uid != uid);
+            this.total = Math.max(0, this.total - 1);
         },
     },
     watch: {
@@ -109,19 +120,8 @@ export default {
             },
         },
     },
-    filters: {
-        showAvatar: function (val) {
-            return showAvatar(val, 68);
-        },
-        authorLink,
-    },
     created: function () {
         this.init();
     },
-    mounted: function () {},
 };
 </script>
-
-<style lang="less">
-@import "@/assets/css/team/member/list_member.less";
-</style>

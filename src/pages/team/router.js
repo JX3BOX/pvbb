@@ -8,6 +8,21 @@ const ViewOrg = () => import("@/views/team/org/ViewOrg.vue");
 const VerifyOrg = () => import("@/views/team/org/VerifyOrg.vue");
 const ViewMyOrg = () => import("@/views/team/org/ViewMyOrg.vue");
 
+function normalizeLegacyWorkspaceRoute(to) {
+    if (!("mode" in to.query)) return true;
+
+    const query = { ...to.query };
+    const mode = query.mode;
+    delete query.mode;
+
+    return {
+        name: mode === "manage" && to.params.id ? "manage_my_org" : "view_my_org",
+        params: to.params,
+        query,
+        replace: true,
+    };
+}
+
 const BindRole = () => import("@/views/team/role/BindRole.vue");
 const ListRole = () => import("@/views/team/role/ListRole.vue");
 const AddRole = () => import("@/views/team/role/AddRole.vue");
@@ -132,16 +147,32 @@ const routes = [
         component: VerifyOrg,
     },
     {
-        name: "view_my_org",
-        path: "/my/org/:id",
+        name: "manage_my_org",
+        path: "/manage/org/:id",
         meta: {
             isPublic: false,
+            workspaceMode: "manage",
             i18n: {
                 title: "pages.team.title",
                 keywords: "pages.team.keywords",
                 description: "pages.team.description",
             },
         },
+        component: ViewMyOrg,
+    },
+    {
+        name: "view_my_org",
+        path: "/my/org/:id?",
+        meta: {
+            isPublic: false,
+            workspaceMode: "member",
+            i18n: {
+                title: "pages.team.title",
+                keywords: "pages.team.keywords",
+                description: "pages.team.description",
+            },
+        },
+        beforeEnter: normalizeLegacyWorkspaceRoute,
         component: ViewMyOrg,
     },
 

@@ -1,3 +1,5 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-team-joinpop{
     .fz(1rem);
     .el-dialog{
@@ -75,6 +77,444 @@
 }
 .m-team-joinpop-null{
     .lh(1.6);
+}
+
+// 团队主页的角色申请弹窗使用独立根类，避免影响活动报名弹窗对旧样式的复用。
+.m-team-member-join-dialog.el-dialog {
+    display: flex;
+    height: auto;
+    min-height: 0;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 48px);
+    align-self: center;
+    flex-direction: column;
+    margin: 24px auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid @team-border-light;
+    border-radius: 18px;
+    background: @team-surface;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .el-dialog__header {
+        flex: none;
+        margin: 0;
+        padding: @team-space-4 60px @team-space-4 @team-space-5;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__headerbtn {
+        top: 20px;
+        right: 20px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+
+        &:hover {
+            background: @team-surface-muted;
+        }
+
+        .el-dialog__close {
+            color: @team-text-muted;
+            font-size: 18px;
+        }
+    }
+
+    .el-dialog__body {
+        height: auto;
+        min-height: 0;
+        max-height: calc(100vh - 210px);
+        flex: 0 1 auto;
+        padding: @team-space-4 @team-space-5 @team-space-5;
+        overflow-y: auto;
+        color: @team-text-regular;
+        scrollbar-color: @team-border @team-surface-muted;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: @team-border;
+        }
+    }
+
+    .el-dialog__footer {
+        flex: none;
+        padding: @team-space-3 @team-space-5 @team-space-4;
+        border-top: 1px solid @team-border-light;
+        background: @team-surface-muted;
+    }
+
+    .m-team-joinpop-content {
+        position: relative;
+        min-height: 240px;
+    }
+
+    .m-team-joinpop-header {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: @team-space-2;
+    }
+
+    .u-header-icon {
+        display: inline-flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border-radius: 12px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 20px;
+    }
+
+    .u-header-copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+
+        strong {
+            color: @team-text-primary;
+            font-size: 18px;
+            font-weight: 650;
+            line-height: 24px;
+        }
+
+        small {
+            color: @team-text-secondary;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    .m-team-joinpop-toolbar {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: @team-space-3;
+        padding: @team-space-2 @team-space-3;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        gap: @team-space-3;
+    }
+
+    .u-selection-summary {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 2px;
+
+        strong {
+            color: @team-text-primary;
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        span {
+            color: @team-text-secondary;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    .u-all {
+        height: 34px;
+        flex: none;
+        margin: 0;
+        padding: 0 @team-space-2;
+        border-radius: 9px;
+        background: @team-surface;
+        color: @team-text-regular;
+
+        .el-checkbox__label {
+            display: inline-flex;
+            align-items: center;
+            padding-left: 7px;
+            font-size: 12px;
+            gap: 6px;
+        }
+    }
+
+    .u-count {
+        display: inline-flex;
+        min-width: 34px;
+        height: 20px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .u-list {
+        display: grid;
+        margin: 0;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: @team-space-2;
+    }
+
+    .el-checkbox.is-bordered.u-role-card {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 80px;
+        min-width: 0;
+        align-items: center;
+        margin: 0 !important;
+        padding: 12px 36px 12px 12px;
+        border-color: @team-border;
+        border-radius: 12px;
+        background: @team-surface;
+        transition:
+            border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard,
+            box-shadow @team-duration-fast @team-ease-standard,
+            transform @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: @team-border-focus;
+            background: #fbfcff;
+            transform: translateY(-1px);
+        }
+
+        &:focus-within {
+            border-color: @team-primary;
+            box-shadow: @team-shadow-focus;
+        }
+
+        &.is-checked {
+            border-color: @team-primary;
+            background: @team-primary-soft;
+            box-shadow: inset 0 0 0 1px @team-primary;
+        }
+
+        .el-checkbox__input {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 1;
+        }
+
+        .el-checkbox__inner {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+
+            &::after {
+                top: 50%;
+                left: 50%;
+                width: 3px;
+                height: 7px;
+                transform: translate(-50%, -58%) rotate(45deg) scaleY(0);
+                transform-origin: center;
+            }
+        }
+
+        .el-checkbox__input.is-checked .el-checkbox__inner::after {
+            transform: translate(-50%, -58%) rotate(45deg) scaleY(1);
+        }
+
+        .el-checkbox__label {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
+            color: inherit;
+            line-height: normal;
+        }
+    }
+
+    .u-role-card__content {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .u-item-avatar {
+        display: block;
+        width: 42px;
+        height: 42px;
+        flex: none;
+        padding: 4px;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        background: @team-surface;
+        object-fit: contain;
+    }
+
+    .u-role-card__copy {
+        display: flex;
+        min-width: 0;
+        flex: 1;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .u-item-name,
+    .u-item-server {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .u-item-name {
+        color: @team-text-primary;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 18px;
+    }
+
+    .u-item-server {
+        margin: 0;
+        color: @team-text-secondary;
+        font-size: 11px;
+        line-height: 16px;
+    }
+
+    .m-team-joinpop-null {
+        display: flex;
+        min-height: 240px;
+        align-items: center;
+        justify-content: center;
+        color: @team-text-secondary;
+
+        .el-empty {
+            padding: @team-space-4 0;
+        }
+
+        .el-empty__description {
+            margin-top: @team-space-2;
+
+            p {
+                color: @team-text-regular;
+                font-size: 13px;
+            }
+        }
+    }
+
+    .u-empty-tip {
+        display: block;
+        color: @team-text-muted;
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .dialog-footer {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: space-between;
+        gap: @team-space-3;
+    }
+
+    .u-footer-status {
+        color: @team-text-secondary;
+        font-size: 12px;
+        line-height: 20px;
+
+        strong {
+            color: @team-primary;
+            font-size: 14px;
+        }
+    }
+
+    .u-footer-actions {
+        display: flex;
+        flex: none;
+        gap: @team-space-1;
+
+        .el-button {
+            min-width: 88px;
+            min-height: 40px;
+            margin: 0;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    }
+}
+
+@media screen and (max-width: 760px) {
+    .m-team-member-join-dialog.el-dialog {
+        .u-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+}
+
+@media screen and (max-width: 520px) {
+    .m-team-member-join-dialog.el-dialog {
+        width: calc(100% - 20px) !important;
+        max-width: none;
+        max-height: calc(100vh - 20px);
+        margin: 10px auto !important;
+        border-radius: 16px;
+
+        .el-dialog__header {
+            padding: @team-space-3 52px @team-space-3 @team-space-3;
+        }
+
+        .el-dialog__headerbtn {
+            top: 14px;
+            right: 14px;
+        }
+
+        .el-dialog__body {
+            padding: @team-space-3;
+        }
+
+        .el-dialog__footer {
+            padding: @team-space-2 @team-space-3 @team-space-3;
+        }
+
+        .u-header-icon {
+            width: 38px;
+            height: 38px;
+        }
+
+        .u-header-copy small,
+        .u-selection-summary span,
+        .u-footer-status {
+            display: none;
+        }
+
+        .m-team-joinpop-toolbar {
+            padding: 10px 12px;
+        }
+
+        .u-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .dialog-footer {
+            justify-content: flex-end;
+        }
+    }
 }
 
 @media screen and (max-width:@phone){

@@ -1,13 +1,18 @@
 <template>
     <div class="v-dkp-list">
         <!-- 头部 -->
-        <h1 class="m-title m-select-org-dkp">
-            <i class="el-icon-coin"></i>
-            <span class="u-txt">DKP管理</span>
+        <header v-if="!teamId" class="m-dkp-page-header m-select-org-dkp">
+            <span class="u-dkp-page-icon" aria-hidden="true">
+                <el-icon><Coin /></el-icon>
+            </span>
+            <div class="u-dkp-page-heading">
+                <h1>{{ $t("team.dkp.title") }}</h1>
+                <p>{{ $t("team.dkp.description") }}</p>
+            </div>
             <el-select
                 class="m-select-org"
                 v-model.number="org"
-                placeholder="请选择团队"
+                :placeholder="$t('team.dkp.selectTeam')"
                 popper-class="m-select-org-options"
                 v-if="orgs.length"
             >
@@ -18,7 +23,7 @@
                 </el-option>
             </el-select>
             <div class="u-op">
-                <a href="/tool/23786" class="u-help" target="_blank"> <i class="el-icon-info"></i> 帮助文档 </a>
+                <a href="/tool/23786" class="u-help" target="_blank"> <i class="el-icon-info"></i> {{ $t("team.dkp.help") }} </a>
                 <el-button
                     v-if="orgs.length"
                     type="warning"
@@ -27,32 +32,78 @@
                     icon="RefreshLeft"
                     :disabled="!isSuperLeader"
                     @click="resetAllDkp"
-                    >全部重置</el-button
+                    >{{ $t("team.dkp.resetAll") }}</el-button
                 >
             </div>
-        </h1>
+        </header>
         <div v-if="org" class="m-dkp-box">
-            <el-tabs type="card" v-model="activeTab">
-                <el-tab-pane label="当前分值" name="score">
-                    <template #label> <i class="el-icon-tickets"></i> 当前分值 </template>
-                </el-tab-pane>
-                <el-tab-pane label="历史记录" name="logs">
-                    <template #label> <i class="el-icon-time"></i> 历史记录 </template>
-                </el-tab-pane>
-                <el-tab-pane label="快照关联" name="snapshot">
-                    <template #label> <i class="el-icon-camera"></i> 快照关联 </template>
-                </el-tab-pane>
-            </el-tabs>
-            <keep-alive>
-                <component
-                    :is="componentsMaps[activeTab]"
-                    :org="org"
-                    :readOnly="activeTab === 'snapshot'"
-                    :supportDkpSync="true"
-                />
-            </keep-alive>
+            <nav class="m-dkp-manage-nav" :aria-label="$t('team.dkp.aria')">
+                <button type="button" :class="{ 'is-active': activeTab === 'score' }" @click="switchTab('score')">
+                    <i class="el-icon-tickets"></i>
+                    <span>{{ $t("team.dkp.current") }}</span>
+                </button>
+                <button type="button" :class="{ 'is-active': activeTab === 'logs' }" @click="switchTab('logs')">
+                    <i class="el-icon-time"></i>
+                    <span>{{ $t("team.dkp.history") }}</span>
+                </button>
+                <button
+                    type="button"
+                    :class="{ 'is-active': activeTab === 'snapshot' }"
+                    @click="switchTab('snapshot')"
+                >
+                    <i class="el-icon-camera"></i>
+                    <span>{{ $t("team.dkp.snapshot") }}</span>
+                </button>
+                <button
+                    v-if="isSuperLeader"
+                    type="button"
+                    :class="{ 'is-active': activeTab === 'advanced' }"
+                    @click="switchTab('advanced')"
+                >
+                    <i class="el-icon-setting"></i>
+                    <span>{{ $t("team.dkp.advanced") }}</span>
+                </button>
+                <a class="u-dkp-help" href="/tool/23786" target="_blank" rel="noopener noreferrer">
+                    <i class="el-icon-document" aria-hidden="true"></i>
+                    <span>{{ $t("team.dkp.help") }}</span>
+                </a>
+            </nav>
+            <section v-if="activeTab === 'advanced'" class="m-dkp-advanced" aria-labelledby="dkp-advanced-title">
+                <div class="m-dkp-advanced-heading">
+                    <span class="u-advanced-icon" aria-hidden="true"><i class="el-icon-setting"></i></span>
+                    <div>
+                        <h2 id="dkp-advanced-title">{{ $t("team.dkp.advanced") }}</h2>
+                        <p>{{ $t("team.dkp.advancedDescription") }}</p>
+                    </div>
+                </div>
+                <div class="m-dkp-danger-card">
+                    <div class="u-danger-content">
+                        <h3>{{ $t("team.dkp.resetTitle") }}</h3>
+                        <p>{{ $t("team.dkp.resetDescription") }}</p>
+                        <div class="u-danger-notice">
+                            <i class="el-icon-warning-outline" aria-hidden="true"></i>
+                            <span>{{ $t("team.dkp.resetNotice") }}</span>
+                        </div>
+                    </div>
+                    <el-button
+                        type="danger"
+                        icon="RefreshLeft"
+                        :disabled="!isSuperLeader"
+                        @click="resetAllDkp"
+                    >
+                        {{ $t("team.dkp.reset") }}
+                    </el-button>
+                </div>
+            </section>
+            <component
+                v-else
+                :is="componentsMaps[activeTab]"
+                :org="org"
+                :readOnly="activeTab === 'snapshot'"
+                :supportDkpSync="true"
+            />
         </div>
-        <el-alert v-else title="你当前没有任何团队的DKP管理权限" type="info" show-icon></el-alert>
+        <el-alert v-else :title="$t('team.dkp.noPermission')" type="info" show-icon></el-alert>
     </div>
 </template>
 
@@ -68,9 +119,16 @@ import snapshot_list from "@/components/team/snapshot/snapshotList.vue";
 import { getTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user";
 import { resetDkp } from "@/service/team/dkp.js";
+import { Coin } from "@element-plus/icons-vue";
+import bus from "@/store/bus";
 export default {
     name: "ManageDkp",
-    props: [],
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: 0,
+        },
+    },
     data: function () {
         return {
             // 团队
@@ -78,6 +136,7 @@ export default {
             orgs: [],
             activeTab: "score",
             isSuperLeader: false,
+            leaderChecked: false,
 
             componentsMaps: {
                 score: "dkp-list",
@@ -90,6 +149,11 @@ export default {
         teamMembers() {
             return this.$store.state.teamMembers;
         },
+        allowedTabs() {
+            const tabs = ["score", "logs", "snapshot"];
+            if (this.isSuperLeader) tabs.push("advanced");
+            return tabs;
+        },
     },
     filters: {
         showTeamLogo: function (val) {
@@ -99,6 +163,10 @@ export default {
     methods: {
         // 加载我参与管理DKP的团队、并设置默认团队
         init() {
+            if (~~this.teamId) {
+                this.org = ~~this.teamId;
+                return;
+            }
             getMyPowerTeams("r_dkp").then((res) => {
                 this.orgs = res.data.data.list || [];
                 this.org = this.orgs.length && this.orgs[0]["ID"];
@@ -111,20 +179,55 @@ export default {
             });
         },
         checkLeader: function () {
+            this.isSuperLeader = false;
+            this.leaderChecked = false;
+            if (this.activeTab === "advanced") this.activeTab = "score";
             getTeam(this.org).then((res) => {
                 this.isSuperLeader = res.data.data.super == User.getInfo().uid;
+                this.leaderChecked = true;
+                this.syncTabFromRoute(true);
             });
+        },
+        switchTab: function (tab) {
+            if (!this.allowedTabs.includes(tab)) return;
+
+            this.activeTab = tab;
+            if (this.$route.query.subtab === tab) return;
+
+            this.$router
+                .replace({
+                    query: {
+                        ...this.$route.query,
+                        subtab: tab,
+                    },
+                })
+                .catch(() => {});
+        },
+        syncTabFromRoute: function (normalize = false) {
+            const subtab = this.$route.query.subtab || "score";
+            if (subtab === "advanced" && !this.leaderChecked) return;
+
+            const nextTab = this.allowedTabs.includes(subtab) ? subtab : "score";
+            this.activeTab = nextTab;
+            if (normalize && subtab !== nextTab) this.switchTab(nextTab);
         },
         // 清空重置
         resetAllDkp: function () {
-            this.$alert("确定全部清空重置么，此操作将不会删除历史记录，仅归零当前所有成员数值。", "警告", {
-                confirmButtonText: "确定",
+            if (!this.isSuperLeader) {
+                this.$message.warning(this.$t("team.dkp.founderOnly"));
+                return;
+            }
+            this.$alert(this.$t("team.dkp.resetConfirm"), this.$t("team.dkp.resetTitle"), {
+                confirmButtonText: this.$t("team.dkp.confirmReset"),
+                cancelButtonText: this.$t("team.dkp.cancel"),
+                showCancelButton: true,
+                type: "warning",
                 callback: (action) => {
                     if (action == "confirm") {
                         resetDkp(this.org).then(() => {
-                            this.$bus.$emit("resetAllDkp");
+                            bus.$emit("resetAllDkp");
                             this.$message({
-                                message: "重置成功",
+                                message: this.$t("team.dkp.resetSuccess"),
                                 type: "success",
                             });
                         });
@@ -140,6 +243,11 @@ export default {
         this.init();
     },
     watch: {
+        teamId: {
+            handler: function (val) {
+                if (~~val) this.org = ~~val;
+            },
+        },
         org: {
             immediate: true,
             handler: function (val) {
@@ -149,11 +257,18 @@ export default {
                 }
             },
         },
+        "$route.query.subtab": {
+            immediate: true,
+            handler: function () {
+                this.syncTabFromRoute();
+            },
+        },
     },
     components: {
         "dkp-list": dkp_list,
         "dkp-logs": dkp_logs,
         "snapshot-list": snapshot_list,
+        Coin,
     },
 };
 </script>

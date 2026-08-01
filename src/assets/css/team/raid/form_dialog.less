@@ -1,0 +1,302 @@
+@import (reference) "../design-system/_tokens.less";
+
+.m-raid-form-dialog {
+    --el-color-primary: @team-primary;
+
+    &.el-dialog {
+        display: flex;
+        max-height: calc(100vh - 24px);
+        margin: auto;
+        max-width: calc(100vw - 32px);
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: @team-radius-control;
+        box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+    }
+
+    .el-dialog__header {
+        margin: 0;
+        padding: @team-space-4 @team-space-5;
+        border-bottom: 1px solid @team-border-light;
+    }
+
+    .el-dialog__title {
+        color: @team-text-primary;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .el-dialog__body {
+        min-height: 0;
+        padding: 0;
+        flex: 1 1 auto;
+        overflow-y: auto;
+        background: @team-surface;
+    }
+
+    .el-dialog__footer {
+        padding: @team-space-3 @team-space-5;
+        border-top: 1px solid @team-border-light;
+        background: @team-surface;
+    }
+}
+
+.m-raid-dialog-body {
+    min-height: 280px;
+    padding: @team-space-2 @team-space-5 @team-space-3;
+}
+
+.m-raid-dialog-form {
+    display: grid;
+    gap: 0;
+
+    .el-form-item {
+        margin-bottom: 0;
+    }
+
+    .el-form-item__label {
+        height: auto;
+        padding: 0 0 7px;
+        color: @team-text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 18px;
+    }
+
+    .el-input,
+    .el-select,
+    .el-date-editor.el-input {
+        width: 100%;
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper,
+    .el-textarea__inner {
+        border: 1px solid @team-border;
+        border-radius: 9px;
+        box-shadow: none;
+
+        &:hover {
+            border-color: @team-border-focus;
+        }
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper {
+        min-height: 40px;
+    }
+
+    .el-input__wrapper.is-focus,
+    .el-select__wrapper.is-focused,
+    .el-textarea__inner:focus {
+        border-color: @team-primary;
+        box-shadow: @team-shadow-focus;
+    }
+}
+
+.m-raid-form-section {
+    padding: 0;
+
+    & + & {
+        margin-top: @team-space-3;
+        padding-top: @team-space-3;
+        border-top: 1px solid @team-border;
+    }
+
+    > header {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: @team-space-2;
+        gap: @team-space-2;
+
+        h4,
+        span {
+            margin: 0;
+        }
+
+        h4 {
+            display: inline-flex;
+            align-items: center;
+            color: @team-text-primary;
+            font-size: 14px;
+            line-height: 22px;
+
+            &::before {
+                content: "";
+                width: 3px;
+                height: 18px;
+                margin-right: 10px;
+                border-radius: 9999px;
+                background: @team-primary;
+            }
+        }
+
+        span {
+            color: @team-text-muted;
+            font-size: 11px;
+        }
+    }
+}
+
+.m-raid-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: @team-space-3;
+
+    .is-wide {
+        grid-column: 1 / -1;
+    }
+
+    .u-label-help {
+        margin-left: 4px;
+        color: @team-text-muted;
+        cursor: help;
+    }
+}
+
+.m-raid-event-field,
+.m-raid-size-row {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: @team-space-1;
+
+    .el-button {
+        flex: none;
+    }
+}
+
+.m-raid-size-row {
+    .el-select {
+        width: 180px;
+        flex: none;
+    }
+
+    .el-input-number {
+        width: 118px;
+    }
+
+    .u-size-times,
+    .u-capacity {
+        color: @team-text-muted;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .u-capacity {
+        margin-left: auto;
+        padding: 4px 9px;
+        border-radius: 9999px;
+        background: @team-surface-muted;
+    }
+}
+
+.u-auth-options {
+    .el-radio-group {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .el-radio-button,
+    .el-radio-button__inner {
+        width: 100%;
+    }
+}
+
+.m-raid-switch-list {
+    display: grid;
+    margin-top: @team-space-3;
+    border-top: 1px solid @team-border-light;
+
+    > label {
+        display: flex;
+        min-height: 50px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid @team-border-light;
+        gap: @team-space-3;
+
+        &:last-child {
+            border-bottom: 0;
+        }
+
+        > span {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+        }
+
+        b {
+            color: @team-text-regular;
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        small {
+            color: @team-text-muted;
+            font-size: 11px;
+            line-height: 18px;
+        }
+    }
+}
+
+.u-desc-field .el-textarea__inner {
+    resize: vertical;
+}
+
+.m-raid-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: @team-space-2;
+
+    .el-button + .el-button {
+        margin-left: 0;
+    }
+
+    .el-button {
+        min-width: 92px;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+}
+
+@media screen and (max-width: 620px) {
+    .m-raid-form-dialog {
+        .el-dialog__header,
+        .el-dialog__footer {
+            padding-right: @team-space-3;
+            padding-left: @team-space-3;
+        }
+    }
+
+    .m-raid-dialog-body {
+        padding: @team-space-3;
+    }
+
+    .m-raid-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+
+        .is-wide {
+            grid-column: auto;
+        }
+    }
+
+    .u-auth-options .el-radio-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .m-raid-size-row {
+        align-items: stretch;
+        flex-wrap: wrap;
+
+        .el-select {
+            width: 100%;
+        }
+
+        .u-capacity {
+            margin-left: 0;
+        }
+    }
+}

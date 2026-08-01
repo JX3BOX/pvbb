@@ -1,77 +1,114 @@
 <template>
-    <el-dialog :title="title" v-model="dialogVisible" width="720px">
-        <el-form
-            class="u-role-setting"
-            :model="form"
-            :rules="rules"
-            ref="roleForm"
-            label-width="120px"
-            :label-position="position"
-        >
-            <el-form-item label="角色名称" prop="name">
-                <el-input
-                    v-if="!['normal', 'sub'].includes(mode)"
-                    v-model="form.name"
-                    class="u-name"
-                    placeholder="请输入角色名称"
-                    :disabled="!canEdit"
-                ></el-input>
-                <el-input
-                    v-model="form.name"
-                    placeholder="请输入团员名称"
-                    class="u-role-setting-member"
-                    :disabled="!!form.role_id || !canEdit"
-                >
-                    <template #append>
-                        <el-select
-                            v-model="tmpVal"
-                            popper-class="m-raid-pop-member-select"
-                            popper-append-to-body
-                            @change="handleChange"
-                            :disabled="!!form.role_id || !canEdit"
-                        >
-                            <el-option v-for="(role, index) in roles" :key="index" :label="role.name" :value="role.ID">
-                                <div style="display: inline-flex; align-items: center">
-                                    <img
-                                        style="margin-right: 8px"
-                                        width="24"
-                                        height="24"
-                                        :src="showSchoolIcon(role.mount)"
-                                    />
-                                    <span>{{ role.name }}</span>
-                                </div>
-                            </el-option>
-                        </el-select>
-                    </template>
-                </el-input>
-                <el-button
-                    v-if="form.role_id"
-                    :disabled="!canEdit"
-                    class="u-remove-role"
-                    type="text"
-                    icon="CircleClose"
-                    @click="removeRole"
-                ></el-button>
-            </el-form-item>
-            <el-form-item label="指定心法" prop="mount">
-                <el-select v-model="form.mount" placeholder="请选择心法" filterable>
-                    <el-option v-for="xf in xfMaps" :key="xf.id" :value="xf.id" :label="xf.name">
-                        <div style="display: inline-flex; align-items: center">
-                            <img style="margin-right: 8px" width="24" height="24" :src="showMountIcon(xf.id)" />
-                            <span>{{ xf.name }}</span>
-                        </div>
-                    </el-option>
-                </el-select>
-            </el-form-item>
+    <el-dialog
+        v-model="dialogVisible"
+        class="m-raid-member-setting"
+        width="680px"
+        align-center
+        append-to-body
+        :close-on-click-modal="false"
+    >
+        <template #header>
+            <div class="m-raid-member-setting__title">
+                <span class="u-title-icon"><i class="el-icon-user"></i></span>
+                <div>
+                    <strong>{{ title || "角色设置" }}</strong>
+                    <span>设置排表成员使用的角色、心法与备注</span>
+                </div>
+            </div>
+        </template>
 
-            <el-form-item label="备注内容" prop="remark">
-                <el-input show-word-limit :maxlength="20" v-model="form.remark" placeholder="请输入备注"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" :loading="addLoading" @click="handleSave">保存</el-button>
-                <el-button @click="handleCancel">取消</el-button>
-            </el-form-item>
+        <el-form ref="roleForm" class="m-raid-member-setting__form" :model="form" :rules="rules" label-position="top">
+            <section class="m-raid-member-setting__section">
+                <header>
+                    <strong>角色信息</strong>
+                    <span>可以选择团队中的已绑定角色，也可以填写临时角色</span>
+                </header>
+
+                <el-form-item label="角色名称" prop="name">
+                    <el-input
+                        v-if="!['normal', 'sub'].includes(mode)"
+                        v-model="form.name"
+                        placeholder="请输入角色名称"
+                        :disabled="!canEdit"
+                        clearable
+                    />
+
+                    <div v-else class="m-raid-member-source">
+                        <div v-if="form.role_id" class="m-raid-selected-role">
+                            <img :src="showMountIcon(form.mount)" :alt="form.name" />
+                            <div>
+                                <strong>{{ form.name }}</strong>
+                                <span>已绑定团队角色，心法可在下方调整</span>
+                            </div>
+                            <el-button link type="primary" :disabled="!canEdit" @click="removeRole">更换角色</el-button>
+                        </div>
+                        <template v-else>
+                            <el-select
+                                v-model="tmpVal"
+                                popper-class="m-raid-pop-member-select"
+                                teleported
+                                filterable
+                                clearable
+                                placeholder="选择团队中的已绑定角色"
+                                :disabled="!canEdit"
+                                @change="handleChange"
+                            >
+                                <el-option v-for="role in roles" :key="role.ID" :label="role.name" :value="role.ID">
+                                    <div class="m-raid-member-option">
+                                        <img :src="showSchoolIcon(role.mount)" :alt="role.name" />
+                                        <span>{{ role.name }}</span>
+                                        <small v-if="role.server">{{ role.server }}</small>
+                                    </div>
+                                </el-option>
+                            </el-select>
+                            <div class="m-raid-member-divider"><span>或填写临时角色</span></div>
+                            <el-input
+                                v-model="form.name"
+                                placeholder="请输入临时角色名称"
+                                :disabled="!canEdit"
+                                clearable
+                            />
+                        </template>
+                    </div>
+                </el-form-item>
+            </section>
+
+            <section class="m-raid-member-setting__section">
+                <header>
+                    <strong>排表设置</strong>
+                    <span>用于排表展示与队伍配置</span>
+                </header>
+                <el-form-item label="指定心法" prop="mount">
+                    <el-select v-model="form.mount" placeholder="请选择心法" filterable clearable>
+                        <el-option v-for="xf in xfMaps" :key="xf.id" :value="xf.id" :label="xf.name">
+                            <div class="m-raid-member-option">
+                                <img :src="showMountIcon(xf.id)" :alt="xf.name" />
+                                <span>{{ xf.name }}</span>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="备注内容" prop="remark">
+                    <el-input
+                        v-model="form.remark"
+                        type="textarea"
+                        :rows="2"
+                        resize="none"
+                        show-word-limit
+                        :maxlength="20"
+                        placeholder="可填写分组、职责或其他排表说明"
+                    />
+                </el-form-item>
+            </section>
         </el-form>
+
+        <template #footer>
+            <div class="m-raid-member-setting__footer">
+                <el-button @click="handleCancel">取消</el-button>
+                <el-button type="primary" :loading="addLoading" @click="handleSave">保存设置</el-button>
+            </div>
+        </template>
     </el-dialog>
 </template>
 
@@ -82,7 +119,7 @@ import mountg from "@jx3box/jx3box-data/data/xf/mount_group.json";
 import { __imgPath } from "@/utils/config";
 import cloneDeep from "lodash/cloneDeep";
 import pick from "lodash/pick";
-import { showSchoolIcon, showMountIcon } from "@/utils/filters";
+import { showMountIcon, showSchoolIcon } from "@/utils/filters";
 
 const default_form = {
     role_func: "",
@@ -96,8 +133,8 @@ const default_form = {
 export default {
     name: "MemberSetting",
     props: ["data", "teamId", "mode", "title", "visible", "members", "max"],
+    emits: ["close", "updateRole"],
     data: () => ({
-        position: window.innerWidth < 768 ? "top" : "left",
         form: {
             role_func: "", // 角色职能
             name: "", // 角色名称
@@ -241,8 +278,8 @@ export default {
             if (member) {
                 this.form.name = member.name;
                 this.form.role_id = member.ID;
-                this.selectedSchool = ~~member.mount;
-                this.form.mount = this.xfMaps[0].id;
+                this.selectedSchool = Number(member.mount) || 0;
+                this.form.mount = this.xfMaps[0]?.id || "";
             }
         },
         remoteMethod(query) {
@@ -274,43 +311,12 @@ export default {
             this.form.mount = "";
             this.selectedSchool = 0;
         },
-        showSchoolIcon,
         showMountIcon,
+        showSchoolIcon,
     },
 };
 </script>
 
 <style lang="less">
-.u-role-setting {
-    .el-dialog__body {
-        padding-top: 0 !important;
-    }
-    .u-name {
-        width: 200px;
-        margin-right: 8px;
-    }
-    .el-form-item {
-        margin-bottom: 22px;
-    }
-    .u-tip {
-        margin-left: 4px;
-    }
-}
-.m-raid-pop-member-select {
-    width: 200px;
-}
-.u-role-setting-member {
-    max-width: 220px;
-    .el-input-group__append {
-        padding: 0 18px;
-    }
-    .el-input__suffix {
-        right: 10px;
-    }
-}
-
-.u-remove-role {
-    margin-left: 8px;
-    cursor: pointer;
-}
+@import "~@/assets/css/team/raid/member_setting.less";
 </style>

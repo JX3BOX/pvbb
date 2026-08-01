@@ -1,6 +1,6 @@
 <template>
-    <div class="v-raid-myteams">
-        <h1 class="m-title">
+    <div class="v-raid-myteams" :class="{ 'is-embedded': embedded }">
+        <h1 v-if="!embedded" class="m-title">
             <i class="el-icon-s-flag"></i>
             <span class="u-txt">我的活动</span>
             <div class="u-op">
@@ -9,9 +9,9 @@
             </div>
         </h1>
         <div class="m-raid-joined" v-loading="loading">
-            <div class="m-raid-myteams" v-if="data && data.length">
+            <div class="m-raid-myteams" v-if="displayData.length">
                 <div class="m-raid-table">
-                    <template v-for="item in data" :key="item.id">
+                    <template v-for="item in displayData" :key="item.id">
                         <activity-item
                             :activity="item.raid_info"
                             :team-info="item.raid_team_info"
@@ -34,7 +34,16 @@ import { moment } from "@jx3box/jx3box-common/js/moment";
 import ActivityItem from "@/components/team/raid/ActivityItem.vue";
 export default {
     name: "MyTeamRaid",
-    props: [],
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: 0,
+        },
+        embedded: {
+            type: Boolean,
+            default: false,
+        },
+    },
     components: {
         ActivityItem,
     },
@@ -47,6 +56,13 @@ export default {
         };
     },
     computed: {
+        displayData: function () {
+            if (!this.teamId) return this.data || [];
+            return (this.data || []).filter((item) => {
+                const teamId = item?.raid_team_info?.ID || item?.raid_info?.team_id;
+                return String(teamId) === String(this.teamId);
+            });
+        },
         is_guawang: function () {
             return !this.teams?.length;
         },
@@ -98,7 +114,6 @@ export default {
         },
         handleQuit(id) {
             this.data = this.data.filter((item) => item.raid_info.id != id);
-            debugger;
         },
     },
     filters: {

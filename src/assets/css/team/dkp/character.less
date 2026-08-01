@@ -1,18 +1,79 @@
-.m-team-character_wrapper{
-    .u-character-logo{
-        // .fl;
-        .size(28px);
-        .y;
+@import (reference) "../design-system/_tokens.less";
+
+.m-team-character_wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 46px;
+    padding: 8px 10px;
+    border: 1px solid @team-border-light;
+    border-radius: @team-radius-small;
+    background: @team-surface-muted;
+    transition: border-color @team-duration-fast @team-ease-standard,
+        background-color @team-duration-fast @team-ease-standard;
+
+    &:hover {
+        border-color: @team-border;
+        background: @team-surface;
     }
-    .u-character-name{
-        .ml(6px);
-        .fz(12px);
-        .dbi;
-        .w(160px);
+
+    .u-character-logo {
+        .size(28px);
+        flex: 0 0 28px;
+    }
+
+    .u-character-name {
+        min-width: 0;
+        .fz(13px);
+        flex: 1;
         overflow: hidden;
+        color: @team-text-regular;
+        font-weight: 600;
         text-overflow: ellipsis;
         white-space: nowrap;
         line-height: 28px;
-        vertical-align: middle;
+    }
+}
+
+.m-dkp-role-popover {
+    max-width: calc(100vw - 24px);
+    padding: 12px !important;
+    border-color: @team-border !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
+}
+
+.m-dkp-role-popover__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    strong {
+        color: @team-text-primary;
+        font-size: 13px;
+        line-height: 20px;
+    }
+
+    span {
+        padding: 1px 7px;
+        border-radius: 999px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 11px;
+        line-height: 18px;
+    }
+}
+
+.m-dkp-role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+@media screen and (max-width: 480px) {
+    .m-dkp-role-grid {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

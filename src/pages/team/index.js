@@ -73,7 +73,10 @@ app.use(ElementPlus, {
 });
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component);
+    // JX3BOX UI 已注册 Comment 等同名业务组件，避免图标覆盖并消除重复注册 warning。
+    if (!app.component(key)) {
+        app.component(key, component);
+    }
 }
 
 // 6.3 Tailwind
@@ -81,9 +84,6 @@ import "@/assets/css/tailwind.css";
 
 // 7. 其它扩展
 import VueSvgInlinePlugin from "vue-svg-inline-plugin";
-
-// use Vue plugin without options
-app.use(VueSvgInlinePlugin);
 
 // use Vue plugin with options
 app.use(VueSvgInlinePlugin, {
@@ -97,4 +97,7 @@ import { copyText } from "@/utils/common";
 app.config.globalProperties.$copyText = copyText;
 
 // Final.Mount DOM
-app.mount("#app");
+// 等待首个路由完成解析，避免刷新团队首页时短暂按普通内页布局渲染。
+router.isReady().then(() => {
+    app.mount("#app");
+});

@@ -1,3 +1,5 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-team-namespace {
     .u-warning {
         .mb(10px);
@@ -57,10 +59,121 @@
         }
     }
 }
+
+.m-team-namespace.is-archive {
+    min-width: 0;
+
+    .u-warning,
+    .u-alert {
+        margin: 0 0 @team-space-3;
+        border-radius: 10px;
+    }
+
+    .m-team-other-block {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .u-desc {
+        margin: 0 0 @team-space-2;
+        color: @team-text-secondary;
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .u-input {
+        display: grid;
+        align-items: center;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: @team-space-2;
+
+        .el-input {
+            width: 100%;
+            max-width: none;
+            margin-right: 0;
+        }
+
+        .el-input__wrapper,
+        .el-button {
+            min-height: 40px;
+            border-radius: 10px;
+        }
+
+        .el-input-group__prepend {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .el-input-group .el-input__wrapper {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .el-button {
+            min-width: 104px;
+            font-weight: 600;
+        }
+    }
+
+    .u-validate {
+        margin-top: @team-space-1;
+        color: #dc2626;
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .u-result {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: @team-space-2;
+        color: @team-text-secondary;
+        font-size: 12px;
+        gap: @team-space-1;
+    }
+
+    .u-status {
+        display: inline-flex;
+        min-height: 24px;
+        align-items: center;
+        margin-right: 0;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: @team-surface;
+        font-weight: 600;
+    }
+
+    .u-url {
+        min-width: 0;
+
+        em {
+            color: @team-text-muted;
+        }
+
+        a {
+            color: @team-primary;
+            box-shadow: none;
+            word-break: break-all;
+        }
+    }
+}
+
 @media screen and (max-width: @phone) {
     .m-team-namespace {
         .el-button {
             .mt(10px);
+        }
+    }
+
+    .m-team-namespace.is-archive {
+        .u-input {
+            grid-template-columns: minmax(0, 1fr);
+
+            .el-button {
+                width: 100%;
+                margin-top: 0;
+            }
         }
     }
 }

@@ -1,47 +1,60 @@
 <template>
-    <div class="m-team-namespace">
-        <el-divider content-position="left"> <i class="el-icon-postcard"></i> 绑定铭牌 </el-divider>
+    <section class="m-team-namespace" :class="{ 'is-archive': variant === 'archive' }">
+        <template v-if="variant === 'archive'">
+            <header class="m-team-form-section">
+                <h2>{{ $t("team.namespace.title") }}</h2>
+            </header>
+            <div class="m-archive-field-label">{{ $t("team.namespace.shortcut") }}</div>
+        </template>
+        <el-divider v-else content-position="left"> <i class="el-icon-postcard"></i> {{ $t("team.namespace.bind") }} </el-divider>
         <el-alert v-if="!isVerified" type="warning" show-icon class="u-warning"
             ><template #title>
-                注册命名空间请先进行<router-link :to="'/org/verify/' + team_id">团队认证</router-link>
+                <template v-if="variant === 'archive'">
+                    {{ $t("team.namespace.verifyFirst") }}<router-link :to="verifyLink">{{ $t("team.namespace.verification") }}</router-link>
+                </template>
+                <template v-else>
+                    {{ $t("team.namespace.verifyFirst") }}<router-link :to="verifyLink">{{ $t("team.namespace.verification") }}</router-link>
+                </template>
             </template></el-alert
         >
         <el-alert
             v-if="action"
             class="u-alert"
-            title="因接口缓存原因，提交后需要等待10分钟后才会更新铭牌和对应状态，请耐心等待，并非提交失败。"
+            :title="$t('team.namespace.cacheNotice')"
             type="warning"
             effect="dark"
         >
         </el-alert>
         <div class="m-team-other-block" :class="{ disabled: !isVerified }">
-            <div class="u-desc">团队主页的中文快捷链接，请尽量与团队名称保持一致</div>
+            <div v-if="variant !== 'archive'" class="u-desc">
+                {{ $t("team.namespace.description") }}
+            </div>
             <div class="u-input">
                 <el-input
-                    placeholder="请输入唯一名称"
+                    :placeholder="$t('team.namespace.placeholder')"
                     size="large"
                     v-model="form.key"
                     clearable
                     :disabled="!isVerified"
                 >
-                    <template #prepend>剑网3.com/</template>
+                    <template #prepend>{{ $t("team.namespaceLink.domain") }}/</template>
                 </el-input>
-                <el-button type="primary" @click="submit" size="large" :disabled="!ready">提交</el-button>
+                <el-button type="primary" @click="submit" size="large" :disabled="!ready">{{ $t("team.namespace.submit") }}</el-button>
             </div>
-            <div class="u-validate" v-show="!available"><i class="el-icon-warning-outline"></i> 当前名称已被使用</div>
+            <div class="u-validate" v-show="!available"><i class="el-icon-warning-outline"></i> {{ $t("team.namespace.used") }}</div>
             <div class="u-result">
                 <span class="u-status" :class="'u-status-' + status" v-if="!first">
-                    <span v-if="status == 0"> <i class="el-icon-remove"></i> 审核中 </span>
-                    <span v-else-if="status == 1"> <i class="el-icon-success"></i> 正常 </span>
-                    <span v-else-if="status == 2"> <i class="el-icon-error"></i> 未通过审核 </span>
+                    <span v-if="status == 0"> <i class="el-icon-remove"></i> {{ $t("team.namespace.reviewing") }} </span>
+                    <span v-else-if="status == 1"> <i class="el-icon-success"></i> {{ $t("team.namespace.normal") }} </span>
+                    <span v-else-if="status == 2"> <i class="el-icon-error"></i> {{ $t("team.namespace.rejected") }} </span>
                 </span>
                 <span class="u-url">
-                    <em>绑定网址</em>
-                    <a :href="'https://剑网3.com/' + form.key" target="_blank">https://剑网3.com/{{ form.key }}</a>
+                    <em>{{ $t("team.namespace.boundUrl") }}</em>
+                    <a :href="$t('team.namespaceLink.base') + form.key" target="_blank">{{ $t("team.namespaceLink.base") }}{{ form.key }}</a>
                 </span>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
@@ -60,7 +73,12 @@ const default_form = {
 
 export default {
     name: "EditNamespace",
-    props: [],
+    props: {
+        variant: {
+            type: String,
+            default: "default",
+        },
+    },
     data: function () {
         return {
             form: cloneDeep(default_form),
@@ -99,6 +117,16 @@ export default {
         team_desc: function () {
             return this.team && this.team.name + "@" + this.team.server;
         },
+        verifyLink: function () {
+            if (this.variant === "archive") {
+                return {
+                    name: "manage_my_org",
+                    params: { id: this.team_id },
+                    query: { tab: "setting", subtab: "verify" },
+                };
+            }
+            return "/org/verify/" + this.team_id;
+        },
     },
     methods: {
         checkAvailable: function () {
@@ -126,15 +154,15 @@ export default {
             fn.then((res) => {
                 this.getData();
                 this.$alert(
-                    "因接口缓存原因，提交后需要等待10分钟后才会更新铭牌和对应状态，请耐心等待，并非提交失败。",
-                    "提示",
+                    this.$t("team.namespace.cacheNotice"),
+                    this.$t("team.namespace.prompt"),
                     {
-                        confirmButtonText: "确定",
+                        confirmButtonText: this.$t("team.namespace.confirm"),
                         callback: (action) => {
                             this.action = action;
                             this.$message({
                                 type: "success",
-                                message: "提交成功，请等待审核",
+                                message: this.$t("team.namespace.submitted"),
                             });
                         },
                     }
@@ -169,7 +197,6 @@ export default {
     mounted: function () {
         this.getData();
     },
-    components: {},
 };
 </script>
 

@@ -3,71 +3,107 @@
         class="m-team-joinpop m-raid-joinpop"
         :title="title"
         v-model="visible"
+        width="920px"
+        align-center
+        append-to-body
         :close-on-click-modal="false"
         :close-on-press-escape="false"
     >
-        <template v-if="isLogin && auth !== 1">
-            <el-radio-group v-model="custom">
-                <el-radio-button :value="0"><i class="el-icon-user"></i> 已有角色</el-radio-button>
-                <el-radio-button :value="1"><i class="el-icon-edit"></i> 临时自定义</el-radio-button>
-            </el-radio-group>
-        </template>
-
-        <!-- 已有角色列表 -->
-        <div class="m-raid-joinpop-box" v-if="!custom & isLogin" v-loading="loading">
-            <div class="m-raid-joinpop-list" v-if="data && data.length">
-                <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
-                    <el-checkbox
-                        v-for="item in data"
-                        :label="item.ID"
-                        :key="item.ID"
-                        class="u-item"
-                        border
-                        v-show="auth !== 1 || !item.custom"
-                    >
-                        <el-tooltip class="item" effect="dark" :content="item.note || item.name" placement="bottom">
-                            <div>
-                                <img class="u-item-avatar" :src="showAvatar(item.mount)" />
-
-                                <span class="u-item-name">{{ item.name }}</span>
-                                <span class="u-item-server">{{ item.server }}</span>
-                            </div>
-                        </el-tooltip>
-                    </el-checkbox>
-                </el-checkbox-group>
+        <div class="m-raid-joinpop-content">
+            <div class="m-raid-joinpop-mode" v-if="isLogin && auth !== 1">
+                <div>
+                    <strong>报名角色</strong>
+                    <span>选择已绑定角色，或临时填写本次活动角色</span>
+                </div>
+                <el-radio-group v-model="custom">
+                    <el-radio-button :value="0"><i class="el-icon-user"></i> 已有角色</el-radio-button>
+                    <el-radio-button :value="1"><i class="el-icon-edit"></i> 临时自定义</el-radio-button>
+                </el-radio-group>
             </div>
-            <div class="m-team-joinpop-null" v-else>
-                <el-alert title="暂无可用角色,请绑定角色或临时自定义" type="warning" show-icon></el-alert>
-            </div>
-        </div>
 
-        <!-- 角色名称（仅自定义） -->
-        <div class="m-team-joinpop-block" :class="{ isFirstBlock: custom }" v-if="custom || !isLogin">
-            <p class="u-label"><i class="el-icon-postcard"></i> 角色名称 <b>(*必填)</b></p>
-            <el-input v-model="form.name" placeholder="请输入角色名" :maxlength="12" show-word-limit></el-input>
-        </div>
+            <!-- 已有角色列表 -->
+            <section class="m-raid-joinpop-section m-raid-joinpop-box" v-if="!custom && isLogin" v-loading="loading">
+                <header class="u-section-heading">
+                    <div>
+                        <strong>选择角色</strong>
+                        <span>每次预约可选择一个角色</span>
+                    </div>
+                    <span class="u-selection-count">已选 {{ roles.length }}/1</span>
+                </header>
+                <div class="m-raid-joinpop-list" v-if="roleData && roleData.length">
+                    <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
+                        <el-checkbox v-for="item in roleData" :value="item.ID" :key="item.ID" class="u-item" border>
+                            <el-tooltip
+                                class="item"
+                                effect="dark"
+                                :content="item.note || item.name"
+                                placement="bottom"
+                            >
+                                <div class="u-role-card">
+                                    <img class="u-item-avatar" :src="showAvatar(item.mount)" />
 
-        <!-- 角色心法（即使选择角色也需要设置心法） -->
-        <div class="m-team-joinpop-block is-mount-block" v-if="custom || (!custom && data && data.length)">
-            <p class="u-label"><i class="el-icon-orange"></i> 角色心法 <b>(*必选)</b></p>
-            <div class="m-team-xf">
-                <el-radio v-for="(item, i) in xfMaps" v-model="form.mount" :value="String(item.id)" :key="i">
-                    <img class="u-pic" :src="showMountIcon(item.id)" :alt="item.name" />
-                    <span class="u-txt">{{ item.name }}</span>
-                </el-radio>
-            </div>
-        </div>
+                                    <span class="u-item-name">{{ item.name }}</span>
+                                    <span class="u-item-server">{{ item.server }}</span>
+                                </div>
+                            </el-tooltip>
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </div>
+                <div class="m-team-joinpop-null" v-else>
+                    <el-alert title="暂无可用角色，请绑定角色或临时自定义" type="warning" show-icon></el-alert>
+                </div>
+            </section>
 
-        <!-- 角色备注（不管怎样总是显示备注） -->
-        <div class="m-team-joinpop-block" v-if="custom || (!custom && data && data.length)">
-            <p class="u-label"><i class="el-icon-chat-line-square"></i> 备注信息</p>
-            <el-input v-model="form.remark" placeholder="请输入备注" :maxlength="20" show-word-limit></el-input>
+            <!-- 角色名称（仅自定义） -->
+            <section
+                class="m-raid-joinpop-section m-team-joinpop-block is-name-block"
+                v-if="custom || !isLogin"
+            >
+                <p class="u-label"><i class="el-icon-postcard"></i> 角色名称 <b>必填</b></p>
+                <el-input v-model="form.name" placeholder="请输入角色名" :maxlength="12" show-word-limit></el-input>
+            </section>
+
+            <!-- 角色心法（即使选择角色也需要设置心法） -->
+            <section
+                class="m-raid-joinpop-section m-team-joinpop-block is-mount-block"
+                v-if="custom || (!custom && roleData && roleData.length)"
+            >
+                <div class="u-section-heading">
+                    <div>
+                        <p class="u-label"><i class="el-icon-orange"></i> 角色心法 <b>必选</b></p>
+                        <span>选择本次活动使用的心法</span>
+                    </div>
+                </div>
+                <div class="m-team-xf">
+                    <el-radio v-for="(item, i) in xfMaps" v-model="form.mount" :value="String(item.id)" :key="i">
+                        <img class="u-pic" :src="showMountIcon(item.id)" :alt="item.name" />
+                        <span class="u-txt">{{ item.name }}</span>
+                    </el-radio>
+                </div>
+            </section>
+
+            <!-- 角色备注（不管怎样总是显示备注） -->
+            <section
+                class="m-raid-joinpop-section m-team-joinpop-block is-remark-block"
+                v-if="custom || (!custom && roleData && roleData.length)"
+            >
+                <p class="u-label"><i class="el-icon-chat-line-square"></i> 备注信息 <span>选填</span></p>
+                <el-input
+                    v-model="form.remark"
+                    placeholder="可填写进组时间、装备情况等说明"
+                    :maxlength="20"
+                    show-word-limit
+                ></el-input>
+            </section>
         </div>
 
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="visible = false">取 消</el-button>
-                <el-button type="primary" @click="confirm">确 定</el-button>
+            <div class="m-raid-joinpop-footer">
+                <span><i class="el-icon-info"></i> 提交后可在候选名单中查看报名状态</span>
+                <div>
+                    <el-button @click="visible = false">取消</el-button>
+                    <el-button type="primary" @click="confirm">确认报名</el-button>
+                </div>
             </div>
         </template>
     </el-dialog>
@@ -81,8 +117,8 @@ import User from "@jx3box/jx3box-common/js/user";
 import { showMountIcon } from "@/utils/filters";
 export default {
     name: "RaidJoinPop",
-    props: ["title", "show", "modelValue", "auth", "client"],
-    emits: ["update:modelValue", "switchJoinPop", "confirm"],
+    props: ["title", "modelValue", "auth", "client"],
+    emits: ["update:modelValue", "confirm"],
     data: function () {
         return {
             isLogin: User.isLogin(),
@@ -106,15 +142,11 @@ export default {
         };
     },
     watch: {
-        show: function (newval) {
-            this.open(newval);
-        },
         modelValue: function (newval) {
             this.open(newval);
         },
         visible: function (newval) {
             this.$emit("update:modelValue", newval);
-            this.$emit("switchJoinPop", newval);
             if (newval) {
                 if (this.isLogin) {
                     this.loading = true;
@@ -230,6 +262,5 @@ export default {
 </script>
 
 <style lang="less">
-@import "@/assets/css/team/member/joinpop.less";
 @import "@/assets/css/team/raid/joinpop.less";
 </style>

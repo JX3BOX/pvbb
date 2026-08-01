@@ -2,7 +2,7 @@
     <div class="w-drop-item">
         <a class="w-drop-item-link" :href="getDropLink(id)" target="_blank">
             <img class="w-drop-item-img" :src="iconLink(icon)" />
-            <span class="w-drop-item-name">{{ name || "未知" }}</span>
+            <span class="w-drop-item-name">{{ name || $t("team.dkp.unknown") }}</span>
         </a>
     </div>
 </template>
@@ -29,10 +29,13 @@ export default {
 
 <style scoped lang="less">
 .w-drop-item-link {
-    .db;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
 }
 .w-drop-item-img {
     .size(28px);
+    flex: none;
     .y;
     .mr(5px);
     .r(2px);

@@ -1,6 +1,89 @@
+@import (reference) "../design-system/_tokens.less";
+
+.v-battle,
+.m-team-view {
+    .m-battle-notice {
+        margin-bottom: @team-space-3;
+        border: 1px solid #fde7b0;
+        border-radius: @team-radius-small;
+        background: #fffbeb;
+
+        .el-alert__title {
+            color: #a16207;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .el-alert__icon {
+            color: #f59e0b;
+        }
+
+        &.m-battle-notice--filter {
+            .el-alert__content,
+            .el-alert__title {
+                width: 100%;
+            }
+        }
+
+        .m-battle-notice__content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: @team-space-3;
+
+            .u-notice-copy {
+                display: flex;
+                min-width: 0;
+                flex-direction: column;
+                gap: 2px;
+
+                small {
+                    color: #b7791f;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                }
+
+                .u-battle-guide {
+                    color: #a16207;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                    text-decoration: underline;
+                }
+            }
+
+            .el-switch__label {
+                color: @team-text-secondary;
+                font-size: 12px;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .v-battle,
+    .m-team-view {
+        .m-battle-notice__content {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+}
+
 .m-battle-index {
+    min-height: 120px;
+
+    .m-mybattle-list {
+        display: grid;
+        gap: @team-space-2;
+    }
+
     .u-team-collapse {
-        .mb(10px);
+        margin-bottom: @team-space-2;
+
         .u-team-title {
             cursor: pointer;
         }
@@ -8,5 +91,11 @@
             // height: 0;
             // transition: height 0.4s;
         }
+    }
+
+    .m-archive-pages {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: @team-space-4;
     }
 }

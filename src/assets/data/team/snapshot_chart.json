@@ -1,69 +1,107 @@
 {
     "lineOptions": {
-        "title": {
-            "text": "每日开团次数",
-            "top": "10px"
+        "color": ["#5b5cf5"],
+        "tooltip": {
+            "trigger": "axis"
         },
         "grid": {
-            "left": "3%",
-            "right": "4%",
-            "bottom": "3%",
+            "left": 20,
+            "right": 24,
+            "top": 24,
+            "bottom": 18,
             "containLabel": true
         },
         "xAxis": {
             "type": "category",
             "data": [],
-            "boundaryGap": false
+            "boundaryGap": false,
+            "axisTick": {
+                "show": false
+            },
+            "axisLine": {
+                "lineStyle": {
+                    "color": "#e2e8f0"
+                }
+            },
+            "axisLabel": {
+                "color": "#64748b"
+            }
         },
         "yAxis": {
             "type": "value",
-            "minInterval": 1
+            "minInterval": 1,
+            "axisLine": {
+                "show": false
+            },
+            "axisTick": {
+                "show": false
+            },
+            "axisLabel": {
+                "color": "#64748b"
+            },
+            "splitLine": {
+                "lineStyle": {
+                    "color": "#f1f5f9"
+                }
+            }
         },
         "series": [
             {
                 "data": [],
-                "type": "line"
+                "type": "line",
+                "smooth": true,
+                "symbolSize": 7,
+                "lineStyle": {
+                    "width": 3
+                },
+                "areaStyle": {
+                    "color": "rgba(91, 92, 245, 0.08)"
+                }
             }
         ]
     },
     "pieOptions": {
-        "title": {
-            "text": "心法比例",
-            "left": "center"
-        },
         "tooltip": {
             "trigger": "item"
         },
         "legend": {
-            "orient": "vertical",
-            "left": "left"
+            "type": "scroll",
+            "orient": "horizontal",
+            "left": "center",
+            "right": 20,
+            "bottom": 12,
+            "textStyle": {
+                "color": "#64748b"
+            }
         },
         "series": [
             {
                 "type": "pie",
-                "radius": "70%",
+                "radius": ["40%", "66%"],
+                "center": ["50%", "44%"],
                 "data": [],
+                "itemStyle": {
+                    "borderColor": "#ffffff",
+                    "borderWidth": 2,
+                    "borderRadius": 4
+                },
                 "emphasis": {
                     "itemStyle": {
-                        "shadowBlur": 10,
+                        "shadowBlur": 12,
                         "shadowOffsetX": 0,
-                        "shadowColor": "rgba(0, 0, 0, 0.5)"
+                        "shadowColor": "rgba(15, 23, 42, 0.16)"
                     }
                 },
                 "label": {
-                    "normal": {
-                        "show": true,
-                        "formatter": "{b}: {d}%"
-                    }
+                    "show": true,
+                    "color": "#64748b",
+                    "formatter": "{b}  {d}%"
                 }
             }
         ]
     },
     "barOptions": {
-        "title": {
-            "text": "角色出勤次数",
-            "left": "center"
-        },
+        "color": ["#5b5cf5", "#38bdf8", "#8b5cf6", "#14b8a6", "#f59e0b", "#f97316"],
         "tooltip": {
             "trigger": "axis",
             "axisPointer": {
@@ -79,24 +117,54 @@
             }
         ],
         "grid": {
-            "left": "3%",
-            "right": "4%",
-            "bottom": "3%",
+            "left": 20,
+            "right": 20,
+            "top": 24,
+            "bottom": 64,
             "containLabel": true
         },
         "xAxis": {
             "type": "category",
-            "data": []
+            "data": [],
+            "axisTick": {
+                "show": false
+            },
+            "axisLine": {
+                "lineStyle": {
+                    "color": "#e2e8f0"
+                }
+            },
+            "axisLabel": {
+                "color": "#64748b"
+            }
         },
         "yAxis": {
             "type": "value",
-            "minInterval": 1
+            "minInterval": 1,
+            "axisLine": {
+                "show": false
+            },
+            "axisTick": {
+                "show": false
+            },
+            "axisLabel": {
+                "color": "#64748b"
+            },
+            "splitLine": {
+                "lineStyle": {
+                    "color": "#f1f5f9"
+                }
+            }
         },
         "series": [
             {
                 "type": "bar",
                 "data": [],
-                "colorBy": "data"
+                "colorBy": "data",
+                "barMaxWidth": 32,
+                "itemStyle": {
+                    "borderRadius": [6, 6, 0, 0]
+                }
             }
         ]
     }

@@ -1,0 +1,506 @@
+# 团队平台业务与代码结构
+
+> 项目：`frontend/pvbb`
+>
+> 应用地址：`/team/`
+>
+> 整理日期：2026-08-02
+>
+> 文档性质：当前代码盘点与后续重构边界，不代表所有历史页面都已完成产品化
+
+## 1. 业务定义
+
+团队平台可以按以下 8 个核心业务域理解：
+
+1. **档案**：创建团队，以及团队资料、认证、权限、公开范围、移交和删除等 CRUD。
+2. **主页**：团队对外公开主页，聚合团队介绍、招募、荣誉、成员、DKP、视频、留言等子模块。
+3. **角色与成员**：用户管理自己的游戏角色和入团关系；团队管理员审核申请、管理正式成员及其角色。
+4. **视频**：团队战斗视频的新增、编辑、删除和公开展示。
+5. **战绩**：团队或个人的百强战绩，并可关联具体战斗数据。
+6. **快照**：记录某一时刻游戏内团队成员及相关数据，可用于对比和同步 DKP。
+7. **DKP**：团队 DKP 初始化、同步、调整、日志、规则和个人 DKP 查询。
+8. **排表**：创建 RAID 活动、安排正式/替补/候选成员、处理报名、排序及模板。
+
+这套划分与当前代码大体一致，但当前实现不是 8 个完全隔离的应用模块：
+
+- `/manage/org/:id` 与 `/my/org/:id` 共用统一团队工作台，分别承载管理视图和成员视图；档案、成员、视频、战绩、快照、DKP、排表按权限组合成页签。
+- `/org/:id` 是团队对外主页，负责公开信息的聚合展示。
+- `battle` 才是“战绩”；`raid` 才是当前真正的“排表/开团报名”。
+- `plan` 名为“活动规划”，但目前主要是静态示例，不能视为已经可用的排表模块。
+- `role` 管“我的游戏角色”；`member` 管“角色与团队的关系以及团队成员”，二者共同组成角色与成员业务。
+
+## 2. 应用骨架
+
+| 层级 | 文件 | 职责 |
+| --- | --- | --- |
+| 多页面构建入口 | `vue.config.js` | 将 `team` 构建为 `team/index.html` |
+| Vue 入口 | `src/pages/team/index.js` | 安装 Router、Vuex、i18n、JX3BOX UI、Element Plus |
+| 路由 | `src/pages/team/router.js` | 使用 `createWebHistory('/team')`，定义团队平台全部页面 |
+| 应用外壳 | `src/pages/team/App.vue` | 公共头尾、登录拦截、旧版侧栏与现代团队工作台布局 |
+| 状态 | `src/pages/team/store.js` | 客户端类型、当前团队、待审核数、DKP 编辑状态、RAID 成员状态 |
+| 统一接口目录 | `src/service/team/` | `$team`、`$cms`、`$next` 三类服务调用 |
+| 统一样式入口 | `src/assets/css/team/app.less` | 团队应用布局及现代工作台外壳 |
+| 设计令牌 | `src/assets/css/team/design-system/_tokens.less` | 团队模块颜色、间距、圆角、阴影、动效 |
+
+应用外壳把 `index`、`view_my_org`、`manage_my_org`、`add_org` 等视为现代工作区；其它历史路由仍使用面包屑和 `Nav2.vue` 旧侧栏。
+
+## 3. 核心入口与两种视图
+
+### 3.1 团队广场
+
+- 路由：`/team/`、`/team/org/list`
+- 页面：`src/views/team/org/ListOrg.vue`
+- 列表组件：`src/components/team/org/team_list.vue`
+- 个人工作区侧栏：`src/components/team/org/team_home_sidebar.vue`
+- 接口：`GET /api/team/public`
+
+负责公开团队搜索、服务器/标签/认证筛选和创建团队入口。左侧导航分为两组：发现区包含“团队广场 / 团队活动”；个人工作区包含“团队管理 / 我的团队 / 我的角色”。登录后分别加载可管理团队和已加入团队，“我的角色”外跳角色中心。
+
+### 3.2 团队工作台
+
+- 管理路由：`/team/manage/org/:id`
+- 成员路由：`/team/my/org/:id?`
+- 页面：`src/views/team/org/ViewMyOrg.vue`
+- 视图身份由路径表达，不再使用 `mode=manage|member` 查询参数。
+- 页签参数：`tab=...`；默认页签省略该参数。
+- 二级页签参数：`subtab=...`；团队设置支持 `basic|verify|permission|feature|other|advanced`。
+
+旧地址 `/team/my/org/:id?mode=manage...` 会保留页签状态并自动迁移到管理路由；旧的团队设置 `section` 参数会迁移为 `subtab`，`mode=member` 会被清理为成员路由。
+
+管理页顶部只承担“当前正在管理哪个团队”的识别作用，保留团队 Logo、名称、服务器、团队 ID、创始人/管理员身份、认证状态和团队主页入口。公告、招募、百科、直播、YY、QQ群、好评等公开团队资料不在管理页头部重复展示，管理功能紧接着以页签呈现。Web 与后续 App 应沿用该信息层级。
+
+团队设置分为“基本设置 / 团队认证 / 权限管理 / 功能设置 / 其它设置 / 高级设置”：功能设置只承载快照密码和 DKP 制度；其它设置承载团队铭牌和团队海报；高级设置只保留移交团队、删除团队等高风险操作。PC 与后续 App 都应保持这组业务边界，不按组件历史位置重新混排。
+
+高级设置中的移交和删除使用实色警示按钮，并且不得由按钮直接调用接口。移交需要先选择并校验目标 UID，再显示包含团队名、目标 UID 和后果说明的二次确认；删除需要显示不可恢复说明并二次确认，用户取消或关闭确认框时不执行请求。
+
+管理视图按权限显示：
+
+| 页签 | 权限字段 | 主要组件 |
+| --- | --- | --- |
+| 成员管理 | `r_member` 或创始人 | `member/ListMember.vue` |
+| 战绩管理 | `r_race` 或创始人 | `battle/index.vue` |
+| 视频管理 | `r_video` 或创始人 | `org/ManageVideo.vue` |
+| 快照管理 | `r_snapshot` 或创始人 | `snapshot/ListSnapshot.vue` |
+| DKP 管理 | `r_dkp` 或创始人 | `dkp/ManageDkp.vue` |
+| RAID 管理 | `r_raid` 或创始人 | `raid/ManageRaid.vue` |
+| 团队设置 | 仅创始人 | 档案表单、认证、权限、功能、其它及高级设置 |
+
+成员视图显示：我的角色、我的战绩、我的 DKP、参与的 RAID、团队快照和团队视频。团队快照在成员视图中为只读模式；密码配置只对拥有管理能力的入口开放。
+
+工作台的一级页签使用 `tab`，成员管理、团队设置、快照和 DKP 内部的二级页签统一使用 `subtab`。切换二级页签时应更新 URL，刷新或复制链接后仍恢复相同位置；旧的团队设置 `section` 参数只用于兼容迁移。
+
+团队信息来自 `GET /api/team/info/:id`，管理权限来自 `GET /api/team/my-team/:id/manage/power-list`。创始人通过 `team.super == 当前 uid` 获得完整管理能力。
+
+### 3.3 团队公开主页
+
+- 路由：`/team/org/:id`
+- 页面：`src/views/team/org/ViewOrg.vue`
+
+公开主页与团队广场、团队工作台共用同一套 `TeamHomeSidebar` 外壳。侧边栏保持“团队广场”激活，右侧分为两层：顶部团队信息卡展示 Logo、名称、ID、服务器、认证、创始人、百科/直播/YY/QQ群以及好评、加入等公开操作；下方公开内容卡通过页签聚合各业务模块。公开主页对所有访问者都保持访客视角，即使当前用户是创始人或管理员，顶部也不显示编辑、认证等管理入口，相关操作统一回到“团队管理”工作台完成。公开页不复用管理页的精简头部，因为两者承担的信息和操作不同，但卡片、间距、颜色与页签语言应保持一致。后续 App 也应沿用“团队身份在上、公开模块在下”的信息层级。
+
+当前公开主页页签：
+
+- 团队概况：简介、招募、勋章、团队成绩。
+- 团队成员：受 `v_member` 公开级别与访问者权限控制。
+- 团队活动：展示公开 RAID 活动，受活动可见性和访问权限控制。
+- 通关视频。
+- 留言板：受 `v_comment` 控制。
+
+公开主页不再提供 DKP 页签。DKP 读取仍保留服务端 `v_dkp` 可见性合同，当前前端入口位于团队成员/管理工作台，不应因为后端存在公开级别字段就重新推断为公开主页功能。
+
+“团队成员”页按团队管理员、今日寿星、团队角色三组展示。管理员名单始终公开；寿星和角色列表继续受 `v_member` 与访问者权限控制。成员接口返回的是角色条目，因此列表总数统一表述为“个角色”，不能当作去重后的账号人数。
+
+团队快照不属于当前公开主页页签；它继续作为独立业务模块维护，不在团队主页对外展示。
+
+## 4. 八个业务模块复盘
+
+### 4.1 档案
+
+#### 产品定义与跨端约束
+
+“档案”就是团队实体本身的 **CUD**：创建（Create）、更新（Update）和删除（Delete）。它负责建立和维护一支团队的身份与基础资料，不等同于团队主页，也不承接成员、视频、战绩、快照、DKP、排表等独立业务的内容管理。
+
+后续 PC 与 App 应沿用同一业务思路：
+
+- 创建团队后得到稳定的团队 ID，再进入该团队的管理工作区。
+- 更新围绕同一个团队实体进行，包括基础资料、公开范围、认证、管理员权限、功能设置、其它外观设置和高级操作。
+- 删除是创始人专属的高风险操作，必须与普通资料更新分开呈现并二次确认。
+- 团队主页只消费档案及其它模块允许公开的数据，不反向承担档案编辑。
+- 跨端应复用真实接口、权限字段和数据合同；页面结构与交互按 PC/App 各自的使用场景实现，不照搬布局。
+
+#### 职责
+
+团队创建、基础资料、招募信息、联系方式、直播信息、内容公开范围、认证、管理员权限、功能设置、铭牌与海报、移交和删除。
+
+#### 路由
+
+| 路由 | 页面 | 当前作用 |
+| --- | --- | --- |
+| `/org/add` | `org/AddOrg.vue` | 创建团队；普通账号默认限制 1 支，专业版可继续创建 |
+| `/org/manage` | `org/ManageOrg.vue` | 历史团队管理列表 |
+| `/org/edit/:id` | `org/EditOrg.vue` | 历史独立设置页 |
+| `/org/verify/:id` | `org/VerifyOrg.vue` | 历史独立认证页 |
+| `/manage/org/:id?tab=setting` | `org/ViewMyOrg.vue` | 当前统一档案入口 |
+
+#### 主要文件
+
+- `components/team/org/teamform.vue`：创建和编辑共用的基础表单。
+- `components/team/org/team_advanced_setting.vue`：移交、删除等高级操作。
+- `views/team/org/EditOrgConfig.vue`：快照密码、DKP 规则和团队海报配置。
+- `views/team/org/EditPermission.vue`：管理员及权限分配。
+- `views/team/org/EditNamespace.vue`：团队命名空间。
+- `views/team/org/VerifyOrg.vue`：团队认证申请。
+- `components/team/org/team_verify.vue`、`team_verify_logs.vue`：认证表单及记录。
+
+#### 主要接口
+
+- `POST /api/team/my-team`：创建。
+- `PUT /api/team/my-team/:id`、`PATCH /api/team/my-team/:id`：更新。
+- `DELETE /api/team/info/:id`：删除。
+- `PUT /api/team/my-team/:id/transfer/to/user/:uid`：移交。
+- `/api/team/my-team/:id/manage/admin...`：管理员 CRUD。
+- `/api/cms/team/:id/verify`：认证申请与记录。
+- `/api/cms/namespace/team`：团队命名空间。
+
+#### 团队海报的数据合同
+
+团队海报使用团队对象的 `banner` 字符串字段，交互分为两步：
+
+1. 选择图片后，上传组件以 `multipart/form-data` 请求 `POST /api/cms/upload`，文件字段为 `file`；取返回值 `res.data.data[0]` 作为图片地址。
+2. 点击“保存海报”后，请求 `PATCH /api/team/my-team/:id`，请求体为 `{ "banner": "图片地址" }`，才会把地址写入团队档案。
+
+已有海报随 `GET /api/team/info/:id` 返回，从团队对象的 `banner` 字段回填。预览使用缩略图工具，但保存的仍是 CMS 上传接口返回的原始地址字符串；移除预览只会先把本地值清空，仍需保存，最终提交 `{ "banner": "" }`。
+
+当前 PC 海报推荐尺寸为 **920 × 120**，主体尽量靠右。公开主页只在宽屏头部叠加该海报，并使用从左侧白色内容区向右侧图片过渡的遮罩；窄屏会隐藏背景海报，避免压缩团队名称和操作区。旧的 1125 × 630 说明已经失效。
+
+#### 当前判断
+
+业务能力较完整，但存在“统一工作台入口”和“历史独立设置路由”两套界面。后续优化应先以 `ViewMyOrg.vue` 的团队档案页签为主入口，再判断历史路由是保留兼容还是逐步收口。
+
+### 4.2 主页
+
+#### 职责
+
+向访客展示一个团队的公开形象和可公开业务信息，不承担管理员 CRUD 主流程。
+
+#### 主要文件
+
+- `views/team/org/ViewOrg.vue`：公开主页容器。
+- `components/team/org/team_info.vue`：Logo、名称、服务器、团长等头部信息。
+- `components/team/org/team_intro.vue`：团队简介。
+- `components/team/org/team_recruit.vue`：招募和标签。
+- `components/team/org/team_medals.vue`：勋章。
+- `components/team/org/team_trophy.vue`：成绩/荣誉。
+- `views/team/member/ViewMember.vue`：公开成员视图。
+- `views/team/raid/TeamRaid.vue`：公开团队活动。
+- `views/team/org/ViewVideo.vue`：公开视频。
+- `views/team/org/ViewComment.vue`：留言板。
+
+#### 当前判断
+
+主页本质是模块聚合器。以后增加子模块时，应分别定义“是否公开、谁可见、数据为空时如何展示”，避免把管理功能直接塞进公开主页。
+
+### 4.3 角色与成员
+
+该业务需要区分三个对象：
+
+1. **账号**：JX3BOX 用户。
+2. **角色**：账号绑定或自建的游戏角色。
+3. **团队成员关系**：某个角色申请/加入某个团队形成的关系。
+
+#### 用户侧角色管理
+
+| 路由 | 页面 | 功能 |
+| --- | --- | --- |
+| `/role/manage` | `role/ListRole.vue` | 角色列表、搜索、备注、星标、解绑、删除 |
+| `/role/bind` | `role/BindRole.vue` | 获取绑定 Token、绑定角色 |
+| `/role/add` | `role/AddRole.vue` | 创建自定义角色 |
+| `/role/edit/:id` | `role/EditRole.vue` | 编辑自定义角色 |
+| `/role/:id` | `role/ViewRole.vue` | 查看角色及其所属团队 |
+| `/role/group` | `role/GroupRole.vue` | 按团队查看角色、设置公开、退出团队 |
+
+角色接口集中在 `service/team/role.js`；角色入团关系集中在 `service/team/member.js`。
+
+#### 团队管理员侧成员管理
+
+- 当前入口：`/manage/org/:id`；默认直接进入成员管理页签。
+- 容器：`views/team/member/ListMember.vue`。
+- 正式团员：`UserList.vue` + `MemberItem.vue`，按账号查看并管理其角色。
+- 加入申请：`PendingList.vue`，支持批准与拒绝。
+- 权限：`r_member` 或创始人。
+
+关键接口包括：
+
+- `GET /api/team/relation/:teamId/manage/user`：正式成员账号。
+- `GET /api/team/relation/:teamId/manage/need-review-roles`：待审核角色。
+- `PUT /api/team/relation/:teamId/manage/role/:roleId/review`：批准。
+- `DELETE /api/team/relation/:teamId/manage/role/:roleId`：拒绝或移除角色。
+- `DELETE /api/team/relation/:teamId/manage/user/:uid`：移除账号及其角色。
+- `PUT .../remark`、`PUT .../star`：成员角色备注与星标。
+
+#### 当前判断
+
+你的理解准确，但建议模块名使用“角色与成员”，避免只叫“角色”后把管理员审核、成员账号和角色关系混在一起。当前全局“角色中心”链接已经指向 `/dashboard/role`，而仓库内仍保留一整套 `/role/*` 历史页面，后续需要确认两者的产品归属。
+
+### 4.4 视频
+
+#### 入口与文件
+
+- 管理入口：工作台 `tab=video`，组件 `views/team/org/ManageVideo.vue`。
+- 公开入口：团队主页“通关视频”，组件 `views/team/org/ViewVideo.vue`。
+
+#### 接口
+
+- `GET /api/team/video/team/:id`：公开视频列表。
+- `GET /api/team/video/team/:id/all`：管理列表。
+- `POST /api/team/video`：新增。
+- `PUT /api/team/video/:id`：编辑。
+- `DELETE /api/team/video/:id`：删除。
+
+管理权限为 `r_video` 或创始人。当前没有单独的视频顶层路由，管理和展示都嵌在团队上下文中，这与业务归属是合理的。
+
+前后端权限合同：
+
+- 公开视频只调用 `GET /api/team/video/team/:id`，不读取管理列表。
+- 管理列表调用 `GET /api/team/video/team/:id/all`，Team 后端允许创始人、`r_video` 管理员及系统管理员访问。
+- 更新视频时，后端以数据库中的原记录为准保留 `team_id`，不能通过 PUT payload 把视频转移到无权管理的团队。
+- 管理端新增、编辑、删除失败时必须结束 loading 并保留可恢复页面状态，不能把失败误显示为空列表。
+
+### 4.5 战绩
+
+#### 入口与文件
+
+- 团队战绩管理：工作台 `tab=manage-battle`，`views/team/battle/index.vue`。
+- 我的战绩：工作台 `tab=battle`，`views/team/battle/myBattle.vue`；旧 `tab=history` 会规范化到新名称。
+- 战绩项：`battleItem.vue`、`teamItem.vue`。
+- 关联战斗数据：`relevance.vue`。
+- 历史独立路由：`/battle`、`/myBattle`。
+
+#### 接口
+
+- `GET /api/team/my-team/race-rank/records`：我管理团队的百强战绩。
+- `GET /api/team/my-race-rank/records`：个人百强战绩。
+- `GET /api/team/battle/my-list`：可关联的战斗/JCL 数据。
+- `POST /api/team/my-race-rank/records/item/:id/bind-battle`：绑定战斗数据。
+- `GET /api/cms/team/boss_aid`：首领配置。
+
+管理权限为 `r_race` 或创始人。这里的“战绩”与公开主页中的 `team_trophy.vue` 有展示层关联，但不是 `raid` 排表。
+
+战绩模块的数据来源、榜单规则、活动筛选、关联流程与当前后端边界详见 [战绩模块说明](./battle.md)。
+
+### 4.6 快照
+
+#### 入口与文件
+
+- 管理入口：工作台 `tab=manage-snapshot`。
+- 历史路由：`/snapshot/list`、`/snapshot/add`、`/snapshot/edit/:id`。
+- 页面：`snapshot/ListSnapshot.vue`、`AddSnapshot.vue`。
+- 组件：`snapshotList.vue`、`snapshotItem.vue`、`snapshotDetail.vue`、`snapshotBody.vue`、`snapshotRole.vue`、`snapshotStat.vue`、`snapshotChart.vue`。
+- 功能设置：`snapshot/EditPassword.vue`。
+
+#### 接口
+
+- `GET /api/cms/team/snapshot/team/:teamId`：快照列表。
+- `POST /api/cms/team/snapshot/team/:teamId`：新增。
+- `GET /api/cms/team/snapshot/record/:id`：详情。
+- `PUT /api/cms/team/snapshot/record/:id`：编辑。
+- `DELETE /api/cms/team/snapshot/record/:id`：软删除。
+- `GET /api/cms/team/snapshot/team/:teamId/more`：按时间查看更多/统计。
+- `PUT /api/cms/team/dkp/:teamId/snapshot/:snapshotId`：按快照名单关联当前团队成员，并批量增加考勤 DKP。
+
+快照已从 Go Team API 迁到 `service-cms`，数据仍使用团队数据库的 `team_snapshot` 表。创建、编辑、删除要求系统管理员、团队创始人或 `r_snapshot`；团队正式成员可以读取列表、详情和统计，但不能修改。所有查询都限制 `status=1、has_deleted=0`，删除使用软删除。
+
+列表支持分页和关键词搜索；统计接口支持搜索以及按 Asia/Shanghai 自然日解释的开始、结束日期。相关快照详情使用 Vue 3 `modelValue / update:modelValue` 合同，列表分页展示，阵容弹窗固定按五队结构预览。编辑弹窗只提交 `team_id、teammate、title、desc` 白名单字段，并忽略已经过期的异步详情响应。
+
+公开主页当前不开放快照页签，因此“团队成员可读”不等于“匿名访客公开可读”。
+
+### 4.7 DKP
+
+#### 入口与文件
+
+- 团队管理：工作台 `tab=manage-dkp`，`views/team/dkp/ManageDkp.vue`。
+- 个人查询：工作台 `tab=my-dkp`，`views/team/dkp/MyDkp.vue`。
+- 公开查看：团队主页 `views/team/dkp/ViewDkp.vue`。
+- 历史路由：`/dkp/manage`、`/dkp/my`。
+- 核心组件：`dkp_list.vue`、`dkp_logs.vue`、`dkp_dialog.vue`、`Character.vue`、`drop_item.vue`。
+- 规则：`views/team/dkp/EditDkpRule.vue`。
+
+#### 能力
+
+- 初始化与同步团队 DKP。
+- 批量或单项增减分、编辑与删除记录。
+- 查询团队总表、日志、个人分数和排名。
+- 重置 DKP、配置 DKP 规则。
+- 从快照同步成员/DKP 数据。
+
+快照考勤只为能够关联到当前团队成员的角色记分；未绑定网站账号或未加入团队的名单项会自动跳过，并在提交结果中返回跳过数量。
+
+DKP 的总分、日志、重置、制度和快照考勤统一使用 CMS API；管理权限为 `r_dkp` 或创始人，重置仅限创始人，读取还受团队 `v_dkp` 设置控制。
+
+DKP 写入合同：
+
+- 手工批量调整最多 200 条，同一请求内 `user_id` 唯一；分数必须为正整数，增减由 `action` 表达。
+- 写入前必须确认目标账号是当前团队的有效正式成员；指定 `role_id` 时，该角色也必须属于该账号在当前团队的有效关系。
+- 总表更新与日志写入处于同一数据库事务，任何一项失败都应整体回滚。
+- 快照考勤以快照记录锁和 `dkp` 标记保证幂等；已经同步的快照再次提交返回冲突，不重复加分。
+- 重置仅归零当前分数并保留历史记录，同时写入操作审计；只有团队创始人可以执行。
+- DKP 制度按 `team_id` 唯一保存；总表按 `team_id + user_id` 唯一保存。
+
+数据库结构加固由 `service-cms/migrations/20260802_harden_team_dkp.sql` 承担，包括唯一索引、非空默认值和日志 `operator_id`。发布 DKP 后端前必须先确认迁移已在目标数据库成功执行；代码提交或单元测试通过不代表迁移已经落库。
+
+### 4.8 排表（RAID）
+
+#### 业务含义
+
+当前代码中的 `raid` 是实际可用的团队排表和报名系统，覆盖活动 CRUD、模板、角色报名、正式/替补/候选名单、成员调整与排序。
+
+#### 路由
+
+| 路由 | 页面 | 功能 |
+| --- | --- | --- |
+| `/raid/add` | `raid/AddRaid.vue` | 创建排表 |
+| `/raid/edit/:id` | `raid/EditRaid.vue` | 编辑排表 |
+| `/raid/manage` | `raid/ManageRaid.vue` | 管理团队排表 |
+| `/raid/my` | `raid/MyTeamRaid.vue` | 我报名的近期排表 |
+| `/raid/list` | `raid/ListRaid.vue` | 公开活动大厅 |
+| `/raid/:id` | `raid/ViewRaid.vue` | 排表详情与报名 |
+
+工作台中同样嵌入：管理视图 `tab=manage-raid`，成员视图 `tab=my-raid`。
+
+#### 主要组件
+
+- `Raid.vue`、`RaidNormal_v1.vue`、`RaidNormal_v2.vue`：排表主体及版本布局。
+- `RaidMemberSetting.vue`：成员安排。
+- `RaidTobe.vue`、`RaidSub.vue`：候选和替补。
+- `JoinPop.vue`、`MemberPop.vue`：报名和成员弹窗。
+- `TemplateList.vue`：排表模板。
+- `RaidItem.vue`、`RaidList.vue`、`ActivityItem.vue`：列表展示。
+
+#### 接口边界
+
+RAID 主数据位于 CMS：`/api/cms/team/raid...`；角色搜索来自 Team API。接口支持活动 CRUD、模板 CRUD、公开搜索、我的报名、置顶、退出，以及正式/替补/候选成员的新增、转换、拒绝、移除和排序。
+
+管理权限为 `r_raid` 或创始人。
+
+#### 与 plan 的区别
+
+`src/views/team/plan/` 当前包含 `/plan/add`、`/plan/edit/:id`、`/plan/list`、`/plan/:id/all` 等路由，但没有对应的 `service/team/plan.js`：
+
+- `ListPlan.vue` 和 `AllPlan.vue` 中存在硬编码示例内容。
+- `AddPlan.vue` 主要是本地表单结构，尚未形成完整持久化闭环。
+- `ViewPlan.vue` 仍有 TODO。
+
+因此当前产品语义应以 **RAID = 排表** 为准；`plan` 暂记为未完成的“活动规划”原型，不应与 RAID 并列宣传为已完成能力。
+
+## 5. 辅助与历史模块
+
+以下代码存在，但不属于上述 8 个核心域：
+
+- `views/team/apply/`、`service/team/apply.js`：团队福利/活动申请，不是成员入团申请。
+- `service/team/verify.js`：团队认证。
+- `service/team/admin.js`：管理员和成员移除。
+- `service/team/namespace.js`：团队命名空间。
+- `service/team/qqbot.js`：QQ群机器人对团队活动的读取与修改。
+- `service/team/server.js`：用户资料、公告、团队事件和 Banner 等辅助数据。
+- `views/team/Index.vue`：旧团队首页/聚合页，当前 `/team/` 路由没有使用它。
+- `components/team/Wrapper.vue`、`components/team/widget/Nav.vue`：历史外壳/导航，当前主外壳使用 `App.vue` 和 `Nav2.vue`。
+
+这些文件不能仅凭“当前主入口未引用”就直接删除；删除前还要检查动态组件、其它多页面入口和线上旧链接。
+
+## 6. 权限模型
+
+当前权限不是简单的“创始人/团员”二元判断：
+
+- **访客**：浏览团队广场、公开团队主页、活动大厅和公开 RAID 详情。
+- **登录用户/团员**：查看自己在团队中的角色、战绩、DKP 和已参与 RAID。
+- **管理员**：由团队权限列表获得一个或多个业务权限。
+- **创始人**：`team.super == uid`，拥有全部管理页签，并独占团队档案设置。
+
+团队管理列表的身份标签在 Web 与后续 App 中统一使用以下判定：
+
+- `team.super == 当前 uid`：显示“创始人”。
+- 团队出现在当前用户的可管理列表中、但 `team.super != 当前 uid`：显示“管理员”。
+- 管理列表不再使用“团长”标签，也不以无标签的箭头代替“管理员”身份。
+
+主要权限字段：
+
+| 字段 | 业务域 |
+| --- | --- |
+| `r_member` | 成员管理 |
+| `r_race` | 战绩管理 |
+| `r_video` | 视频管理 |
+| `r_snapshot` | 快照管理 |
+| `r_dkp` | DKP 管理 |
+| `r_raid` | RAID/排表管理 |
+| `r_plan` | 历史活动规划权限，当前统一工作台未使用 |
+| `r_drop` | 金团账目；管理员权限界面允许分配，当前统一工作台尚无对应页签 |
+| `r_audit` | 仍存在于数据结构，需结合服务端业务进一步确认 |
+
+路由的 `meta.isPublic` 只负责第一层登录拦截；团队内具体操作还依赖接口权限和组件内判断，不能仅根据路由公开性推断业务授权。
+
+## 7. 当前文件索引
+
+```text
+src/pages/team/
+├── index.js                 # 应用入口
+├── App.vue                  # 页面外壳、登录拦截、工作台布局
+├── router.js                # 路由真值
+└── store.js                 # 跨模块状态
+
+src/views/team/
+├── org/                     # 档案、公开主页、团队工作台、视频、留言
+├── role/                    # 用户自己的游戏角色
+├── member/                  # 团队成员关系、审核和管理
+├── battle/                  # 团队/个人战绩
+├── snapshot/                # 团队快照
+├── dkp/                     # DKP
+├── raid/                    # 排表、报名和活动大厅
+├── plan/                    # 未完成的活动规划原型
+└── apply/                   # 团队福利/活动申请
+
+src/components/team/
+├── org/                     # 团队资料与主页展示组件
+├── member/                  # 入团弹窗等成员组件
+├── role/                    # 角色表单
+├── snapshot/                # 快照详情、统计与图表
+├── dkp/                     # DKP 表格、日志和编辑弹窗
+├── raid/                    # 排表主体、名单、模板和报名
+├── plan/                    # 活动规划条目
+└── widget/                  # 导航、头像、上传、物品等通用组件
+
+src/service/team/
+├── team.js                  # 团队资料、视频、权限入口
+├── role.js                  # 用户角色 CRUD/绑定
+├── member.js                # 入团关系与成员管理
+├── admin.js                 # 管理员与强制移除
+├── battle.js                # 战绩与战斗关联
+├── snapshot.js              # 快照 CRUD
+├── dkp.js                   # DKP
+├── raid.js                  # RAID/排表
+├── verify.js                # 团队认证
+├── namespace.js             # 团队命名空间
+├── apply.js                 # 福利活动申请
+├── qqbot.js                 # QQ 机器人活动桥接
+├── server.js                # 辅助 CMS 数据
+└── item.js                  # 物品展示工具
+```
+
+## 8. 后续优化建议边界
+
+1. 以“团队广场 → 团队公开主页 → 我的团队工作台”作为一级信息架构。
+2. 工作台内部再按“成员视图 / 管理视图”区分身份，不为每个能力重复造一套团队选择页。
+3. 档案只承担团队本体和权限设置；成员审核归角色与成员；各业务模块保留自己的数据 CRUD。
+4. 对外主页只组合允许公开的模块；所有公开级别都以真实字段和接口合同为准。
+5. 战绩统一使用 `battle` 术语，排表统一使用 `raid` 术语；产品文案可显示中文，但代码映射必须明确。
+6. 在确认并迁移旧链接前，保留 `/org/manage`、`/org/edit/:id`、独立 `/battle`、`/dkp/*`、`/snapshot/*`、`/raid/*` 等历史路由。
+7. `plan` 在补齐产品定义、接口和 CRUD 闭环前，标记为原型，不纳入核心可用功能。
+8. 后续每次优化一个模块时，应同步核对：路由入口、工作台嵌入方式、服务接口、权限字段、公开主页展示和历史入口兼容。
+
+## 9. 现有验证文件
+
+- `tests/team-home.test.mjs`：团队首页、统一工作台、档案及 DKP 等结构约束。
+- `tests/team-member-management.test.mjs`：正式成员和加入申请管理。
+- `tests/team-battle-management.test.mjs`：战绩管理。
+- `docs/design/TEAM_HOMEPAGE_DESIGN_GUIDE.md`：已落地的团队首页视觉与交互基线。
+
+本文档是业务结构盘点。具体接口响应字段、服务端权限判定和线上兼容情况，在对应模块进入改造前仍需结合真实请求逐项验证。

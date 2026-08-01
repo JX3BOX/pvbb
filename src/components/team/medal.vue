@@ -1,15 +1,20 @@
 <template>
     <div class="m-medal">
-        <a
-            :href="medalLink(item)"
-            target="_blank"
-            class="u-medal"
-            v-for="item in medals"
-            :key="item.id"
-            :title="item.medal_desc"
-        >
-            <img class="u-medal-img" :src="showIcon(item.medal)" />
-        </a>
+        <template v-for="item in medals" :key="item.id">
+            <a
+                v-if="interactive"
+                :href="medalLink(item)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="u-medal"
+                :title="item.medal_desc"
+            >
+                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || '勋章'" />
+            </a>
+            <span v-else class="u-medal is-static" :title="item.medal_desc">
+                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || '勋章'" />
+            </span>
+        </template>
     </div>
 </template>
 
@@ -27,6 +32,10 @@ export default {
             type: Function,
             default: () => true,
         },
+        interactive: {
+            type: Boolean,
+            default: true,
+        },
     },
     methods: {
         medalLink(medal) {
@@ -42,6 +51,11 @@ export default {
     display: flex;
     .u-medal {
         cursor: pointer;
+
+        &.is-static {
+            cursor: default;
+        }
+
         .u-medal-img {
             width: 20px;
             height: 20px;
