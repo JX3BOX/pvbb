@@ -32,6 +32,14 @@ test("raid detail only shows legacy conflict-free mounts for legacy content", as
     assert.match(page, /if \(!Array\.isArray\(this\.data\?\.content\)\) return \[\]/);
 });
 
+test("raid detail renders the 10-player roster on a 5 by 5 board", async () => {
+    const page = await read("../src/views/team/raid/ViewRaid.vue");
+
+    assert.match(page, /<Raid[\s\S]*:row="displayRow"[\s\S]*:col="displayCol"/);
+    assert.match(page, /displayRow:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5 : this\.data\?\.row/);
+    assert.match(page, /displayCol:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5 : this\.data\?\.col/);
+});
+
 test("raid detail component chain uses Vue 3 model and mitt event contracts", async () => {
     const [raid, normalV1, normalV2, sub, tobe, join, memberSetting, memberPop, roleDialog, page] = await Promise.all([
         read("../src/components/team/raid/Raid.vue"),
@@ -123,6 +131,10 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(raidStyles, /grid-auto-flow:\s*column/);
     assert.match(raidStyles, /grid-template-columns:\s*repeat\(var\(--raid-columns,\s*5\),\s*minmax\(0,\s*1fr\)\)/);
     assert.match(raidStyles, /grid-template-rows:\s*repeat\(var\(--raid-rows,\s*5\),\s*68px\)/);
+    assert.match(raidStyles, /@media screen and \(max-width:\s*@phone\)[\s\S]*\.m-raid-corebox\.m-raid-normal\s*\{[\s\S]*overflow-x:\s*auto/);
+    assert.match(raidStyles, /@media screen and \(max-width:\s*@phone\)[\s\S]*\.m-raid-normal \.m-raid-members\s*\{[\s\S]*grid-auto-flow:\s*column/);
+    assert.match(raidStyles, /grid-template-columns:\s*repeat\(var\(--raid-columns,\s*5\),\s*220px\)/);
+    assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal \.m-raid-flag\s*\{[\s\S]*display:\s*flex/);
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal[\s\S]*border-radius:\s*18px/);
     assert.match(normalV1 + normalV2, /--raid-columns/);
     assert.match(normalV1 + normalV2, /\{\{\s*f\s*\}\}\s*队/);

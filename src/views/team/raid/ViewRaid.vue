@@ -138,8 +138,8 @@
                             :team-id="team_id"
                             :leader="data.leader"
                             :content="data.content"
-                            :row="data.row"
-                            :col="data.col"
+                            :row="displayRow"
+                            :col="displayCol"
                             :is-public="data.is_public"
                             :isForceMatch="data.force_match"
                             @updateMembers="handleUpdate"
@@ -262,6 +262,12 @@ export default {
         },
         isOldVersion: function () {
             return !!this.data?.content;
+        },
+        displayRow: function () {
+            return Number(this.data?.count) === 10 ? 5 : this.data?.row;
+        },
+        displayCol: function () {
+            return Number(this.data?.count) === 10 ? 5 : this.data?.col;
         },
         chosenRole: function ({ formData }) {
             const data = {

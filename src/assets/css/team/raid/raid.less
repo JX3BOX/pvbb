@@ -407,12 +407,7 @@
         }
     }
 
-    .m-raid-flag {
-        display: none;
-    }
-
-    .m-raid-core .m-raid-members,
-    .m-raid-normal .m-raid-members {
+    .m-raid-core .m-raid-members {
         display: grid;
         height: auto !important;
         margin: 0;
@@ -435,6 +430,45 @@
 
         .u-group-start {
             display: none;
+        }
+    }
+
+    .m-raid-corebox.m-raid-normal {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .m-raid-corebox.m-raid-normal .m-raid-flag {
+        display: flex;
+        width: max-content;
+        min-width: 100%;
+
+        .i-flag {
+            flex: 0 0 220px;
+        }
+    }
+
+    .m-raid-normal .m-raid-members {
+        width: max-content;
+        min-width: 100%;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        grid-auto-flow: column;
+        grid-template-columns: repeat(var(--raid-columns, 5), 220px);
+        grid-template-rows: repeat(var(--raid-rows, 5), 68px);
+        gap: 0;
+
+        .u-member {
+            width: auto;
+            height: 68px;
+            min-height: 68px;
+            padding: 16px 52px 16px 22px;
+            border: 0;
+            border-right: 1px solid @team-border;
+            border-bottom: 1px solid @team-border;
+            border-radius: 0;
         }
     }
 }
