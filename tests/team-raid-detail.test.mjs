@@ -26,6 +26,14 @@ test("snapshot editor ignores stale record responses", async () => {
     assert.match(dialog, /this\.loadRequestId \+= 1/);
 });
 
+test("snapshot editor submits a writable field whitelist and handles request errors", async () => {
+    const dialog = await read("../src/components/team/snapshot/EditSnapshotDialog.vue");
+
+    assert.doesNotMatch(dialog, /const payload = \{\s*\.\.\.this\.form/);
+    assert.match(dialog, /const payload = \{[\s\S]*?team_id: this\.selectedTeamId,[\s\S]*?title: this\.form\.title \|\| "",[\s\S]*?desc: this\.form\.desc \|\| "",[\s\S]*?teammate: this\.teammate/);
+    assert.match(dialog, /catch \(error\) \{[\s\S]*?error\?\.response\?\.data\?\.msg \|\| "快照保存失败，请稍后重试"/);
+});
+
 test("raid detail only shows legacy conflict-free mounts for legacy content", async () => {
     const page = await read("../src/views/team/raid/ViewRaid.vue");
 

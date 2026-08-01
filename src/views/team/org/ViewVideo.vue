@@ -54,17 +54,15 @@ import {
     getBoss,
     getTeamsList,
     getVideos,
-    getVideosMaster,
     updateVideo,
     deleteVideo,
     addVideo,
 } from "@/service/team/team.js";
 import team_videos from "@/components/team/org/team_videos.vue";
 import rank_event_boss from "@/assets/data/team/rank_event_boss.json";
-import User from "@jx3box/jx3box-common/js/user";
 export default {
     name: "ViewVideo",
-    props: ["v", "super", "authority"],
+    props: ["v", "authority"],
     components: { "team-videos": team_videos },
     data: function () {
         return {
@@ -99,11 +97,7 @@ export default {
                 page: this.page,
                 per: this.per,
                 total: this.total,
-                isMaster: this.isMaster,
             };
-        },
-        isMaster() {
-            return User.getInfo().uid == this.super;
         },
         rank_event_boss() {
             return rank_event_boss;
@@ -125,30 +119,26 @@ export default {
         },
     },
     methods: {
-        // 加载视频列表，团长显示可编辑删除等功能
+        // 公开主页始终只加载审核通过的视频
         loadVideos() {
             this.loading = true;
-            let _params = {
+            const params = {
                 pageIndex: this.page,
                 pageSize: this.per,
             };
-            this.isMaster
-                ? getVideosMaster(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      })
-                : getVideos(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      });
+
+            return getVideos(this.id, params)
+                .then((res) => {
+                    this.videos_list = res.data.data.list || [];
+                    this.total = res.data.data.page.total;
+                })
+                .catch(() => {
+                    this.videos_list = [];
+                    this.total = 0;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 加载赛事和 boss
         loadEvents() {

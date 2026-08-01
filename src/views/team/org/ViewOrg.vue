@@ -13,13 +13,19 @@
         </section>
 
         <template v-else>
-            <section class="m-public-org__hero" aria-label="团队信息">
+            <section
+                class="m-public-org__hero"
+                :class="{ 'has-banner': publicBanner }"
+                :style="publicBanner ? { '--team-banner-image': `url('${publicBanner}')` } : null"
+                aria-label="团队信息"
+            >
                 <team-info
                     v-if="done"
                     :key="`public-team-info-${id}`"
                     :info="data"
                     :team_id="id"
                     :show-manage-action="false"
+                    :always-show-join-action="true"
                 />
             </section>
 
@@ -51,13 +57,19 @@
                             />
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="DKP记录" name="dkp" lazy>
+                    <el-tab-pane label="团队活动" name="raid" lazy>
                         <template #label>
-                            <el-icon><Coin /></el-icon>
-                            <span>DKP记录</span>
+                            <el-icon><Calendar /></el-icon>
+                            <span>团队活动</span>
                         </template>
                         <div class="m-public-org__pane">
-                            <ViewDkp v-if="done" :v="data.v_dkp" :super="data.super" :authority="authority" />
+                            <TeamRaid
+                                v-if="done"
+                                :v="data.v_activity"
+                                :super="data.super"
+                                :authority="authority"
+                                :is-home-page="true"
+                            />
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="通关视频" name="video" lazy>
@@ -66,7 +78,7 @@
                             <span>通关视频</span>
                         </template>
                         <div class="m-public-org__pane">
-                            <ViewVideo v-if="done" :super="data.super" />
+                            <ViewVideo v-if="done" />
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="留言板" name="comment" lazy class="m-team-notes">
@@ -99,15 +111,16 @@ import team_recruit from "@/components/team/org/team_recruit.vue";
 import ViewMember from "@/views/team/member/ViewMember.vue";
 import ViewComment from "@/views/team/org/ViewComment.vue";
 import ViewVideo from "@/views/team/org/ViewVideo.vue";
-import ViewDkp from "@/views/team/dkp/ViewDkp.vue";
+import TeamRaid from "@/views/team/raid/TeamRaid.vue";
 
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
+import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getTeam } from "@/service/team/team.js";
 import { checkMyAuthority } from "@/service/team/member.js";
-import { ChatLineSquare, Coin, DataBoard, Refresh, User as UserIcon, VideoPlay, WarningFilled } from "@element-plus/icons-vue";
+import { Calendar, ChatLineSquare, DataBoard, Refresh, User as UserIcon, VideoPlay, WarningFilled } from "@element-plus/icons-vue";
 
-const PUBLIC_TABS = ["overview", "member", "dkp", "video", "comment"];
+const PUBLIC_TABS = ["overview", "member", "raid", "video", "comment"];
 
 function createDefaultTeam() {
     return {
@@ -125,6 +138,7 @@ function createDefaultTeam() {
         v_activity: 0,
         v_dkp: 0,
         v_comment: 0,
+        banner: "",
     };
 }
 
@@ -162,6 +176,9 @@ export default {
         },
         query: function () {
             return this.$route.query.tab;
+        },
+        publicBanner: function () {
+            return this.data.banner ? resolveImagePath(this.data.banner) : "";
         },
     },
     methods: {
@@ -255,13 +272,13 @@ export default {
         "team-medals": team_medals,
         "team-trophy": team_trophy,
         "team-recruit": team_recruit,
+        Calendar,
         ChatLineSquare,
-        Coin,
         DataBoard,
         Refresh,
         User: UserIcon,
         ViewMember,
-        ViewDkp,
+        TeamRaid,
         ViewComment,
         ViewVideo,
         VideoPlay,

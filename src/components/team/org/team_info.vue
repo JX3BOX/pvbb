@@ -78,12 +78,15 @@
         </div>
 
         <team-panel
-            v-if="!isRaid || !isTeamSuper"
+            v-if="(showPublicActions || showHomeAction) && (!isRaid || !isTeamSuper)"
             :team="info"
             :isRaid="isRaid"
             :team_id="id"
             :isMine="isMine"
             :showManageAction="showManageAction !== false"
+            :show-public-actions="showPublicActions"
+            :show-home-action="showHomeAction"
+            :always-show-join-action="alwaysShowJoinAction"
         />
     </div>
 </template>
@@ -102,7 +105,40 @@ import User from "@jx3box/jx3box-common/js/user";
 
 export default {
     name: "team_info",
-    props: ["info", "isRaid", "team_id", "isMine", "showManageAction"],
+    props: {
+        info: {
+            type: Object,
+            default: () => ({}),
+        },
+        isRaid: {
+            type: Boolean,
+            default: false,
+        },
+        team_id: {
+            type: [Number, String],
+            default: 0,
+        },
+        isMine: {
+            type: Boolean,
+            default: false,
+        },
+        showManageAction: {
+            type: Boolean,
+            default: true,
+        },
+        showPublicActions: {
+            type: Boolean,
+            default: true,
+        },
+        showHomeAction: {
+            type: Boolean,
+            default: false,
+        },
+        alwaysShowJoinAction: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data: function () {
         return {
             tvmap,

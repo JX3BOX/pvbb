@@ -79,7 +79,7 @@
                             class="u-btn u-reject"
                             type="button"
                             :disabled="processingIds.includes(item.relation.role_id)"
-                            @click="rejectRole(item.relation.team_id, item.relation.role_id, i)"
+                            @click="rejectRole(item.relation.role_id)"
                         >
                             <el-icon><Close /></el-icon>
                             拒绝
@@ -88,7 +88,7 @@
                             class="u-btn u-pass"
                             type="button"
                             :disabled="processingIds.includes(item.relation.role_id)"
-                            @click="checkRole(item.relation.team_id, item.relation.role_id, i)"
+                            @click="checkRole(item.relation.role_id)"
                         >
                             <el-icon><Check /></el-icon>
                             批准加入
@@ -159,13 +159,13 @@ export default {
                     this.loading = false;
                 });
         },
-        checkRole(team_id, role_id, i) {
+        checkRole(role_id) {
             if (this.processingIds.includes(role_id)) return;
+            const teamId = this.team_id;
             this.processingIds.push(role_id);
-            checkRole(team_id, role_id)
+            checkRole(teamId, role_id)
                 .then(() => {
-                    this.data.splice(i, 1);
-                    this.updateTotal(this.total - 1);
+                    if (!this.removePendingRole(teamId, role_id)) return;
                     this.$notify({
                         title: "操作成功",
                         message: "批准该成员加入",
@@ -176,19 +176,20 @@ export default {
                     this.processingIds = this.processingIds.filter((id) => id !== role_id);
                 });
         },
-        rejectRole(team_id, role_id, i) {
+        rejectRole(role_id) {
             if (this.processingIds.includes(role_id)) return;
+            const teamId = this.team_id;
             this.$confirm("确定拒绝该角色的加入申请？拒绝后该申请将从列表中移除。", "拒绝加入申请", {
                 confirmButtonText: "确认拒绝",
                 cancelButtonText: "取消",
                 type: "warning",
             })
                 .then(() => {
+                    if (String(this.team_id) !== String(teamId)) return;
                     this.processingIds.push(role_id);
-                    return deleteRole(team_id, role_id)
+                    return deleteRole(teamId, role_id)
                         .then(() => {
-                            this.data.splice(i, 1);
-                            this.updateTotal(this.total - 1);
+                            if (!this.removePendingRole(teamId, role_id)) return;
                             this.$notify({
                                 title: "操作成功",
                                 message: "已拒绝该成员加入",
@@ -200,6 +201,15 @@ export default {
                         });
                 })
                 .catch(() => {});
+        },
+        removePendingRole(teamId, role_id) {
+            if (String(this.team_id) !== String(teamId)) return false;
+            const index = this.data.findIndex((item) => item.relation.role_id === role_id);
+            if (index !== -1) {
+                this.data.splice(index, 1);
+                this.updateTotal(this.total - 1);
+            }
+            return true;
         },
         changePage: function () {
             window.scrollTo(0, 0);

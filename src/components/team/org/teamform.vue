@@ -166,16 +166,6 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="团队DKP" class="m-team-field is-visibility">
-                <el-select v-model.number="form.v_dkp" placeholder="请选择">
-                    <el-option
-                        v-for="item in vismap"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                    ></el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item label="留言板" class="m-team-field is-visibility">
                 <el-select v-model.number="form.v_comment" placeholder="请选择">
                     <el-option
@@ -240,7 +230,7 @@ export default {
                 tv_type: "",
                 tv: "",
                 v_member: 99,
-                v_dkp: 99,
+                v_dkp: 2,
                 v_activity: 99,
                 v_comment: 99,
                 yy_channel: "",
@@ -304,6 +294,7 @@ export default {
                 return;
             }
 
+            this.form.v_dkp = 2;
             this.$emit("submit");
         },
         checkTeamName: function () {

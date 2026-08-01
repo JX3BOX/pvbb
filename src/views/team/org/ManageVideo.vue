@@ -8,13 +8,13 @@
                     <p>管理团队在各赛季活动中的首领通关录像。</p>
                 </span>
             </div>
-            <el-button class="u-add" type="primary" v-if="isMaster" @click="openDialog">
+            <el-button class="u-add" type="primary" v-if="canManage" @click="openDialog">
                 <el-icon><Plus /></el-icon>
                 <span>添加通关视频</span>
             </el-button>
         </header>
 
-        <team-videos :data="videos" @toEmit="isEmit" :isMine="true" />
+        <team-videos :data="videos" @toEmit="isEmit" :isMine="canManage" />
 
         <el-dialog
             class="m-rank-video-dialog"
@@ -118,14 +118,17 @@ import {
     addVideo,
 } from "@/service/team/team.js";
 import team_videos from "@/components/team/org/team_videos.vue";
-import User from "@jx3box/jx3box-common/js/user";
 import { Film, Link, Plus, VideoCamera, WarningFilled } from "@element-plus/icons-vue";
 export default {
     name: "ManageVideo",
     props: {
-        super: {
+        teamId: {
             type: [Number, String],
             default: 0,
+        },
+        canManage: {
+            type: Boolean,
+            default: false,
         },
     },
     components: { Film, Link, Plus, VideoCamera, WarningFilled, "team-videos": team_videos },
@@ -151,7 +154,7 @@ export default {
     },
     computed: {
         id: function () {
-            return this.$route.params.id;
+            return ~~this.teamId;
         },
         videos() {
             return {
@@ -159,11 +162,8 @@ export default {
                 page: this.page,
                 per: this.per,
                 total: this.total,
-                isMaster: this.isMaster,
+                isMaster: this.canManage,
             };
-        },
-        isMaster() {
-            return User.getInfo().uid == this.super;
         },
         eventsBoss() {
             const event = this.eventsList.find((item) => this.video.event_id == item.ID);
@@ -182,36 +182,37 @@ export default {
         },
     },
     methods: {
-        // 加载视频列表，团长显示可编辑删除等功能
+        // 加载视频列表，有管理权限时加载包含审核状态的完整列表
         loadVideos() {
             this.loading = true;
-            let _params = {
+            const params = {
                 pageIndex: this.page,
                 pageSize: this.per,
             };
-            this.isMaster
-                ? getVideosMaster(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      })
-                : getVideos(this.id, _params)
-                      .then((res) => {
-                          this.videos_list = res.data.data.list || [];
-                          this.total = res.data.data.page.total;
-                      })
-                      .finally(() => {
-                          this.loading = false;
-                      });
+            const request = this.canManage ? getVideosMaster(this.id, params) : getVideos(this.id, params);
+
+            return request
+                .then((res) => {
+                    this.videos_list = res.data.data.list || [];
+                    this.total = res.data.data.page.total;
+                })
+                .catch(() => {
+                    this.videos_list = [];
+                    this.total = 0;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 加载赛事和 boss
         loadEvents() {
-            getTeamsList().then((res) => {
-                this.eventsList = res.data.data.list;
-            });
+            return getTeamsList()
+                .then((res) => {
+                    this.eventsList = res.data.data.list;
+                })
+                .catch(() => {
+                    this.eventsList = [];
+                });
         },
         // 子组件提交数据
         isEmit(data) {
@@ -248,13 +249,17 @@ export default {
                 confirmButtonText: "确定",
                 callback: (action) => {
                     if (action == "confirm") {
-                        deleteVideo(id).then((res) => {
-                            this.$message({
-                                type: "success",
-                                message: `删除成功`,
+                        return deleteVideo(id)
+                            .then(() => {
+                                this.$message({
+                                    type: "success",
+                                    message: `删除成功`,
+                                });
+                                this.videos_list = this.videos_list.filter((item) => item.ID !== id);
+                            })
+                            .catch(() => {
+                                // 公共请求拦截器已展示业务错误，这里只消费拒绝，避免触发运行时遮罩。
                             });
-                            this.videos_list = this.videos_list.filter((item) => item.ID !== id);
-                        });
                     }
                 },
             });
@@ -275,6 +280,9 @@ export default {
                         this.$message.success(isEditing ? "更新成功" : "发布成功");
                         this.dialogVisible = false;
                         this.loadVideos();
+                    })
+                    .catch(() => {
+                        // 公共请求拦截器已展示业务错误，这里只消费拒绝，避免触发运行时遮罩。
                     })
                     .finally(() => {
                         this.submitting = false;

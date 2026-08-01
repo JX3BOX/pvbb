@@ -35,11 +35,14 @@
                             </td>
                             <td>
                                 <el-button
+                                    class="u-quit-team"
                                     type="info"
                                     size="small"
                                     plain
                                     @click="confirmQuitTeam(role.info.ID, role.info.name, data, i)"
-                                    >退出</el-button
+                                >
+                                    <el-icon><SwitchButton /></el-icon>
+                                    退出</el-button
                                 >
                             </td>
                         </tr>
@@ -56,6 +59,7 @@ import { getMyJoinedTeams, changeRolePublic, quitTeam as quitTeamRequest } from 
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { showSchoolIcon, showSchoolName, showBodyType, showTime } from "@/utils/filters";
+import { SwitchButton } from "@element-plus/icons-vue";
 
 export default {
     name: "TeamRole",

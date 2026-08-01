@@ -2,7 +2,7 @@
     <div class="m-team-admin">
         <div class="u-feeling">
             <Good
-                v-if="!isRaid"
+                v-if="showPublicActions && !isRaid"
                 class="u-like"
                 mode="heart"
                 txt="好评"
@@ -30,7 +30,16 @@
         </div>
 
         <div class="u-panel">
-            <el-button v-if="showJoinAction" type="primary" icon="Right" size="small" @click="openPop">
+            <router-link v-if="showHomeAction" class="u-team-home-link" :to="`/org/${team_id}`" target="_blank">
+                <el-button type="primary" plain icon="HomeFilled" size="small">团队主页</el-button>
+            </router-link>
+            <el-button
+                v-if="showPublicActions && showJoinAction"
+                type="primary"
+                icon="Right"
+                size="small"
+                @click="openPop"
+            >
                 加入团队
             </el-button>
             <template v-if="!isRaid">
@@ -79,6 +88,18 @@ export default {
             type: Boolean,
             default: true,
         },
+        showPublicActions: {
+            type: Boolean,
+            default: true,
+        },
+        showHomeAction: {
+            type: Boolean,
+            default: false,
+        },
+        alwaysShowJoinAction: {
+            type: Boolean,
+            default: false,
+        },
     },
     data: function () {
         return {
@@ -105,7 +126,7 @@ export default {
             return this.data.super == this.uid;
         },
         showJoinAction: function () {
-            return !this.isMine && !this.isLeader;
+            return this.alwaysShowJoinAction || (!this.isMine && !this.isLeader);
         },
         showEditAction: function () {
             return this.showManageAction && (this.isLeader || this.isSuperAdmin);
@@ -174,7 +195,7 @@ export default {
                 },
                 query: {
                     tab: "setting",
-                    section: "basic",
+                    subtab: "basic",
                 },
             });
         },

@@ -78,7 +78,7 @@ test("team creation reuses the modern workspace and grouped archive form languag
     assert.match(page, /正在检查创建权限/);
     assert.match(page, /name:\s*"manage_my_org"/);
     assert.match(page, /v_member:\s*0/);
-    assert.match(page, /v_dkp:\s*0/);
+    assert.match(page, /v_dkp:\s*2/);
     assert.match(page, /v_activity:\s*0/);
     assert.match(page, /v_comment:\s*0/);
     assert.doesNotMatch(page, /带有必填校验的项目会在提交时提示/);
@@ -112,6 +112,18 @@ test("team workspace uses the persistent sidebar as its only team switcher", asy
     assert.match(sidebar, /name:\s*mode === "manage" \? "manage_my_org" : "view_my_org"/);
     assert.doesNotMatch(sidebar, /query:\s*\{\s*mode/);
     assert.match(sidebar, /this\.workspaceMode === mode/);
+});
+
+test("team member workspace redirects non-members to the public team page", async () => {
+    const workspace = await read("../src/views/team/org/ViewMyOrg.vue");
+
+    assert.match(workspace, /import \{ checkMyAuthority, getPendingCount \}/);
+    assert.match(workspace, /v-if="id && accessGranted"/);
+    assert.match(workspace, /checkMyAuthority\(requestedId\)/);
+    assert.match(workspace, /res\.data\.data\.authority < 2/);
+    assert.match(workspace, /name: "view_org",[\s\S]*?params: \{ id: requestedId \}/);
+    assert.match(workspace, /\["view_my_org", "manage_my_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(workspace, /if \(!isCurrentWorkspace \|\| this\.id !== requestedId\) return/);
 });
 
 test("team management uses a canonical route without the mode query", async () => {
@@ -151,18 +163,23 @@ test("team public homepage shares the modern shell and keeps public modules inta
     assert.match(router, /name:\s*"view_org"[\s\S]*?path:\s*"\/org\/:id"[\s\S]*?isPublic:\s*true/);
     assert.match(page, /class="v-org-view p-team-public"/);
     assert.match(page, /class="m-public-org__hero"/);
+    assert.match(page, /'has-banner': publicBanner/);
+    assert.match(page, /--team-banner-image/);
+    assert.match(page, /publicBanner:[\s\S]*?resolveImagePath\(this\.data\.banner\)/);
     assert.match(page, /class="m-public-org__workspace"/);
     assert.match(page, /<team-info[\s\S]*?:info="data"[\s\S]*?:team_id="id"/);
     assert.match(page, /<team-info[\s\S]*?:show-manage-action="false"/);
     assert.match(page, /class="m-team-view m-public-org__tabs"/);
     assert.doesNotMatch(page, /<el-tabs[^>]*type="card"/);
-    for (const tab of ["团队概况", "团队成员", "DKP记录", "通关视频", "留言板"]) {
+    for (const tab of ["团队概况", "团队成员", "团队活动", "通关视频", "留言板"]) {
         assert.match(page, new RegExp(`<span>${tab}<\\/span>`));
     }
-    for (const component of ["team-intro", "team-recruit", "team-medals", "team-trophy", "ViewMember", "ViewDkp", "ViewVideo", "ViewComment"]) {
+    assert.doesNotMatch(page, /DKP记录|ViewDkp|name="dkp"/);
+    for (const component of ["team-intro", "team-recruit", "team-medals", "team-trophy", "ViewMember", "TeamRaid", "ViewVideo", "ViewComment"]) {
         assert.match(page, new RegExp(`<${component}\\b`));
     }
-    assert.match(page, /const PUBLIC_TABS = \["overview", "member", "dkp", "video", "comment"\]/);
+    assert.match(page, /const PUBLIC_TABS = \["overview", "member", "raid", "video", "comment"\]/);
+    assert.match(page, /label="团队活动" name="raid"[\s\S]*?:v="data\.v_activity"[\s\S]*?:authority="authority"/);
     assert.match(page, /const query = \{ \.\.\.this\.\$route\.query \}/);
     assert.match(page, /Promise\.all\(\[this\.loadTeamInfo\(id\), this\.loadAuthority\(id\)\]\)/);
     assert.match(page, /version !== this\.loadVersion \|\| id !== this\.id/);
@@ -170,6 +187,16 @@ test("team public homepage shares the modern shell and keeps public modules inta
     assert.match(page, /class="m-public-org__error"/);
     assert.match(shellStyles, /> \.p-team-public/);
     assert.match(pageStyles, /\.p-team-public[\s\S]*\.m-public-org__hero[\s\S]*border-radius:\s*@team-radius-control/);
+    assert.match(pageStyles, /background-image:\s*var\(--team-banner-image\)/);
+    assert.match(pageStyles, /background-position:\s*right center/);
+    assert.match(pageStyles, /background-size:\s*cover/);
+    assert.match(pageStyles, /width:\s*min\(920px, 100%\)[\s\S]*height:\s*120px/);
+    assert.match(pageStyles, /linear-gradient\(90deg,[\s\S]*fade\(#fff, 92%\)[\s\S]*transparent 28%/);
+    assert.match(pageStyles, /max-width:\s*700px[\s\S]*fade\(#fff, 94%\)[\s\S]*transparent 72%/);
+    assert.match(pageStyles, /max-width:\s*520px[\s\S]*&::before,[\s\S]*display:\s*none !important/);
+    assert.match(pageStyles, /max-width:\s*520px[\s\S]*> \.u-logo[\s\S]*grid-row:\s*1/);
+    assert.match(pageStyles, /max-width:\s*520px[\s\S]*\.u-title[\s\S]*align-self:\s*center[\s\S]*grid-row:\s*1[\s\S]*flex-direction:\s*row/);
+    assert.match(pageStyles, /max-width:\s*520px[\s\S]*\.u-meta[\s\S]*background:\s*transparent/);
     assert.match(pageStyles, /\.m-team-info[\s\S]*grid-template-columns:\s*76px minmax\(0, 1fr\) auto/);
     assert.match(pageStyles, /\.m-public-org__overview[\s\S]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
 });
@@ -315,14 +342,69 @@ test("team card tabs keep their top border above painted tab backgrounds", async
     );
 });
 
+test("r_video administrators receive the complete video management workspace", async () => {
+    const [workspace, manager, publicPage, publicVideo, service] = await Promise.all([
+        read("../src/views/team/org/ViewMyOrg.vue"),
+        read("../src/views/team/org/ManageVideo.vue"),
+        read("../src/views/team/org/ViewOrg.vue"),
+        read("../src/views/team/org/ViewVideo.vue"),
+        read("../src/service/team/team.js"),
+    ]);
+
+    assert.match(workspace, /canManageVideo:[\s\S]*?this\.isSuper \|\| Number\(this\.permissions\.r_video\) === 1/);
+    assert.match(workspace, /<el-tab-pane label="视频管理"[^>]*v-if="canManageVideo"/);
+    assert.match(workspace, /<ManageVideo[\s\S]*?:key="`manage-video-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-manage="canManageVideo"/);
+    assert.match(workspace, /if \(this\.canManageVideo\) tabs\.push\("video"\)/);
+
+    assert.match(manager, /teamId:[\s\S]*?canManage:/);
+    assert.match(manager, /return ~~this\.teamId/);
+    assert.match(manager, /v-if="canManage" @click="openDialog"/);
+    assert.match(manager, /:isMine="canManage"/);
+    assert.match(manager, /isMaster:\s*this\.canManage/);
+    assert.match(manager, /this\.canManage \? getVideosMaster\(this\.id, params\) : getVideos\(this\.id, params\)/);
+    assert.match(manager, /return request[\s\S]*?\.catch\(\(\) => \{[\s\S]*?this\.videos_list = \[\];[\s\S]*?this\.total = 0/);
+    assert.match(manager, /return getTeamsList\(\)[\s\S]*?\.catch\(\(\) => \{[\s\S]*?this\.eventsList = \[\]/);
+    assert.match(manager, /deleteVideo\(id\)[\s\S]*?\.catch\(\(\) => \{/);
+    assert.match(manager, /const request = isEditing[\s\S]*?\.catch\(\(\) => \{[\s\S]*?\.finally\(\(\) => \{/);
+    assert.doesNotMatch(manager, /User\.getInfo\(\)\.uid == this\.super/);
+
+    assert.match(publicPage, /<ViewVideo v-if="done" \/>/);
+    assert.match(publicVideo, /<team-videos :data="videos" @toEmit="isEmit" \/>/);
+    assert.match(publicVideo, /return getVideos\(this\.id, params\)/);
+    assert.doesNotMatch(publicVideo, /getVideosMaster/);
+    assert.doesNotMatch(publicVideo, /User\.getInfo\(\)\.uid == this\.super/);
+    assert.match(service, /get\(`\/api\/team\/video\/team\/\$\{id\}\/all`/);
+});
+
 test("team edit action opens the basic settings section in the workbench", async () => {
     const panel = await read("../src/components/team/org/team_panel.vue");
 
     assert.match(panel, /name:\s*"manage_my_org"/);
     assert.doesNotMatch(panel, /mode:\s*"manage"/);
     assert.match(panel, /tab:\s*"setting"/);
-    assert.match(panel, /section:\s*"basic"/);
+    assert.match(panel, /subtab:\s*"basic"/);
     assert.match(panel, /this\.showManageAction && \(this\.isLeader \|\| this\.isSuperAdmin\)/);
+});
+
+test("team header actions follow management, member, and public route modes", async () => {
+    const [workspace, publicPage, info, panel] = await Promise.all([
+        read("../src/views/team/org/ViewMyOrg.vue"),
+        read("../src/views/team/org/ViewOrg.vue"),
+        read("../src/components/team/org/team_info.vue"),
+        read("../src/components/team/org/team_panel.vue"),
+    ]);
+
+    assert.match(workspace, /:show-public-actions="false"/);
+    assert.match(workspace, /:show-home-action="true"/);
+    assert.doesNotMatch(workspace, /:always-show-join-action="!isManagementMode"/);
+    assert.match(publicPage, /:always-show-join-action="true"/);
+    assert.match(info, /v-if="\(showPublicActions \|\| showHomeAction\) && \(!isRaid \|\| !isTeamSuper\)"/);
+    assert.match(info, /:show-home-action="showHomeAction"/);
+    assert.match(info, /:always-show-join-action="alwaysShowJoinAction"/);
+    assert.match(panel, /v-if="showHomeAction"[\s\S]*?:to="`\/org\/\$\{team_id\}`"[\s\S]*?团队主页/);
+    assert.match(panel, /v-if="showPublicActions && !isRaid"/);
+    assert.match(panel, /v-if="showPublicActions && showJoinAction"/);
+    assert.match(panel, /return this\.alwaysShowJoinAction \|\| \(!this\.isMine && !this\.isLeader\)/);
 });
 
 test("team workspace separates management tools from the member view", async () => {
@@ -340,25 +422,29 @@ test("team workspace separates management tools from the member view", async () 
     assert.deepEqual(topLevelLabels, [
         "成员管理",
         "战绩管理",
+        "活动管理",
         "快照管理",
         "DKP管理",
-        "RAID管理",
         "视频管理",
         "团队设置",
         "我的角色",
         "我的战绩",
-        "我的DKP",
-        "参与的RAID",
+        "团队活动",
+        "团队快照",
+        "团队DKP",
+        "通关视频",
+        "留言板",
     ]);
-    assert.doesNotMatch(managementTemplate, /我的角色|我的战绩|我的DKP|参与的RAID/);
-    assert.doesNotMatch(memberTemplate, /成员管理|战绩管理|视频管理|快照管理|DKP管理|RAID管理|团队设置/);
+    assert.doesNotMatch(managementTemplate, /我的角色|我的战绩|团队DKP|团队活动/);
+    assert.doesNotMatch(memberTemplate, /成员管理|战绩管理|视频管理|快照管理|DKP管理|活动管理|团队设置/);
     assert.match(managementTemplate, /<Setting \/>[\s\S]*?<span>团队设置<\/span>/);
-    assert.match(workspace, /class="m-my-org__identity"/);
-    assert.doesNotMatch(workspace, /当前管理团队|当前团队/);
-    assert.match(workspace, /data\.logo \? showTeamLogo\(data\.logo\) : defaultLogo/);
-    assert.match(workspace, /isSuper \? "创始人" : "管理员"/);
-    assert.match(workspace, /团队 ID \{\{ id \}\}/);
-    assert.doesNotMatch(workspace, /<team-info|switchWorkspaceMode|专注成员、内容、团队数据与基础设置/);
+    assert.match(workspace, /class="p-team-my-org p-team-public"/);
+    assert.match(workspace, /class="m-public-org__hero"/);
+    assert.match(workspace, /'has-banner': publicBanner/);
+    assert.match(workspace, /<team-info[\s\S]*?:info="data"[\s\S]*?:team_id="id"/);
+    assert.match(workspace, /<team-info[\s\S]*?:show-manage-action="false"/);
+    assert.match(workspace, /publicBanner:[\s\S]*?resolveImagePath\(this\.data\.banner\)/);
+    assert.doesNotMatch(workspace, /switchWorkspaceMode|专注成员、内容、团队数据与基础设置/);
     assert.match(workspace, /const LEGACY_TAB_MAP = \{/);
     assert.match(workspace, /"battle-record": \{ mode: "manage", tab: "manage-battle" \}/);
     assert.match(raidManager, /teamId:/);
@@ -366,6 +452,14 @@ test("team workspace separates management tools from the member view", async () 
     assert.match(myRaid, /teamId:/);
     assert.match(myRaid, /displayData:\s*function/);
     assert.match(myRaid, /String\(teamId\) === String\(this\.teamId\)/);
+    assert.match(memberTemplate, /name="comment"[\s\S]*?<ViewComment/);
+    assert.match(memberTemplate, /name="video"[\s\S]*?<ViewVideo/);
+    assert.match(workspace, /if \(!mode\) mode = routeMode \|\| \(MANAGEMENT_TAB_NAMES\.includes\(tab\) \? "manage" : "member"\)/);
+    assert.match(
+        workspace,
+        /const MEMBER_TABS = \["overview", "history", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/,
+    );
+    assert.match(workspace, /:v="data\.v_comment"[\s\S]*?:authority="authority"/);
 });
 
 test("team archive uses a grouped basic settings form without changing other form entries", async () => {
@@ -380,6 +474,8 @@ test("team archive uses a grouped basic settings form without changing other for
     assert.match(form, /<h2>对外展示<\/h2>/);
     assert.match(form, /<h2>联系与直播<\/h2>/);
     assert.match(form, /<h2>内容可见范围<\/h2>/);
+    assert.doesNotMatch(form, /label="团队DKP"/);
+    assert.match(form, /this\.form\.v_dkp = 2;[\s\S]*?this\.\$emit\("submit"\)/);
     assert.doesNotMatch(form, /u-field-help/);
     assert.doesNotMatch(form, /<p>设置团队最基础的识别信息/);
     assert.match(form, /this\.variant === "archive"/);
@@ -477,9 +573,22 @@ test("DKP tables follow the archive certification table language", async () => {
         ]);
 
     assert.match(manager, /class="m-dkp-manage-nav"/);
+    assert.doesNotMatch(manager, /class="m-dkp-embedded-header"/);
+    assert.match(manager, /v-if="isSuperLeader"[\s\S]*?activeTab === 'advanced'[\s\S]*?<span>高级操作<\/span>/);
+    assert.match(manager, /@click="switchTab\('score'\)"/);
+    assert.match(manager, /@click="switchTab\('advanced'\)"/);
+    assert.match(manager, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
+    assert.match(manager, /subtab:\s*tab/);
+    assert.match(manager, /if \(subtab === "advanced" && !this\.leaderChecked\) return/);
+    assert.match(manager, /class="u-dkp-help" href="\/tool\/23786" target="_blank" rel="noopener noreferrer"/);
+    assert.match(manager, /v-if="activeTab === 'advanced'" class="m-dkp-advanced"/);
+    assert.match(manager, /重置团队 DKP[\s\S]*?重置DKP/);
+    assert.match(manager, /if \(!this\.isSuperLeader\)[\s\S]*?仅团队创始人可以重置DKP/);
     assert.doesNotMatch(manager, /<el-tabs type="card"/);
     assert.doesNotMatch(manager, /<keep-alive>/);
     assert.match(managerStyles, /\.m-dkp-manage-nav[\s\S]*button[\s\S]*&\.is-active/);
+    assert.match(managerStyles, /\.u-dkp-help\s*\{[\s\S]*?margin-left:\s*auto/);
+    assert.match(managerStyles, /\.m-dkp-danger-card\s*\{[\s\S]*?fade\(#ef4444, 24%\)/);
     assert.doesNotMatch(list, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(list, /type="selection" width="52" align="center"/);
     assert.match(list, /label="操作" width="120" v-if="!readOnly"/);
@@ -500,6 +609,11 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(dialog, /width="620px"/);
     assert.match(dialog, /label-position="top"/);
     assert.match(dialog, /class="m-dkp-target-list"/);
+    assert.match(dialog, /:value="role\.relation\.role_id"/);
+    assert.match(dialog, /error\?\.response\?\.data\?\.msg[\s\S]*?DKP调整失败，请稍后重试/);
+    assert.match(dialog, /this\.\$emit\("updateRows"\)/);
+    assert.match(list, /updateRows:\s*function \(\)[\s\S]*?clearSelection\(\)[\s\S]*?return this\.loadDkpList\(\)/);
+    assert.doesNotMatch(list, /const _score = action/);
     assert.match(dialogStyles, /\.m-dkp-dialog-modify\.el-dialog/);
     assert.match(dialogStyles, /\.m-dkp-dialog-form__row[\s\S]*grid-template-columns:\s*repeat\(2/);
 });
@@ -518,7 +632,16 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
     ]);
 
     assert.match(item, /v-for="group of 5"[\s\S]*\{\{ group \}\} 队/);
+    assert.match(item, /v-if="supportDkpSync && data\.dkp"[\s\S]*?el-icon-check[\s\S]*?DKP 已同步/);
+    assert.match(item, /:loading="syncingDkp"[\s\S]*?:disabled="syncingDkp"/);
+    assert.match(item, /if \(!Number\.isInteger\(score\)\)/);
+    assert.match(item, /syncSnapshotDkp\(this\.team_id, data\.id,[\s\S]*?\.catch\(\(error\) => \{/);
+    assert.match(item, /result\.matched[\s\S]*?跳过 \$\{skipped\} 条未匹配数据/);
+    assert.match(item, /未匹配到团队成员，已跳过 \$\{skipped\} 条数据/);
+    assert.match(item, /error\?\.response\?\.data\?\.msg[\s\S]*?提交失败，请稍后重试/);
+    assert.match(item, /\.finally\(\(\) => \{[\s\S]*?this\.syncingDkp = false/);
     assert.match(itemStyles, /\.m-snapshot-flags[\s\S]*grid-template-columns:\s*repeat\(5/);
+    assert.match(itemStyles, /\.u-dkp-status\s*\{[\s\S]*?border-radius:\s*999px[\s\S]*?color:\s*#15803d/);
     assert.match(itemStyles, /\.m-snapshot-dkp[\s\S]*grid-template-columns:\s*minmax\(160px/);
     assert.match(
         itemStyles,
@@ -528,6 +651,9 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
     assert.match(bodyStyles, /@row-height:\s*48px/);
     assert.match(bodyStyles, /background:\s*@team-primary-soft/);
     assert.match(list, /aria-label="搜索快照"/);
+    assert.match(list, /v-if="supportDkpSync" class="m-snapshot-dkp-guide"/);
+    assert.match(list, /按快照批量记录考勤 DKP[\s\S]*?填写分值与备注后提交/);
+    assert.match(listStyles, /\.m-snapshot-dkp-guide\s*\{[\s\S]*?fade\(@team-primary, 18%\)/);
     assert.match(listStyles, /\.m-snapshot-box > \.m-snapshot-search[\s\S]*background:\s*@team-surface-muted/);
     assert.match(listStyles, /\.el-input\s*\{[\s\S]*width:\s*420px[\s\S]*max-width:\s*100%/);
     assert.match(
@@ -548,6 +674,8 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
     assert.match(chart, /m-snapshot-chart-card m-chart-line/);
     assert.match(chart, /ref="lineChart" id="snapshot-line"/);
     assert.match(chart, /requestId !== this\.requestId/);
+    assert.match(chart, /import \{ markRaw \} from "vue"/);
+    assert.match(chart, /this\.charts\[type\] = markRaw\(echarts\.getInstanceByDom\(dom\) \|\| echarts\.init\(dom\)\)/);
     assert.match(chart, /setOption\(option, \{ notMerge: true \}\)/);
     assert.match(chart, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
     assert.match(chart, /--el-date-editor-width:\s*250px/);
@@ -596,6 +724,9 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(workspace, /:key="`advanced-\$\{id\}`"/);
     assert.match(workspace, /config: \{ mode: "manage", tab: "setting", section: "feature" \}/);
     assert.match(workspace, /other: \{ mode: "manage", tab: "setting", section: "other" \}/);
+    assert.match(workspace, /rawSubtab = this\.\$route\.query\.subtab \|\| ""/);
+    assert.match(workspace, /if \(tab === "setting"\) query\.subtab = section/);
+    assert.match(workspace, /delete query\.section/);
     assert.match(workspace, /\["basic", "verify", "permission", "feature", "other", "advanced"\]/);
     assert.match(workspace, /<team-advanced-setting[\s\S]*?variant="archive"/);
     assert.match(config, /class="v-team-config"[\s\S]*?'is-archive'/);
@@ -618,9 +749,10 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(password, /\^\\d\{6\}\$/);
     assert.match(password, /@input="formatPassword"/);
     assert.match(banner, /m-archive-field-label">团队海报/);
-    assert.match(banner, /\[320, 179\]/);
-    assert.match(banner, /width:\s*320px[\s\S]*height:\s*179px/);
-    assert.match(banner, /aspect-ratio:\s*1125 \/ 630/);
+    assert.match(banner, /\[920, 120\]/);
+    assert.match(banner, /推荐尺寸为920\*120[\s\S]*?画面主体尽量靠右/);
+    assert.match(banner, /width:\s*920px[\s\S]*aspect-ratio:\s*920 \/ 120/);
+    assert.match(banner, /object-position:\s*right center/);
     assert.match(banner, /\.u-tip[\s\S]*display:\s*none/);
     assert.match(banner, /updateTeamInfo\(this\.id,\s*\{\s*banner:\s*this\.banner/);
     assert.match(teamService, /function updateTeamInfo\(team_id, data\)[\s\S]*?\.patch\(`\/api\/team\/my-team\/\$\{team_id\}`/);
@@ -643,7 +775,7 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.doesNotMatch(advanced, /<EditNamespace :variant="variant"/);
     assert.match(namespace, /<h2>团队铭牌<\/h2>/);
     assert.match(namespace, /v-if="variant !== 'archive'" class="u-desc"/);
-    assert.match(namespace, /section:\s*"verify"/);
+    assert.match(namespace, /subtab:\s*"verify"/);
     assert.match(namespaceStyles, /\.m-team-namespace\.is-archive/);
     assert.match(namespaceStyles, /\.el-input-group__prepend[\s\S]*border-radius:\s*10px 0 0 10px/);
     assert.match(namespaceStyles, /\.el-input-group \.el-input__wrapper[\s\S]*border-radius:\s*0 10px 10px 0/);
@@ -664,6 +796,57 @@ test("team discovery filters stay available in embedded environments", async () 
 
     assert.match(list, /v-for="item in tags"/);
     assert.doesNotMatch(miniProgramStyles, /el-checkbox-group/);
+});
+
+test("snapshot subtabs stay synchronized with the subtab query", async () => {
+    const [snapshot, snapshotService] = await Promise.all([
+        read("../src/views/team/snapshot/ListSnapshot.vue"),
+        read("../src/service/team/snapshot.js"),
+    ]);
+
+    assert.match(snapshot, /@click="switchTab\('list'\)"[\s\S]*?团队快照/);
+    assert.match(snapshot, /@click="switchTab\('stat'\)">团员印象<\/button>/);
+    assert.match(snapshot, /const MANAGE_SNAPSHOT_TABS = \["list", "stat", "chart", "password"\]/);
+    assert.match(snapshot, /const MEMBER_SNAPSHOT_TABS = \["list", "stat", "chart"\]/);
+    assert.match(snapshot, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
+    assert.match(snapshot, /this\.tab = this\.allowedTabs\.includes\(subtab\) \? subtab : "list"/);
+    assert.match(snapshot, /@click="switchTab\('list'\)"/);
+    assert.match(snapshot, /@click="switchTab\('password'\)"/);
+    assert.match(snapshot, /v-if="canConfigurePassword"[^>]*@click="switchTab\('password'\)"/);
+    assert.match(snapshot, /return this\.canConfigurePassword \? MANAGE_SNAPSHOT_TABS : MEMBER_SNAPSHOT_TABS/);
+    assert.match(snapshot, /canConfigurePassword:\s*function \(\)[\s\S]*?this\.tab = this\.allowedTabs\.includes\(subtab\) \? subtab : "list"/);
+    assert.match(snapshot, /query:\s*\{[\s\S]*?\.\.\.this\.\$route\.query,[\s\S]*?subtab:\s*tab/);
+    assert.match(snapshot, /class="u-snapshot-help" href="\/tool\/23783" target="_blank" rel="noopener noreferrer"/);
+    assert.match(snapshot, /\.u-snapshot-help\s*\{[\s\S]*?margin-left:\s*auto/);
+    assert.match(snapshotService, /import \{ \$cms \} from "@jx3box\/jx3box-common\/js\/api"/);
+    assert.match(snapshotService, /\/api\/cms\/team\/snapshot\/team\/\$\{team_id\}/);
+    assert.doesNotMatch(snapshotService, /\$team\(\)/);
+});
+
+test("member workspace exposes team snapshots as a read-only tab before videos", async () => {
+    const [workspace, snapshot] = await Promise.all([
+        read("../src/views/team/org/ViewMyOrg.vue"),
+        read("../src/views/team/snapshot/ListSnapshot.vue"),
+    ]);
+
+    assert.match(workspace, /const MEMBER_TABS = \["overview", "history", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
+    assert.match(
+        workspace,
+        /label="团队快照" name="snapshot"[\s\S]*?<SnapshotList :team-id="id" read-only \/>[\s\S]*?label="团队DKP" name="my-dkp"[\s\S]*?<MyDkp :team-id="id" \/>[\s\S]*?label="通关视频" name="video"/,
+    );
+    assert.match(workspace, /<SnapshotList :team-id="id" :can-configure-password="isSuper" \/>/);
+    assert.match(snapshot, /:read-only="readOnly"/);
+    assert.match(snapshot, /:support-dkp-sync="false"/);
+});
+
+test("member management subtabs stay synchronized with the subtab query", async () => {
+    const members = await read("../src/views/team/member/ListMember.vue");
+
+    assert.match(members, /const MEMBER_SUBTABS = \["user", "pending"\]/);
+    assert.match(members, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
+    assert.match(members, /this\.tab = MEMBER_SUBTABS\.includes\(subtab\) \? subtab : "user"/);
+    assert.match(members, /@click="switchTab\(item\.value\)"/);
+    assert.match(members, /query:\s*\{[\s\S]*?\.\.\.this\.\$route\.query,[\s\S]*?subtab:\s*tab/);
 });
 
 test("team discovery keeps two-column cards and exposes real totals in the hero", async () => {

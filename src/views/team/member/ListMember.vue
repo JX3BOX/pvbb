@@ -7,7 +7,7 @@
                 type="button"
                 :class="{ 'is-active': tab === item.value }"
                 :aria-current="tab === item.value ? 'page' : undefined"
-                @click="tab = item.value"
+                @click="switchTab(item.value)"
             >
                 <span>{{ item.label }}</span>
                 <i v-if="item.value === 'pending' && pendingCount" class="u-subnav-count">{{ pendingCount }}</i>
@@ -20,6 +20,9 @@
 <script>
 import PendingList from "./PendingList.vue";
 import UserList from "./UserList.vue";
+
+const MEMBER_SUBTABS = ["user", "pending"];
+
 export default {
     props: ["id"],
     data: function () {
@@ -40,7 +43,30 @@ export default {
             return pending ? Number(pending.pending) || 0 : 0;
         },
     },
+    watch: {
+        "$route.query.subtab": {
+            immediate: true,
+            handler: function (subtab) {
+                this.tab = MEMBER_SUBTABS.includes(subtab) ? subtab : "user";
+            },
+        },
+    },
     methods: {
+        switchTab: function (tab) {
+            if (!MEMBER_SUBTABS.includes(tab)) return;
+
+            this.tab = tab;
+            if (this.$route.query.subtab === tab) return;
+
+            this.$router
+                .replace({
+                    query: {
+                        ...this.$route.query,
+                        subtab: tab,
+                    },
+                })
+                .catch(() => {});
+        },
         updatePendingCount: function (count) {
             const pendingList = [...this.$store.state.pendingList];
             const index = pendingList.findIndex((item) => item.team_id == this.id);

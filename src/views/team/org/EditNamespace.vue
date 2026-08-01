@@ -122,7 +122,7 @@ export default {
                 return {
                     name: "manage_my_org",
                     params: { id: this.team_id },
-                    query: { tab: "setting", section: "verify" },
+                    query: { tab: "setting", subtab: "verify" },
                 };
             }
             return "/org/verify/" + this.team_id;

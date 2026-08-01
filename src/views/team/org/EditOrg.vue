@@ -86,7 +86,7 @@ export default {
                 tv_type: "",
                 tv: "",
                 v_member: 0,
-                v_dkp: 0,
+                v_dkp: 2,
                 v_activity: 0,
                 v_comment: 0,
                 yy_channel: "",
