@@ -271,7 +271,7 @@
 #### 入口与文件
 
 - 团队战绩管理：工作台 `tab=manage-battle`，`views/team/battle/index.vue`。
-- 我的战绩：工作台 `tab=history`，`views/team/battle/myBattle.vue`。
+- 我的战绩：工作台 `tab=battle`，`views/team/battle/myBattle.vue`；旧 `tab=history` 会规范化到新名称。
 - 战绩项：`battleItem.vue`、`teamItem.vue`。
 - 关联战斗数据：`relevance.vue`。
 - 历史独立路由：`/battle`、`/myBattle`。
@@ -285,6 +285,8 @@
 - `GET /api/cms/team/boss_aid`：首领配置。
 
 管理权限为 `r_race` 或创始人。这里的“战绩”与公开主页中的 `team_trophy.vue` 有展示层关联，但不是 `raid` 排表。
+
+战绩模块的数据来源、榜单规则、活动筛选、关联流程与当前后端边界详见 [战绩模块说明](./battle.md)。
 
 ### 4.6 快照
 

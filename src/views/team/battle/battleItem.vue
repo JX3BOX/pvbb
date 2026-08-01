@@ -134,6 +134,10 @@ export default {
             type: Object,
             default: () => {},
         },
+        personalRanking: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         showIcon() {
@@ -147,6 +151,10 @@ export default {
         RankLink() {
             const boss_info = this.item.boss_info;
             const aid_info = this.item.aid_info;
+            const rankId = boss_info?.rank_id || aid_info?.event_id;
+            if (this.personalRanking) {
+                return rankId && this.mountId ? `/rank/#/${rankId}/dps?mount=${this.mountId}` : "";
+            }
             if (boss_info) {
                 return `/rank/#/${boss_info.rank_id}/rank?aid=${boss_info.aid}`;
             } else if (aid_info) {
@@ -155,7 +163,13 @@ export default {
             return "";
         },
         hasRanking() {
+            if (this.personalRanking) return Boolean(this.RankLink);
             return this.item.boss_info?.is_rank_boss > 0 || Boolean(this.item.aid_info?.event_id);
+        },
+        mountId() {
+            const role = this.item.role;
+            const member = (this.item.team_members || []).find((item) => item.Name === role);
+            return member?.XFId || 0;
         },
     },
     methods: {

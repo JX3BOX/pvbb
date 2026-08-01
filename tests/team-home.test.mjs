@@ -457,7 +457,7 @@ test("team workspace separates management tools from the member view", async () 
     assert.match(workspace, /if \(!mode\) mode = routeMode \|\| \(MANAGEMENT_TAB_NAMES\.includes\(tab\) \? "manage" : "member"\)/);
     assert.match(
         workspace,
-        /const MEMBER_TABS = \["overview", "history", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/,
+        /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/,
     );
     assert.match(workspace, /:v="data\.v_comment"[\s\S]*?:authority="authority"/);
 });
@@ -829,7 +829,7 @@ test("member workspace exposes team snapshots as a read-only tab before videos",
         read("../src/views/team/snapshot/ListSnapshot.vue"),
     ]);
 
-    assert.match(workspace, /const MEMBER_TABS = \["overview", "history", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
+    assert.match(workspace, /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
     assert.match(
         workspace,
         /label="团队快照" name="snapshot"[\s\S]*?<SnapshotList :team-id="id" read-only \/>[\s\S]*?label="团队DKP" name="my-dkp"[\s\S]*?<MyDkp :team-id="id" \/>[\s\S]*?label="通关视频" name="video"/,

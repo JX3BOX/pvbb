@@ -119,14 +119,14 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        margin: 4px 0 0;
-        gap: 2px @team-space-3;
+        margin: 6px 0 0;
+        gap: 4px 14px;
 
         > div {
-            display: flex;
+            display: inline-flex;
             min-width: 0;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
 
         dt,
@@ -135,9 +135,13 @@
         }
 
         dd {
+            overflow: hidden;
             color: @team-text-secondary;
             font-size: 12px;
+            font-weight: 400;
             line-height: 18px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 
@@ -147,16 +151,18 @@
         padding-left: @team-space-3;
         border-left: 1px solid @team-border-light;
         grid-area: content;
-        grid-template-columns: minmax(320px, 1fr) 252px;
+        grid-template-columns: minmax(320px, 1fr) minmax(280px, 0.8fr);
         gap: @team-space-3;
     }
 
     .u-team-setting,
     .u-battle-data {
+        display: flex;
         min-width: 0;
+        flex-direction: column;
 
         h3 {
-            margin: 0 0 5px;
+            margin: 0 0 6px;
             font-size: 11px;
             line-height: 14px;
             white-space: nowrap;
@@ -175,15 +181,22 @@
 
         > div {
             min-width: 0;
-            padding: 6px 9px;
+            height: 50px;
+            padding: 6px 10px;
+            border: 1px solid transparent;
             border-radius: 8px;
             background: @team-surface-muted;
+            box-sizing: border-box;
         }
 
         dt,
         dd {
             margin: 0;
             white-space: nowrap;
+        }
+
+        dt {
+            font-weight: 500;
         }
 
         dd {
@@ -194,7 +207,7 @@
             overflow: hidden;
             color: @team-text-regular;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             line-height: 18px;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -211,59 +224,43 @@
 
     .u-battle-links {
         display: grid;
-        min-height: 39px;
-        align-items: center;
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
     }
 
     .u-battle-link {
-        position: relative;
-        display: flex;
+        display: grid;
         min-width: 0;
-        min-height: 32px;
-        align-items: center;
-        justify-content: center;
-        padding: 0 8px;
-        gap: 7px;
-
-        &:first-child {
-            padding-left: 0;
-        }
-
-        &:last-child {
-            padding-right: 0;
-        }
-
-        & + &::before {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 1px;
-            height: 14px;
-            background: @team-border;
-            content: "";
-            transform: translateY(-50%);
-        }
+        height: 50px;
+        align-content: center;
+        padding: 5px 9px;
+        border: 1px solid @team-border-light;
+        border-radius: 8px;
+        background: @team-surface;
+        box-sizing: border-box;
+        gap: 1px;
 
         > span {
             color: @team-text-muted;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 18px;
             white-space: nowrap;
         }
 
         em,
         .u-link {
-            font-size: 12px;
+            overflow: hidden;
+            font-size: 13px;
             font-style: normal;
-            font-weight: 600;
-            line-height: 20px;
+            font-weight: 500;
+            line-height: 18px;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         em {
-            color: @team-text-muted;
+            color: @team-text-secondary;
         }
 
         .u-link {
@@ -279,6 +276,8 @@
     .u-team-op {
         display: flex;
         align-items: center;
+        padding-top: 12px;
+        box-sizing: border-box;
         grid-area: action;
 
         .el-button {
@@ -312,7 +311,11 @@
             padding-left: 0;
             border-top: 1px solid @team-border-light;
             border-left: 0;
-            grid-template-columns: minmax(320px, 1fr) 252px;
+            grid-template-columns: minmax(320px, 1fr) minmax(280px, 0.8fr);
+        }
+
+        .u-team-op {
+            padding-top: 0;
         }
     }
 }
@@ -379,8 +382,11 @@
 
         .u-battle-meta {
             align-items: flex-start;
-            flex-direction: column;
-            gap: 2px;
+            gap: 4px 12px;
+
+            > div {
+                max-width: 100%;
+            }
         }
 
         .u-battle-fields,
@@ -395,7 +401,7 @@
 
         .u-battle-fields > div {
             display: grid;
-            min-height: 42px;
+            height: 42px;
             align-items: center;
             grid-template-columns: 72px minmax(0, 1fr);
         }
@@ -406,25 +412,10 @@
 
         .u-battle-link {
             display: grid;
-            min-height: 38px;
-            justify-content: initial;
-            padding: 0 4px;
-            border-bottom: 1px solid @team-border-light;
-            border-left: 0;
+            height: 42px;
+            align-items: center;
+            padding: 6px 9px;
             grid-template-columns: 72px minmax(0, 1fr);
-
-            &:first-child {
-                padding-left: 4px;
-            }
-
-            &:last-child {
-                padding-right: 4px;
-                border-bottom: 0;
-            }
-
-            &::before {
-                display: none;
-            }
         }
     }
 }

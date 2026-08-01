@@ -184,7 +184,7 @@
                         <team-role v-if="isLogin" :team_id="id" />
                     </el-tab-pane>
 
-                    <el-tab-pane label="我的战绩" name="history" lazy>
+                    <el-tab-pane label="我的战绩" name="battle" lazy>
                         <template #label>
                             <el-icon><Trophy /></el-icon>
                             <span>我的战绩</span>
@@ -282,7 +282,7 @@ import {
     VideoPlay,
 } from "@element-plus/icons-vue";
 
-const MEMBER_TABS = ["overview", "history", "my-raid", "snapshot", "my-dkp", "video", "comment"];
+const MEMBER_TABS = ["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"];
 const MANAGEMENT_TAB_NAMES = [
     "manage-member",
     "manage-battle",
@@ -553,9 +553,9 @@ export default {
 
             if (!mode && (rawMode === "manage" || rawMode === "member")) mode = rawMode;
 
-            if (!legacyState && rawTab === "history" && rawSection === "manage") {
-                mode = "manage";
-                tab = "manage-battle";
+            if (!legacyState && rawTab === "history") {
+                mode = rawSection === "manage" ? "manage" : "member";
+                tab = rawSection === "manage" ? "manage-battle" : "battle";
                 section = "";
             } else if (!legacyState && rawTab === "my-dkp" && rawSection === "manage") {
                 mode = "manage";

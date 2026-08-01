@@ -17,6 +17,51 @@
         .el-alert__icon {
             color: #f59e0b;
         }
+
+        &.m-battle-notice--filter {
+            .el-alert__content,
+            .el-alert__title {
+                width: 100%;
+            }
+        }
+
+        .m-battle-notice__content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: @team-space-3;
+
+            .u-notice-copy {
+                display: flex;
+                min-width: 0;
+                flex-direction: column;
+                gap: 2px;
+
+                small {
+                    color: #b7791f;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                }
+            }
+
+            .el-switch__label {
+                color: @team-text-secondary;
+                font-size: 12px;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: @phone) {
+    .v-battle,
+    .m-team-view {
+        .m-battle-notice__content {
+            align-items: flex-start;
+            flex-direction: column;
+        }
     }
 }
 

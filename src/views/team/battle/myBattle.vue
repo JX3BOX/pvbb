@@ -1,35 +1,45 @@
 <template>
     <div class="v-battle">
-        <el-alert
-            class="m-battle-notice"
-            :title="$t('pages.team.battle.myNotice')"
-            type="warning"
-            show-icon
-        ></el-alert>
+        <el-alert class="m-battle-notice m-battle-notice--filter" type="warning" show-icon :closable="false">
+            <template #title>
+                <div class="m-battle-notice__content">
+                    <span class="u-notice-copy">
+                        <span>{{ $t("pages.team.battle.myNotice") }}</span>
+                        <small>{{ $t("pages.team.battle.mySource") }}</small>
+                    </span>
+                    <el-switch v-model="filterRanking" active-text="只看活动数据" />
+                </div>
+            </template>
+        </el-alert>
 
         <div class="m-battle-index" v-loading="loading">
             <div class="m-battle-list_null" v-if="list.length == 0">
                 <el-alert :title="$t('pages.team.battle.noRecords')" type="info" show-icon></el-alert>
             </div>
-            <div class="m-mybattle-list" v-else>
+            <div class="m-mybattle-list" v-else-if="displayList.length">
                 <BattleItem
-                    v-for="item in list"
+                    v-for="item in displayList"
                     :key="item.ID || item.id || item.created"
                     :item="item"
+                    personal-ranking
                     @uploadBattle="uploadBattle"
                 ></BattleItem>
-                <el-pagination
-                    class="m-archive-pages"
-                    background
-                    layout="total, prev, pager, next,jumper"
-                    :hide-on-single-page="true"
-                    :page-size="per"
-                    :total="total"
-                    :current-page="page"
-                    @current-change="changePage"
-                >
-                </el-pagination>
             </div>
+            <div class="m-battle-list_null" v-else>
+                <el-alert title="当前页暂无榜单数据" type="info" show-icon></el-alert>
+            </div>
+            <el-pagination
+                v-if="list.length"
+                class="m-archive-pages"
+                background
+                layout="total, prev, pager, next,jumper"
+                :hide-on-single-page="true"
+                :page-size="per"
+                :total="total"
+                :current-page="page"
+                @current-change="changePage"
+            >
+            </el-pagination>
 
             <!-- 绑定界面 -->
             <Relevance
@@ -49,6 +59,8 @@ import { uniq } from "lodash";
 import Relevance from "./relevance.vue";
 import BattleItem from "./battleItem.vue";
 
+const RANKING_FILTER_STORAGE_KEY = "team:my-battle:ranking-only";
+
 export default {
     components: { BattleItem, Relevance },
     props: {
@@ -66,19 +78,26 @@ export default {
             page: 1,
             total: 1,
             loading: false,
+            filterRanking: localStorage.getItem(RANKING_FILTER_STORAGE_KEY) === "1",
         };
     },
     computed: {
+        displayList() {
+            if (!this.filterRanking) return this.list;
+            return this.list.filter((item) => item.boss_info?.is_rank_boss > 0 || Boolean(item.aid_info?.event_id));
+        },
         params: function () {
             return {
                 pageIndex: this.page,
                 pageSize: this.per,
                 team_id: this.teamId,
-                is_leader: 0, // 此处筛选非团长的成绩
             };
         },
     },
     watch: {
+        filterRanking(value) {
+            localStorage.setItem(RANKING_FILTER_STORAGE_KEY, value ? "1" : "0");
+        },
         params: {
             immediate: true,
             handler: function () {
@@ -116,7 +135,8 @@ export default {
             this.relevanceShow = true;
         },
 
-        changePage: function () {
+        changePage: function (page) {
+            this.page = page;
             window.scrollTo(0, 0);
         },
         onRelevanceUpdate(val) {

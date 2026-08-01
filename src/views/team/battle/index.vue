@@ -1,18 +1,23 @@
 <template>
     <div>
-        <el-alert
-            class="m-battle-notice"
-            :title="$t('pages.team.battle.teamNotice')"
-            type="warning"
-            show-icon
-        ></el-alert>
+        <el-alert class="m-battle-notice m-battle-notice--filter" type="warning" show-icon :closable="false">
+            <template #title>
+                <div class="m-battle-notice__content">
+                    <span class="u-notice-copy">
+                        <span>{{ $t("pages.team.battle.teamNotice") }}</span>
+                        <small>{{ $t("pages.team.battle.teamSource") }}</small>
+                    </span>
+                    <el-switch v-model="filterRanking" active-text="只看活动数据" />
+                </div>
+            </template>
+        </el-alert>
 
         <div class="m-battle-index" v-loading="loading">
             <div class="m-battle-list_null" v-if="list.length == 0">
                 <el-alert :title="$t('pages.team.battle.noTeamRecords')" type="info" show-icon></el-alert>
             </div>
-            <div v-else>
-                <div v-for="(item, i) in list" :key="i" class="u-team-collapse">
+            <div v-else-if="displayList.length">
+                <div v-for="(item, i) in displayList" :key="item.ID || item.id || item.created" class="u-team-collapse">
                     <div @click="showItem(i)" class="u-team-title">
                         <BattleItem :item="item" @uploadBattle="uploadBattle"></BattleItem>
                     </div>
@@ -22,6 +27,9 @@
                         </div>
                     </collapse-transition>
                 </div>
+            </div>
+            <div class="m-battle-list_null" v-else>
+                <el-alert title="暂无活动数据" type="info" show-icon></el-alert>
             </div>
             <!-- 绑定界面 -->
             <Relevance
@@ -42,6 +50,8 @@ import Relevance from "./relevance.vue";
 import teamItem from "./teamItem.vue";
 import BattleItem from "./battleItem.vue";
 
+const RANKING_FILTER_STORAGE_KEY = "team:my-battle:ranking-only";
+
 export default {
     components: { Relevance, teamItem, BattleItem, "collapse-transition": CollapseTransition },
     props: {
@@ -58,9 +68,19 @@ export default {
             relevanceData: {},
             loading: false,
             show: [],
+            filterRanking: localStorage.getItem(RANKING_FILTER_STORAGE_KEY) === "1",
         };
     },
+    computed: {
+        displayList() {
+            if (!this.filterRanking) return this.list;
+            return this.list.filter((item) => item.boss_info?.is_rank_boss > 0 || Boolean(item.aid_info?.event_id));
+        },
+    },
     watch: {
+        filterRanking(value) {
+            localStorage.setItem(RANKING_FILTER_STORAGE_KEY, value ? "1" : "0");
+        },
         teamId: {
             handler: function (val) {
                 if (!val) return;
