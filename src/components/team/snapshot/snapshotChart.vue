@@ -60,6 +60,7 @@ const { lineOptions, pieOptions, barOptions } = snapshotChartData;
 import * as echarts from "echarts";
 import cloneDeep from "lodash/cloneDeep";
 import moment from "moment";
+import { markRaw } from "vue";
 
 export default {
     name: "snapshotChart",
@@ -240,7 +241,8 @@ export default {
             if (!dom || !dom.isConnected) return;
 
             if (!this.charts[type]) {
-                this.charts[type] = echarts.getInstanceByDom(dom) || echarts.init(dom);
+                // ECharts 实例依赖内部对象身份，不能被 Vue 3 深度响应式代理。
+                this.charts[type] = markRaw(echarts.getInstanceByDom(dom) || echarts.init(dom));
             }
 
             option && this.charts[type].setOption(option, { notMerge: true });

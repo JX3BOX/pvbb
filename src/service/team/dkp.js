@@ -75,8 +75,8 @@ function getTeamMyDkp(team_id) {
     return $cms().get(`/api/cms/team/dkp/${team_id}/my`);
 }
 
-function syncSnapshotDkp(id, data) {
-    return $team().post(`/api/team/snapshot/record/${id}/dkp`, data);
+function syncSnapshotDkp(team_id, id, data) {
+    return $cms().put(`/api/cms/team/dkp/${team_id}/snapshot/${id}`, data);
 }
 
 function updateDkp(team_id, data) {

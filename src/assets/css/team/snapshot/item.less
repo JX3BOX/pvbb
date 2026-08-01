@@ -58,6 +58,28 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        .u-dkp-status {
+            display: inline-flex;
+            min-height: 26px;
+            align-items: center;
+            flex: none;
+            padding: 0 9px;
+            border: 1px solid fade(#16a34a, 20%);
+            border-radius: 999px;
+            background: fade(#16a34a, 7%);
+            color: #15803d;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 18px;
+            white-space: nowrap;
+            gap: 5px;
+
+            i {
+                font-size: 13px;
+                font-weight: 700;
+            }
+        }
     }
 
     .u-meta {
@@ -141,32 +163,16 @@
         font-weight: 600;
     }
 
-    .u-edit {
+    .u-fold {
         border-color: fade(@team-primary, 28%);
         color: @team-primary;
     }
 
-    .u-delete {
+    .u-more {
         border-color: @team-border-light;
         color: @team-text-muted;
-        transition: border-color @team-duration-fast @team-ease-standard,
-            background-color @team-duration-fast @team-ease-standard,
-            color @team-duration-fast @team-ease-standard;
-
-        &:hover,
-        &:focus-visible {
-            border-color: fade(#ef4444, 35%);
-            background: fade(#ef4444, 6%);
-            color: #dc2626;
-        }
     }
 
-    .u-dkp-status {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 0 5px;
-        color: #0d7c07;
-    }
 }
 @media screen and (max-width: @phone) {
     .m-snapshot-item-op {
@@ -180,19 +186,22 @@
     display: grid;
     width: 100%;
     overflow: hidden;
-    border: 1px solid #dbe4f0;
+    border: 1px solid fade(@team-primary, 18%);
+    border-bottom: 0;
     border-radius: 12px 12px 0 0;
-    background: #edf4fc;
+    background: @team-primary-soft;
     grid-template-columns: repeat(5, minmax(0, 1fr));
 
     i {
-        height: 30px;
-        border-right: 2px solid #dbe4f0;
-        color: #7088a5;
+        height: 36px;
+        border-right: 1px solid fade(@team-primary, 18%);
+        background: linear-gradient(180deg, #f5f3ff 0%, @team-primary-soft 100%);
+        color: @team-primary;
         font-size: 12px;
         font-style: normal;
         font-weight: 700;
-        line-height: 30px;
+        letter-spacing: 1px;
+        line-height: 36px;
         text-align: center;
 
         &:last-child {

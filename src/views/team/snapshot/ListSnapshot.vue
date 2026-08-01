@@ -2,13 +2,25 @@
     <div class="v-snapshot-list">
         <div class="m-snapshot-workspace">
             <nav class="m-snapshot-subnav" aria-label="快照管理功能">
-                <button type="button" :class="{ 'is-active': tab === 'list' }" @click="tab = 'list'">全部快照</button>
-                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="tab = 'stat'">团员印象</button>
-                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="tab = 'chart'">快照统计</button>
-                <button type="button" :class="{ 'is-active': tab === 'password' }" @click="tab = 'password'">密码配置</button>
+                <button type="button" :class="{ 'is-active': tab === 'list' }" @click="switchTab('list')">
+                    团队快照
+                </button>
+                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="switchTab('stat')">团员印象</button>
+                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="switchTab('chart')">快照统计</button>
+                <button v-if="canConfigurePassword" type="button" :class="{ 'is-active': tab === 'password' }" @click="switchTab('password')">密码配置</button>
+                <a class="u-snapshot-help" href="/tool/23783" target="_blank" rel="noopener noreferrer">
+                    <i class="el-icon-document" aria-hidden="true"></i>
+                    <span>帮助文档</span>
+                </a>
             </nav>
             <keep-alive>
-                <component :is="componentsMap[tab]" :org="org" />
+                <component
+                    :is="componentsMap[tab]"
+                    :key="tab"
+                    :org="org"
+                    :read-only="readOnly"
+                    :support-dkp-sync="false"
+                />
             </keep-alive>
         </div>
     </div>
@@ -21,9 +33,26 @@ import EditPassword from "./EditPassword.vue";
 
 import { getMyPowerTeams } from "@/service/team/team.js";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
+
+const MANAGE_SNAPSHOT_TABS = ["list", "stat", "chart", "password"];
+const MEMBER_SNAPSHOT_TABS = ["list", "stat", "chart"];
+
 export default {
     name: "ListSnapshot",
-    props: [],
+    props: {
+        teamId: {
+            type: [Number, String],
+            default: null,
+        },
+        readOnly: {
+            type: Boolean,
+            default: false,
+        },
+        canConfigurePassword: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data: function () {
         return {
             tab: "list",
@@ -39,9 +68,50 @@ export default {
             },
         };
     },
-    computed: {},
+    computed: {
+        allowedTabs() {
+            return this.canConfigurePassword ? MANAGE_SNAPSHOT_TABS : MEMBER_SNAPSHOT_TABS;
+        },
+    },
+    watch: {
+        teamId: {
+            immediate: true,
+            handler: function (teamId) {
+                if (teamId) this.org = Number(teamId);
+            },
+        },
+        "$route.query.subtab": {
+            immediate: true,
+            handler: function (subtab) {
+                this.tab = this.allowedTabs.includes(subtab) ? subtab : "list";
+            },
+        },
+        canConfigurePassword: function () {
+            const subtab = this.$route.query.subtab;
+            this.tab = this.allowedTabs.includes(subtab) ? subtab : "list";
+        },
+    },
     methods: {
+        switchTab(tab) {
+            if (!this.allowedTabs.includes(tab)) return;
+
+            this.tab = tab;
+            if (this.$route.query.subtab === tab) return;
+
+            this.$router
+                .replace({
+                    query: {
+                        ...this.$route.query,
+                        subtab: tab,
+                    },
+                })
+                .catch(() => {});
+        },
         loadTeams() {
+            if (this.teamId) {
+                this.org = Number(this.teamId);
+                return Promise.resolve();
+            }
             return getMyPowerTeams("r_snapshot").then((res) => {
                 this.orgs = res.data.data.list || [];
                 this.org = this.orgs.length && this.orgs[0]["ID"];
@@ -124,6 +194,34 @@ export default {
                 background: @team-surface;
                 color: @team-primary;
                 box-shadow: @team-shadow-xs;
+            }
+        }
+
+        .u-snapshot-help {
+            display: inline-flex;
+            min-width: max-content;
+            min-height: 34px;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-left: auto;
+            padding: 0 @team-space-3;
+            border-radius: 9px;
+            color: @team-text-muted;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color @team-duration-fast @team-ease-standard,
+                background-color @team-duration-fast @team-ease-standard;
+
+            &:hover {
+                background: fade(@team-primary, 8%);
+                color: @team-primary;
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: @team-shadow-focus;
             }
         }
     }

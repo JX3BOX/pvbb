@@ -1,6 +1,21 @@
 <template>
     <div class="m-snapshot-box" v-loading="loading">
+        <div v-if="supportDkpSync" class="m-snapshot-dkp-guide">
+            <span class="u-guide-icon" aria-hidden="true"><i class="el-icon-connection"></i></span>
+            <div class="u-guide-content">
+                <h3>按快照批量记录考勤 DKP</h3>
+                <p>选择一次活动快照，可为快照名单中的所有成员快速增加相同的考勤分值。</p>
+                <ol class="u-guide-steps" aria-label="快照关联操作步骤">
+                    <li><b>1</b> 找到对应快照</li>
+                    <li><b>2</b> 展开确认名单</li>
+                    <li><b>3</b> 填写分值与备注后提交</li>
+                </ol>
+            </div>
+        </div>
         <div class="m-snapshot-search">
+            <el-button v-if="!readOnly" class="u-manual-add" type="primary" icon="Plus" @click="openCreateDialog">
+                手动补录
+            </el-button>
             <el-input
                 placeholder="搜索快照标题、上传人员或备注"
                 aria-label="搜索快照"
@@ -38,7 +53,12 @@
                 <a href="/tool/23783" target="_blank">帮助文档</a>
             </template>
         </el-alert>
-        <EditSnapshotDialog v-model="editVisible" :snapshot-id="editingId" @saved="loadSnapshots" />
+        <EditSnapshotDialog
+            v-model="editVisible"
+            :snapshot-id="editingId"
+            :target-team-id="org"
+            @saved="loadSnapshots"
+        />
     </div>
 </template>
 
@@ -90,6 +110,10 @@ export default {
         },
     },
     methods: {
+        openCreateDialog() {
+            this.editingId = null;
+            this.editVisible = true;
+        },
         openEditDialog(id) {
             this.editingId = id;
             this.editVisible = true;
@@ -108,7 +132,8 @@ export default {
                     this.loading = false;
                 });
         },
-        changePage: function () {
+        changePage: function (page) {
+            this.page = page;
             window.scrollTo(0, 0);
         },
     },
