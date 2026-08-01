@@ -4,7 +4,7 @@
 >
 > 应用地址：`/team/`
 >
-> 整理日期：2026-07-31
+> 整理日期：2026-08-02
 >
 > 文档性质：当前代码盘点与后续重构边界，不代表所有历史页面都已完成产品化
 
@@ -85,7 +85,9 @@
 | RAID 管理 | `r_raid` 或创始人 | `raid/ManageRaid.vue` |
 | 团队设置 | 仅创始人 | 档案表单、认证、权限、功能、其它及高级设置 |
 
-成员视图显示：我的角色、我的战绩、我的 DKP、参与的 RAID。
+成员视图显示：我的角色、我的战绩、我的 DKP、参与的 RAID、团队快照和团队视频。团队快照在成员视图中为只读模式；密码配置只对拥有管理能力的入口开放。
+
+工作台的一级页签使用 `tab`，成员管理、团队设置、快照和 DKP 内部的二级页签统一使用 `subtab`。切换二级页签时应更新 URL，刷新或复制链接后仍恢复相同位置；旧的团队设置 `section` 参数只用于兼容迁移。
 
 团队信息来自 `GET /api/team/info/:id`，管理权限来自 `GET /api/team/my-team/:id/manage/power-list`。创始人通过 `team.super == 当前 uid` 获得完整管理能力。
 
@@ -100,9 +102,11 @@
 
 - 团队概况：简介、招募、勋章、团队成绩。
 - 团队成员：受 `v_member` 公开级别与访问者权限控制。
-- DKP 记录：受 `v_dkp` 控制。
+- 团队活动：展示公开 RAID 活动，受活动可见性和访问权限控制。
 - 通关视频。
 - 留言板：受 `v_comment` 控制。
+
+公开主页不再提供 DKP 页签。DKP 读取仍保留服务端 `v_dkp` 可见性合同，当前前端入口位于团队成员/管理工作台，不应因为后端存在公开级别字段就重新推断为公开主页功能。
 
 “团队成员”页按团队管理员、今日寿星、团队角色三组展示。管理员名单始终公开；寿星和角色列表继续受 `v_member` 与访问者权限控制。成员接口返回的是角色条目，因此列表总数统一表述为“个角色”，不能当作去重后的账号人数。
 
@@ -167,6 +171,8 @@
 
 已有海报随 `GET /api/team/info/:id` 返回，从团队对象的 `banner` 字段回填。预览使用缩略图工具，但保存的仍是 CMS 上传接口返回的原始地址字符串；移除预览只会先把本地值清空，仍需保存，最终提交 `{ "banner": "" }`。
 
+当前 PC 海报推荐尺寸为 **920 × 120**，主体尽量靠右。公开主页只在宽屏头部叠加该海报，并使用从左侧白色内容区向右侧图片过渡的遮罩；窄屏会隐藏背景海报，避免压缩团队名称和操作区。旧的 1125 × 630 说明已经失效。
+
 #### 当前判断
 
 业务能力较完整，但存在“统一工作台入口”和“历史独立设置路由”两套界面。后续优化应先以 `ViewMyOrg.vue` 的团队档案页签为主入口，再判断历史路由是保留兼容还是逐步收口。
@@ -186,7 +192,7 @@
 - `components/team/org/team_medals.vue`：勋章。
 - `components/team/org/team_trophy.vue`：成绩/荣誉。
 - `views/team/member/ViewMember.vue`：公开成员视图。
-- `views/team/dkp/ViewDkp.vue`：公开 DKP。
+- `views/team/raid/TeamRaid.vue`：公开团队活动。
 - `views/team/org/ViewVideo.vue`：公开视频。
 - `views/team/org/ViewComment.vue`：留言板。
 
@@ -253,6 +259,13 @@
 
 管理权限为 `r_video` 或创始人。当前没有单独的视频顶层路由，管理和展示都嵌在团队上下文中，这与业务归属是合理的。
 
+前后端权限合同：
+
+- 公开视频只调用 `GET /api/team/video/team/:id`，不读取管理列表。
+- 管理列表调用 `GET /api/team/video/team/:id/all`，Team 后端允许创始人、`r_video` 管理员及系统管理员访问。
+- 更新视频时，后端以数据库中的原记录为准保留 `team_id`，不能通过 PUT payload 把视频转移到无权管理的团队。
+- 管理端新增、编辑、删除失败时必须结束 loading 并保留可恢复页面状态，不能把失败误显示为空列表。
+
 ### 4.5 战绩
 
 #### 入口与文件
@@ -285,15 +298,19 @@
 
 #### 接口
 
-- `GET /api/team/snapshot/team/:teamId`：快照列表。
-- `POST /api/team/snapshot/team/:teamId`：新增。
-- `GET /api/team/snapshot/record/:id`：详情。
-- `PUT /api/team/snapshot/record/:id`：编辑。
-- `DELETE /api/team/snapshot/record/:id`：删除。
-- `GET /api/team/snapshot/team/:teamId/more`：按时间查看更多/统计。
+- `GET /api/cms/team/snapshot/team/:teamId`：快照列表。
+- `POST /api/cms/team/snapshot/team/:teamId`：新增。
+- `GET /api/cms/team/snapshot/record/:id`：详情。
+- `PUT /api/cms/team/snapshot/record/:id`：编辑。
+- `DELETE /api/cms/team/snapshot/record/:id`：软删除。
+- `GET /api/cms/team/snapshot/team/:teamId/more`：按时间查看更多/统计。
 - `PUT /api/cms/team/dkp/:teamId/snapshot/:snapshotId`：按快照名单关联当前团队成员，并批量增加考勤 DKP。
 
-管理权限为 `r_snapshot` 或创始人。公开主页当前不开放快照页签，因此当前可确认的是“管理能力存在”，不能说“访客可在主页查看快照”。
+快照已从 Go Team API 迁到 `service-cms`，数据仍使用团队数据库的 `team_snapshot` 表。创建、编辑、删除要求系统管理员、团队创始人或 `r_snapshot`；团队正式成员可以读取列表、详情和统计，但不能修改。所有查询都限制 `status=1、has_deleted=0`，删除使用软删除。
+
+列表支持分页和关键词搜索；统计接口支持搜索以及按 Asia/Shanghai 自然日解释的开始、结束日期。相关快照详情使用 Vue 3 `modelValue / update:modelValue` 合同，列表分页展示，阵容弹窗固定按五队结构预览。编辑弹窗只提交 `team_id、teammate、title、desc` 白名单字段，并忽略已经过期的异步详情响应。
+
+公开主页当前不开放快照页签，因此“团队成员可读”不等于“匿名访客公开可读”。
 
 ### 4.7 DKP
 
@@ -317,6 +334,17 @@
 快照考勤只为能够关联到当前团队成员的角色记分；未绑定网站账号或未加入团队的名单项会自动跳过，并在提交结果中返回跳过数量。
 
 DKP 的总分、日志、重置、制度和快照考勤统一使用 CMS API；管理权限为 `r_dkp` 或创始人，重置仅限创始人，读取还受团队 `v_dkp` 设置控制。
+
+DKP 写入合同：
+
+- 手工批量调整最多 200 条，同一请求内 `user_id` 唯一；分数必须为正整数，增减由 `action` 表达。
+- 写入前必须确认目标账号是当前团队的有效正式成员；指定 `role_id` 时，该角色也必须属于该账号在当前团队的有效关系。
+- 总表更新与日志写入处于同一数据库事务，任何一项失败都应整体回滚。
+- 快照考勤以快照记录锁和 `dkp` 标记保证幂等；已经同步的快照再次提交返回冲突，不重复加分。
+- 重置仅归零当前分数并保留历史记录，同时写入操作审计；只有团队创始人可以执行。
+- DKP 制度按 `team_id` 唯一保存；总表按 `team_id + user_id` 唯一保存。
+
+数据库结构加固由 `service-cms/migrations/20260802_harden_team_dkp.sql` 承担，包括唯一索引、非空默认值和日志 `operator_id`。发布 DKP 后端前必须先确认迁移已在目标数据库成功执行；代码提交或单元测试通过不代表迁移已经落库。
 
 ### 4.8 排表（RAID）
 
