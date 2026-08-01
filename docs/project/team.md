@@ -63,9 +63,9 @@
 - 页面：`src/views/team/org/ViewMyOrg.vue`
 - 视图身份由路径表达，不再使用 `mode=manage|member` 查询参数。
 - 页签参数：`tab=...`；默认页签省略该参数。
-- 团队设置子区域：`section=basic|verify|permission|feature|other|advanced`
+- 二级页签参数：`subtab=...`；团队设置支持 `basic|verify|permission|feature|other|advanced`。
 
-旧地址 `/team/my/org/:id?mode=manage...` 会保留 `tab`、`section` 并自动迁移到管理路由；`mode=member` 会被清理为成员路由。
+旧地址 `/team/my/org/:id?mode=manage...` 会保留页签状态并自动迁移到管理路由；旧的团队设置 `section` 参数会迁移为 `subtab`，`mode=member` 会被清理为成员路由。
 
 管理页顶部只承担“当前正在管理哪个团队”的识别作用，保留团队 Logo、名称、服务器、团队 ID、创始人/管理员身份、认证状态和团队主页入口。公告、招募、百科、直播、YY、QQ群、好评等公开团队资料不在管理页头部重复展示，管理功能紧接着以页签呈现。Web 与后续 App 应沿用该信息层级。
 
@@ -291,7 +291,7 @@
 - `PUT /api/team/snapshot/record/:id`：编辑。
 - `DELETE /api/team/snapshot/record/:id`：删除。
 - `GET /api/team/snapshot/team/:teamId/more`：按时间查看更多/统计。
-- `POST /api/team/snapshot/record/:id/dkp`：将快照同步到 DKP。
+- `PUT /api/cms/team/dkp/:teamId/snapshot/:snapshotId`：按快照名单关联当前团队成员，并批量增加考勤 DKP。
 
 管理权限为 `r_snapshot` 或创始人。公开主页当前不开放快照页签，因此当前可确认的是“管理能力存在”，不能说“访客可在主页查看快照”。
 
@@ -314,7 +314,9 @@
 - 重置 DKP、配置 DKP 规则。
 - 从快照同步成员/DKP 数据。
 
-DKP 同时使用 Team API 和 CMS API；管理权限为 `r_dkp` 或创始人，公开查看还受团队 `v_dkp` 设置控制。
+快照考勤只为能够关联到当前团队成员的角色记分；未绑定网站账号或未加入团队的名单项会自动跳过，并在提交结果中返回跳过数量。
+
+DKP 的总分、日志、重置、制度和快照考勤统一使用 CMS API；管理权限为 `r_dkp` 或创始人，重置仅限创始人，读取还受团队 `v_dkp` 设置控制。
 
 ### 4.8 排表（RAID）
 

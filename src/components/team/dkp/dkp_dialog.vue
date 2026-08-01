@@ -53,7 +53,7 @@
                         v-for="(role, index) in singleRow.roles"
                         :key="index"
                         :label="role.roleInfo.name"
-                        :value="role.relation.ID"
+                        :value="role.relation.role_id"
                     >
                         <div class="m-dkp-role-option">
                             <img :src="showSchoolIcon(role.roleInfo.mount)" />
@@ -273,14 +273,22 @@ export default {
                         message: "修改分值成功",
                     });
 
-                    this.$emit("updateRows", { action: this.form.action, score: this.form.score });
+                    this.$emit("updateRows");
 
                     this.$refs["editForm"].resetFields();
                     this.show = false;
                 })
+                .catch((error) => {
+                    const message =
+                        error?.response?.data?.msg ||
+                        error?.data?.msg ||
+                        error?.msg ||
+                        error?.message ||
+                        "DKP调整失败，请稍后重试";
+                    this.$message.error(String(message));
+                })
                 .finally(() => {
                     this.editFormLoading = false;
-                    this.editFormVisible = false;
                 });
         },
         handleSubmitEdit() {
@@ -333,7 +341,6 @@ export default {
                 this.form.action = 0;
             }
         },
-
         // 头像渲染
         renderAvatar: function (userinfo) {
             return showAvatar(userinfo?.user_avatar || userinfo?.avatar);

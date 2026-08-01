@@ -36,44 +36,67 @@
                 >
             </div>
         </header>
-        <header v-else class="m-dkp-embedded-header">
-            <div>
-                <h2>DKP管理</h2>
-                <p>查看团队分值与变更历史，可进行加分、扣分、物品分配和批量调整。</p>
-            </div>
-            <div class="u-dkp-actions">
-                <a href="/tool/23786" target="_blank">帮助文档</a>
-                <el-button
-                    type="warning"
-                    plain
-                    icon="RefreshLeft"
-                    :disabled="!isSuperLeader"
-                    @click="resetAllDkp"
-                >
-                    全部重置
-                </el-button>
-            </div>
-        </header>
         <div v-if="org" class="m-dkp-box">
             <nav class="m-dkp-manage-nav" aria-label="DKP管理功能">
-                <button type="button" :class="{ 'is-active': activeTab === 'score' }" @click="activeTab = 'score'">
+                <button type="button" :class="{ 'is-active': activeTab === 'score' }" @click="switchTab('score')">
                     <i class="el-icon-tickets"></i>
                     <span>当前分值</span>
                 </button>
-                <button type="button" :class="{ 'is-active': activeTab === 'logs' }" @click="activeTab = 'logs'">
+                <button type="button" :class="{ 'is-active': activeTab === 'logs' }" @click="switchTab('logs')">
                     <i class="el-icon-time"></i>
                     <span>历史记录</span>
                 </button>
                 <button
                     type="button"
                     :class="{ 'is-active': activeTab === 'snapshot' }"
-                    @click="activeTab = 'snapshot'"
+                    @click="switchTab('snapshot')"
                 >
                     <i class="el-icon-camera"></i>
                     <span>快照关联</span>
                 </button>
+                <button
+                    v-if="isSuperLeader"
+                    type="button"
+                    :class="{ 'is-active': activeTab === 'advanced' }"
+                    @click="switchTab('advanced')"
+                >
+                    <i class="el-icon-setting"></i>
+                    <span>高级操作</span>
+                </button>
+                <a class="u-dkp-help" href="/tool/23786" target="_blank" rel="noopener noreferrer">
+                    <i class="el-icon-document" aria-hidden="true"></i>
+                    <span>帮助文档</span>
+                </a>
             </nav>
+            <section v-if="activeTab === 'advanced'" class="m-dkp-advanced" aria-labelledby="dkp-advanced-title">
+                <div class="m-dkp-advanced-heading">
+                    <span class="u-advanced-icon" aria-hidden="true"><i class="el-icon-setting"></i></span>
+                    <div>
+                        <h2 id="dkp-advanced-title">高级操作</h2>
+                        <p>管理影响整个团队 DKP 数据的高风险操作。</p>
+                    </div>
+                </div>
+                <div class="m-dkp-danger-card">
+                    <div class="u-danger-content">
+                        <h3>重置团队 DKP</h3>
+                        <p>将所有成员的当前 DKP 分值统一归零，已有历史记录仍会保留，可用于后续查询和追溯。</p>
+                        <div class="u-danger-notice">
+                            <i class="el-icon-warning-outline" aria-hidden="true"></i>
+                            <span>此操作会影响全体成员，执行后无法直接恢复当前分值。</span>
+                        </div>
+                    </div>
+                    <el-button
+                        type="danger"
+                        icon="RefreshLeft"
+                        :disabled="!isSuperLeader"
+                        @click="resetAllDkp"
+                    >
+                        重置DKP
+                    </el-button>
+                </div>
+            </section>
             <component
+                v-else
                 :is="componentsMaps[activeTab]"
                 :org="org"
                 :readOnly="activeTab === 'snapshot'"
@@ -113,6 +136,7 @@ export default {
             orgs: [],
             activeTab: "score",
             isSuperLeader: false,
+            leaderChecked: false,
 
             componentsMaps: {
                 score: "dkp-list",
@@ -124,6 +148,11 @@ export default {
     computed: {
         teamMembers() {
             return this.$store.state.teamMembers;
+        },
+        allowedTabs() {
+            const tabs = ["score", "logs", "snapshot"];
+            if (this.isSuperLeader) tabs.push("advanced");
+            return tabs;
         },
     },
     filters: {
@@ -150,14 +179,49 @@ export default {
             });
         },
         checkLeader: function () {
+            this.isSuperLeader = false;
+            this.leaderChecked = false;
+            if (this.activeTab === "advanced") this.activeTab = "score";
             getTeam(this.org).then((res) => {
                 this.isSuperLeader = res.data.data.super == User.getInfo().uid;
+                this.leaderChecked = true;
+                this.syncTabFromRoute(true);
             });
+        },
+        switchTab: function (tab) {
+            if (!this.allowedTabs.includes(tab)) return;
+
+            this.activeTab = tab;
+            if (this.$route.query.subtab === tab) return;
+
+            this.$router
+                .replace({
+                    query: {
+                        ...this.$route.query,
+                        subtab: tab,
+                    },
+                })
+                .catch(() => {});
+        },
+        syncTabFromRoute: function (normalize = false) {
+            const subtab = this.$route.query.subtab || "score";
+            if (subtab === "advanced" && !this.leaderChecked) return;
+
+            const nextTab = this.allowedTabs.includes(subtab) ? subtab : "score";
+            this.activeTab = nextTab;
+            if (normalize && subtab !== nextTab) this.switchTab(nextTab);
         },
         // 清空重置
         resetAllDkp: function () {
-            this.$alert("确定全部清空重置么，此操作将不会删除历史记录，仅归零当前所有成员数值。", "警告", {
-                confirmButtonText: "确定",
+            if (!this.isSuperLeader) {
+                this.$message.warning("仅团队创始人可以重置DKP");
+                return;
+            }
+            this.$alert("重置后，团队所有成员的当前 DKP 分值将归零，历史记录仍会保留。确定继续吗？", "重置团队DKP", {
+                confirmButtonText: "确认重置",
+                cancelButtonText: "取消",
+                showCancelButton: true,
+                type: "warning",
                 callback: (action) => {
                     if (action == "confirm") {
                         resetDkp(this.org).then(() => {
@@ -191,6 +255,12 @@ export default {
                     this.checkLeader();
                     this.loadMyTeamMembers();
                 }
+            },
+        },
+        "$route.query.subtab": {
+            immediate: true,
+            handler: function () {
+                this.syncTabFromRoute();
             },
         },
     },

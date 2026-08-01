@@ -137,7 +137,7 @@ export default {
         // 加载当前团队的DKP成绩
         loadDkpList: function () {
             this.loading = true;
-            getTeamDkpList(this.org)
+            return getTeamDkpList(this.org)
                 .then((res) => {
                     this.list = res.data.data;
                 })
@@ -165,19 +165,11 @@ export default {
             this.selectedRows = selection;
         },
 
-        // 更新rows
-        updateRows: function ({ action, score }) {
-            const rowIds = this.selectedRows.map((row) => row.uid);
-            this.list.forEach((row) => {
-                if (rowIds.includes(row.user_id)) {
-                    const _score = action ? Number(row.score) - score : Number(row.score) + score;
-                    const _total = action ? Number(row.total) : Number(row.total) + score;
-                    row["score"] = _score;
-                    row["total"] = _total;
-                }
-            });
+        // 调整成功后重新获取服务端最终结果
+        updateRows: function () {
             this.selectedRows = [];
             this.$refs.dkpTable.clearSelection();
+            return this.loadDkpList();
         },
         // 重置所有dkp
         handleRestAllDkp: function () {
