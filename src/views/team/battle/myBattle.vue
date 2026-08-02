@@ -5,10 +5,12 @@
                 <div class="m-battle-notice__content">
                     <span class="u-notice-copy">
                         <span>{{ $t("pages.team.battle.myNotice") }}</span>
-                        <small>{{ $t("pages.team.battle.mySource") }}</small>
-                        <a class="u-battle-guide" href="/tool/109317" target="_blank" rel="noopener noreferrer">
-                            {{ $t("pages.team.battle.reportGuide") }}
-                        </a>
+                        <span class="u-notice-meta">
+                            <small>{{ $t("pages.team.battle.mySource") }}</small>
+                            <a class="u-battle-guide" href="/tool/109317" target="_blank" rel="noopener noreferrer">
+                                {{ $t("pages.team.battle.reportGuide") }}
+                            </a>
+                        </span>
                     </span>
                     <el-switch v-model="filterRanking" :active-text="$t('pages.team.battle.activityOnly')" />
                 </div>

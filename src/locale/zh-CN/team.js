@@ -47,6 +47,8 @@ export default {
         emptyDescription: "从团队广场选择合适的伙伴，或者创建自己的团队。",
         createTeam: "创建团队",
         myRoles: "我的角色",
+        mobileOpen: "打开团队导航",
+        mobileClose: "关闭团队导航",
     },
     home: {
         title: "团队平台",

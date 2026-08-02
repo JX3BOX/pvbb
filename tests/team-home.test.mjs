@@ -101,6 +101,42 @@ test("team home sidebar has loading, error, empty and unauthenticated states", a
     assert.match(sidebar, /allTeamsResult\.status === "rejected" && managedTeamsResult\.status === "rejected"/);
 });
 
+test("team workspace uses a shared mobile navigation trigger and side drawer", async () => {
+    const [sidebar, shell, styles, guide] = await Promise.all([
+        read("../src/components/team/org/team_home_sidebar.vue"),
+        read("../src/assets/css/team/app.less"),
+        read("../src/assets/css/team/modules/home-theme.less"),
+        read("../docs/design/TEAM_MOBILE_NAVIGATION_GUIDE.md"),
+    ]);
+
+    assert.match(sidebar, /class="u-team-mobile-navigation-trigger"/);
+    assert.match(sidebar, /<el-icon><ArrowRight \/><\/el-icon>/);
+    assert.doesNotMatch(sidebar, /mobileTriggerLogo|mobileTriggerTitle/);
+    assert.match(sidebar, /'is-mobile-drawer-open': mobileDrawerOpen/);
+    assert.match(sidebar, /team\.sidebar\.mobileOpen/);
+    assert.match(sidebar, /aria-controls="team-mobile-navigation-drawer"/);
+    assert.match(sidebar, /:aria-expanded="mobileDrawerOpen"/);
+    assert.match(sidebar, /class="m-team-home-sidebar__drawer"/);
+    assert.match(sidebar, /class="u-team-mobile-navigation-mask"/);
+    assert.match(sidebar, /"\$route\.fullPath": function \(\)/);
+    assert.match(sidebar, /event\.key === "Escape"/);
+    assert.match(sidebar, /document\.body\.classList\.remove\("is-team-navigation-open"\)/);
+    assert.match(shell, /body\.is-team-navigation-open\s*\{\s*overflow:\s*hidden/);
+    assert.match(shell, /m-team-modern-shell__sidebar[\s\S]*?order:\s*1/);
+    assert.match(shell, /m-team-modern-shell__sidebar[\s\S]*?position:\s*absolute[\s\S]*?width:\s*0/);
+    assert.match(shell, /m-team-modern-shell__content[\s\S]*?order:\s*2/);
+    assert.match(styles, /@media screen and \(max-width:\s*820px\)[\s\S]*?\.u-team-mobile-navigation-trigger[\s\S]*?position:\s*fixed/);
+    assert.match(styles, /\.u-team-mobile-navigation-trigger[\s\S]*?border-radius:\s*0 12px 12px 0/);
+    assert.match(styles, /&\.is-mobile-drawer-open\s*\{\s*z-index:\s*1001/);
+    assert.match(styles, /left:\s*0/);
+    assert.match(styles, /transform:\s*translateX\(-104%\)/);
+    assert.match(styles, /&\.is-open[\s\S]*?transform:\s*translateX\(0\)/);
+    assert.match(styles, /prefers-reduced-motion:\s*reduce[\s\S]*?m-team-home-sidebar__drawer/);
+    assert.match(guide, /左侧悬浮触发按钮 \+ 左侧侧滑抽屉/);
+    assert.match(guide, /只显示团队导航图标，不展示当前团队 Logo、名称/);
+    assert.match(guide, /禁止复制一份独立的移动团队列表/);
+});
+
 test("team workspace uses the persistent sidebar as its only team switcher", async () => {
     const [router, workspace, sidebar] = await Promise.all([
         read("../src/pages/team/router.js"),
@@ -619,6 +655,10 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(dialog, /:value="role\.relation\.role_id"/);
     assert.match(dialog, /error\?\.response\?\.data\?\.msg[\s\S]*?team\.dkpDialog\.failed/);
     assert.match(dialog, /this\.\$emit\("updateRows"\)/);
+    assert.match(dialog, /const createDefaultForm = \(\) => \(\{/);
+    assert.match(dialog, /form:\s*createDefaultForm\(\)/);
+    assert.match(dialog, /this\.form = createDefaultForm\(\)/);
+    assert.doesNotMatch(dialog, /this\.\$options\.data\(\)/);
     assert.match(list, /updateRows:\s*function \(\)[\s\S]*?clearSelection\(\)[\s\S]*?return this\.loadDkpList\(\)/);
     assert.doesNotMatch(list, /const _score = action/);
     assert.match(dialogStyles, /\.m-dkp-dialog-modify\.el-dialog/);
@@ -867,9 +907,16 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     assert.doesNotMatch(list, /m-team-results-header/);
     assert.doesNotMatch(list, /u-card-enter/);
     assert.match(list, /team\.homeFilters\.noRecruitment/);
+    assert.match(list, /:pager-count="isMobilePagination \? 5 : 7"/);
+    assert.match(list, /:small="isMobilePagination"/);
+    assert.match(list, /window\.matchMedia\("\(max-width: 560px\)"\)/);
+    assert.match(list, /removeEventListener\("change", this\.updatePaginationViewport\)/);
     assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
     assert.match(
         styles,
-        /@media screen and \(max-width: 820px\)[\s\S]*?> \.u-meta:not\(\.u-recruit\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-meta-item[\s\S]*?width:\s*100%/,
+        /@media screen and \(max-width: 820px\)[\s\S]*?> \.u-meta:not\(\.u-recruit\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-meta-item[\s\S]*?display:\s*flex[\s\S]*?width:\s*100%/,
     );
+    assert.match(styles, /> \.u-super\s*\{[\s\S]*?min-width:\s*0[\s\S]*?white-space:\s*nowrap/);
+    assert.match(styles, /\.m-team-list-pages[\s\S]*?overflow:\s*hidden[\s\S]*?min-width:\s*32px/);
+    assert.match(styles, /@media screen and \(max-width: 360px\)[\s\S]*?min-width:\s*28px/);
 });

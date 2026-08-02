@@ -179,6 +179,8 @@
             :hide-on-single-page="true"
             :page-size="per"
             :total="total"
+            :pager-count="isMobilePagination ? 5 : 7"
+            :small="isMobilePagination"
             v-model:current-page="page"
             @current-change="changePage"
         ></el-pagination>
@@ -217,6 +219,8 @@ export default {
             isVerified: false,
             tags,
             tag: [],
+            isMobilePagination: false,
+            paginationMediaQuery: null,
         };
     },
     computed: {
@@ -297,6 +301,9 @@ export default {
             this.tag = [];
             this.page = 1;
         },
+        updatePaginationViewport: function (event) {
+            this.isMobilePagination = event.matches;
+        },
         showLogo: function (val) {
             return getThumbnail(val, 204, true);
         },
@@ -318,7 +325,13 @@ export default {
     },
     created: function () {},
     mounted: function () {
+        this.paginationMediaQuery = window.matchMedia("(max-width: 560px)");
+        this.updatePaginationViewport(this.paginationMediaQuery);
+        this.paginationMediaQuery.addEventListener("change", this.updatePaginationViewport);
         this.loadData();
+    },
+    beforeUnmount: function () {
+        this.paginationMediaQuery?.removeEventListener("change", this.updatePaginationViewport);
     },
 };
 </script>

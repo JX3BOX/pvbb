@@ -104,9 +104,19 @@ test("battle notices link to the report guide in a new tab", async () => {
     ]);
 
     for (const page of [personalPage, managementPage]) {
+        assert.match(page, /class="u-notice-meta"/);
         assert.match(page, /class="u-battle-guide" href="\/tool\/109317" target="_blank" rel="noopener noreferrer"/);
         assert.match(page, /pages\.team\.battle\.reportGuide/);
     }
+});
+
+test("battle notice keeps its copy and activity filter in a compact responsive toolbar", async () => {
+    const styles = await read("../src/assets/css/team/battle/index.less");
+
+    assert.match(styles, /\.m-battle-notice__content[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+    assert.match(styles, /\.u-notice-meta[\s\S]*?display:\s*flex[\s\S]*?flex-wrap:\s*wrap/);
+    assert.match(styles, /max-width:\s*480px[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+    assert.doesNotMatch(styles, /\.m-battle-notice__content\s*\{[\s\S]{0,120}flex-direction:\s*column/);
 });
 
 test("season video management uses the modern workspace, cards, empty state and dialog", async () => {
