@@ -302,17 +302,18 @@ test("team homepage medals are display-only", async () => {
     assert.match(medal, /&\.is-static\s*\{[\s\S]*?cursor:\s*default/);
 });
 
-test("team card tabs keep their top border above painted tab backgrounds", async () => {
-    const [shellStyles, dkp] = await Promise.all([
-        read("../src/assets/css/team/app.less"),
+test("team DKP records use a segmented switch", async () => {
+    const [dkp, styles] = await Promise.all([
         read("../src/views/team/dkp/ViewDkp.vue"),
+        read("../src/assets/css/team/dkp/view_dkp.less"),
     ]);
 
-    assert.match(dkp, /<el-tabs v-model="tab" type="card">/);
-    assert.match(
-        shellStyles,
-        /\.el-tabs--card\s*>\s*\.el-tabs__header\s+\.el-tabs__item\s*\{[\s\S]*?margin-top:\s*0\s*!important/,
-    );
+    assert.match(dkp, /<el-segmented v-model="tab" :options="tabs" class="m-dkp-segmented">/);
+    assert.match(dkp, /\{ label: "当前分值", value: "list", icon: "el-icon-tickets" \}/);
+    assert.match(dkp, /\{ label: "历史记录", value: "logs", icon: "el-icon-time" \}/);
+    assert.match(dkp, /<dkp-list v-if="tab === 'list' && data\.length > 0"/);
+    assert.match(dkp, /<dkp-logs v-if="tab === 'logs'"/);
+    assert.match(styles, /\.m-dkp-segmented\s*\{[\s\S]*?margin-bottom:\s*16px/);
 });
 
 test("team edit action opens the basic settings section in the workbench", async () => {

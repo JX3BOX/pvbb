@@ -9,20 +9,16 @@
         </el-divider>
         <div class="m-dkp-overview" v-loading="loading">
             <template v-if="hasRight">
-                <el-tabs v-model="tab" type="card">
-                    <el-tab-pane label="当前分值" name="list">
-                        <template #label>
-                            <i class="el-icon-tickets"></i> 当前分值
-                        </template>
-                        <dkp-list :org="id" :list="data" v-if="data.length > 0" :readOnly="true" />
-                    </el-tab-pane>
-                    <el-tab-pane label="历史记录" name="logs">
-                        <template #label>
-                            <i class="el-icon-time"></i> 历史记录
-                        </template>
-                        <dkp-logs v-if="tab === 'logs'" :org="id" />
-                    </el-tab-pane>
-                </el-tabs>
+                <el-segmented v-model="tab" :options="tabs" class="m-dkp-segmented">
+                    <template #default="{ item }">
+                        <span class="u-segmented-label">
+                            <i :class="item.icon"></i>
+                            {{ item.label }}
+                        </span>
+                    </template>
+                </el-segmented>
+                <dkp-list v-if="tab === 'list' && data.length > 0" :org="id" :list="data" :readOnly="true" />
+                <dkp-logs v-if="tab === 'logs'" :org="id" />
             </template>
             <template v-else>
                 <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
@@ -45,6 +41,10 @@ export default {
             data: [], //dkp情况一览
             loading: false,
             tab: "list",
+            tabs: [
+                { label: "当前分值", value: "list", icon: "el-icon-tickets" },
+                { label: "历史记录", value: "logs", icon: "el-icon-time" },
+            ],
         };
     },
     computed: {
