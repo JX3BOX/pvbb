@@ -3,7 +3,7 @@
         <h5 class="u-title">
             <span>
                 <i class="el-icon-s-flag"></i>
-                正式队员
+                {{ header || $t("team.raid.board.normal") }}
                 <span class="u-count">({{ count }})</span>
                 <!-- 职能统计 -->
                 <span class="u-mount-group">
@@ -19,7 +19,7 @@
                     icon="CirclePlusFilled"
                     @click="handleButtonAdd('add')"
                     v-if="canManage"
-                    >添加队员</el-button
+                    >{{ $t("team.raid.board.add") }}</el-button
                 >
             </div>
         </h5>
@@ -30,7 +30,7 @@
             v-if="members && members.length"
         >
             <div class="m-raid-flag">
-                <i class="i-flag" v-for="f in col" :key="f">{{ f }} 队</i>
+                <i class="i-flag" v-for="f in col" :key="f">{{ $t("team.raid.board.group", { group: f }) }}</i>
             </div>
             <VueDraggable
                 tag="div"
@@ -57,14 +57,14 @@
                         v-if="isLeader(member) || (!leader && i === 0)"
                         src="@/assets/img/team/raid/leader.png"
                         alt="leader"
-                        title="队长"
+                        :title="$t('team.raid.board.leader')"
                     />
                     <img
                         class="u-member-core"
                         v-if="isCore(member)"
                         src="@/assets/img/team/raid/core.png"
                         alt="core"
-                        title="阵眼"
+                        :title="$t('team.raid.board.core')"
                     />
                     <span class="u-member-primary">
                         <img
@@ -77,7 +77,7 @@
                                 class="u-member-role-trigger"
                                 type="button"
                                 v-if="member.role_id && !editing[i] && linkVisible"
-                                :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                :aria-label="$t('team.raid.board.viewRole', { name: showMemberName(member['name']) })"
                                 @mousedown.stop
                                 @click.stop="openRoleDialog(member)"
                             >
@@ -88,7 +88,7 @@
 
                             <el-select
                                 v-show="editing[i]"
-                                placeholder="请选择或输入团员名"
+                                :placeholder="$t('team.raid.board.selectMember')"
                                 v-model="tempMember.name"
                                 allow-create
                                 filterable
@@ -124,21 +124,21 @@
                         >
                     </span>
                     <span class="u-member-op" v-if="canManage">
-                        <el-tooltip class="item" effect="dark" content="设置" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.settings')" placement="top-start">
                             <i class="u-member-setting el-icon-setting" @click="handleSetting(member, i)"></i>
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="设为替补队员" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.toSubstitute')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否将该角色转为替补成员？" @confirm="pending(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.toSubstituteConfirm')" @confirm="pending(member, i)">
                                     <template #reference>
                                         <i class="u-member-reset el-icon-first-aid-kit"></i>
                                     </template>
                                 </el-popconfirm>
                             </span>
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="删除" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.remove')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否删除该角色？" @confirm="remove(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.removeConfirm')" @confirm="remove(member, i)">
                                     <template #reference>
                                         <i class="u-member-delete el-icon-delete"></i>
                                     </template>
@@ -149,7 +149,7 @@
                 </div>
                 <div
                     v-if="members.length > 0 && members.length < row * col"
-                    title="新增队员"
+                    :title="$t('team.raid.board.add')"
                     @click="handleAdd('add')"
                     class="u-member u-member-add"
                 >
@@ -157,7 +157,7 @@
                 </div>
             </VueDraggable>
         </div>
-        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> 当前没有任何名单</div>
+        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> {{ $t("team.raid.board.empty") }}</div>
 
         <member-setting
             :title="title"
@@ -225,7 +225,7 @@ export default {
             visible: false,
             roleDialogVisible: false,
             roleDialogMember: null,
-            title: "新增队员",
+            title: "",
 
             // 右键菜单
             selectedMember: null,
@@ -314,7 +314,7 @@ export default {
         // ===============================
         // 设置
         handleSetting(member, index) {
-            this.title = "角色设置";
+            this.title = this.$t("team.raid.board.roleSettings");
             this.selectedMember = member;
             this.selectedIndex = index;
             this.visible = true;
@@ -329,8 +329,8 @@ export default {
             // 如果当前是一个虚拟节点，则只是重置所有值为默认
             if (member.is_virtual && !member?.id) {
                 this.$notify({
-                    title: "操作成功",
-                    message: `删除成功`,
+                    title: this.$t("team.raid.member.operationSuccess"),
+                    message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.members.splice(i, 1, cloneDeep(item_demo));
@@ -339,8 +339,8 @@ export default {
             // 如果当前是一个非虚拟节点，则发起删除请求并用一个虚拟节点替代
             removeMember(this.raid_id, member?.id).then(() => {
                 this.$notify({
-                    title: "操作成功",
-                    message: `删除成功`,
+                    title: this.$t("team.raid.member.operationSuccess"),
+                    message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.members.splice(i, 1, cloneDeep(item_demo)); //应同时添加一个虚拟节点
@@ -366,7 +366,7 @@ export default {
         },
         // 弹窗添加队员
         handleButtonAdd(action) {
-            this.title = "新增队员";
+            this.title = this.$t("team.raid.board.add");
             this.action = action;
             this.selectedMember = null;
             this.visible = true;
@@ -395,13 +395,13 @@ export default {
         roleFunc(val) {
             switch (val) {
                 case "内攻":
-                    return "内";
+                    return this.$t("team.raid.roles.inner");
                 case "外攻":
-                    return "外";
+                    return this.$t("team.raid.roles.outer");
                 case "坦克":
-                    return "坦";
+                    return this.$t("team.raid.roles.tank");
                 case "治疗":
-                    return "奶";
+                    return this.$t("team.raid.roles.healer");
                 default:
                     return "";
             }
@@ -435,17 +435,17 @@ export default {
                     customClass: "m-raid-contextmenu",
                     items: [
                         {
-                            label: "编辑",
+                            label: this.$t("team.raid.item.edit"),
                             customClass: "item",
                             onClick: () => this.setEdit(),
                         },
                         {
-                            label: "替补",
+                            label: this.$t("team.raid.board.substitute"),
                             customClass: "item",
                             onClick: () => this.pending(this.selectedMember, this.selectedIndex),
                         },
                         {
-                            label: "删除",
+                            label: this.$t("team.raid.member.remove"),
                             customClass: "item",
                             onClick: () => this.remove(this.selectedMember, this.selectedIndex),
                         },
@@ -455,7 +455,7 @@ export default {
         },
         // 右键编辑
         setEdit() {
-            this.title = "角色设置";
+            this.title = this.$t("team.raid.board.roleSettings");
             this.visible = true;
         },
         // 设为阵眼
@@ -466,13 +466,13 @@ export default {
         },
         // 设置备注
         setRemark() {
-            this.$prompt("请输入备注", "", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$prompt(this.$t("team.raid.board.remarkPrompt"), "", {
+                confirmButtonText: this.$t("team.raid.common.confirm"),
+                cancelButtonText: this.$t("team.raid.common.cancel"),
                 inputValue: this.selectedMember.remark,
                 inputValidator: (val) => {
                     if (val.length > 20) {
-                        return "备注内容应不超过20个字符";
+                        return this.$t("team.raid.board.remarkTooLong");
                     }
                 },
             }).then(({ value }) => {

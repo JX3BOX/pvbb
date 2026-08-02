@@ -181,7 +181,7 @@
 
     .m-activity-center-list .m-raid-list {
         display: grid;
-        gap: 12px;
+        gap: 14px;
         padding-top: 20px;
     }
 
@@ -189,11 +189,12 @@
         position: relative;
         display: grid;
         min-width: 0;
+        min-height: 104px;
         align-items: center;
-        padding: 18px;
+        padding: 20px;
         border: 1px solid @team-border-light;
         border-radius: @team-radius-control;
-        background: @team-surface;
+        background: linear-gradient(145deg, @team-surface 62%, fade(@team-primary, 3%));
         cursor: pointer;
         grid-template-columns: 58px minmax(0, 1fr) auto;
         gap: @team-space-3;
@@ -202,7 +203,7 @@
 
         &:hover {
             border-color: fade(@team-primary, 30%);
-            background: @team-surface;
+            background: linear-gradient(145deg, @team-surface 55%, fade(@team-primary, 6%));
             box-shadow: 0 10px 26px fade(@team-text-primary, 8%);
             transform: translateY(-1px);
 
@@ -221,7 +222,7 @@
     .u-center-date {
         display: flex;
         width: 58px;
-        height: 62px;
+        height: 76px;
         align-items: center;
         justify-content: center;
         flex-direction: column;
@@ -239,35 +240,30 @@
             font-size: 11px;
             line-height: 16px;
         }
+
+        time {
+            width: 34px;
+            margin-top: 3px;
+            padding-top: 3px;
+            border-top: 1px solid fade(@team-primary, 14%);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 14px;
+            text-align: center;
+        }
     }
 
     .u-center-content {
+        display: flex;
         min-width: 0;
+        flex-direction: column;
     }
 
     .u-center-heading {
         display: flex;
         min-width: 0;
         align-items: center;
-        justify-content: space-between;
-        gap: @team-space-2;
-
-        > div {
-            display: flex;
-            min-width: 0;
-            align-items: center;
-            gap: 8px;
-        }
-
-        h2 {
-            overflow: hidden;
-            margin: 0;
-            color: @team-text-primary;
-            font-size: 16px;
-            line-height: 24px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        gap: 8px;
     }
 
     .u-center-today {
@@ -281,31 +277,47 @@
         line-height: 16px;
     }
 
-    .u-center-time {
-        flex: none;
-        color: @team-primary;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-    .u-center-desc {
+    .u-center-type {
         overflow: hidden;
-        margin: 4px 0 9px;
+        padding: 2px 8px;
+        border: 1px solid @team-border-light;
+        border-radius: 999px;
+        background: @team-surface-muted;
         color: @team-text-secondary;
-        font-size: 12px;
-        line-height: 19px;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 16px;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .u-center-title {
+        overflow: hidden;
+        margin: 0;
+        color: @team-text-primary;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 26px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .u-center-operation {
+        display: flex;
+        min-width: 96px;
+        align-items: center;
+        justify-content: center;
     }
 
     .u-center-meta {
         display: flex;
         min-width: 0;
         align-items: center;
+        margin-top: 10px;
         color: @team-text-muted;
         font-size: 11px;
         line-height: 18px;
-        gap: 16px;
+        gap: 12px;
 
         > span,
         .u-center-team {
@@ -348,12 +360,12 @@
 
     .u-center-action {
         display: inline-flex;
-        min-height: 38px;
+        min-height: 32px;
         align-items: center;
         justify-content: center;
-        padding: 0 13px;
+        padding: 0 10px;
         border: 1px solid @team-border;
-        border-radius: 11px;
+        border-radius: 9px;
         background: @team-surface;
         color: @team-text-secondary;
         cursor: pointer;
@@ -464,23 +476,27 @@
 
         .u-center-date {
             width: 48px;
-            height: 54px;
+            height: 72px;
             border-radius: 14px;
+
+            time {
+                width: 30px;
+            }
         }
 
         .u-center-heading {
             align-items: flex-start;
-            flex-direction: column;
-            gap: 2px;
+            flex-wrap: wrap;
         }
 
         .u-center-meta {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 4px;
+            flex-wrap: wrap;
+            gap: 5px 10px;
         }
 
-        .u-center-action {
+        .u-center-operation {
+            min-width: 0;
+            justify-content: flex-end;
             grid-column: 1 / -1;
         }
     }

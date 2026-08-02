@@ -9,10 +9,10 @@
                 class="u-medal"
                 :title="item.medal_desc"
             >
-                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || '勋章'" />
+                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || $t('team.raid.misc.medal')" />
             </a>
             <span v-else class="u-medal is-static" :title="item.medal_desc">
-                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || '勋章'" />
+                <img class="u-medal-img" :src="showIcon(item.medal)" :alt="item.medal_desc || $t('team.raid.misc.medal')" />
             </span>
         </template>
     </div>

@@ -2,61 +2,61 @@
     <div class="v-raid-build" v-loading="loading">
         <h1 class="m-title">
             <i class="el-icon-s-flag"></i>
-            <span class="u-txt">编辑活动</span>
+            <span class="u-txt">{{ $t("team.raid.common.edit") }}</span>
             <router-link :to="'/raid/' + id" class="u-homepage" v-if="id">
                 <i class="el-icon-s-home"></i>
-                <span>活动主页</span>
+                <span>{{ $t("team.raid.legacy.homepage") }}</span>
             </router-link>
             <div class="u-op">
                 <el-button class="u-delete" type="danger" size="small" icon="Delete" @click="deleteRaid"
-                    >删除活动</el-button
+                    >{{ $t("team.raid.common.delete") }}</el-button
                 >
-                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.raid.common.back") }}</el-button>
             </div>
         </h1>
         <!-- 排表表单 -->
         <div class="m-raid-form">
             <el-form ref="form" :model="form" label-width="100px" :label-position="position">
-                <el-form-item label="所属团队">
+                <el-form-item :label="$t('team.raid.form.team')">
                     <el-input v-model="form.team_name" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="活动名称">
+                <el-form-item :label="$t('team.raid.form.name')">
                     <el-input v-model="form.name" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="活动标题">
+                <el-form-item :label="$t('team.raid.form.title')">
                     <el-input
                         v-model="form.title"
-                        placeholder="请输入内容"
+                        :placeholder="$t('team.raid.legacy.contentPlaceholder')"
                         show-word-limit
                         :maxlength="50"
                         :minlength="5"
                     ></el-input>
                 </el-form-item>
-                <el-form-item label="活动说明">
+                <el-form-item :label="$t('team.raid.form.notes')">
                     <el-input
                         v-model="form.desc"
-                        placeholder="可对活动的拍卖价格和补贴规则等作补充说明"
+                        :placeholder="$t('team.raid.form.notesHint')"
                         show-word-limit
                         :maxlength="300"
                         type="textarea"
                     ></el-input>
                 </el-form-item>
-                <el-form-item label="报名条件" class="u-auth">
+                <el-form-item :label="$t('team.raid.form.condition')" class="u-auth">
                     <el-radio-group v-model.number="form.auth">
-                        <el-radio :value="0">所有人可报名</el-radio>
+                        <el-radio :value="0">{{ $t("team.raid.auth.0") }}</el-radio>
                         <el-radio :value="1">
-                            <el-tooltip class="item" effect="dark" content="可查看角色信息与装备" placement="top">
-                                <span>仅认证角色</span>
+                            <el-tooltip class="item" effect="dark" :content="$t('team.raid.legacy.verifiedHint')" placement="top">
+                                <span>{{ $t("team.raid.form.verifiedRole") }}</span>
                             </el-tooltip>
                         </el-radio>
-                        <el-radio :value="2">仅团员可报名</el-radio>
-                        <el-radio :value="3">仅管理员指定</el-radio>
+                        <el-radio :value="2">{{ $t("team.raid.auth.2") }}</el-radio>
+                        <el-radio :value="3">{{ $t("team.raid.auth.3") }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item>
                     <template #label>
-                        <el-tooltip content="开启自动审批时不能强制匹配心法"
-                            ><span>扩展设置 <i class="el-icon-info"></i></span
+                        <el-tooltip :content="$t('team.raid.legacy.autoConflict')"
+                            ><span>{{ $t("team.raid.legacy.advanced") }} <i class="el-icon-info"></i></span
                         ></el-tooltip>
                     </template>
                     <el-checkbox
@@ -64,30 +64,30 @@
                         :disabled="!!form.auto_accept"
                         :true-value="1"
                         :false-value="0"
-                        >审批时强制匹配心法</el-checkbox
+                        >{{ $t("team.raid.legacy.forceMatch") }}</el-checkbox
                     >
                     <el-checkbox
                         v-model.number="form.auto_accept"
                         :disabled="!isVerified"
                         :true-value="1"
                         :false-value="0"
-                        >自动批准入队申请</el-checkbox
+                        >{{ $t("team.raid.legacy.autoApprove") }}</el-checkbox
                     >
                 </el-form-item>
-                <el-form-item label="活动时间">
+                <el-form-item :label="$t('team.raid.form.time')">
                     <el-date-picker
                         v-model="form.start_time"
                         type="datetime"
-                        placeholder="选择开团时间"
+                        :placeholder="$t('team.raid.legacy.selectStart')"
                         default-time="19:00:00"
                         :picker-options="{ firstDayOfWeek: 1 }"
                     ></el-date-picker>
                 </el-form-item>
-                <el-form-item label="开组角色">
+                <el-form-item :label="$t('team.raid.form.leader')">
                     <template #label>
-                        <el-tooltip class="item" effect="dark" content="用于游戏内插件点击指定角色进组" placement="top">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.form.leaderHint')" placement="top">
                             <span>
-                                开组角色
+                                {{ $t("team.raid.form.leader") }}
                                 <i class="el-icon-info"></i>
                             </span>
                         </el-tooltip>
@@ -95,22 +95,22 @@
                     <el-input
                         class="u-leader"
                         v-model="form.leader"
-                        placeholder="请填写队长角色名称"
+                        :placeholder="$t('team.raid.legacy.leaderPlaceholder')"
                         show-word-limit
                         :maxlength="12"
                         :minlength="2"
                     ></el-input>
                 </el-form-item>
-                <el-form-item label="是否广播">
+                <el-form-item :label="$t('team.raid.legacy.broadcast')">
                     <template #label>
                         <el-tooltip
                             class="item"
                             effect="dark"
-                            content="仅认证团队可广播，禁止工作室广告，违者永久禁言"
+                            :content="$t('team.raid.legacy.broadcastHint')"
                             placement="top"
                         >
                             <span>
-                                是否广播
+                                {{ $t("team.raid.legacy.broadcast") }}
                                 <i class="el-icon-info"></i>
                             </span>
                         </el-tooltip>
@@ -120,11 +120,11 @@
                         :disabled="!isVerified"
                         :true-value="1"
                         :false-value="0"
-                        >显示在活动大厅</el-checkbox
+                        >{{ $t("team.raid.legacy.showLobby") }}</el-checkbox
                     >
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="u-btn" type="primary" @click="submit" :disabled="processing">更新</el-button>
+                    <el-button class="u-btn" type="primary" @click="submit" :disabled="processing">{{ $t("team.raid.legacy.update") }}</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -161,7 +161,7 @@ export default {
                 desc: "",
                 auth: 0,
                 start_time: "",
-                leader: "队长名字",
+                leader: "",
                 is_public: 0,
                 auto_accept: 0,
                 force_match: 1,
@@ -250,13 +250,13 @@ export default {
         // 模板相关
         // ===========================
         saveAsTemplate: function () {
-            this.$prompt("请输入模板名称", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$prompt(this.$t("team.raid.legacy.templatePrompt"), this.$t("team.raid.common.tip"), {
+                confirmButtonText: this.$t("team.raid.common.confirm"),
+                cancelButtonText: this.$t("team.raid.common.cancel"),
                 inputValidator: (val) => {
-                    if (!val) return "请输入模板名称";
-                    if (val.length < 2) return "模板名称长度不能小于2个字符";
-                    if (val.length > 30) return "模板名称长度不能超过30个字符";
+                    if (!val) return this.$t("team.raid.legacy.templatePrompt");
+                    if (val.length < 2) return this.$t("team.raid.legacy.templateMin");
+                    if (val.length > 30) return this.$t("team.raid.legacy.templateMax");
                 },
                 beforeClose: (action, instance, done) => {
                     if (action === "cancel") {
@@ -269,7 +269,7 @@ export default {
                             .then((res) => {
                                 this.$message({
                                     type: "success",
-                                    message: "模板保存成功",
+                                    message: this.$t("team.raid.legacy.templateSaved"),
                                 });
                                 done();
                             })
@@ -326,7 +326,7 @@ export default {
             updateRaid(this.id, data)
                 .then((res) => {
                     this.$message({
-                        message: "更新成功",
+                        message: this.$t("team.raid.legacy.updated"),
                         type: "success",
                     });
                     this.$router.push(`/raid/${this.id}`);
@@ -336,14 +336,14 @@ export default {
                 });
         },
         deleteRaid: function () {
-            this.$alert("确定删除团队活动吗？", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.raid.legacy.deleteConfirm"), this.$t("team.raid.item.message"), {
+                confirmButtonText: this.$t("team.raid.common.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
                         deleteRaid(this.teamId, this.id).then((res) => {
                             this.$notify({
-                                title: "删除成功",
-                                message: "活动删除成功",
+                                title: this.$t("team.raid.common.deleted"),
+                                message: this.$t("team.raid.legacy.deleteSuccess"),
                                 type: "success",
                             });
                             this.$router.push("/raid/manage");

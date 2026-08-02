@@ -2,21 +2,21 @@
     <div class="v-snapshot-add">
         <h1 class="m-title">
             <i :class="id ? 'el-icon-edit' : 'el-icon-circle-plus-outline'"></i>
-            <span class="u-txt">{{ id ? "修改" : "创建" }}快照</span>
+            <span class="u-txt">{{ $t(id ? "team.snapshotEdit.edit" : "team.snapshotEdit.create") }}</span>
             <div class="u-op">
-                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.snapshotEdit.back") }}</el-button>
             </div>
         </h1>
         <div class="m-snapshot-form" v-loading="loading">
             <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="快照标题">
-                    <el-input v-model="form.title" placeholder="请输入标题"></el-input>
+                <el-form-item :label="$t('team.snapshotEdit.title')">
+                    <el-input v-model="form.title" :placeholder="$t('team.snapshotEdit.titlePlaceholder')"></el-input>
                 </el-form-item>
-                <el-form-item label="所属团队">
+                <el-form-item :label="$t('team.snapshotEdit.team')">
                     <el-select
                         class="m-select-org"
                         v-model.number="org"
-                        placeholder="请选择团队"
+                        :placeholder="$t('team.snapshotEdit.selectTeam')"
                         size="medium"
                         popper-class="m-select-org-options"
                         :disabled="!!id"
@@ -28,11 +28,11 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="备注信息">
-                    <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="form.desc"></el-input>
+                <el-form-item :label="$t('team.snapshotEdit.remark')">
+                    <el-input type="textarea" :rows="2" :placeholder="$t('team.snapshotEdit.remarkPlaceholder')" v-model="form.desc"></el-input>
                 </el-form-item>
-                <el-form-item label="参与人员">
-                    <el-divider content-position="left">快照名单</el-divider>
+                <el-form-item :label="$t('team.snapshotEdit.participants')">
+                    <el-divider content-position="left">{{ $t("team.snapshotEdit.roster") }}</el-divider>
                     <VueDraggable class="m-user-list" v-model="list">
                         <div v-for="(item, index) in list" :key="dragKey(item, 'snapshot-role')" class="u-user">
                             <div class="u-user-inner">
@@ -48,7 +48,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="u-btn u-submit" @click="submit" :disabled="processing"
-                        >提交</el-button
+                        >{{ $t("team.snapshotEdit.submit") }}</el-button
                     >
                 </el-form-item>
             </el-form>
@@ -161,7 +161,7 @@ export default {
         },
         skip: function () {
             this.$message({
-                message: "快照更新成功",
+                message: this.$t("team.snapshotEdit.updated"),
                 type: "success",
             });
             this.$router.push("/snapshot/list");

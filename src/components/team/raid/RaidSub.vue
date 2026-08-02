@@ -3,11 +3,11 @@
         <h5 class="u-title">
             <span>
                 <i class="el-icon-first-aid-kit"></i>
-                替补队员
+                {{ header || $t("team.raid.board.substitute") }}
                 <span class="u-count">({{ count }})</span>
             </span>
             <el-button size="small" type="primary" icon="CirclePlus" @click="handleButtonAdd('add')" v-if="canManage"
-                >添加替补</el-button
+                >{{ $t("team.raid.member.addSubstitute") }}</el-button
             >
         </h5>
         <div class="m-raid-corebox" v-if="data && data.length">
@@ -40,7 +40,7 @@
                                         class="u-member-role-trigger"
                                         type="button"
                                         v-if="member.role_id && linkVisible"
-                                        :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                        :aria-label="$t('team.raid.board.viewRole', { name: showMemberName(member['name']) })"
                                         @mousedown.stop
                                         @click.stop="openRoleDialog(member)"
                                     >
@@ -54,21 +54,21 @@
                         </template>
                     </el-popover>
                     <span class="u-member-op" v-if="canManage">
-                        <el-tooltip class="item" effect="dark" content="设置" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.settings')" placement="top-start">
                             <i class="u-member-setting el-icon-setting" @click="handleSetting(member, i)"></i>
                         </el-tooltip>
-                        <el-tooltip clss="item" effect="dark" content="转为正式成员" placement="top-start">
+                        <el-tooltip clss="item" effect="dark" :content="$t('team.raid.member.toNormal')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.toNormalConfirm')" @confirm="pass(member, i)">
                                     <template #reference>
                                         <i class="u-member-reset el-icon-check"></i>
                                     </template>
                                 </el-popconfirm>
                             </span>
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="删除" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.remove')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否删除该角色？" @confirm="remove(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.removeConfirm')" @confirm="remove(member, i)">
                                     <template #reference>
                                         <i class="u-member-delete el-icon-delete"></i>
                                     </template>
@@ -79,7 +79,7 @@
                 </div>
             </ul>
         </div>
-        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> 当前没有任何名单</div>
+        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> {{ $t("team.raid.board.empty") }}</div>
 
         <member-setting
             :title="title"
@@ -123,7 +123,7 @@ export default {
             data: [],
             // 弹层
             visible: false,
-            title: "新增替补",
+            title: "",
             roleDialogVisible: false,
             roleDialogMember: null,
 
@@ -204,7 +204,7 @@ export default {
         // ===============================
         // 设置
         handleSetting(member, index) {
-            this.title = "角色设置";
+            this.title = this.$t("team.raid.board.roleSettings");
             this.selectedMember = member;
             this.selectedIndex = index;
             this.visible = true;
@@ -254,8 +254,8 @@ export default {
                 } else {
                     this.$notify({
                         type: "warning",
-                        title: "提示",
-                        message: "当前团队人数已满或无匹配职责空位",
+                        title: this.$t("team.raid.common.tip"),
+                        message: this.$t("team.raid.member.teamFull"),
                     });
                 }
             } catch (e) {
@@ -266,8 +266,8 @@ export default {
         remove(member, i) {
             removeMember(this.raid_id, member?.id).then(() => {
                 this.$notify({
-                    title: "操作成功",
-                    message: `删除成功`,
+                    title: this.$t("team.raid.member.operationSuccess"),
+                    message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.data.splice(i, 1);
@@ -278,7 +278,7 @@ export default {
         // ===============================
         // 添加替补
         handleButtonAdd(action) {
-            this.title = "新增替补";
+            this.title = this.$t("team.raid.member.addSubstitute");
             this.action = action;
             this.selectedMember = null;
             this.visible = true;
@@ -314,17 +314,17 @@ export default {
                     customClass: "m-raid-contextmenu",
                     items: [
                         {
-                            label: "编辑",
+                            label: this.$t("team.raid.item.edit"),
                             customClass: "item",
                             onClick: () => this.setEdit(),
                         },
                         {
-                            label: "转正",
+                            label: this.$t("team.raid.member.toNormal"),
                             customClass: "item",
                             onClick: () => this.setPass(),
                         },
                         {
-                            label: "删除",
+                            label: this.$t("team.raid.member.remove"),
                             customClass: "item",
                             onClick: () => this.remove(this.selectedMember, this.selectedIndex),
                         },
@@ -334,7 +334,7 @@ export default {
         },
         // 右键编辑
         setEdit() {
-            this.title = "角色设置";
+            this.title = this.$t("team.raid.board.roleSettings");
             this.visible = true;
         },
         // 右键转正
@@ -343,13 +343,13 @@ export default {
         },
         // 设置备注
         setRemark() {
-            this.$prompt("请输入备注", "", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$prompt(this.$t("team.raid.board.remarkPrompt"), "", {
+                confirmButtonText: this.$t("team.raid.common.confirm"),
+                cancelButtonText: this.$t("team.raid.common.cancel"),
                 inputValue: this.selectedMember.remark,
                 inputValidator: (val) => {
                     if (val.length > 20) {
-                        return "备注内容应不超过20个字符";
+                        return this.$t("team.raid.board.remarkTooLong");
                     }
                 },
             }).then(({ value }) => {
@@ -418,8 +418,8 @@ export default {
             if (from !== "sub") return;
             this.$notify({
                 type: "warning",
-                title: "提醒",
-                message: "此角色职能位已不足，请检查后再试",
+                title: this.$t("team.raid.common.tip"),
+                message: this.$t("team.raid.member.teamFull"),
             });
             this.isMax = true;
         },

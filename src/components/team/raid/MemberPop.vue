@@ -6,7 +6,7 @@
             }}</span></a
         >
         <div class="u-member-time">
-            <i class="el-icon-time"></i><span class="u-member-time-label">申请时间</span>{{ formatApplyTime(member) }}
+            <i class="el-icon-time"></i><span class="u-member-time-label">{{ $t("team.raid.member.applyTime") }}</span>{{ formatApplyTime(member) }}
         </div>
         <div class="u-member-desc">{{ member["remark"] }}</div>
     </div>
@@ -29,7 +29,7 @@ export default {
             return showTime(member?.created_at);
         },
         showMemberUsername(member) {
-            return member?.raid_member_info?.display_name || "匿名";
+            return member?.raid_member_info?.display_name || this.$t("team.raid.member.anonymous");
         },
         showMemberAvatar(member) {
             return showAvatar(member?.raid_member_info?.user_avatar);

@@ -63,46 +63,43 @@
         <template v-else>
             <RightSideMsg class="m-org-verify-ac">
                 <div class="m-org-verify-info">
-                    <h3>【声明与特权】</h3>
-                    <p>① 工作室的团队认证申请将不予受理，提交此申请默认代表您已承诺您的团队的真实性合法性。</p>
-                    <p>
-                        ②
-                        经过团队认证的团队将可以享受部分团队平台的特殊功能，网站的赛事及特定活动均只有认证团队可以参与。
-                    </p>
-                    <p>③ 团队认证审核结果的最终解释权由魔盒公证团队所有。</p>
+                    <h3>{{ $t("team.verification.notice") }}</h3>
+                    <p>① {{ $t("team.verification.notice1") }}</p>
+                    <p>② {{ $t("team.verification.notice2") }}</p>
+                    <p>③ {{ $t("team.verification.notice3") }}</p>
                 </div>
             </RightSideMsg>
             <RightSideMsg>
                 <div class="m-org-verify-info">
-                    <h3>【认证步骤】</h3>
-                    <p>① 在本页面提交申请，等待公证团队审核。</p>
-                    <p>② 一旦修改团队名称或队徽，将需要重新提交认证。</p>
+                    <h3>{{ $t("team.verification.process") }}</h3>
+                    <p>① {{ $t("team.verification.step1") }}</p>
+                    <p>② {{ $t("team.verification.step2") }}</p>
                     <p>
-                        ③ 请务必加入【认证团长群】（QQ群：
+                        ③ {{ $t("team.verification.leaderGroup") }}：
                         <a
                             href="https://qm.qq.com/q/O3fXaqtAwS"
                             class="el-button el-button--primary el-button--small is-plain"
                             target="_blank"
                             >915477780</a
-                        >），此群禁止聊天，只用于发送重要活动通知，请勿屏蔽。
+                        >（{{ $t("team.verification.required") }}）
                     </p>
                     <p>
-                        ④ 可选择加入【团长群】（QQ群：<a
+                        ④ {{ $t("team.verification.exchangeGroup") }}：<a
                             href="https://jq.qq.com/?_wv=1027&k=MglORFXo"
                             class="el-button el-button--primary el-button--small is-plain"
                             target="_blank"
-                            >「正式服」785597424</a
+                            >{{ $t("team.verification.retail") }}</a
                         >、<a
                             href="https://jq.qq.com/?_wv=1027&k=MXEj10bv"
                             class="el-button el-button--primary el-button--small is-plain"
                             target="_blank"
-                            >「怀旧服」528707506</a
-                        >），此群可邀请团队内的其它管理一起加入，用于团长之间沟通。
+                            >{{ $t("team.verification.legacy") }}</a
+                        >
                     </p>
                     <div class="m-org-verify-alert">
                         <el-alert v-if="done" type="success" show-icon class="u-warning">
                             <router-link to="/org/manage" arget="_blank" class="u-org-verify-alert-a"
-                                >提交成功，请等待审核</router-link
+                                >{{ $t("team.verification.submitted") }}</router-link
                             >
                         </el-alert>
                     </div>
@@ -112,7 +109,7 @@
                         @submit="submit"
                         :done="done"
                         :has-applied="hasApplied"
-                        btn_txt="提交认证"
+                        :btn_txt="$t('team.verification.submit')"
                     />
                 </div>
             </RightSideMsg>

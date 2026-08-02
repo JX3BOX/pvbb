@@ -25,8 +25,8 @@ export default {
         onCopy: function (val) {
             copyText(val);
             this.$notify({
-                title: "复制成功",
-                message: "复制内容 : " + val,
+                title: this.$t("team.snapshotEdit.copied"),
+                message: this.$t("team.snapshotEdit.copiedText", { text: val }),
                 type: "success",
             });
         },

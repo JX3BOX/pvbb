@@ -2,23 +2,23 @@
     <div class="v-role-list" v-loading="loading">
         <h1 class="m-title">
             <i class="el-icon-user"></i>
-            <span class="u-txt">我的角色</span>
+            <span class="u-txt">{{ $t("team.role.myRoles") }}</span>
             <!-- <goback /> -->
             <div class="u-op">
                 <router-link to="/role/bind" class="el-button el-button--primary el-button--mini">
-                    <i class="el-icon-connection"></i> 绑定角色
+                    <i class="el-icon-connection"></i> {{ $t("team.role.bind") }}
                 </router-link>
                 <router-link to="/role/add" class="el-button el-button--primary el-button--mini">
-                    <i class="el-icon-plus"></i> 自定义角色
+                    <i class="el-icon-plus"></i> {{ $t("team.role.customRole") }}
                 </router-link>
             </div>
         </h1>
         <div class="m-role-list-filter">
-            <el-input class="u-name" v-model="name" placeholder="请输入角色名称" size="small">
-                <template #prepend> <i class="el-icon-search"></i> 查找 </template>
+            <el-input class="u-name" v-model="name" :placeholder="$t('team.role.namePlaceholder')" size="small">
+                <template #prepend> <i class="el-icon-search"></i> {{ $t("team.role.find") }} </template>
             </el-input>
             <el-select size="small" v-model="mount" popper-class="m-school-pop">
-                <el-option label="全部" value=""></el-option>
+                <el-option :label="$t('team.role.all')" value=""></el-option>
                 <el-option
                     v-for="(school, school_id) in school_id_map"
                     :key="school_id"
@@ -39,12 +39,12 @@
                     </router-link>
                     <span class="u-title">
                         <router-link class="u-rolename" :to="'/role/' + item.ID">{{ item.name }}</router-link>
-                        <i class="u-status" v-if="!item.custom" title="已认证">
+                        <i class="u-status" v-if="!item.custom" :title="$t('team.role.verified')">
                             <img svg-inline src="@/assets/img/team/verify.svg" />
                         </i>
                         <span class="u-note" v-if="item.note">({{ item.note }})</span>
                         <span class="u-addnote" @click="addNote(item)">
-                            <el-tooltip class="item" effect="dark" content="设置备注" placement="top">
+                            <el-tooltip class="item" effect="dark" :content="$t('team.role.note')" placement="top">
                                 <i class="el-icon-edit-outline"></i>
                             </el-tooltip>
                         </span>
@@ -52,7 +52,7 @@
                             <el-tooltip
                                 class="item"
                                 effect="dark"
-                                :content="item.priority ? '取消置顶' : '置顶'"
+                                :content="$t(item.priority ? 'team.role.unpin' : 'team.role.pin')"
                                 placement="top"
                             >
                                 <i class="el-icon-star-off"></i>
@@ -61,16 +61,16 @@
                     </span>
                     <span class="u-meta">
                         <span class="u-server">
-                            <em>服务器</em>
+                            <em>{{ $t("team.role.server") }}</em>
                             {{ item.server }}
                         </span>
                         <span class="u-mount">
-                            <em>门派</em>
+                            <em>{{ $t("team.role.school") }}</em>
                             <img class="u-icon" :src="showSchoolIcon(item.mount)" />
                             {{ showSchoolName(item.mount) }}
                         </span>
                     </span>
-                    <span class="u-time">绑定时间 : {{ showTime(item.created_at) }}</span>
+                    <span class="u-time">{{ $t("team.role.boundAt", { time: showTime(item.created_at) }) }}</span>
                     <div class="u-op">
                         <el-button
                             v-if="!item.custom"
@@ -80,7 +80,7 @@
                             size="small"
                             @click="unbind(item.ID, i)"
                         >
-                            <i class="u-icon"> <img svg-inline src="@/assets/img/team/unbind.svg" /> </i>解绑角色
+                            <i class="u-icon"> <img svg-inline src="@/assets/img/team/unbind.svg" /> </i>{{ $t("team.role.unbind") }}
                         </el-button>
                         <template v-else>
                             <router-link
@@ -88,7 +88,7 @@
                                 class="el-button el-button--primary el-button--small is-plain"
                             >
                                 <i class="el-icon-edit-outline"></i>
-                                编辑
+                                {{ $t("team.role.edit") }}
                             </router-link>
                             <el-button
                                 class="u-btn u-delete"
@@ -97,7 +97,7 @@
                                 size="small"
                                 @click="delRole(item.ID, i)"
                                 icon="Delete"
-                                >删除</el-button
+                                >{{ $t("team.role.delete") }}</el-button
                             >
                         </template>
                     </div>
@@ -115,24 +115,24 @@
             ></el-pagination>
         </div>
         <template v-else>
-            <el-alert class="m-archive-null" title="没有找到相关条目" type="info" center show-icon></el-alert>
+            <el-alert class="m-archive-null" :title="$t('team.role.empty')" type="info" center show-icon></el-alert>
             <div class="m-role-null">
                 <router-link to="/role/bind" class="el-button el-button--primary el-button--mini">
-                    <i class="el-icon-connection"></i> 绑定角色
+                    <i class="el-icon-connection"></i> {{ $t("team.role.bind") }}
                 </router-link>
                 <router-link to="/role/add" class="el-button el-button--primary el-button--mini">
-                    <i class="el-icon-plus"></i> 自定义角色
+                    <i class="el-icon-plus"></i> {{ $t("team.role.customRole") }}
                 </router-link>
             </div>
         </template>
-        <el-dialog title="设置备注" v-model="noteVisible" width="30%" class="m-team-note-dialog">
+        <el-dialog :title="$t('team.role.note')" v-model="noteVisible" width="30%" class="m-team-note-dialog">
             <div>
-                <el-input v-model="note" placeholder="请输入内容" :maxlength="20" :show-word-limit="true"></el-input>
+                <el-input v-model="note" :placeholder="$t('team.role.contentPlaceholder')" :maxlength="20" :show-word-limit="true"></el-input>
             </div>
             <template #foorer>
                 <span class="dialog-footer">
-                    <el-button @click="noteVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="confirmNote">确 定</el-button>
+                    <el-button @click="noteVisible = false">{{ $t("team.role.cancel") }}</el-button>
+                    <el-button type="primary" @click="confirmNote">{{ $t("team.role.confirm") }}</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -182,14 +182,14 @@ export default {
     },
     methods: {
         unbind: function (id, i) {
-            this.$alert("在网站进行解绑游戏内需要小退方可生效", "消息", {
-                confirmButtonText: "确定解绑",
+            this.$alert(this.$t("team.role.unbindHint"), this.$t("team.raid.item.message"), {
+                confirmButtonText: this.$t("team.role.confirmUnbind"),
                 callback: (action) => {
                     if (action == "confirm") {
                         unbindRole(id).then((res) => {
                             this.$notify({
-                                title: "解绑成功",
-                                message: "角色解绑成功",
+                                title: this.$t("team.role.unbound"),
+                                message: this.$t("team.role.unboundMessage"),
                                 type: "success",
                             });
                             this.data.splice(i, 1);
@@ -227,21 +227,21 @@ export default {
                 this.note = "";
 
                 this.$notify({
-                    title: "成功",
-                    message: "备注设置成功",
+                    title: this.$t("team.role.success"),
+                    message: this.$t("team.role.noteSaved"),
                     type: "success",
                 });
             });
         },
         delRole: function (role_id, i) {
-            this.$alert("确定删除该角色吗？", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.role.deleteConfirm"), this.$t("team.raid.item.message"), {
+                confirmButtonText: this.$t("team.role.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
                         deleteRole(role_id).then((res) => {
                             this.$notify({
-                                title: "删除成功",
-                                message: "角色删除成功",
+                                title: this.$t("team.role.deleted"),
+                                message: this.$t("team.role.deletedMessage"),
                                 type: "success",
                             });
                             this.data.splice(i, 1);
@@ -255,8 +255,8 @@ export default {
                 unstarRole(item.ID).then((res) => {
                     item.priority = 0;
                     this.$notify({
-                        title: "取消星标成功",
-                        message: "角色取消星标成功",
+                        title: this.$t("team.role.unpinned"),
+                        message: this.$t("team.role.unpinnedMessage"),
                         type: "success",
                     });
                 });
@@ -264,8 +264,8 @@ export default {
                 starRole(item.ID).then((res) => {
                     item.priority = Date.now();
                     this.$notify({
-                        title: "星标成功",
-                        message: "角色星标成功",
+                        title: this.$t("team.role.pinned"),
+                        message: this.$t("team.role.pinnedMessage"),
                         type: "success",
                     });
                 });

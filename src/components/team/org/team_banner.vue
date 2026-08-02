@@ -1,12 +1,12 @@
 <template>
     <section class="m-team-banner" :class="{ 'is-archive': variant === 'archive' }">
         <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.settingSections.banner") }}</div>
-        <el-divider v-else content-position="left"> <i class="el-icon-picture-outline"></i> 团队海报 </el-divider>
+        <el-divider v-else content-position="left"> <i class="el-icon-picture-outline"></i> {{ $t("team.settingSections.banner") }} </el-divider>
         <div class="m-banner-editor">
             <uploadImage
                 v-model="banner"
                 :size="variant === 'archive' ? [920, 120] : 148"
-                info="团队海报推荐尺寸为920*120，画面主体尽量靠右，用于微信小程序团队主页与活动等作为主题展示。"
+                :info="$t('team.settingSections.bannerHint')"
             ></uploadImage>
             <div v-if="variant === 'archive'" class="m-banner-editor__actions">
                 <p>{{ $t("team.settingSections.bannerHint") }}</p>

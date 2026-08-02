@@ -3,12 +3,12 @@
         <div ref="teamImage" class="m-raid-view-page" :class="{ 'm-teamImage': hideBtn }" :style="boxsize">
             <header class="m-raid-view-hero">
                 <div class="u-heading">
-                    <span class="u-eyebrow"><i class="el-icon-data-board"></i> RAID 排表</span>
-                    <h1>{{ data.name || "活动详情" }}</h1>
+                    <span class="u-eyebrow"><i class="el-icon-data-board"></i> {{ $t("team.raid.view.eyebrow") }}</span>
+                    <h1>{{ data.name || $t("team.raid.view.detail") }}</h1>
                     <p>
-                        <span>{{ data.team_name || "团队活动" }}</span>
+                        <span>{{ data.team_name || $t("team.raid.view.teamActivity") }}</span>
                         <i></i>
-                        <span>{{ showTime(data.start_time) || "时间待定" }}</span>
+                        <span>{{ showTime(data.start_time) || $t("team.raid.view.timePending") }}</span>
                     </p>
                 </div>
                 <div class="u-op">
@@ -20,17 +20,17 @@
                         @click="editRaid"
                         v-if="isAdmin || canManage"
                         :disabled="isOldVersion"
-                        >编辑活动</el-button
+                        >{{ $t("team.raid.common.edit") }}</el-button
                     >
 
-                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.raid.common.back") }}</el-button>
                 </div>
             </header>
 
             <el-alert
                 v-if="loadError"
                 class="m-raid-view-error"
-                title="活动详情加载失败，请稍后重试"
+                :title="$t('team.raid.view.loadFailed')"
                 type="error"
                 show-icon
                 :closable="false"
@@ -46,8 +46,8 @@
                         <div>
                             <span class="u-section-icon"><i class="el-icon-tickets"></i></span>
                             <div>
-                                <h2>活动信息</h2>
-                                <p>开团安排与报名说明</p>
+                                <h2>{{ $t("team.raid.view.info") }}</h2>
+                                <p>{{ $t("team.raid.view.infoHint") }}</p>
                             </div>
                         </div>
                         <span class="u-auth" :class="{ 'is-disabled': !canJoin }">
@@ -58,7 +58,7 @@
 
                     <el-alert
                         v-if="isOldVersion"
-                        title="这是旧版排表，仅支持查看。"
+                        :title="$t('team.raid.view.legacy')"
                         type="warning"
                         show-icon
                         :closable="false"
@@ -68,33 +68,33 @@
                         <div class="u-meta-item">
                             <span class="u-icon"><i class="el-icon-date"></i></span>
                             <div>
-                                <em>开团时间</em>
-                                <strong>{{ showTime(data.start_time) || "待定" }}</strong>
+                                <em>{{ $t("team.raid.view.startTime") }}</em>
+                                <strong>{{ showTime(data.start_time) || $t("team.raid.common.pending") }}</strong>
                             </div>
                         </div>
                         <div class="u-meta-item">
                             <span class="u-icon"><i class="el-icon-microphone"></i></span>
                             <div>
-                                <em>队长指挥</em>
-                                <strong>{{ data.leader || "暂未填写" }}</strong>
+                                <em>{{ $t("team.raid.view.leader") }}</em>
+                                <strong>{{ data.leader || $t("team.raid.view.leaderPending") }}</strong>
                             </div>
                         </div>
                         <div class="u-meta-item">
                             <span class="u-icon"><i class="el-icon-user"></i></span>
                             <div>
-                                <em>活动规模</em>
-                                <strong>{{ data.count ? `${data.count} 人` : "按排表安排" }}</strong>
+                                <em>{{ $t("team.raid.view.scale") }}</em>
+                                <strong>{{ data.count ? $t("team.raid.common.people", { count: data.count }) : $t("team.raid.view.arranged") }}</strong>
                             </div>
                         </div>
                     </div>
 
                     <div class="m-raid-view-info">
-                        <h3>{{ data.title || data.name || "团队活动" }}</h3>
-                        <p>{{ data.desc || "暂无补充说明" }}</p>
+                        <h3>{{ data.title || data.name || $t("team.raid.view.teamActivity") }}</h3>
+                        <p>{{ data.desc || $t("team.raid.view.noDescription") }}</p>
                     </div>
 
                     <div class="m-raid-lackmount" v-if="lackMounts.length">
-                        <h3><i class="el-icon-circle-check"></i> 以下职业无冲突</h3>
+                        <h3><i class="el-icon-circle-check"></i> {{ $t("team.raid.view.noConflict") }}</h3>
                         <ul class="u-list">
                             <li class="u-item" v-for="mount in lackMounts" :key="mount.id">
                                 <img class="u-icon" :src="showMountIcon(mount.id)" :alt="mount.name" />
@@ -109,16 +109,16 @@
                         <div class="u-copy">
                             <span class="u-icon"><i class="el-icon-s-promotion"></i></span>
                             <div>
-                                <h3>{{ canJoin ? "报名通道已开放" : "当前暂不可报名" }}</h3>
+                                <h3>{{ $t(canJoin ? "team.raid.view.joinOpen" : "team.raid.view.joinClosed") }}</h3>
                                 <p>{{ showAuth(data.auth) }}</p>
                             </div>
                         </div>
                         <div class="u-actions">
                             <el-button icon="FullScreen" :disabled="!canJoin" @click="showMiniprogramCode">
-                                微信小程序
+                                {{ $t("team.raid.view.miniProgram") }}
                             </el-button>
                             <el-button type="primary" icon="Right" @click="handleShowDialog" :disabled="!canJoin">
-                                预约报名
+                                {{ $t("team.raid.view.reserve") }}
                             </el-button>
                         </div>
                     </div>
@@ -128,8 +128,8 @@
                             <div>
                                 <span class="u-section-icon"><i class="el-icon-user"></i></span>
                                 <div>
-                                    <h2>活动排表</h2>
-                                    <p>正式队员、替补队员与候选名单</p>
+                                    <h2>{{ $t("team.raid.view.board") }}</h2>
+                                    <p>{{ $t("team.raid.view.boardHint") }}</p>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                     </section>
 
                     <join-pop
-                        title="预约报名"
+                        :title="$t('team.raid.view.reserve')"
                         v-model="joinShow"
                         :auth="data.auth"
                         :client="client"
@@ -173,7 +173,6 @@
 
 <script>
 import html2canvas from "html2canvas";
-import raid_auth from "@/assets/data/team/raid_auth.json";
 import { getTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user";
 import { getRaid, updateRaid, removeRaid, addTobeMember, getWxacode } from "@/service/team/raid.js";
@@ -204,7 +203,6 @@ export default {
             info: "",
             data: "",
 
-            raid_auth,
             authority: 0,
             auth_map: {
                 r_raid: 0,
@@ -311,7 +309,7 @@ export default {
                     _data.count_normal = count_normal;
                     updateRaid(this.id, _data).then(() => {
                         this.$message({
-                            message: "更新成功",
+                            message: this.$t("team.raid.view.updateSuccess"),
                             type: "success",
                         });
                     });
@@ -407,7 +405,7 @@ export default {
             // 提交到报名接口
             addTobeMember(this.id, this.chosenRole).then((res) => {
                 this.$message({
-                    message: "申请成功,请等待团长审核",
+                    message: this.$t("team.raid.view.applySuccess"),
                     type: "success",
                 });
                 this.joinShow = false;
@@ -435,7 +433,7 @@ export default {
         rmRaid: function () {
             removeRaid(this.id).then((res) => {
                 this.$message({
-                    message: "删除成功",
+                    message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.visible = false;
@@ -460,7 +458,7 @@ export default {
             });
         },
         showAuth: function (val) {
-            return raid_auth[val];
+            return this.$t(`team.raid.auth.${val}`);
         },
         showTime,
         showMountIcon,

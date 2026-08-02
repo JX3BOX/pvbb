@@ -21,7 +21,7 @@ test("raid management creates and edits activities in the shared dialog", async 
     assert.match(item, /name:\s*["']view_raid["']/);
     assert.match(item, /this\.\$router\.resolve\(\{/);
     assert.doesNotMatch(item, /window\.open\(`\/raid\//);
-    assert.match(dialog, /isEdit \? ['"]编辑活动['"] : ['"]创建活动['"]/);
+    assert.match(dialog, /isEdit \? \$t\('team\.raid\.common\.edit'\) : \$t\('team\.raid\.common\.create'\)/);
     assert.match(dialog, /addRaid\(data\)/);
     assert.match(dialog, /updateRaid\(this\.raidId, data\)/);
     assert.match(dialog, /moment\(raid\.start_time\)\.format\("YYYY-MM-DD HH:mm:ss"\)/);
@@ -37,9 +37,9 @@ test("raid activity dialog keeps the existing API contract and grouped form sect
         read("../src/assets/css/team/raid/form_dialog.less"),
     ]);
 
-    assert.match(dialog, /<h4>基础信息<\/h4>/);
-    assert.match(dialog, /<h4>报名设置<\/h4>/);
-    assert.match(dialog, /<h4>补充说明<\/h4>/);
+    assert.match(dialog, /<h4>\{\{ \$t\("team\.raid\.form\.basic"\) \}\}<\/h4>/);
+    assert.match(dialog, /<h4>\{\{ \$t\("team\.raid\.form\.signup"\) \}\}<\/h4>/);
+    assert.match(dialog, /<h4>\{\{ \$t\("team\.raid\.form\.notes"\) \}\}<\/h4>/);
     assert.match(dialog, /width="920px"/);
     assert.match(dialog, /align-center/);
     assert.match(dialog, /:rows="3"/);

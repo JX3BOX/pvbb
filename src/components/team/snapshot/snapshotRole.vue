@@ -1,15 +1,15 @@
 <template>
     <el-form :inline="true" :rules="rules" ref="ruleForm" :model="form" class="demo-form-inline">
-        <el-form-item label="角色名" prop="name">
-            <el-input v-model="form.name" placeholder="角色名"></el-input>
+        <el-form-item :label="$t('team.snapshotEdit.roleName')" prop="name">
+            <el-input v-model="form.name" :placeholder="$t('team.snapshotEdit.roleName')"></el-input>
         </el-form-item>
-        <el-form-item label="心法" prop="xf">
-            <el-select v-model="form.xf" placeholder="心法">
+        <el-form-item :label="$t('team.snapshotEdit.mount')" prop="xf">
+            <el-select v-model="form.xf" :placeholder="$t('team.snapshotEdit.mount')">
                 <el-option v-for="item in xflist" :key="item.name" :label="item.name" :value="item.id"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button type="success" @click="submitForm('ruleForm')"> <i class="el-icon-right"></i> 添加 </el-button>
+            <el-button type="success" @click="submitForm('ruleForm')"> <i class="el-icon-right"></i> {{ $t("team.snapshotEdit.add") }} </el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -31,14 +31,14 @@ export default {
                 name: [
                     {
                         required: true,
-                        message: "请输入角色名",
+                        message: this.$t("team.snapshotEdit.roleRequired"),
                         trigger: "blur",
                     },
                 ],
                 xf: [
                     {
                         required: true,
-                        message: "请选择角色心法",
+                        message: this.$t("team.snapshotEdit.mountRequired"),
                         trigger: "change",
                     },
                 ],

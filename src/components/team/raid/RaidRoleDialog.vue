@@ -12,8 +12,8 @@
             <div class="m-raid-role-dialog__title">
                 <span class="u-title-icon"><i class="el-icon-user"></i></span>
                 <div>
-                    <strong>角色信息</strong>
-                    <span>查看当前排表成员的绑定角色资料</span>
+                    <strong>{{ $t("team.raid.roleDialog.title") }}</strong>
+                    <span>{{ $t("team.raid.roleDialog.hint") }}</span>
                 </div>
             </div>
         </template>
@@ -21,7 +21,7 @@
         <div class="m-raid-role-dialog__body" v-loading="loading">
             <el-alert
                 v-if="loadError"
-                title="角色信息加载失败，请稍后重试"
+                :title="$t('team.raid.roleDialog.loadFailed')"
                 type="error"
                 show-icon
                 :closable="false"
@@ -32,43 +32,43 @@
                     <img class="u-role-icon" :src="showMountIcon(displayRole.mount)" :alt="displayRole.name" />
                     <div class="u-role-copy">
                         <div class="u-name-line">
-                            <strong>{{ displayRole.name || member.name || "未命名角色" }}</strong>
+                            <strong>{{ displayRole.name || member.name || $t("team.raid.roleDialog.unnamed") }}</strong>
                             <span v-if="role && !Number(role.custom)" class="u-verified">
-                                <i class="el-icon-circle-check"></i> 已认证
+                                <i class="el-icon-circle-check"></i> {{ $t("team.raid.roleDialog.verified") }}
                             </span>
                         </div>
-                        <span>{{ displayRole.server || member.server || "服务器未知" }}</span>
+                        <span>{{ displayRole.server || member.server || $t("team.raid.roleDialog.unknownServer") }}</span>
                     </div>
                 </section>
 
                 <section class="m-raid-role-meta">
                     <div>
-                        <span>门派</span>
-                        <strong>{{ showRoleSchool(displayRole.mount) || "未知" }}</strong>
+                        <span>{{ $t("team.raid.roleDialog.school") }}</span>
+                        <strong>{{ showRoleSchool(displayRole.mount) || $t("team.raid.common.unknown") }}</strong>
                     </div>
                     <div>
-                        <span>心法</span>
-                        <strong>{{ showMountName(displayRole.mount) || "未知" }}</strong>
+                        <span>{{ $t("team.raid.roleDialog.mount") }}</span>
+                        <strong>{{ showMountName(displayRole.mount) || $t("team.raid.common.unknown") }}</strong>
                     </div>
                     <div>
-                        <span>体型</span>
-                        <strong>{{ showBodyType(displayRole.body_type) || "未知" }}</strong>
+                        <span>{{ $t("team.raid.roleDialog.bodyType") }}</span>
+                        <strong>{{ showBodyType(displayRole.body_type) || $t("team.raid.common.unknown") }}</strong>
                     </div>
                 </section>
 
                 <section v-if="role && (role.display_name || role.uid)" class="m-raid-role-owner">
-                    <span class="u-section-label">绑定账号</span>
+                    <span class="u-section-label">{{ $t("team.raid.roleDialog.owner") }}</span>
                     <div class="u-owner-card">
                         <img :src="showAvatar(role.user_avatar)" alt="" />
                         <div>
-                            <strong>{{ role.display_name || "未设置昵称" }}</strong>
+                            <strong>{{ role.display_name || $t("team.raid.roleDialog.nicknameUnset") }}</strong>
                             <span>UID {{ role.uid || "--" }}</span>
                         </div>
                     </div>
                 </section>
 
                 <section v-if="member.remark || role?.note" class="m-raid-role-note">
-                    <span class="u-section-label">排表备注</span>
+                    <span class="u-section-label">{{ $t("team.raid.roleDialog.remark") }}</span>
                     <p>{{ member.remark || role.note }}</p>
                 </section>
             </template>
@@ -76,7 +76,7 @@
 
         <template #footer>
             <div class="m-raid-role-dialog__footer">
-                <el-button type="primary" @click="visible = false">知道了</el-button>
+                <el-button type="primary" @click="visible = false">{{ $t("team.raid.roleDialog.close") }}</el-button>
             </div>
         </template>
     </el-dialog>

@@ -10,38 +10,38 @@
         @closed="reset"
     >
         <div class="m-snapshot-edit" v-loading="loading">
-            <el-segmented v-model="section" :options="sections" class="m-snapshot-edit__segmented" />
+            <el-segmented v-model="section" :options="sectionOptions" class="m-snapshot-edit__segmented" />
 
-            <el-form v-if="section === '基本信息'" label-position="top" class="m-snapshot-edit__form">
-                <el-form-item label="快照标题">
-                    <el-input v-model="form.title" placeholder="请输入快照标题" clearable />
+            <el-form v-if="section === 'basic'" label-position="top" class="m-snapshot-edit__form">
+                <el-form-item :label="$t('team.snapshotEdit.title')">
+                    <el-input v-model="form.title" :placeholder="$t('team.snapshotEdit.titlePlaceholder')" clearable />
                 </el-form-item>
-                <el-form-item label="所属团队">
-                    <el-select v-model.number="selectedTeamId" disabled placeholder="所属团队">
+                <el-form-item :label="$t('team.snapshotEdit.team')">
+                    <el-select v-model.number="selectedTeamId" disabled :placeholder="$t('team.snapshotEdit.team')">
                         <el-option v-for="item in teams" :key="item.ID" :label="item.name" :value="item.ID" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="备注信息">
-                    <el-input v-model="form.desc" type="textarea" :rows="4" placeholder="请输入备注信息" />
+                <el-form-item :label="$t('team.snapshotEdit.remark')">
+                    <el-input v-model="form.desc" type="textarea" :rows="4" :placeholder="$t('team.snapshotEdit.remarkPlaceholder')" />
                 </el-form-item>
             </el-form>
 
             <div v-else class="m-snapshot-edit__members">
                 <div class="m-snapshot-edit__members-head">
                     <div>
-                        <h3>参与人员</h3>
-                        <p>拖动可以调整名单顺序，点击角色右上角可移除。</p>
+                        <h3>{{ $t("team.snapshotEdit.participants") }}</h3>
+                        <p>{{ $t("team.snapshotEdit.participantHint") }}</p>
                     </div>
-                    <span>{{ list.length }} 人</span>
+                    <span>{{ $t("team.snapshotEdit.people", { count: list.length }) }}</span>
                 </div>
-                <div class="m-snapshot-edit__group-head" aria-label="团队小队编号">
-                    <span v-for="group in 5" :key="group">{{ group }} 队</span>
+                <div class="m-snapshot-edit__group-head" :aria-label="$t('team.snapshotEdit.groupAria')">
+                    <span v-for="group in 5" :key="group">{{ $t("team.snapshotEdit.group", { group }) }}</span>
                 </div>
                 <VueDraggable v-model="list" class="m-snapshot-edit__member-list">
                     <div v-for="(item, index) in list" :key="dragKey(item, 'snapshot-dialog-role')" class="u-member">
                         <img :src="showMountIcon(item[3])" alt="" />
                         <span>{{ item[0] }}</span>
-                        <button type="button" aria-label="移除参与人员" @click.stop="delRole(index)">
+                        <button type="button" :aria-label="$t('team.snapshotEdit.remove')" @click.stop="delRole(index)">
                             <i class="el-icon-close"></i>
                         </button>
                     </div>
@@ -49,8 +49,8 @@
                 <div class="m-snapshot-edit__role-adder">
                     <div class="m-snapshot-edit__role-adder-head">
                         <div>
-                            <h3>添加角色</h3>
-                            <p>补充角色名并选择心法后加入当前快照。</p>
+                            <h3>{{ $t("team.snapshotEdit.addRole") }}</h3>
+                            <p>{{ $t("team.snapshotEdit.addRoleHint") }}</p>
                         </div>
                     </div>
                     <el-form
@@ -60,13 +60,13 @@
                         label-position="top"
                         class="m-snapshot-edit__role-form"
                     >
-                        <el-form-item label="角色名" prop="name">
-                            <el-input v-model="roleForm.name" placeholder="请输入角色名" clearable />
+                        <el-form-item :label="$t('team.snapshotEdit.roleName')" prop="name">
+                            <el-input v-model="roleForm.name" :placeholder="$t('team.snapshotEdit.rolePlaceholder')" clearable />
                         </el-form-item>
-                        <el-form-item label="心法" prop="xf">
+                        <el-form-item :label="$t('team.snapshotEdit.mount')" prop="xf">
                             <el-select
                                 v-model="roleForm.xf"
-                                placeholder="请选择心法"
+                                :placeholder="$t('team.snapshotEdit.selectMount')"
                                 filterable
                                 popper-class="m-snapshot-xf-select"
                             >
@@ -92,7 +92,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item class="u-add-action">
-                            <el-button type="primary" icon="Plus" @click="addMember">添加到名单</el-button>
+                            <el-button type="primary" icon="Plus" @click="addMember">{{ $t("team.snapshotEdit.addToRoster") }}</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -101,9 +101,9 @@
 
         <template #footer>
             <div class="m-snapshot-edit__footer">
-                <el-button @click="visible = false">取消</el-button>
+                <el-button @click="visible = false">{{ $t("team.snapshotEdit.cancel") }}</el-button>
                 <el-button type="primary" :loading="processing" :disabled="loading" @click="submit">
-                    {{ snapshotId ? "保存修改" : "确认补录" }}
+                    {{ $t(snapshotId ? "team.snapshotEdit.save" : "team.snapshotEdit.confirmAdd") }}
                 </el-button>
             </div>
         </template>
@@ -140,8 +140,7 @@ export default {
     emits: ["update:modelValue", "saved"],
     data() {
         return {
-            section: "基本信息",
-            sections: ["基本信息", "参与人员"],
+            section: "basic",
             form: {
                 title: "",
                 desc: "",
@@ -152,10 +151,6 @@ export default {
             roleForm: {
                 name: "",
                 xf: "",
-            },
-            roleRules: {
-                name: [{ required: true, message: "请输入角色名", trigger: "blur" }],
-                xf: [{ required: true, message: "请选择心法", trigger: "change" }],
             },
             loading: false,
             processing: false,
@@ -172,7 +167,19 @@ export default {
             },
         },
         dialogTitle() {
-            return this.snapshotId ? "修改快照" : "手动补录快照";
+            return this.$t(this.snapshotId ? "team.snapshotEdit.edit" : "team.snapshotEdit.manualAdd");
+        },
+        sectionOptions() {
+            return [
+                { label: this.$t("team.snapshotEdit.basic"), value: "basic" },
+                { label: this.$t("team.snapshotEdit.participants"), value: "participants" },
+            ];
+        },
+        roleRules() {
+            return {
+                name: [{ required: true, message: this.$t("team.snapshotEdit.roleRequired"), trigger: "blur" }],
+                xf: [{ required: true, message: this.$t("team.snapshotEdit.selectMount"), trigger: "change" }],
+            };
         },
         teammate() {
             return this.list.map((item) => item.join(",")).join(";");
@@ -244,7 +251,7 @@ export default {
         },
         async submit() {
             if (!this.selectedTeamId) {
-                this.$message.warning("请选择所属团队");
+                this.$message.warning(this.$t("team.snapshotEdit.teamRequired"));
                 return;
             }
             this.processing = true;
@@ -260,11 +267,11 @@ export default {
                 } else {
                     await addSnapshot(this.selectedTeamId, payload);
                 }
-                this.$message.success(this.snapshotId ? "快照更新成功" : "快照补录成功");
+                this.$message.success(this.$t(this.snapshotId ? "team.snapshotEdit.updated" : "team.snapshotEdit.added"));
                 this.$emit("saved");
                 this.visible = false;
             } catch (error) {
-                this.$message.error(error?.response?.data?.msg || "快照保存失败，请稍后重试");
+                this.$message.error(error?.response?.data?.msg || this.$t("team.snapshotEdit.saveFailed"));
             } finally {
                 this.processing = false;
             }
@@ -272,7 +279,7 @@ export default {
         reset() {
             this.loadRequestId += 1;
             this.loading = false;
-            this.section = "基本信息";
+            this.section = "basic";
             this.form = { title: "", desc: "" };
             this.selectedTeamId = "";
             this.teams = [];

@@ -1,11 +1,11 @@
 <template>
     <div class="v-org-list">
         <h1 class="m-title">
-            <i class="el-icon-setting"></i><span class="u-txt">团队管理</span>
+            <i class="el-icon-setting"></i><span class="u-txt">{{ $t("team.orgLegacy.management") }}</span>
             <div class="u-op">
-                <a href="/tool/21789" class="u-help" target="_blank"> <i class="el-icon-info"></i> 帮助文档 </a>
+                <a href="/tool/21789" class="u-help" target="_blank"> <i class="el-icon-info"></i> {{ $t("team.orgLegacy.help") }} </a>
                 <router-link to="/org/add" class="el-button el-button--primary el-button--mini"
-                    ><i class="el-icon-circle-plus-outline"></i>&nbsp;创建团队</router-link
+                    ><i class="el-icon-circle-plus-outline"></i>&nbsp;{{ $t("team.orgLegacy.create") }}</router-link
                 >
             </div>
         </h1>
@@ -17,24 +17,24 @@
                         <img class="u-team-logo" src="@/assets/img/team/team_logo_null.svg" v-else />
                         <router-link class="u-team-name" :to="'/org/' + item.ID" target="_blank"
                             ><span class="el-icon-link"></span> {{ item.name }}
-                            <i class="u-team-status" v-if="item.status == 1" title="已认证"
+                            <i class="u-team-status" v-if="item.status == 1" :title="$t('team.orgLegacy.verified')"
                                 ><img svg-inline src="@/assets/img/team/verify.svg" /></i
                         ></router-link>
                         <div class="u-team-info">
-                            <span class="u-team-meta"><em>服务器</em> {{ item.server }}</span>
+                            <span class="u-team-meta"><em>{{ $t("team.orgLegacy.server") }}</em> {{ item.server }}</span>
                         </div>
                         <div class="u-team-setting">
-                            <span class="u-team-meta"><em>团员信息</em> {{ showVisLabel(item.v_member) }}</span>
-                            <span class="u-team-meta"><em>DKP记录</em> {{ showVisLabel(item.v_dkp) }}</span>
-                            <span class="u-team-meta"><em>团队活动</em> {{ showVisLabel(item.v_activity) }}</span>
-                            <span class="u-team-meta"><em>团队留言板</em> {{ showVisLabel(item.v_comment) }}</span>
+                            <span class="u-team-meta"><em>{{ $t("team.orgLegacy.members") }}</em> {{ showVisLabel(item.v_member) }}</span>
+                            <span class="u-team-meta"><em>{{ $t("team.orgLegacy.dkp") }}</em> {{ showVisLabel(item.v_dkp) }}</span>
+                            <span class="u-team-meta"><em>{{ $t("team.orgLegacy.activities") }}</em> {{ showVisLabel(item.v_activity) }}</span>
+                            <span class="u-team-meta"><em>{{ $t("team.orgLegacy.comments") }}</em> {{ showVisLabel(item.v_comment) }}</span>
                         </div>
                         <div class="u-team-op">
                             <router-link
                                 v-if="item.super == uid && !item.status"
                                 :to="'/org/verify/' + item.ID"
                                 class="u-verify el-button u-edit el-button--default el-button--mini"
-                                ><i class="el-icon-position"></i>&nbsp;团队认证</router-link
+                                ><i class="el-icon-position"></i>&nbsp;{{ $t("team.orgLegacy.verification") }}</router-link
                             >
                             <!-- <div
                                 v-if="item.super == uid && item.status == 2"
@@ -45,13 +45,13 @@
                                 v-if="item.super == uid && item.status == 2"
                                 :to="'/org/verify/' + item.ID"
                                 class="u-verify el-button u-edit el-button--warning el-button--mini"
-                                ><i class="el-icon-remove-outline"></i> 审核中</router-link
+                                ><i class="el-icon-remove-outline"></i> {{ $t("team.orgLegacy.reviewing") }}</router-link
                             >
                             <router-link
                                 v-if="item.super == uid"
                                 :to="'/org/edit/' + item.ID"
                                 class="u-edit el-button u-edit el-button--primary el-button--mini"
-                                ><i class="el-icon-setting"></i>&nbsp;管理</router-link
+                                ><i class="el-icon-setting"></i>&nbsp;{{ $t("team.orgLegacy.manage") }}</router-link
                             >
                         </div>
                     </div>
@@ -70,9 +70,9 @@
             </template>
             <template v-else>
                 <div class="m-team-list-null">
-                    <el-alert class="m-archive-null" title="没有找到相关条目" type="info" center show-icon> </el-alert>
+                    <el-alert class="m-archive-null" :title="$t('team.orgLegacy.empty')" type="info" center show-icon> </el-alert>
                     <router-link to="/org/add" class="u-add-team el-button u-edit el-button--primary"
-                        ><i class="el-icon-circle-plus-outline"></i> 创建团队</router-link
+                        ><i class="el-icon-circle-plus-outline"></i> {{ $t("team.orgLegacy.create") }}</router-link
                     >
                 </div>
             </template>
@@ -130,12 +130,8 @@ export default {
         },
         showVisLabel: function (val) {
             if (!val) val = 0;
-            for (let i = 0; i < vismap.length; i++) {
-                let item = vismap[i];
-                if (item.value == val) {
-                    return item.label;
-                }
-            }
+            const key = { 0: "public", 1: "loginOnly", 2: "membersOnly", 3: "adminsOnly", 99: "selfOnly" }[val];
+            return this.$t(`team.visibility.${key || "private"}`);
             // return vismap[val] || "不公开";
         },
     },

@@ -1,13 +1,13 @@
 <template>
-    <el-dialog title="模板列表" v-model="dialogVisible" destroy-on-close>
+    <el-dialog :title="$t('team.raid.template.title')" v-model="dialogVisible" destroy-on-close>
         <el-table :data="templates" size="small" v-loading="loading" class="u-table-box">
-            <el-table-column label="模板名称" prop="template_name">
+            <el-table-column :label="$t('team.raid.template.name')" prop="template_name">
                 <template #default="props">
                     <template v-if="!props.row.editable">
                         <span>{{ props.row.template_name }}</span>
                         <span class="u-op">
                             <el-button type="text" size="small" @click="editTemplate(props.row)" icon="Edit"
-                                >修改</el-button
+                                >{{ $t("team.raid.template.edit") }}</el-button
                             >
                         </span>
                     </template>
@@ -16,38 +16,38 @@
                             size="small"
                             style="width: 70%"
                             v-model="editTmpName"
-                            placeholder="请输入模板名称"
+                            :placeholder="$t('team.raid.template.namePlaceholder')"
                         ></el-input>
                         <span class="u-op">
                             <el-button type="text" size="small" @click="handleEditConfirm(props.row)" icon="Check"
-                                >确认</el-button
+                                >{{ $t("team.raid.common.confirm") }}</el-button
                             >
                             <el-button type="text" size="small" @click="handleEditCancel(props.row)" icon="Close"
-                                >取消</el-button
+                                >{{ $t("team.raid.common.cancel") }}</el-button
                             >
                         </span>
                     </template>
                 </template>
             </el-table-column>
-            <el-table-column label="创建人" width="100px">
+            <el-table-column :label="$t('team.raid.template.creator')" width="100px">
                 <template #default="props">
                     <a class="u-author" :href="authorLink(props.row.author_id)" target="_blank">{{
                         props.row.author_name
                     }}</a>
                 </template>
             </el-table-column>
-            <el-table-column label="修改时间" prop="updated_at" width="150px">
+            <el-table-column :label="$t('team.raid.template.updatedAt')" prop="updated_at" width="150px">
                 <template #default="props">{{ showTime(props.row.updated_at) }}</template>
             </el-table-column>
-            <el-table-column label="操作" width="200px">
+            <el-table-column :label="$t('team.raid.template.operation')" width="200px">
                 <template #default="props">
                     <template>
                         <el-button size="small" type="primary" @click="useTemplate(props.row)" icon="DocumentCopy"
-                            >使用</el-button
+                            >{{ $t("team.raid.template.use") }}</el-button
                         >
-                        <el-popconfirm title="确认删除该模板？" @confirm="removeTemplate(props.row)">
+                        <el-popconfirm :title="$t('team.raid.template.deleteConfirm')" @confirm="removeTemplate(props.row)">
                             <template #reference>
-                                <el-button size="small" style="margin-left: 10px" icon="Delete">删除</el-button>
+                                <el-button size="small" style="margin-left: 10px" icon="Delete">{{ $t("team.raid.template.delete") }}</el-button>
                             </template>
                         </el-popconfirm>
                     </template>
@@ -120,7 +120,7 @@ export default {
                 .then((res) => {
                     this.$message({
                         type: "success",
-                        message: res.message || "删除模板成功",
+                        message: res.message || this.$t("team.raid.template.deleted"),
                     });
                     this.getTemplateList();
                 })

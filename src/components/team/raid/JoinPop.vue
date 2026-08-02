@@ -12,12 +12,12 @@
         <div class="m-raid-joinpop-content">
             <div class="m-raid-joinpop-mode" v-if="isLogin && auth !== 1">
                 <div>
-                    <strong>报名角色</strong>
-                    <span>选择已绑定角色，或临时填写本次活动角色</span>
+                    <strong>{{ $t("team.raid.join.role") }}</strong>
+                    <span>{{ $t("team.raid.join.roleHint") }}</span>
                 </div>
                 <el-radio-group v-model="custom">
-                    <el-radio-button :value="0"><i class="el-icon-user"></i> 已有角色</el-radio-button>
-                    <el-radio-button :value="1"><i class="el-icon-edit"></i> 临时自定义</el-radio-button>
+                    <el-radio-button :value="0"><i class="el-icon-user"></i> {{ $t("team.raid.join.existing") }}</el-radio-button>
+                    <el-radio-button :value="1"><i class="el-icon-edit"></i> {{ $t("team.raid.join.custom") }}</el-radio-button>
                 </el-radio-group>
             </div>
 
@@ -25,10 +25,10 @@
             <section class="m-raid-joinpop-section m-raid-joinpop-box" v-if="!custom && isLogin" v-loading="loading">
                 <header class="u-section-heading">
                     <div>
-                        <strong>选择角色</strong>
-                        <span>每次预约可选择一个角色</span>
+                        <strong>{{ $t("team.raid.join.selectRole") }}</strong>
+                        <span>{{ $t("team.raid.join.selectOne") }}</span>
                     </div>
-                    <span class="u-selection-count">已选 {{ roles.length }}/1</span>
+                    <span class="u-selection-count">{{ $t("team.raid.join.selected", { count: roles.length }) }}</span>
                 </header>
                 <div class="m-raid-joinpop-list" v-if="roleData && roleData.length">
                     <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
@@ -50,7 +50,7 @@
                     </el-checkbox-group>
                 </div>
                 <div class="m-team-joinpop-null" v-else>
-                    <el-alert title="暂无可用角色，请绑定角色或临时自定义" type="warning" show-icon></el-alert>
+                    <el-alert :title="$t('team.raid.join.noRole')" type="warning" show-icon></el-alert>
                 </div>
             </section>
 
@@ -59,8 +59,8 @@
                 class="m-raid-joinpop-section m-team-joinpop-block is-name-block"
                 v-if="custom || !isLogin"
             >
-                <p class="u-label"><i class="el-icon-postcard"></i> 角色名称 <b>必填</b></p>
-                <el-input v-model="form.name" placeholder="请输入角色名" :maxlength="12" show-word-limit></el-input>
+                <p class="u-label"><i class="el-icon-postcard"></i> {{ $t("team.raid.join.roleName") }} <b>{{ $t("team.raid.join.required") }}</b></p>
+                <el-input v-model="form.name" :placeholder="$t('team.raid.join.rolePlaceholder')" :maxlength="12" show-word-limit></el-input>
             </section>
 
             <!-- 角色心法（即使选择角色也需要设置心法） -->
@@ -70,8 +70,8 @@
             >
                 <div class="u-section-heading">
                     <div>
-                        <p class="u-label"><i class="el-icon-orange"></i> 角色心法 <b>必选</b></p>
-                        <span>选择本次活动使用的心法</span>
+                        <p class="u-label"><i class="el-icon-orange"></i> {{ $t("team.raid.join.mount") }} <b>{{ $t("team.raid.join.selectRequired") }}</b></p>
+                        <span>{{ $t("team.raid.join.mountHint") }}</span>
                     </div>
                 </div>
                 <div class="m-team-xf">
@@ -87,10 +87,10 @@
                 class="m-raid-joinpop-section m-team-joinpop-block is-remark-block"
                 v-if="custom || (!custom && roleData && roleData.length)"
             >
-                <p class="u-label"><i class="el-icon-chat-line-square"></i> 备注信息 <span>选填</span></p>
+                <p class="u-label"><i class="el-icon-chat-line-square"></i> {{ $t("team.raid.join.remark") }} <span>{{ $t("team.raid.join.optional") }}</span></p>
                 <el-input
                     v-model="form.remark"
-                    placeholder="可填写进组时间、装备情况等说明"
+                    :placeholder="$t('team.raid.join.remarkHint')"
                     :maxlength="20"
                     show-word-limit
                 ></el-input>
@@ -99,10 +99,10 @@
 
         <template #footer>
             <div class="m-raid-joinpop-footer">
-                <span><i class="el-icon-info"></i> 提交后可在候选名单中查看报名状态</span>
+                <span><i class="el-icon-info"></i> {{ $t("team.raid.join.statusHint") }}</span>
                 <div>
-                    <el-button @click="visible = false">取消</el-button>
-                    <el-button type="primary" @click="confirm">确认报名</el-button>
+                    <el-button @click="visible = false">{{ $t("team.raid.common.cancel") }}</el-button>
+                    <el-button type="primary" @click="confirm">{{ $t("team.raid.join.confirm") }}</el-button>
                 </div>
             </div>
         </template>
@@ -232,7 +232,7 @@ export default {
             };
 
             if (!formData.name) {
-                this.$message.warning("请输入角色名称");
+                this.$message.warning(this.$t("team.raid.join.nameRequired"));
                 return;
             }
 

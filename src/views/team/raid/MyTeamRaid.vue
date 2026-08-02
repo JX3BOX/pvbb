@@ -2,10 +2,10 @@
     <div class="v-raid-myteams" :class="{ 'is-embedded': embedded }">
         <h1 v-if="!embedded" class="m-title">
             <i class="el-icon-s-flag"></i>
-            <span class="u-txt">我的活动</span>
+            <span class="u-txt">{{ $t("team.raid.legacy.myActivities") }}</span>
             <div class="u-op">
-                <el-button class="u-join" size="small" icon="Plus" @click="goTeamList">加入团队</el-button>
-                <el-button class="u-back" size="small" icon="Search" @click="goRaidList">活动大厅</el-button>
+                <el-button class="u-join" size="small" icon="Plus" @click="goTeamList">{{ $t("team.raid.legacy.joinTeam") }}</el-button>
+                <el-button class="u-back" size="small" icon="Search" @click="goRaidList">{{ $t("team.raid.legacy.lobby") }}</el-button>
             </div>
         </h1>
         <div class="m-raid-joined" v-loading="loading">
@@ -21,8 +21,8 @@
                     </template>
                 </div>
             </div>
-            <el-alert class="m-raid-myteams-null" title="没有近期的活动" type="info" show-icon v-else></el-alert>
-            <div class="m-raid-myteam-tip"><i class="el-icon-warning-outline"></i> 此处仅显示我报名的近期的活动</div>
+            <el-alert class="m-raid-myteams-null" :title="$t('team.raid.legacy.noRecent')" type="info" show-icon v-else></el-alert>
+            <div class="m-raid-myteam-tip"><i class="el-icon-warning-outline"></i> {{ $t("team.raid.legacy.recentHint") }}</div>
         </div>
     </div>
 </template>

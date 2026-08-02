@@ -1,25 +1,25 @@
 <template>
     <div class="m-events">
-        <h3><i class="el-icon-present"></i>可申请福利</h3>
+        <h3><i class="el-icon-present"></i>{{ $t("team.apply.available") }}</h3>
         <div class="m-events-box" v-if="list && list.length">
             <div @click="gotoApply(item)" class="u-item" v-for="(item, index) in list" :key="index">
                 <img :src="resolveImagePath(item.banner) || img" :alt="item.name" />
                 <div class="u-info">
                     <div class="u-txt">
                         <span class="u-title">{{ item.name }}</span>
-                        <span class="u-time"><i class="el-icon-date"></i> 时间：{{ showTime(item.start_at || item.created_at) }} ~
+                        <span class="u-time"><i class="el-icon-date"></i> {{ $t("team.apply.time", { time: showTime(item.start_at || item.created_at) }) }} ~
                             {{ showTime(item.end_at || item.created_at) }}</span>
                         <span class="u-desc" v-html="item.desc"></span>
                     </div>
                     <div class="u-status">
-                        <el-button :disabled="!item.status" size="small" :type="item.status ? 'success' : 'info'">{{ item.status ? '进行中' : '已结束' }}<i class="el-icon-arrow-right" v-if="item.status"></i></el-button>
+                        <el-button :disabled="!item.status" size="small" :type="item.status ? 'success' : 'info'">{{ $t(item.status ? "team.apply.ongoing" : "team.apply.ended") }}<i class="el-icon-arrow-right" v-if="item.status"></i></el-button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="m-events-null" v-else>
-            <el-alert title="暂无活动" type="info" show-icon> </el-alert>
+            <el-alert :title="$t('team.apply.empty')" type="info" show-icon> </el-alert>
         </div>
     </div>
 </template>

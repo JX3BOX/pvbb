@@ -31,7 +31,7 @@ test("snapshot editor submits a writable field whitelist and handles request err
 
     assert.doesNotMatch(dialog, /const payload = \{\s*\.\.\.this\.form/);
     assert.match(dialog, /const payload = \{[\s\S]*?team_id: this\.selectedTeamId,[\s\S]*?title: this\.form\.title \|\| "",[\s\S]*?desc: this\.form\.desc \|\| "",[\s\S]*?teammate: this\.teammate/);
-    assert.match(dialog, /catch \(error\) \{[\s\S]*?error\?\.response\?\.data\?\.msg \|\| "快照保存失败，请稍后重试"/);
+    assert.match(dialog, /catch \(error\) \{[\s\S]*?error\?\.response\?\.data\?\.msg \|\| this\.\$t\("team\.snapshotEdit\.saveFailed"\)/);
 });
 
 test("raid detail only shows legacy conflict-free mounts for legacy content", async () => {
@@ -98,14 +98,14 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.match(join, /width="920px"/);
     assert.match(join, /class="m-raid-joinpop-mode"/);
     assert.match(join, /v-for="item in roleData"/);
-    assert.match(join, /确认报名/);
+    assert.match(join, /team\.raid\.join\.confirm/);
     assert.doesNotMatch(join, /team\/member\/joinpop\.less/);
     assert.doesNotMatch(join, /!custom\s*&\s*isLogin/);
     assert.match(memberSetting, /emits:\s*\["close", "updateRole"\]/);
     assert.match(memberSetting, /\bteleported\b/);
     assert.match(memberSetting, /class="m-raid-member-setting"/);
     assert.match(memberSetting, /class="m-raid-selected-role"/);
-    assert.match(memberSetting, /或填写临时角色/);
+    assert.match(memberSetting, /team\.raid\.memberSetting\.orTemporary/);
     assert.match(memberSetting, /:src="showSchoolIcon\(role\.mount\)"/);
     assert.match(memberSetting, /this\.selectedSchool = Number\(member\.mount\) \|\| 0/);
     assert.match(memberSetting, /this\.form\.mount = this\.xfMaps\[0\]\?\.id \|\| ""/);
@@ -145,6 +145,6 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal \.m-raid-flag\s*\{[\s\S]*display:\s*flex/);
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal[\s\S]*border-radius:\s*18px/);
     assert.match(normalV1 + normalV2, /--raid-columns/);
-    assert.match(normalV1 + normalV2, /\{\{\s*f\s*\}\}\s*队/);
+    assert.match(normalV1 + normalV2, /team\.raid\.board\.group/);
     assert.doesNotMatch(normalV2, /class="m-raid-tobebox m-raid-normalbox"/);
 });

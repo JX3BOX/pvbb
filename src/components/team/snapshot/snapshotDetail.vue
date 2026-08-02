@@ -5,18 +5,18 @@
                 <div class="m-snapshot-detail__header">
                     <span class="u-header-icon"><Camera /></span>
                     <div>
-                        <h2>相关快照</h2>
-                        <p>查看该角色参与过的团队阵容记录</p>
+                        <h2>{{ $t("team.snapshotEdit.related") }}</h2>
+                        <p>{{ $t("team.snapshotEdit.relatedHint") }}</p>
                     </div>
                 </div>
             </template>
 
             <div class="m-snapshot-detail__summary">
                 <div class="u-role">
-                    <span class="u-role-label">当前角色</span>
-                    <strong>{{ data.name || "未知角色" }}</strong>
+                    <span class="u-role-label">{{ $t("team.snapshotEdit.currentRole") }}</span>
+                    <strong>{{ data.name || $t("team.snapshotEdit.unknownRole") }}</strong>
                 </div>
-                <span class="u-total">共 {{ snapshotList.length }} 条快照</span>
+                <span class="u-total">{{ $t("team.snapshotEdit.total", { count: snapshotList.length }) }}</span>
             </div>
 
             <div v-if="snapshotList.length" class="m-snapshot-detail__list">
@@ -27,13 +27,13 @@
                         <div class="u-record-meta">
                             <span><Clock />{{ showTime(item.created_at) }}</span>
                             <span><User />{{ uploaderName(item) }}</span>
-                            <span><UserFilled />{{ formatTeammate(item.teammate).length }} 人</span>
+                            <span><UserFilled />{{ $t("team.snapshotEdit.people", { count: formatTeammate(item.teammate).length }) }}</span>
                         </div>
                     </div>
-                    <el-button class="u-view-team" plain icon="Camera" @click="openRoster(item)">查看阵容</el-button>
+                    <el-button class="u-view-team" plain icon="Camera" @click="openRoster(item)">{{ $t("team.snapshotEdit.viewRoster") }}</el-button>
                 </article>
             </div>
-            <el-empty v-else description="暂无相关快照" :image-size="96" />
+            <el-empty v-else :description="$t('team.snapshotEdit.empty')" :image-size="96" />
 
             <el-pagination
                 v-if="snapshotList.length > pageSize"
@@ -57,7 +57,7 @@
                 <div class="m-snapshot-detail__header">
                     <span class="u-header-icon"><UserFilled /></span>
                     <div>
-                        <h2>团队阵容</h2>
+                        <h2>{{ $t("team.snapshotEdit.teamRoster") }}</h2>
                         <p>{{ autoname(currentSnapshot) }}</p>
                     </div>
                 </div>
@@ -66,18 +66,18 @@
             <div class="m-snapshot-roster__meta">
                 <span><Clock />{{ showTime(currentSnapshot.created_at) }}</span>
                 <span><User />{{ uploaderName(currentSnapshot) }}</span>
-                <strong>{{ currentRoster.length }} 人</strong>
+                <strong>{{ $t("team.snapshotEdit.people", { count: currentRoster.length }) }}</strong>
             </div>
             <div class="m-snapshot-roster__body">
                 <div class="m-snapshot-flags">
-                    <i v-for="group of 5" :key="group">{{ group }} 队</i>
+                    <i v-for="group of 5" :key="group">{{ $t("team.snapshotEdit.group", { group }) }}</i>
                 </div>
                 <snapshot-body :data="currentRoster" class="row-5" />
             </div>
-            <p class="m-snapshot-roster__hint">点击角色名称即可复制</p>
+            <p class="m-snapshot-roster__hint">{{ $t("team.snapshotEdit.copyHint") }}</p>
 
             <template #footer>
-                <el-button class="u-roster-close" @click="rosterVisible = false">关闭</el-button>
+                <el-button class="u-roster-close" @click="rosterVisible = false">{{ $t("team.snapshotEdit.close") }}</el-button>
             </template>
         </el-dialog>
     </div>
@@ -145,10 +145,10 @@ export default {
             return showTime(val);
         },
         autoname(row) {
-            return row.title || "游戏内上传快照";
+            return row.title || this.$t("team.snapshotEdit.gameUpload");
         },
         uploaderName(row) {
-            return row.user_data?.display_name || "未知上传者";
+            return row.user_data?.display_name || this.$t("team.snapshotEdit.unknownUploader");
         },
         recordIndex(index) {
             return String((this.currentPage - 1) * this.pageSize + index + 1).padStart(2, "0");

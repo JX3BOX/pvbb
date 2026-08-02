@@ -11,20 +11,20 @@
             <slot></slot>
         </div>
         <div class="u-input">
-            <el-input v-model.number="uid" placeholder="请输入UID（数字）"></el-input>
+            <el-input v-model.number="uid" :placeholder="$t('team.raid.misc.uidPlaceholder')"></el-input>
         </div>
         <div class="u-preview" :class="{ 'is-ready': status }">
             <img class="u-avatar" :src="showAvatar(userdata.user_avatar)" />
             <div class="u-preview-info" v-if="isArchive">
-                <span class="u-name">{{ userdata.display_name || "等待识别用户" }}</span>
-                <span class="u-user-id">{{ status ? `UID ${uid}` : "输入 UID 后自动查找" }}</span>
+                <span class="u-name">{{ userdata.display_name || $t("team.raid.misc.waitingUser") }}</span>
+                <span class="u-user-id">{{ status ? `UID ${uid}` : $t("team.raid.misc.uidHint") }}</span>
             </div>
             <span class="u-name" v-else>{{ userdata.display_name || "-" }}</span>
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="visible = false">{{ isArchive ? "取消" : "取 消" }}</el-button>
-                <el-button type="primary" @click="confirm">{{ confirmText || (isArchive ? "确认添加" : "确 定") }}</el-button>
+                <el-button @click="visible = false">{{ $t("team.raid.common.cancel") }}</el-button>
+                <el-button type="primary" @click="confirm">{{ confirmText || (isArchive ? $t("team.raid.misc.addUser") : $t("team.raid.common.confirm")) }}</el-button>
             </span>
         </template>
     </el-dialog>
@@ -118,8 +118,8 @@ export default {
                 this.visible = false;
                 this.$emit("confirm", this.uid);
             } else {
-                this.$alert("用户不存在 或 UID不正确", "提醒", {
-                    confirmButtonText: "确定",
+                this.$alert(this.$t("team.raid.misc.userNotFound"), this.$t("team.raid.misc.reminder"), {
+                    confirmButtonText: this.$t("team.raid.common.confirm"),
                 });
             }
         },

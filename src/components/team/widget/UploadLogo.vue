@@ -3,7 +3,7 @@
         <div v-if="data" class="u-logo">
             <img :src="preview" />
             <i class="u-logo-mask"></i>
-            <i class="u-logo-delete el-icon-delete" title="移除" @click="remove"></i>
+            <i class="u-logo-delete el-icon-delete" :title="$t('team.raid.misc.remove')" @click="remove"></i>
         </div>
         <div v-else class="u-upload el-upload el-upload--picture-card" @click="select">
             <i class="el-icon-plus"></i>
@@ -54,7 +54,7 @@ export default {
             uploadImage(formdata).then((res) => {
                 this.data = res.data.data[0];
                 this.$message({
-                    message: "上传成功",
+                    message: this.$t("team.raid.misc.uploaded"),
                     type: "success",
                 });
             });

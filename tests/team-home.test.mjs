@@ -73,16 +73,16 @@ test("team creation reuses the modern workspace and grouped archive form languag
     assert.match(page, /class="v-org-add p-team-create"/);
     assert.match(page, /class="m-team-create__hero"/);
     assert.match(page, /teamLogo:\s*__cdn \+ "logo\/logo-light\/team\.svg"/);
-    assert.match(page, /建立团队档案，完善基础资料与对外展示信息/);
+    assert.match(page, /team\.orgLegacy\.createDescription/);
     assert.doesNotMatch(page, /<OfficeBuilding \/>/);
     assert.match(page, /variant="archive"/);
-    assert.match(page, /正在检查创建权限/);
+    assert.match(page, /team\.orgLegacy\.checking/);
     assert.match(page, /name:\s*"manage_my_org"/);
     assert.match(page, /v_member:\s*0/);
     assert.match(page, /v_dkp:\s*2/);
     assert.match(page, /v_activity:\s*0/);
     assert.match(page, /v_comment:\s*0/);
-    assert.doesNotMatch(page, /带有必填校验的项目会在提交时提示/);
+    assert.match(page, /team\.orgLegacy\.fillHint/);
     assert.doesNotMatch(page, /class="m-title"/);
     assert.match(form, /:loading="building"/);
     assert.match(styles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
@@ -342,8 +342,8 @@ test("team DKP records use a segmented switch", async () => {
     ]);
 
     assert.match(dkp, /<el-segmented v-model="tab" :options="tabs" class="m-dkp-segmented">/);
-    assert.match(dkp, /\{ label: "当前分值", value: "list", icon: "el-icon-tickets" \}/);
-    assert.match(dkp, /\{ label: "历史记录", value: "logs", icon: "el-icon-time" \}/);
+    assert.match(dkp, /\{ label: this\.\$t\("team\.raid\.misc\.currentScore"\), value: "list", icon: "el-icon-tickets" \}/);
+    assert.match(dkp, /\{ label: this\.\$t\("team\.raid\.misc\.history"\), value: "logs", icon: "el-icon-time" \}/);
     assert.match(dkp, /<dkp-list v-if="tab === 'list' && data\.length > 0"/);
     assert.match(dkp, /<dkp-logs v-if="tab === 'logs'"/);
     assert.match(styles, /\.m-dkp-segmented\s*\{[\s\S]*?margin-bottom:\s*16px/);
@@ -542,7 +542,7 @@ test("team archive certification and permission management match the compact arc
         assert.ok(checkbox, `${permissionKey} checkbox should exist`);
         assert.doesNotMatch(checkbox, /\bdisabled\b/);
     }
-    assert.match(userpop, /等待识别用户/);
+    assert.match(userpop, /team\.raid\.misc\.waitingUser/);
     assert.match(userpop, /this\.variant === "archive"/);
     assert.match(userpop, /debounce\(this\.lookupUser, 500\)/);
     assert.match(userpop, /this\.lookupUserDebounced\?\.cancel\(\)/);
@@ -781,7 +781,7 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(namespaceStyles, /\.m-team-namespace\.is-archive/);
     assert.match(namespaceStyles, /\.el-input-group__prepend[\s\S]*border-radius:\s*10px 0 0 10px/);
     assert.match(namespaceStyles, /\.el-input-group \.el-input__wrapper[\s\S]*border-radius:\s*0 10px 10px 0/);
-    assert.match(userpop, /confirmText \|\| \(isArchive \? "确认添加"/);
+    assert.match(userpop, /confirmText \|\| \(isArchive \? \$t\("team\.raid\.misc\.addUser"\)/);
     assert.match(
         workspaceStyles,
         /\.m-archive-feature,[\s\S]*\.m-archive-other,[\s\S]*\.m-archive-advanced[\s\S]*\.m-team-form-section[\s\S]*&::before/,

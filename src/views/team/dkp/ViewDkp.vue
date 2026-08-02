@@ -1,11 +1,11 @@
 <template>
     <div class="v-dkp-view">
         <el-divider content-position="left">
-            <i class="el-icon-data-line"></i> DKP制度
+            <i class="el-icon-data-line"></i> {{ $t("team.raid.misc.dkpRule") }}
         </el-divider>
-        <div class="m-dkp-rule">{{ rule || "无" }}</div>
+        <div class="m-dkp-rule">{{ rule || $t("team.snapshot.none") }}</div>
         <el-divider content-position="left">
-            <i class="el-icon-coin"></i> DKP记录
+            <i class="el-icon-coin"></i> {{ $t("team.raid.misc.dkpRecords") }}
         </el-divider>
         <div class="m-dkp-overview" v-loading="loading">
             <template v-if="hasRight">
@@ -21,7 +21,7 @@
                 <dkp-logs v-if="tab === 'logs'" :org="id" />
             </template>
             <template v-else>
-                <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
+                <el-alert class="u-tip" :title="$t('team.raid.misc.noPermission')" type="warning" show-icon></el-alert>
             </template>
         </div>
     </div>
@@ -42,8 +42,8 @@ export default {
             loading: false,
             tab: "list",
             tabs: [
-                { label: "当前分值", value: "list", icon: "el-icon-tickets" },
-                { label: "历史记录", value: "logs", icon: "el-icon-time" },
+                { label: this.$t("team.raid.misc.currentScore"), value: "list", icon: "el-icon-tickets" },
+                { label: this.$t("team.raid.misc.history"), value: "logs", icon: "el-icon-time" },
             ],
         };
     },

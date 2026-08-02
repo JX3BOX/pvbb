@@ -1,12 +1,12 @@
 <template>
     <div class="v-role-add">
         <h1 class="m-title">
-            <i class="el-icon-setting"></i> 编辑角色
+            <i class="el-icon-setting"></i> {{ $t("team.role.edit") }}
             <div class="u-op">
-                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.role.back") }}</el-button>
             </div>
         </h1>
-        <roleform :data="form" @submit="submit" btn_txt="更新" :processing="processing" />
+        <roleform :data="form" @submit="submit" :btn_txt="$t('team.raid.legacy.update')" :processing="processing" />
     </div>
 </template>
 
@@ -42,7 +42,7 @@ export default {
             getRole(this.id).then((res) => {
                 let hasRight = res.data.data.uid == User.getInfo().uid || User.isSuperAdmin();
                 if (!hasRight) {
-                    this.$message.error("没有操作权限");
+                    this.$message.error(this.$t("team.role.noPermission"));
                     return;
                 } else {
                     this.form = res.data.data;
@@ -52,14 +52,14 @@ export default {
         submit: function () {
             // 如果是绑定的角色不能改
             if (!this.form.custom) {
-                this.$message.error("绑定角色不允许篡改");
+                this.$message.error(this.$t("team.role.boundReadonly"));
                 return;
             }
             this.processing = true;
             updateRole(this.id, this.form)
                 .then((res) => {
                     this.$message({
-                        message: "更新成功",
+                        message: this.$t("team.role.updated"),
                         type: "success",
                     });
                     this.$router.push("/role/manage");

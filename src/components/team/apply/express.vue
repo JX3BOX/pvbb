@@ -1,20 +1,20 @@
 <template>
     <el-form class="u-form" label-width="80px">
-        <el-form-item label="收件人">
-            <el-input v-model.lazy="name" placeholder="输入收件人姓名"></el-input>
+        <el-form-item :label="$t('team.apply.recipient')">
+            <el-input v-model.lazy="name" :placeholder="$t('team.apply.recipientName')"></el-input>
         </el-form-item>
-        <el-form-item label="收件电话">
+        <el-form-item :label="$t('team.apply.phone')">
             <el-input
                 v-model.lazy="phone"
-                placeholder="输入收件人电话"
+                :placeholder="$t('team.apply.phonePlaceholder')"
                 @keyup2="phone = phone.replace(/[^\d]/g, '')"
             ></el-input>
         </el-form-item>
-        <el-form-item label="选择地区">
-            <el-cascader size="large" placeholder="选择地区" :options="options" v-model.lazy="area"> </el-cascader>
+        <el-form-item :label="$t('team.apply.region')">
+            <el-cascader size="large" :placeholder="$t('team.apply.region')" :options="options" v-model.lazy="area"> </el-cascader>
         </el-form-item>
-        <el-form-item label="详细地址">
-            <el-input type="textarea" placeholder="输入详细地址" v-model.lazy="address"></el-input>
+        <el-form-item :label="$t('team.apply.address')">
+            <el-input type="textarea" :placeholder="$t('team.apply.addressPlaceholder')" v-model.lazy="address"></el-input>
         </el-form-item>
     </el-form>
 </template>

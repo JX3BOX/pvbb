@@ -7,34 +7,34 @@
                         <img :src="teamLogo" alt="" />
                     </span>
                     <div class="m-team-create__heading">
-                        <h1 id="team-create-title">创建团队</h1>
-                        <p>建立团队档案，完善基础资料与对外展示信息</p>
+                        <h1 id="team-create-title">{{ $t("team.orgLegacy.create") }}</h1>
+                        <p>{{ $t("team.orgLegacy.createDescription") }}</p>
                     </div>
                 </div>
                 <button class="u-team-create-back" type="button" @click="goBack">
                     <el-icon><ArrowLeft /></el-icon>
-                    <span>返回团队广场</span>
+                    <span>{{ $t("team.orgLegacy.backPlaza") }}</span>
                 </button>
             </header>
         </section>
 
         <section v-if="checkingLimit" class="m-team-create__workspace is-checking" aria-live="polite">
             <span class="u-team-create-loading" aria-hidden="true"></span>
-            <strong>正在检查创建权限</strong>
-            <p>马上为你准备团队资料表单。</p>
+            <strong>{{ $t("team.orgLegacy.checking") }}</strong>
+            <p>{{ $t("team.orgLegacy.checkingHint") }}</p>
         </section>
 
         <section v-else-if="status" class="m-team-create__workspace" aria-labelledby="team-create-form-title">
             <header class="m-team-create__form-heading">
                 <div>
-                    <h2 id="team-create-form-title">填写团队资料</h2>
-                    <p>先完成基础资料，创建后仍可在团队档案中继续修改。</p>
+                    <h2 id="team-create-form-title">{{ $t("team.orgLegacy.fill") }}</h2>
+                    <p>{{ $t("team.orgLegacy.fillHint") }}</p>
                 </div>
             </header>
             <teamform
                 :data="form"
                 variant="archive"
-                btn_txt="创建团队"
+                :btn_txt="$t('team.orgLegacy.create')"
                 :processing="processing"
                 @submit="submit"
             />
@@ -44,14 +44,14 @@
             <span class="u-team-create-limit-icon" aria-hidden="true">
                 <el-icon><Lock /></el-icon>
             </span>
-            <h2 id="team-create-limit-title">当前账号已达到创建上限</h2>
-            <p>普通账号默认可创建 1 支团队，升级专业版后可继续创建和管理更多团队。</p>
+            <h2 id="team-create-limit-title">{{ $t("team.orgLegacy.limit") }}</h2>
+            <p>{{ $t("team.orgLegacy.limitHint") }}</p>
             <div class="m-team-create__limit-actions">
                 <a class="u-team-create-upgrade" href="/vip/premium?from=team_create" target="_blank">
                     <el-icon><ShoppingCart /></el-icon>
-                    <span>了解专业版</span>
+                    <span>{{ $t("team.orgLegacy.premium") }}</span>
                 </a>
-                <button class="u-team-create-secondary" type="button" @click="goBack">返回团队广场</button>
+                <button class="u-team-create-secondary" type="button" @click="goBack">{{ $t("team.orgLegacy.backPlaza") }}</button>
             </div>
         </section>
     </div>
@@ -100,7 +100,7 @@ export default {
             createTeam(this.form)
                 .then((res) => {
                     this.$message({
-                        message: "创建成功",
+                        message: this.$t("team.orgLegacy.created"),
                         type: "success",
                     });
                     const teamId = res.data?.data?.ID || res.data?.data?.id;
