@@ -2,7 +2,7 @@
     <div class="w-drop-item">
         <a class="w-drop-item-link" :href="getDropLink(id)" target="_blank">
             <img class="w-drop-item-img" :src="iconLink(icon)" />
-            <span class="w-drop-item-name">{{ name || "未知" }}</span>
+            <span class="w-drop-item-name">{{ name || $t("team.dkp.unknown") }}</span>
         </a>
     </div>
 </template>

@@ -2,28 +2,28 @@
     <article v-if="variant === 'center'" class="m-activity-item is-center" @click="subscribe(activity.id)">
         <div class="u-center-date" aria-hidden="true">
             <strong>{{ showRaidDate(activity.start_time) }}</strong>
-            <span>{{ showRaidMonth(activity.start_time) }}月</span>
+            <span>{{ $t("team.publicContent.month", { month: showRaidMonth(activity.start_time) }) }}</span>
         </div>
         <div class="u-center-content">
             <div class="u-center-heading">
                 <div>
-                    <span v-if="isToday(activity.start_time)" class="u-center-today">今天</span>
-                    <h2>{{ activity.name || "团队活动" }}</h2>
+                    <span v-if="isToday(activity.start_time)" class="u-center-today">{{ $t("team.publicContent.today") }}</span>
+                    <h2>{{ activity.name || $t("team.publicContent.activityFallback") }}</h2>
                 </div>
                 <span class="u-center-time">{{ showRaidTime(activity.start_time) }}</span>
             </div>
-            <p class="u-center-desc">{{ activity.title || "活动详情等待团队补充" }}</p>
+            <p class="u-center-desc">{{ activity.title || $t("team.publicContent.activityPending") }}</p>
             <div class="u-center-meta">
                 <router-link class="u-center-team" :to="'/org/' + activity.team_id" @click.stop>
                     <img :src="getTeamLogo(activity.team_logo || teamInfo.logo)" alt="" />
-                    <span>{{ activity.team_name || "团队" }}</span>
+                    <span>{{ activity.team_name || $t("team.publicContent.teamFallback") }}</span>
                 </router-link>
-                <span><el-icon><Location /></el-icon>{{ activity.server || "服务器待定" }}</span>
+                <span><el-icon><Location /></el-icon>{{ activity.server || $t("team.publicContent.serverPending") }}</span>
                 <span><el-icon><Calendar /></el-icon>{{ showRaidWeek(activity.start_time) }}</span>
             </div>
         </div>
         <button class="u-center-action" type="button" @click.stop="subscribe(activity.id)">
-            <span>查看活动</span>
+            <span>{{ $t("team.publicContent.viewActivity") }}</span>
             <el-icon><ArrowRight /></el-icon>
         </button>
     </article>

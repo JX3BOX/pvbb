@@ -8,8 +8,8 @@
                             <img :src="teamLogo" alt="" />
                         </span>
                         <div class="m-team-home__heading">
-                            <h1 id="team-home-title">团队平台</h1>
-                            <p>查找团队、管理角色，与志同道合的伙伴并肩江湖</p>
+                            <h1 id="team-home-title">{{ $t("team.home.title") }}</h1>
+                            <p>{{ $t("team.home.description") }}</p>
                         </div>
                     </div>
                     <div
@@ -18,18 +18,18 @@
                         :aria-busy="teamTotal === null"
                         aria-live="polite"
                     >
-                        <span>团队广场</span>
+                        <span>{{ $t("team.home.plaza") }}</span>
                         <strong>{{ teamTotal === null ? "—" : formattedTeamTotal }}</strong>
-                        <small>支团队可供浏览</small>
+                        <small>{{ $t("team.home.teamCount") }}</small>
                     </div>
-                    <nav class="m-team-home__actions" aria-label="团队快捷入口">
+                    <nav class="m-team-home__actions" :aria-label="$t('team.home.quickActions')">
                         <a class="u-team-home-action" href="/tool/21789" target="_blank" rel="noopener noreferrer">
                             <el-icon><QuestionFilled /></el-icon>
-                            <span>使用指南</span>
+                            <span>{{ $t("team.home.guide") }}</span>
                         </a>
                         <router-link class="u-team-home-action is-primary" to="/org/add">
                             <el-icon><Plus /></el-icon>
-                            <span>创建团队</span>
+                            <span>{{ $t("team.home.createTeam") }}</span>
                         </router-link>
                     </nav>
                 </header>

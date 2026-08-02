@@ -1,13 +1,13 @@
 <template>
     <div class="v-member-list">
-        <nav class="m-member-subnav" aria-label="成员管理分类">
+        <nav class="m-member-subnav" :aria-label="$t('team.member.categories')">
             <button
                 v-for="item in tabs"
                 :key="item.value"
                 type="button"
                 :class="{ 'is-active': tab === item.value }"
                 :aria-current="tab === item.value ? 'page' : undefined"
-                @click="tab = item.value"
+                @click="switchTab(item.value)"
             >
                 <span>{{ item.label }}</span>
                 <i v-if="item.value === 'pending' && pendingCount" class="u-subnav-count">{{ pendingCount }}</i>
@@ -20,18 +20,23 @@
 <script>
 import PendingList from "./PendingList.vue";
 import UserList from "./UserList.vue";
+
+const MEMBER_SUBTABS = ["user", "pending"];
+
 export default {
     props: ["id"],
     data: function () {
         return {
             tab: "user",
-            tabs: [
-                { label: "正式团员", value: "user" },
-                { label: "加入申请", value: "pending" },
-            ],
         };
     },
     computed: {
+        tabs() {
+            return [
+                { label: this.$t("team.member.officialMembers"), value: "user" },
+                { label: this.$t("team.member.joinRequests"), value: "pending" },
+            ];
+        },
         activeComponent() {
             return this.tab === "pending" ? PendingList : UserList;
         },
@@ -40,7 +45,30 @@ export default {
             return pending ? Number(pending.pending) || 0 : 0;
         },
     },
+    watch: {
+        "$route.query.subtab": {
+            immediate: true,
+            handler: function (subtab) {
+                this.tab = MEMBER_SUBTABS.includes(subtab) ? subtab : "user";
+            },
+        },
+    },
     methods: {
+        switchTab: function (tab) {
+            if (!MEMBER_SUBTABS.includes(tab)) return;
+
+            this.tab = tab;
+            if (this.$route.query.subtab === tab) return;
+
+            this.$router
+                .replace({
+                    query: {
+                        ...this.$route.query,
+                        subtab: tab,
+                    },
+                })
+                .catch(() => {});
+        },
         updatePendingCount: function (count) {
             const pendingList = [...this.$store.state.pendingList];
             const index = pendingList.findIndex((item) => item.team_id == this.id);

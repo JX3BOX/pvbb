@@ -3,15 +3,15 @@
         <template v-if="isArchive">
             <dl class="m-team-verify-summary">
                 <div>
-                    <dt>团队 ID</dt>
+                    <dt>{{ $t("team.verification.teamId") }}</dt>
                     <dd>{{ form.team_id || "-" }}</dd>
                 </div>
                 <div>
-                    <dt>团队名称</dt>
+                    <dt>{{ $t("team.verification.teamName") }}</dt>
                     <dd>{{ form.name || "-" }}</dd>
                 </div>
                 <div>
-                    <dt>服务器</dt>
+                    <dt>{{ $t("team.verification.server") }}</dt>
                     <dd>{{ form.server || "-" }}</dd>
                 </div>
             </dl>
@@ -23,11 +23,11 @@
                 class="m-team-verify-contact"
                 :class="{ 'is-editable': canApply, 'is-disabled': !canApply }"
             >
-                <el-form-item label="认证联系 QQ">
+                <el-form-item :label="$t('team.verification.contactQq')">
                     <el-input
                         v-model="form.proposer"
                         class="u-contact-input"
-                        placeholder="请填写可联系到您的 QQ 号"
+                        :placeholder="$t('team.verification.contactPlaceholder')"
                         :disabled="!canApply"
                     ></el-input>
                 </el-form-item>
@@ -123,8 +123,8 @@ export default {
     methods: {
         submit: function () {
             if (!this.form.proposer) {
-                this.$alert("QQ号不能为空", "提醒", {
-                    confirmButtonText: "确定",
+                this.$alert(this.$t("team.verification.qqRequired"), this.$t("team.verification.reminder"), {
+                    confirmButtonText: this.$t("team.verification.confirm"),
                 });
                 return;
             }

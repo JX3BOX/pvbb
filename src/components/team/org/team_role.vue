@@ -4,12 +4,12 @@
             <table class="m-group-role-table">
                 <thead>
                     <tr>
-                        <th>角色名</th>
-                        <th>心法</th>
-                        <th>体型</th>
-                        <th>加入时间</th>
-                        <th>是否公开</th>
-                        <th>操作</th>
+                        <th>{{ $t("team.myRole.name") }}</th>
+                        <th>{{ $t("team.myRole.mount") }}</th>
+                        <th>{{ $t("team.myRole.bodyType") }}</th>
+                        <th>{{ $t("team.myRole.joinedAt") }}</th>
+                        <th>{{ $t("team.myRole.public") }}</th>
+                        <th>{{ $t("team.myRole.operation") }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,11 +35,14 @@
                             </td>
                             <td>
                                 <el-button
+                                    class="u-quit-team"
                                     type="info"
                                     size="small"
                                     plain
                                     @click="confirmQuitTeam(role.info.ID, role.info.name, data, i)"
-                                    >退出</el-button
+                                >
+                                    <el-icon><SwitchButton /></el-icon>
+                                    {{ $t("team.myRole.quit") }}</el-button
                                 >
                             </td>
                         </tr>
@@ -47,7 +50,7 @@
                 </tbody>
             </table>
         </div>
-        <el-alert title="当前团队没有任何角色" type="info" show-icon v-else></el-alert>
+        <el-alert :title="$t('team.myRole.empty')" type="info" show-icon v-else></el-alert>
     </div>
 </template>
 
@@ -56,6 +59,7 @@ import { getMyJoinedTeams, changeRolePublic, quitTeam as quitTeamRequest } from 
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { showSchoolIcon, showSchoolName, showBodyType, showTime } from "@/utils/filters";
+import { SwitchButton } from "@element-plus/icons-vue";
 
 export default {
     name: "TeamRole",
@@ -99,8 +103,8 @@ export default {
         setPublic: function (role_id, isPublic) {
             changeRolePublic(this.team_id, role_id, isPublic).then((res) => {
                 this.$notify({
-                    title: "设置成功",
-                    message: "更新设置成功",
+                    title: this.$t("team.myRole.settingSuccess"),
+                    message: this.$t("team.myRole.settingUpdated"),
                     type: "success",
                 });
             });
@@ -108,11 +112,11 @@ export default {
         confirmQuitTeam: async function (role_id, roleName, list, i) {
             try {
                 await this.$confirm(
-                    `确定要让角色「${roleName || "未命名角色"}」退出当前团队吗？退出后需要重新申请才能再次加入。`,
-                    "退出团队",
+                    this.$t("team.myRole.quitConfirm", { name: roleName || this.$t("team.myRole.unnamed") }),
+                    this.$t("team.myRole.quitTitle"),
                     {
-                        confirmButtonText: "确认退出",
-                        cancelButtonText: "取消",
+                        confirmButtonText: this.$t("team.myRole.confirmQuit"),
+                        cancelButtonText: this.$t("team.myRole.cancel"),
                         type: "warning",
                         distinguishCancelAndClose: true,
                     }
@@ -123,8 +127,8 @@ export default {
 
             quitTeamRequest(this.team_id, role_id).then(() => {
                 this.$notify({
-                    title: "退出成功",
-                    message: "角色成功退出队伍",
+                    title: this.$t("team.myRole.quitSuccess"),
+                    message: this.$t("team.myRole.quitMessage"),
                     type: "success",
                 });
                 list.splice(i, 1);

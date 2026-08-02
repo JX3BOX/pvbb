@@ -4,31 +4,37 @@
             <span class="u-public-team-error-icon" aria-hidden="true">
                 <el-icon><WarningFilled /></el-icon>
             </span>
-            <h1 id="public-team-error-title">团队信息加载失败</h1>
-            <p>该团队可能已被移除，或当前网络暂时不可用。</p>
+            <h1 id="public-team-error-title">{{ $t("team.public.loadFailed") }}</h1>
+            <p>{{ $t("team.public.loadFailedDescription") }}</p>
             <el-button type="primary" @click="loadData">
                 <el-icon><Refresh /></el-icon>
-                <span>重新加载</span>
+                <span>{{ $t("team.common.retry") }}</span>
             </el-button>
         </section>
 
         <template v-else>
-            <section class="m-public-org__hero" aria-label="团队信息">
+            <section
+                class="m-public-org__hero"
+                :class="{ 'has-banner': publicBanner }"
+                :style="publicBanner ? { '--team-banner-image': `url('${publicBanner}')` } : null"
+                :aria-label="$t('team.common.teamInfo')"
+            >
                 <team-info
                     v-if="done"
                     :key="`public-team-info-${id}`"
                     :info="data"
                     :team_id="id"
                     :show-manage-action="false"
+                    :always-show-join-action="true"
                 />
             </section>
 
-            <section class="m-public-org__workspace" aria-label="团队公开内容">
+            <section class="m-public-org__workspace" :aria-label="$t('team.public.content')">
                 <el-tabs :key="`public-team-tabs-${id}`" v-model="tab" class="m-team-view m-public-org__tabs">
-                    <el-tab-pane label="团队概况" name="overview">
+                    <el-tab-pane :label="$t('team.public.overview')" name="overview">
                         <template #label>
                             <el-icon><DataBoard /></el-icon>
-                            <span>团队概况</span>
+                            <span>{{ $t("team.public.overview") }}</span>
                         </template>
                         <div class="m-public-org__overview">
                             <team-intro :intro="data" />
@@ -37,10 +43,10 @@
                             <team-trophy :id="id" />
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="团队成员" name="member" lazy>
+                    <el-tab-pane :label="$t('team.public.members')" name="member" lazy>
                         <template #label>
                             <el-icon><User /></el-icon>
-                            <span>团队成员</span>
+                            <span>{{ $t("team.public.members") }}</span>
                         </template>
                         <div class="m-public-org__pane">
                             <ViewMember
@@ -51,28 +57,34 @@
                             />
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="DKP记录" name="dkp" lazy>
+                    <el-tab-pane :label="$t('team.public.activities')" name="raid" lazy>
                         <template #label>
-                            <el-icon><Coin /></el-icon>
-                            <span>DKP记录</span>
+                            <el-icon><Calendar /></el-icon>
+                            <span>{{ $t("team.public.activities") }}</span>
                         </template>
                         <div class="m-public-org__pane">
-                            <ViewDkp v-if="done" :v="data.v_dkp" :super="data.super" :authority="authority" />
+                            <TeamRaid
+                                v-if="done"
+                                :v="data.v_activity"
+                                :super="data.super"
+                                :authority="authority"
+                                :is-home-page="true"
+                            />
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="通关视频" name="video" lazy>
+                    <el-tab-pane :label="$t('team.public.videos')" name="video" lazy>
                         <template #label>
                             <el-icon><VideoPlay /></el-icon>
-                            <span>通关视频</span>
+                            <span>{{ $t("team.public.videos") }}</span>
                         </template>
                         <div class="m-public-org__pane">
-                            <ViewVideo v-if="done" :super="data.super" />
+                            <ViewVideo v-if="done" />
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="留言板" name="comment" lazy class="m-team-notes">
+                    <el-tab-pane :label="$t('team.public.comments')" name="comment" lazy class="m-team-notes">
                         <template #label>
                             <el-icon><ChatLineSquare /></el-icon>
-                            <span>留言板</span>
+                            <span>{{ $t("team.public.comments") }}</span>
                         </template>
                         <div class="m-public-org__pane">
                             <ViewComment
@@ -99,32 +111,34 @@ import team_recruit from "@/components/team/org/team_recruit.vue";
 import ViewMember from "@/views/team/member/ViewMember.vue";
 import ViewComment from "@/views/team/org/ViewComment.vue";
 import ViewVideo from "@/views/team/org/ViewVideo.vue";
-import ViewDkp from "@/views/team/dkp/ViewDkp.vue";
+import TeamRaid from "@/views/team/raid/TeamRaid.vue";
 
 import User from "@jx3box/jx3box-common/js/user.js";
 import { postStat } from "@jx3box/jx3box-common/js/stat.js";
+import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getTeam } from "@/service/team/team.js";
 import { checkMyAuthority } from "@/service/team/member.js";
-import { ChatLineSquare, Coin, DataBoard, Refresh, User as UserIcon, VideoPlay, WarningFilled } from "@element-plus/icons-vue";
+import { Calendar, ChatLineSquare, DataBoard, Refresh, User as UserIcon, VideoPlay, WarningFilled } from "@element-plus/icons-vue";
 
-const PUBLIC_TABS = ["overview", "member", "dkp", "video", "comment"];
+const PUBLIC_TABS = ["overview", "member", "raid", "video", "comment"];
 
-function createDefaultTeam() {
+function createDefaultTeam(t) {
     return {
         status: 0,
-        name: "团队名称",
-        server: "服务器名称",
+        name: t("team.common.teamName"),
+        server: t("team.common.serverName"),
         logo: "",
-        desc: "团队介绍",
+        desc: t("team.common.teamDescription"),
         uid: 0,
         recruit: "",
         honors: [],
         medals: [],
-        tags: ["可教学", "固定团"],
+        tags: [t("team.common.teachable"), t("team.common.fixedTeam")],
         v_member: 0,
         v_activity: 0,
         v_dkp: 0,
         v_comment: 0,
+        banner: "",
     };
 }
 
@@ -147,7 +161,7 @@ export default {
     data: function () {
         return {
             tab: "overview",
-            data: createDefaultTeam(),
+            data: createDefaultTeam(this.$t),
             loading: false,
             loadError: false,
             loadVersion: 0,
@@ -162,6 +176,9 @@ export default {
         },
         query: function () {
             return this.$route.query.tab;
+        },
+        publicBanner: function () {
+            return this.data.banner ? resolveImagePath(this.data.banner) : "";
         },
     },
     methods: {
@@ -211,7 +228,7 @@ export default {
             this.loading = true;
             this.loadError = false;
             this.done = false;
-            this.data = createDefaultTeam();
+            this.data = createDefaultTeam(this.$t);
             this.authority = createDefaultAuthority();
 
             Promise.all([this.loadTeamInfo(id), this.loadAuthority(id)])
@@ -255,13 +272,13 @@ export default {
         "team-medals": team_medals,
         "team-trophy": team_trophy,
         "team-recruit": team_recruit,
+        Calendar,
         ChatLineSquare,
-        Coin,
         DataBoard,
         Refresh,
         User: UserIcon,
         ViewMember,
-        ViewDkp,
+        TeamRaid,
         ViewComment,
         ViewVideo,
         VideoPlay,

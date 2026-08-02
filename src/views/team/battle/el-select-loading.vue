@@ -3,9 +3,9 @@
     <el-option ref="el" class="el-select-loading" value=" ">
         <template v-if="hasMore">
             <el-icon class="el-select-loading__icon"><Loading /></el-icon>
-            <span class="el-select-loading__tips">{{ loadingText }}</span>
+            <span class="el-select-loading__tips">{{ resolvedLoadingText }}</span>
         </template>
-        <template v-else>{{ noMoreText }}</template>
+        <template v-else>{{ resolvedNoMoreText }}</template>
     </el-option>
 </template>
 
@@ -25,7 +25,7 @@ export default {
         },
         loadingText: {
             type: String,
-            default: "加载中...",
+            default: "",
         },
         // 是否有更多数据可加载
         hasMore: {
@@ -34,7 +34,7 @@ export default {
         },
         noMoreText: {
             type: String,
-            default: "没有更多了",
+            default: "",
         },
     },
     data() {
@@ -45,6 +45,12 @@ export default {
     computed: {
         el() {
             return this.$refs.el;
+        },
+        resolvedLoadingText() {
+            return this.loadingText || this.$t("pages.team.battle.loading");
+        },
+        resolvedNoMoreText() {
+            return this.noMoreText || this.$t("pages.team.battle.noMore");
         },
         intersectionOption() {
             return {

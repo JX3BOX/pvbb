@@ -6,12 +6,12 @@
             <!-- <h5 class="u-title">茶馆矩阵</h5> -->
             <a href="/team" class="u-item" :class="{ 'is-active': routeActive('index') }">
                 <i class="el-icon-office-building"></i>
-                <span>查找团队</span>
+                <span>{{ $t("team.legacyNav.findTeams") }}</span>
                 <em>Teams</em>
             </a>
             <a href="/dashboard/role" class="u-item" target="_blank">
                 <i class="el-icon-user"></i>
-                <span>我的角色</span>
+                <span>{{ $t("team.workspace.myRoles") }}</span>
                 <em>Role↗</em>
             </a>
             <span
@@ -21,13 +21,13 @@
                 @click.stop="onExpand"
             >
                 <i class="el-icon-school"></i>
-                <span>我的团队</span>
+                <span>{{ $t("team.sidebar.myTeams") }}</span>
                 <!-- <em>Mine</em> -->
                 <i class="expanded-icon el-icon-caret-top" :class="{ 'is-expanded': !isExpand }"></i>
             </span>
         </div>
         <template v-if="!isExpand">
-            <el-alert v-if="!isLogin" title="请先登录"></el-alert>
+            <el-alert v-if="!isLogin" :title="$t('team.common.loginRequired')"></el-alert>
             <div class="m-nav-teams" v-else>
                 <router-link
                     :to="'/my/org/' + item.ID + '?tab=overview'"

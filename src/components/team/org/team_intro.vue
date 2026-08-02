@@ -1,7 +1,7 @@
 <template>
     <div class="m-team-intro">
         <el-divider content-position="left"
-            ><i class="el-icon-data-board"></i> 团队介绍</el-divider
+            ><i class="el-icon-data-board"></i> {{ $t("team.publicContent.intro") }}</el-divider
         >
         <div class="m-team-txt u-content">{{ data.desc }}</div>
     </div>

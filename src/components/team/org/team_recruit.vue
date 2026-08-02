@@ -1,7 +1,7 @@
 <template>
     <div class="m-team-recruit">
         <el-divider content-position="left">
-            <i class="el-icon-umbrella"></i> 团队招募
+            <i class="el-icon-umbrella"></i> {{ $t("team.publicContent.recruit") }}
         </el-divider>
         <div class="m-team-txt u-content">{{ recruit }}</div>
         <div class="m-team-tags" v-if="tags && tags.length">
@@ -9,7 +9,7 @@
                 class="u-tag"
                 v-for="(tag, i) in tags"
                 :key="i"
-                :class="{ love: tag == '可教学' }"
+                :class="{ love: tag == '\u53ef\u6559\u5b66' }"
             >{{ tag }}</span>
         </div>
     </div>

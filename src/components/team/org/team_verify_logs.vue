@@ -1,13 +1,13 @@
 <template>
     <div class="m-verify-logs">
         <header class="m-verify-section-title">
-            <h2>近期认证记录</h2>
+            <h2>{{ $t("team.verification.recent") }}</h2>
         </header>
         <table v-if="data.length" class="u-list">
             <thead>
                 <tr>
-                    <th>状态</th>
-                    <th>提交时间</th>
+                    <th>{{ $t("team.verification.status") }}</th>
+                    <th>{{ $t("team.verification.submittedAt") }}</th>
                 </tr>
             </thead>
             <tr v-for="(item, i) in data" :key="i">
@@ -17,12 +17,11 @@
                 <td>{{ showTime(item.created_at) }}</td>
             </tr>
         </table>
-        <el-empty v-else description="暂无认证记录" :image-size="72" />
+        <el-empty v-else :description="$t('team.verification.noRecords')" :image-size="72" />
     </div>
 </template>
 
 <script>
-const status_map = ["待审核", "认证通过", "认证失败"];
 import { getVerifyLogs } from "@/service/team/verify.js";
 import { showTime } from "@/utils/filters.js";
 export default {
@@ -49,7 +48,7 @@ export default {
             });
         },
         statusLabel: function (val) {
-            return status_map[~~val];
+            return [this.$t("team.verification.pending"), this.$t("team.verification.approved"), this.$t("team.verification.failed")][~~val];
         },
         showTime,
     },

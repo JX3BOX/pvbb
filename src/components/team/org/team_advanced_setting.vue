@@ -2,10 +2,10 @@
     <div class="m-advanced-setting" :class="{ 'is-archive': variant === 'archive' }">
         <div class="m-filter">
             <el-radio-group v-model="active">
-                <el-radio-button value="team_info">基本信息</el-radio-button>
-                <el-radio-button value="verify">团队认证</el-radio-button>
-                <el-radio-button value="permission">权限管理</el-radio-button>
-                <el-radio-button value="other">其他</el-radio-button>
+                <el-radio-button value="team_info">{{ $t("team.advanced.basic") }}</el-radio-button>
+                <el-radio-button value="verify">{{ $t("team.advanced.verification") }}</el-radio-button>
+                <el-radio-button value="permission">{{ $t("team.advanced.permissions") }}</el-radio-button>
+                <el-radio-button value="other">{{ $t("team.advanced.other") }}</el-radio-button>
             </el-radio-group>
         </div>
 
@@ -13,7 +13,7 @@
             <VerifyOrg />
         </template>
         <template v-else-if="active == 'team_info'">
-            <team-form :data="data" btn_txt="更新" @submit="submit" ref="teamForm"></team-form>
+            <team-form :data="data" :btn_txt="$t('team.advanced.update')" @submit="submit" ref="teamForm"></team-form>
         </template>
         <template v-else-if="active == 'permission'">
             <EditPermission />
@@ -22,40 +22,40 @@
             <template v-if="variant === 'archive'">
                 <section class="m-team-operation-card">
                     <header class="m-team-form-section">
-                        <h2>团队操作</h2>
+                        <h2>{{ $t("team.advanced.actions") }}</h2>
                     </header>
                     <div class="m-team-operation-list">
                         <div class="m-team-operation-item">
                             <div class="u-operation-copy">
-                                <h3>移交团队</h3>
-                                <p>将团队所有权转交给另一位用户，移交后您将不再是团长。</p>
+                                <h3>{{ $t("team.advanced.transfer") }}</h3>
+                                <p>{{ $t("team.advanced.transferHint") }}</p>
                             </div>
                             <el-button class="u-transform" type="warning" @click="transformTeam">
                                 <el-icon><Switch /></el-icon>
-                                <span>发起移交</span>
+                                <span>{{ $t("team.advanced.startTransfer") }}</span>
                             </el-button>
                         </div>
                         <div class="m-team-operation-item is-danger">
                             <div class="u-operation-copy">
-                                <h3>删除团队</h3>
-                                <p>永久删除团队及相关数据，此操作完成后无法恢复。</p>
+                                <h3>{{ $t("team.advanced.deleteTeam") }}</h3>
+                                <p>{{ $t("team.advanced.deleteHint") }}</p>
                             </div>
                             <el-button v-if="id" class="u-delete" type="danger" @click="deleteTeam">
                                 <el-icon><Delete /></el-icon>
-                                <span>删除团队</span>
+                                <span>{{ $t("team.advanced.deleteTeam") }}</span>
                             </el-button>
                         </div>
                     </div>
                 </section>
             </template>
             <template v-else>
-                <el-divider content-position="left"> <i class="el-icon-setting"></i> 团队操作 </el-divider>
+                <el-divider content-position="left"> <i class="el-icon-setting"></i> {{ $t("team.advanced.actions") }} </el-divider>
                 <div class="u-op">
                     <el-button class="u-transform" type="warning" icon="Sort" @click="transformTeam"
-                        >移交团队</el-button
+                        >{{ $t("team.advanced.transfer") }}</el-button
                     >
                     <el-button v-if="id" class="u-delete" type="danger" icon="Delete" @click="deleteTeam"
-                        >删除团队</el-button
+                        >{{ $t("team.advanced.deleteTeam") }}</el-button
                     >
                 </div>
                 <EditNamespace />
@@ -63,15 +63,15 @@
         </template>
 
         <userpop
-            title="移交团队"
+            :title="$t('team.advanced.transfer')"
             :data="to_uid"
             :variant="variant"
-            confirm-text="确认移交"
+            :confirm-text="$t('team.advanced.confirmTransfer')"
             class="m-team-transform"
             v-model="openTransformDialog"
             @confirm="confirmTransform"
         >
-            请输入需要移交的用户UID:
+            {{ $t("team.advanced.uidPrompt") }}
         </userpop>
     </div>
 </template>
@@ -126,8 +126,8 @@ export default {
     methods: {
         deleteTeam: function () {
             if (this.variant !== "archive") {
-                this.$alert("确定删除团队的所有数据吗？该操作不可恢复！", "提醒", {
-                    confirmButtonText: "确定",
+                this.$alert(this.$t("team.advanced.deleteLegacyConfirm"), this.$t("team.advanced.reminder"), {
+                    confirmButtonText: this.$t("team.advanced.confirm"),
                     callback: (action) => {
                         if (action === "confirm") this.removeTeam();
                     },
@@ -135,9 +135,9 @@ export default {
                 return;
             }
 
-            return this.$confirm("团队及相关数据将被永久删除，且无法恢复。", "确认删除团队", {
-                confirmButtonText: "确认删除",
-                cancelButtonText: "取消",
+            return this.$confirm(this.$t("team.advanced.deleteConfirm"), this.$t("team.advanced.deleteTitle"), {
+                confirmButtonText: this.$t("team.advanced.confirmDelete"),
+                cancelButtonText: this.$t("team.advanced.cancel"),
                 type: "warning",
                 confirmButtonClass: "el-button--danger",
             })
@@ -152,15 +152,15 @@ export default {
             return delTeam(this.id).then((res) => {
                 if (res.data.data.effect) {
                     this.$notify({
-                        title: "成功",
-                        message: this.variant === "archive" ? "团队已删除" : "删除成功",
+                        title: this.$t("team.advanced.success"),
+                        message: this.variant === "archive" ? this.$t("team.advanced.teamDeleted") : this.$t("team.advanced.deleted"),
                         type: "success",
                     });
                     this.$router.push("/");
                 } else {
                     this.$notify({
-                        title: "失败",
-                        message: "操作失败",
+                        title: this.$t("team.advanced.failed"),
+                        message: this.$t("team.advanced.operationFailed"),
                         type: "error",
                     });
                 }
@@ -173,17 +173,17 @@ export default {
             this.to_uid = uid;
             if (this.to_uid == User.getInfo().uid) {
                 this.$notify.error({
-                    title: "错误",
-                    message: "不能转交给自己",
+                    title: this.$t("team.advanced.error"),
+                    message: this.$t("team.advanced.selfTransfer"),
                 });
                 return;
             }
             return this.$confirm(
-                `确认将团队${this.data.name ? `“${this.data.name}”` : ""}移交给 UID ${this.to_uid}？移交后您将不再是团长。`,
-                "确认移交团队",
+                this.$t("team.advanced.transferConfirm", { name: this.data.name ? `“${this.data.name}”` : "", uid: this.to_uid }),
+                this.$t("team.advanced.transferTitle"),
                 {
-                    confirmButtonText: "确认移交",
-                    cancelButtonText: "取消",
+                    confirmButtonText: this.$t("team.advanced.confirmTransfer"),
+                    cancelButtonText: this.$t("team.advanced.cancel"),
                     type: "warning",
                 }
             )
@@ -192,7 +192,7 @@ export default {
                 })
                 .then(() => {
                     this.$message({
-                        message: "移交成功",
+                        message: this.$t("team.advanced.transferSuccess"),
                         type: "success",
                     });
                 })
@@ -206,7 +206,7 @@ export default {
             updateTeam(this.id, this.data)
                 .then((res) => {
                     this.$message({
-                        message: "更新成功",
+                        message: this.$t("team.advanced.updated"),
                         type: "success",
                     });
                     // eslint-disable-next-line vue/no-mutating-props

@@ -1,9 +1,24 @@
 <template>
     <div class="m-snapshot-box" v-loading="loading">
+        <div v-if="supportDkpSync" class="m-snapshot-dkp-guide">
+            <span class="u-guide-icon" aria-hidden="true"><i class="el-icon-connection"></i></span>
+            <div class="u-guide-content">
+                <h3>{{ $t("team.snapshotGuide.title") }}</h3>
+                <p>{{ $t("team.snapshotGuide.description") }}</p>
+                <ol class="u-guide-steps" :aria-label="$t('team.snapshotGuide.aria')">
+                    <li><b>1</b> {{ $t("team.snapshotGuide.step1") }}</li>
+                    <li><b>2</b> {{ $t("team.snapshotGuide.step2") }}</li>
+                    <li><b>3</b> {{ $t("team.snapshotGuide.step3") }}</li>
+                </ol>
+            </div>
+        </div>
         <div class="m-snapshot-search">
+            <el-button v-if="!readOnly" class="u-manual-add" type="primary" icon="Plus" @click="openCreateDialog">
+                {{ $t("team.snapshot.manualAdd") }}
+            </el-button>
             <el-input
-                placeholder="搜索快照标题、上传人员或备注"
-                aria-label="搜索快照"
+                :placeholder="$t('team.snapshot.search')"
+                :aria-label="$t('team.snapshot.searchAria')"
                 v-model="search"
                 clearable
             >
@@ -34,11 +49,16 @@
         </div>
         <el-alert class="m-snapshot-null" type="info" show-icon v-else>
             <template #title>
-                暂无任何记录，点击查看
-                <a href="/tool/23783" target="_blank">帮助文档</a>
+                {{ $t("team.snapshot.empty") }}
+                <a href="/tool/23783" target="_blank">{{ $t("team.snapshot.help") }}</a>
             </template>
         </el-alert>
-        <EditSnapshotDialog v-model="editVisible" :snapshot-id="editingId" @saved="loadSnapshots" />
+        <EditSnapshotDialog
+            v-model="editVisible"
+            :snapshot-id="editingId"
+            :target-team-id="org"
+            @saved="loadSnapshots"
+        />
     </div>
 </template>
 
@@ -90,6 +110,10 @@ export default {
         },
     },
     methods: {
+        openCreateDialog() {
+            this.editingId = null;
+            this.editVisible = true;
+        },
         openEditDialog(id) {
             this.editingId = id;
             this.editVisible = true;
@@ -108,7 +132,8 @@ export default {
                     this.loading = false;
                 });
         },
-        changePage: function () {
+        changePage: function (page) {
+            this.page = page;
             window.scrollTo(0, 0);
         },
     },

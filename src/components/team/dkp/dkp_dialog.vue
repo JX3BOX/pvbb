@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         class="m-dkp-dialog-modify"
-        title="调整 DKP"
+        :title="$t('team.dkpDialog.title')"
         v-model="show"
         :close-on-click-modal="false"
         :close-on-press-escape="!editFormLoading"
@@ -20,8 +20,8 @@
             <el-form-item>
                 <template #label>
                     <span class="u-field-label">
-                        调整对象
-                        <em>{{ rows.length }} 人</em>
+                        {{ $t("team.dkpDialog.targets") }}
+                        <em>{{ $t("team.dkpDialog.people", { count: rows.length }) }}</em>
                     </span>
                 </template>
                 <div class="m-dkp-target-list">
@@ -44,16 +44,16 @@
             <el-form-item v-if="singleRow">
                 <template #label>
                     <span class="u-field-label">
-                        指定角色
-                        <em>选填</em>
+                        {{ $t("team.dkpDialog.specifiedRole") }}
+                        <em>{{ $t("team.dkpDialog.optional") }}</em>
                     </span>
                 </template>
-                <el-select v-model="form.role_id" clearable placeholder="不指定角色则计入成员总分">
+                <el-select v-model="form.role_id" clearable :placeholder="$t('team.dkpDialog.noSpecifiedRole')">
                     <el-option
                         v-for="(role, index) in singleRow.roles"
                         :key="index"
                         :label="role.roleInfo.name"
-                        :value="role.relation.ID"
+                        :value="role.relation.role_id"
                     >
                         <div class="m-dkp-role-option">
                             <img :src="showSchoolIcon(role.roleInfo.mount)" />
@@ -64,31 +64,31 @@
             </el-form-item>
 
             <div class="m-dkp-dialog-form__row">
-                <el-form-item label="调整原因">
+                <el-form-item :label="$t('team.dkpDialog.reason')">
                     <el-radio-group
                         v-model="form.reason"
                         :class="{ 'is-single-option': !singleRow }"
                         @change="turnScorePM"
                     >
-                        <el-radio value="manual" border>手动设置</el-radio>
-                        <el-radio value="drop" border v-if="singleRow">分配物品</el-radio>
+                        <el-radio value="manual" border>{{ $t("team.dkpDialog.manual") }}</el-radio>
+                        <el-radio value="drop" border v-if="singleRow">{{ $t("team.dkpDialog.item") }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
 
-                <el-form-item label="变动方向">
+                <el-form-item :label="$t('team.dkpDialog.direction')">
                     <el-radio-group v-model="form.action">
-                        <el-radio :value="0" border>增加</el-radio>
-                        <el-radio :value="1" border>扣减</el-radio>
+                        <el-radio :value="0" border>{{ $t("team.dkpDialog.increase") }}</el-radio>
+                        <el-radio :value="1" border>{{ $t("team.dkpDialog.deduct") }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
             </div>
 
-            <el-form-item label="分配物品" v-if="form.reason === 'drop'" prop="drop_item_id">
+            <el-form-item :label="$t('team.dkpDialog.item')" v-if="form.reason === 'drop'" prop="drop_item_id">
                 <el-select
                     v-model="form.drop_item_id"
                     filterable
                     remote
-                    placeholder="请输入关键词（≥2字）"
+                    :placeholder="$t('team.dkpDialog.searchItem')"
                     :remote-method="fetchSelectItems"
                     :loading="fetchSelectItemsloading"
                     :no-data-text="fetchSelectNoDataText"
@@ -104,29 +104,29 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="变动分值" required prop="score">
+            <el-form-item :label="$t('team.dkpDialog.score')" required prop="score">
                 <el-input
                     v-model.number="form.score"
                     autocomplete="off"
                     min="1"
                     type="number"
                     pattern="[1-9][0-9]*"
-                    placeholder="请输入正整数"
+                    :placeholder="$t('team.dkpDialog.positiveInteger')"
                 ></el-input>
             </el-form-item>
 
-            <el-form-item label="备注" prop="remark">
+            <el-form-item :label="$t('team.dkpDialog.remark')" prop="remark">
                 <el-input
                     v-model="form.remark"
                     autocomplete="off"
-                    :placeholder="`选填，留空将自动记录为“${remarkPlaceholder}”`"
+                    :placeholder="$t('team.dkpDialog.remarkHint', { remark: remarkPlaceholder })"
                 ></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
             <div class="m-dkp-dialog-footer" v-if="!editFormLoading">
-                <el-button @click="handleCancel">取消</el-button>
-                <el-button type="primary" @click="handleSubmitEdit" :loading="editFormLoading">确认调整</el-button>
+                <el-button @click="handleCancel">{{ $t("team.dkpDialog.cancel") }}</el-button>
+                <el-button type="primary" @click="handleSubmitEdit" :loading="editFormLoading">{{ $t("team.dkpDialog.confirm") }}</el-button>
             </div>
         </template>
     </el-dialog>
@@ -162,7 +162,7 @@ export default {
     data: function () {
         var validateDrop = (rule, value, callback) => {
             if (this.form.reason === "drop" && value.length < 1) {
-                callback(new Error("请选择至少一个物品"));
+                callback(new Error(this.$t("team.dkpDialog.selectItem")));
             } else {
                 callback();
             }
@@ -178,24 +178,24 @@ export default {
             },
             fetchSelectItemsloading: false,
             fetchedSelectItemsOptions: [],
-            fetchSelectNoDataText: "请输入至少2个字",
+            fetchSelectNoDataText: this.$t("team.dkpDialog.enterTwo"),
             editFormLoading: false,
             editFormRules: {
                 remark: [
                     {
                         min: 0,
                         max: 255,
-                        message: "备注不能超过255个字符",
+                        message: this.$t("team.dkpDialog.remarkTooLong"),
                         trigger: "change",
                     },
                 ],
                 score: [
-                    { required: true, message: "必须填写一个分值" },
+                    { required: true, message: this.$t("team.dkpDialog.scoreRequired") },
                     {
                         type: "number",
-                        message: "分值必须是一个整数",
+                        message: this.$t("team.dkpDialog.scoreInteger"),
                         min: 1,
-                        message: "分值最小为1",
+                        message: this.$t("team.dkpDialog.scoreMin"),
                     },
                 ],
                 drop_item_id: [{ validator: validateDrop, trigger: "blur" }],
@@ -207,11 +207,11 @@ export default {
         remarkPlaceholder() {
             switch (this.form.reason) {
                 case "drop":
-                    return "分配物品";
+                    return this.$t("team.dkpDialog.item");
                 case "penalty":
-                    return "犯错罚款";
+                    return this.$t("team.dkpDialog.mistakeFine");
                 case "manual":
-                    return "手动补正";
+                    return this.$t("team.dkpDialog.manualCorrection");
                 default:
                     return "";
             }
@@ -270,17 +270,25 @@ export default {
                 .then((res) => {
                     this.$message({
                         type: "success",
-                        message: "修改分值成功",
+                        message: this.$t("team.dkpDialog.success"),
                     });
 
-                    this.$emit("updateRows", { action: this.form.action, score: this.form.score });
+                    this.$emit("updateRows");
 
                     this.$refs["editForm"].resetFields();
                     this.show = false;
                 })
+                .catch((error) => {
+                    const message =
+                        error?.response?.data?.msg ||
+                        error?.data?.msg ||
+                        error?.msg ||
+                        error?.message ||
+                        this.$t("team.dkpDialog.failed");
+                    this.$message.error(String(message));
+                })
                 .finally(() => {
                     this.editFormLoading = false;
-                    this.editFormVisible = false;
                 });
         },
         handleSubmitEdit() {
@@ -293,7 +301,7 @@ export default {
             });
         },
         fetchSelectItems(query) {
-            this.fetchSelectNoDataText = "请输入至少2个字";
+            this.fetchSelectNoDataText = this.$t("team.dkpDialog.enterTwo");
             if (query !== "" && query.length >= 2) {
                 this.fetchSelectItemsloading = true;
                 searchItem({
@@ -303,7 +311,7 @@ export default {
                     fields: "id,UiID,Name,IconID,Quality,IsQuest,Level",
                 })
                     .then((res) => {
-                        this.fetchSelectNoDataText = "无匹配物品";
+                        this.fetchSelectNoDataText = this.$t("team.dkpDialog.noItem");
                         // console.log(res.data.data.data);
                         this.fetchedSelectItemsOptions = res.data.data.data.map((item) => {
                             // 为了给武器等 有区分等级的物品 名字后面添加等级
@@ -315,7 +323,7 @@ export default {
                         });
                     })
                     .catch((err) => {
-                        this.fetchSelectNoDataText = "无匹配物品";
+                        this.fetchSelectNoDataText = this.$t("team.dkpDialog.noItem");
                         this.fetchedSelectItemsOptions = [];
                     })
                     .finally(() => {
@@ -333,7 +341,6 @@ export default {
                 this.form.action = 0;
             }
         },
-
         // 头像渲染
         renderAvatar: function (userinfo) {
             return showAvatar(userinfo?.user_avatar || userinfo?.avatar);

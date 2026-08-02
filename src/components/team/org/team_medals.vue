@@ -1,10 +1,10 @@
 <template>
     <div class="m-team-medals">
-        <el-divider content-position="left"> <i class="el-icon-medal"></i> 团队勋章 </el-divider>
+        <el-divider content-position="left"> <i class="el-icon-medal"></i> {{ $t("team.publicContent.medals") }} </el-divider>
         <div class="u-list" v-if="data && data.length">
             <Medal :medals="data" :showIcon="showTeamMedal" :interactive="false"></Medal>
         </div>
-        <div class="u-null" v-else><i class="el-icon-warning-outline"></i> 还没有相关记录</div>
+        <div class="u-null" v-else><i class="el-icon-warning-outline"></i> {{ $t("team.publicContent.empty") }}</div>
     </div>
 </template>
 

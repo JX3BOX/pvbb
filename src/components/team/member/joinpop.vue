@@ -1,13 +1,14 @@
 <template>
     <el-dialog
         class="m-team-joinpop m-team-member-join-dialog"
-        :title="title"
+        :title="resolvedTitle"
         v-model="visible"
         width="820px"
         align-center
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="!submitting"
+        append-to-body
     >
         <template #header>
             <div class="m-team-joinpop-header">
@@ -15,8 +16,8 @@
                     <el-icon><UserFilled /></el-icon>
                 </span>
                 <span class="u-header-copy">
-                    <strong>{{ title }}</strong>
-                    <small>选择需要加入该团队的角色，可同时提交多个角色</small>
+                    <strong>{{ resolvedTitle }}</strong>
+                    <small>{{ $t("team.joinDialog.description") }}</small>
                 </span>
             </div>
         </template>
@@ -25,8 +26,8 @@
             <template v-if="!loading && data.length">
                 <div class="m-team-joinpop-toolbar">
                     <div class="u-selection-summary">
-                        <strong>选择角色</strong>
-                        <span>申请提交后，需要等待团队管理员审核</span>
+                        <strong>{{ $t("team.joinDialog.selectRoles") }}</strong>
+                        <span>{{ $t("team.joinDialog.reviewHint") }}</span>
                     </div>
                     <el-checkbox
                         :indeterminate="isIndeterminate"
@@ -34,7 +35,7 @@
                         @change="selectAll"
                         class="u-all"
                     >
-                        全选
+                        {{ $t("team.joinDialog.selectAll") }}
                         <span class="u-count">{{ roles.length }}/{{ data.length }}</span>
                     </el-checkbox>
                 </div>
@@ -43,18 +44,18 @@
                     class="u-list"
                     v-model="roles"
                     @change="checkIsAll"
-                    aria-label="选择申请加入团队的角色"
+                    :aria-label="$t('team.joinDialog.aria')"
                 >
                     <el-checkbox v-for="item in data" :value="item.ID" :key="item.ID" class="u-role-card" border>
                         <div class="u-role-card__content">
                             <img
                                 class="u-item-avatar"
                                 :src="showAvatar(item.mount)"
-                                :alt="`${item.name || '角色'}门派图标`"
+                                :alt="$t('team.joinDialog.mountAlt', { name: item.name || $t('team.joinDialog.roleFallback') })"
                             />
                             <span class="u-role-card__copy">
                                 <strong class="u-item-name" :title="item.note || item.name">{{ item.name }}</strong>
-                                <small class="u-item-server" :title="item.server">{{ item.server || "未知服务器" }}</small>
+                                <small class="u-item-server" :title="item.server">{{ item.server || $t("team.joinDialog.unknownServer") }}</small>
                             </span>
                         </div>
                     </el-checkbox>
@@ -62,8 +63,8 @@
             </template>
 
             <div class="m-team-joinpop-null" v-else-if="!loading">
-                <el-empty :image-size="80" description="暂无可申请加入该团队的角色">
-                    <span class="u-empty-tip">已加入团队或尚未绑定的角色不会显示在这里</span>
+                <el-empty :image-size="80" :description="$t('team.joinDialog.empty')">
+                    <span class="u-empty-tip">{{ $t("team.joinDialog.emptyHint") }}</span>
                 </el-empty>
             </div>
         </div>
@@ -71,18 +72,18 @@
         <template #footer>
             <div class="dialog-footer">
                 <span class="u-footer-status" aria-live="polite">
-                    <template v-if="data.length">已选择 <strong>{{ roles.length }}</strong> 个角色</template>
-                    <template v-else>请选择可用角色后提交申请</template>
+                    <template v-if="data.length">{{ $t("team.joinDialog.selected", { count: roles.length }) }}</template>
+                    <template v-else>{{ $t("team.joinDialog.selectHint") }}</template>
                 </span>
                 <div class="u-footer-actions">
-                    <el-button :disabled="submitting" @click="visible = false">取消</el-button>
+                    <el-button :disabled="submitting" @click="visible = false">{{ $t("team.joinDialog.cancel") }}</el-button>
                     <el-button
                         type="primary"
                         :loading="submitting"
                         :disabled="loading || !roles.length"
                         @click="confirm"
                     >
-                        提交申请
+                        {{ $t("team.joinDialog.submit") }}
                     </el-button>
                 </div>
             </div>
@@ -100,7 +101,7 @@ export default {
     props: {
         title: {
             type: String,
-            default: "加入团队",
+            default: "",
         },
         show: {
             type: Boolean,
@@ -133,14 +134,17 @@ export default {
             if (newval && this.team_id) {
                 this.loadRoles();
             } else if (newval && !this.team_id) {
-                console.error("team_id 未传入");
-                this.$message.error("团队ID缺失");
+                console.error("team_id is required");
+                this.$message.error(this.$t("team.joinDialog.missingTeam"));
             } else {
                 this.loadVersion += 1;
             }
         },
     },
     computed: {
+        resolvedTitle: function () {
+            return this.title || this.$t("team.joinDialog.title");
+        },
         role_ids: function () {
             return this.data.map((item) => item.ID);
         },
@@ -164,8 +168,8 @@ export default {
                 })
                 .catch((err) => {
                     if (version !== this.loadVersion || !this.visible) return;
-                    console.error("获取角色列表失败:", err);
-                    this.$message.error("获取角色列表失败，请稍后重试");
+                    console.error("Failed to load team roles:", err);
+                    this.$message.error(this.$t("team.joinDialog.loadFailed"));
                 })
                 .finally(() => {
                     if (version === this.loadVersion) {
@@ -180,14 +184,14 @@ export default {
             joinTeam(this.team_id, this.roles)
                 .then(() => {
                     this.$message({
-                        message: "申请成功，请等待团队管理审核",
+                        message: this.$t("team.joinDialog.success"),
                         type: "success",
                     });
                     this.visible = false;
                 })
                 .catch((err) => {
-                    console.error("提交加入团队申请失败:", err);
-                    this.$message.error("申请提交失败，请稍后重试");
+                    console.error("Failed to submit team application:", err);
+                    this.$message.error(this.$t("team.joinDialog.submitFailed"));
                 })
                 .finally(() => {
                     this.submitting = false;

@@ -1,18 +1,18 @@
 <template>
     <div class="m-snapshot-chart">
         <div class="m-snapshot-chart-search">
-            <div class="m-snapshot-chart-period" role="group" aria-label="快照统计日期范围">
-                <button type="button" :class="{ 'is-active': active === 0 }" @click="setDefault">全部</button>
-                <button type="button" :class="{ 'is-active': active === 7 }" @click="quickSelect(7)">近 7 天</button>
-                <button type="button" :class="{ 'is-active': active === 30 }" @click="quickSelect(30)">近 30 天</button>
+            <div class="m-snapshot-chart-period" role="group" :aria-label="$t('team.snapshot.dateRangeAria')">
+                <button type="button" :class="{ 'is-active': active === 0 }" @click="setDefault">{{ $t("team.snapshot.all") }}</button>
+                <button type="button" :class="{ 'is-active': active === 7 }" @click="quickSelect(7)">{{ $t("team.snapshot.last7") }}</button>
+                <button type="button" :class="{ 'is-active': active === 30 }" @click="quickSelect(30)">{{ $t("team.snapshot.last30") }}</button>
             </div>
             <el-date-picker
                 class="m-snapshot-chart-date"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
+                :start-placeholder="$t('team.snapshot.startDate')"
+                :end-placeholder="$t('team.snapshot.endDate')"
                 v-model="rangeDate"
                 type="daterange"
-                range-separator="至"
+                :range-separator="$t('team.snapshot.to')"
                 :picker-options="pickerOptions"
             ></el-date-picker>
         </div>
@@ -20,22 +20,22 @@
         <div class="m-snapshot-chart-content" v-show="hasSnapshot" v-loading="loading">
             <section class="m-snapshot-chart-card m-chart-line">
                 <header class="u-chart-heading">
-                    <h3>每日开团次数</h3>
-                    <p>查看所选日期范围内每天创建的团队快照数量</p>
+                    <h3>{{ $t("team.snapshot.dailyTitle") }}</h3>
+                    <p>{{ $t("team.snapshot.dailyDesc") }}</p>
                 </header>
                 <div ref="lineChart" id="snapshot-line"></div>
             </section>
             <section class="m-snapshot-chart-card m-chart-pie">
                 <header class="u-chart-heading">
-                    <h3>心法比例</h3>
-                    <p>统计所有参团记录中的心法构成</p>
+                    <h3>{{ $t("team.snapshot.mountTitle") }}</h3>
+                    <p>{{ $t("team.snapshot.mountDesc") }}</p>
                 </header>
                 <div ref="pieChart" id="snapshot-pie"></div>
             </section>
             <section class="m-snapshot-chart-card m-chart-bar">
                 <header class="u-chart-heading">
-                    <h3>角色出勤次数</h3>
-                    <p>对比各角色在所选范围内的参团次数</p>
+                    <h3>{{ $t("team.snapshot.attendanceTitle") }}</h3>
+                    <p>{{ $t("team.snapshot.attendanceDesc") }}</p>
                 </header>
                 <div ref="barChart" id="snapshot-bar"></div>
             </section>
@@ -45,7 +45,7 @@
             v-show="!hasSnapshot"
             show-icon
             type="warning"
-            title="该日期范围内不存在快照"
+            :title="$t('team.snapshot.noRangeData')"
         ></el-alert>
     </div>
 </template>
@@ -60,6 +60,7 @@ const { lineOptions, pieOptions, barOptions } = snapshotChartData;
 import * as echarts from "echarts";
 import cloneDeep from "lodash/cloneDeep";
 import moment from "moment";
+import { markRaw } from "vue";
 
 export default {
     name: "snapshotChart",
@@ -217,7 +218,7 @@ export default {
             Object.entries(data).forEach(([key, value]) => {
                 const item = {
                     value,
-                    name: (mount_equip[key] && mount_equip[key].name) || "未知",
+                    name: (mount_equip[key] && mount_equip[key].name) || this.$t("team.snapshot.unknownMount"),
                     itemStyle: {
                         color: mountColor(key),
                     },
@@ -240,7 +241,8 @@ export default {
             if (!dom || !dom.isConnected) return;
 
             if (!this.charts[type]) {
-                this.charts[type] = echarts.getInstanceByDom(dom) || echarts.init(dom);
+                // ECharts 实例依赖内部对象身份，不能被 Vue 3 深度响应式代理。
+                this.charts[type] = markRaw(echarts.getInstanceByDom(dom) || echarts.init(dom));
             }
 
             option && this.charts[type].setOption(option, { notMerge: true });

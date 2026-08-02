@@ -1,17 +1,17 @@
 <template>
     <section class="m-team-banner" :class="{ 'is-archive': variant === 'archive' }">
-        <div v-if="variant === 'archive'" class="m-archive-field-label">团队海报</div>
+        <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.settingSections.banner") }}</div>
         <el-divider v-else content-position="left"> <i class="el-icon-picture-outline"></i> 团队海报 </el-divider>
         <div class="m-banner-editor">
             <uploadImage
                 v-model="banner"
-                :size="variant === 'archive' ? [320, 179] : 148"
-                info="团队海报推荐尺寸为1125*630，用于微信小程序团队主页与活动等作为主题展示。"
+                :size="variant === 'archive' ? [920, 120] : 148"
+                info="团队海报推荐尺寸为920*120，画面主体尽量靠右，用于微信小程序团队主页与活动等作为主题展示。"
             ></uploadImage>
             <div v-if="variant === 'archive'" class="m-banner-editor__actions">
-                <p>建议上传 1125 × 630 的 JPG 或 PNG 图片，画面主体尽量居中。</p>
+                <p>{{ $t("team.settingSections.bannerHint") }}</p>
                 <el-button class="u-submit-btn" type="primary" icon="Upload" @click="submitBanner" :loading="saving"
-                    >保存海报</el-button
+                    >{{ $t("team.settingSections.saveBanner") }}</el-button
                 >
             </div>
         </div>
@@ -23,7 +23,7 @@
             icon="Upload"
             @click="submitBanner"
             :loading="saving"
-            >提交海报</el-button
+            >{{ $t("team.settingSections.submitBanner") }}</el-button
         >
     </section>
 </template>
@@ -75,7 +75,7 @@ export default {
                 banner: this.banner,
             })
                 .then(() => {
-                    this.$message.success(this.variant === "archive" ? "团队海报保存成功" : "海报上传成功");
+                    this.$message.success(this.variant === "archive" ? this.$t("team.settingSections.bannerSaved") : this.$t("team.settingSections.bannerUploaded"));
                 })
                 .finally(() => {
                     this.saving = false;
@@ -99,6 +99,7 @@ export default {
 
         .m-banner-editor {
             display: flex;
+            flex-direction: column;
             align-items: start;
             gap: @team-space-4;
         }
@@ -111,8 +112,10 @@ export default {
             }
 
             .u-upload {
-                width: 320px;
-                height: 179px;
+                width: 920px;
+                max-width: 100%;
+                height: auto !important;
+                aspect-ratio: 920 / 120;
                 margin-top: 0;
                 overflow: hidden;
                 border: 1px dashed @team-border;
@@ -121,13 +124,13 @@ export default {
 
                 img {
                     object-fit: cover;
+                    object-position: right center;
                 }
             }
         }
 
         .m-banner-editor__actions {
             display: flex;
-            max-width: 380px;
             align-items: flex-start;
             flex-direction: column;
             gap: @team-space-3;
@@ -160,12 +163,6 @@ export default {
 
 @media screen and (max-width: 520px) {
     .m-team-banner.is-archive {
-        .c-upload-banner .u-upload {
-            max-width: 100%;
-            height: auto !important;
-            aspect-ratio: 1125 / 630;
-        }
-
         .m-banner-editor__actions,
         .u-submit-btn {
             width: 100%;

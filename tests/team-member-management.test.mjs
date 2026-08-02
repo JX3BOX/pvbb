@@ -52,6 +52,15 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(pendingList, /class="u-pending-skeleton"/);
     assert.match(pendingList, /class="u-btn u-pass"/);
     assert.match(pendingList, /this\.\$emit\("pending-count-change", this\.total\)/);
+    assert.match(pendingList, /@click="checkRole\(item\.relation\.role_id\)"/);
+    assert.match(pendingList, /@click="rejectRole\(item\.relation\.role_id\)"/);
+    assert.match(pendingList, /const teamId = this\.team_id/);
+    assert.match(pendingList, /checkRole\(teamId, role_id\)/);
+    assert.match(pendingList, /deleteRole\(teamId, role_id\)/);
+    assert.match(pendingList, /String\(this\.team_id\) !== String\(teamId\)/);
+    assert.match(pendingList, /findIndex\(\(item\) => item\.relation\.role_id === role_id\)/);
+    assert.doesNotMatch(pendingList, /checkRole\(item\.relation\.team_id/);
+    assert.doesNotMatch(pendingList, /deleteRole\(this\.team_id, role_id\)/);
     assert.match(pendingList, /this\.\$confirm\("确定拒绝该角色的加入申请/);
     assert.match(pendingList, /confirmButtonText:\s*"确认拒绝"/);
     assert.match(pendingList, /per:\s*12/);

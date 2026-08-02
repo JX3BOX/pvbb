@@ -2,8 +2,8 @@
     <div class="v-member-pending">
         <header class="m-member-panel-header">
             <div>
-                <h2>加入申请</h2>
-                <p>核对角色资料后批准加入，待处理申请会集中显示在这里。</p>
+                <h2>{{ $t("team.member.joinRequests") }}</h2>
+                <p>{{ $t("team.member.reviewHint") }}</p>
             </div>
             <el-skeleton-item
                 v-if="loading"
@@ -11,7 +11,7 @@
                 class="u-member-total-skeleton"
                 aria-hidden="true"
             />
-            <span v-else class="u-member-total">{{ total }} 项待处理</span>
+            <span v-else class="u-member-total">{{ $t("team.member.pendingCount", { count: total }) }}</span>
         </header>
 
         <div v-if="loading" class="m-pending-card-grid m-pending-skeleton-grid" aria-hidden="true">
@@ -52,11 +52,11 @@
                             }}</router-link>
                             <span class="u-verified" v-if="!item.role.custom">
                                 <el-icon><CircleCheckFilled /></el-icon>
-                                已认证
+                                {{ $t("team.member.verified") }}
                             </span>
                         </span>
                         <span class="u-meta u-role-meta">
-                            <span>{{ item.role.server || "未知服务器" }}</span>
+                            <span>{{ item.role.server || $t("team.member.unknownServer") }}</span>
                             <span class="u-mount">
                                 <img class="u-icon" :src="showSchoolIcon(item.role.mount)" />
                                 {{ showSchoolName(item.role.mount) }}
@@ -66,7 +66,7 @@
                         <div class="u-apply-meta">
                             <span>
                                 <el-icon><OfficeBuilding /></el-icon>
-                                {{ (item.team && item.team.name) || "未知团队" }}
+                                {{ (item.team && item.team.name) || $t("team.member.unknownTeam") }}
                             </span>
                             <span>
                                 <el-icon><Clock /></el-icon>
@@ -79,19 +79,19 @@
                             class="u-btn u-reject"
                             type="button"
                             :disabled="processingIds.includes(item.relation.role_id)"
-                            @click="rejectRole(item.relation.team_id, item.relation.role_id, i)"
+                            @click="rejectRole(item.relation.role_id)"
                         >
                             <el-icon><Close /></el-icon>
-                            拒绝
+                            {{ $t("team.member.reject") }}
                         </button>
                         <button
                             class="u-btn u-pass"
                             type="button"
                             :disabled="processingIds.includes(item.relation.role_id)"
-                            @click="checkRole(item.relation.team_id, item.relation.role_id, i)"
+                            @click="checkRole(item.relation.role_id)"
                         >
                             <el-icon><Check /></el-icon>
-                            批准加入
+                            {{ $t("team.member.approve") }}
                         </button>
                     </div>
                 </li>
@@ -111,8 +111,8 @@
             <span class="u-empty-icon" aria-hidden="true">
                 <el-icon><Finished /></el-icon>
             </span>
-            <h3>申请已全部处理</h3>
-            <p>新的成员申请会显示在这里。</p>
+            <h3>{{ $t("team.member.allProcessed") }}</h3>
+            <p>{{ $t("team.member.newRequestsHint") }}</p>
         </div>
     </div>
 </template>
@@ -159,16 +159,16 @@ export default {
                     this.loading = false;
                 });
         },
-        checkRole(team_id, role_id, i) {
+        checkRole(role_id) {
             if (this.processingIds.includes(role_id)) return;
+            const teamId = this.team_id;
             this.processingIds.push(role_id);
-            checkRole(team_id, role_id)
+            checkRole(teamId, role_id)
                 .then(() => {
-                    this.data.splice(i, 1);
-                    this.updateTotal(this.total - 1);
+                    if (!this.removePendingRole(teamId, role_id)) return;
                     this.$notify({
-                        title: "操作成功",
-                        message: "批准该成员加入",
+                        title: this.$t("team.member.operationSucceeded"),
+                        message: this.$t("team.member.approvedMessage"),
                         type: "success",
                     });
                 })
@@ -176,22 +176,23 @@ export default {
                     this.processingIds = this.processingIds.filter((id) => id !== role_id);
                 });
         },
-        rejectRole(team_id, role_id, i) {
+        rejectRole(role_id) {
             if (this.processingIds.includes(role_id)) return;
-            this.$confirm("确定拒绝该角色的加入申请？拒绝后该申请将从列表中移除。", "拒绝加入申请", {
-                confirmButtonText: "确认拒绝",
-                cancelButtonText: "取消",
+            const teamId = this.team_id;
+            this.$confirm(this.$t("team.member.rejectConfirm"), this.$t("team.member.rejectTitle"), {
+                confirmButtonText: this.$t("team.member.confirmReject"),
+                cancelButtonText: this.$t("team.member.cancel"),
                 type: "warning",
             })
                 .then(() => {
+                    if (String(this.team_id) !== String(teamId)) return;
                     this.processingIds.push(role_id);
-                    return deleteRole(team_id, role_id)
+                    return deleteRole(teamId, role_id)
                         .then(() => {
-                            this.data.splice(i, 1);
-                            this.updateTotal(this.total - 1);
+                            if (!this.removePendingRole(teamId, role_id)) return;
                             this.$notify({
-                                title: "操作成功",
-                                message: "已拒绝该成员加入",
+                                title: this.$t("team.member.operationSucceeded"),
+                                message: this.$t("team.member.rejectedMessage"),
                                 type: "success",
                             });
                         })
@@ -200,6 +201,15 @@ export default {
                         });
                 })
                 .catch(() => {});
+        },
+        removePendingRole(teamId, role_id) {
+            if (String(this.team_id) !== String(teamId)) return false;
+            const index = this.data.findIndex((item) => item.relation.role_id === role_id);
+            if (index !== -1) {
+                this.data.splice(index, 1);
+                this.updateTotal(this.total - 1);
+            }
+            return true;
         },
         changePage: function () {
             window.scrollTo(0, 0);

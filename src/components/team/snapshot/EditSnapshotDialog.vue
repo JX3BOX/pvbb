@@ -2,7 +2,7 @@
     <el-dialog
         v-model="visible"
         class="m-snapshot-edit-dialog"
-        title="修改快照"
+        :title="dialogTitle"
         width="1100px"
         append-to-body
         destroy-on-close
@@ -17,7 +17,7 @@
                     <el-input v-model="form.title" placeholder="请输入快照标题" clearable />
                 </el-form-item>
                 <el-form-item label="所属团队">
-                    <el-select v-model.number="teamId" disabled placeholder="所属团队">
+                    <el-select v-model.number="selectedTeamId" disabled placeholder="所属团队">
                         <el-option v-for="item in teams" :key="item.ID" :label="item.name" :value="item.ID" />
                     </el-select>
                 </el-form-item>
@@ -64,13 +64,31 @@
                             <el-input v-model="roleForm.name" placeholder="请输入角色名" clearable />
                         </el-form-item>
                         <el-form-item label="心法" prop="xf">
-                            <el-select v-model="roleForm.xf" placeholder="请选择心法" filterable>
+                            <el-select
+                                v-model="roleForm.xf"
+                                placeholder="请选择心法"
+                                filterable
+                                popper-class="m-snapshot-xf-select"
+                            >
+                                <template #prefix>
+                                    <img
+                                        v-if="roleForm.xf"
+                                        class="u-selected-xf-icon"
+                                        :src="showMountIcon(roleForm.xf)"
+                                        alt=""
+                                    />
+                                </template>
                                 <el-option
                                     v-for="item in xflist"
                                     :key="item.id"
                                     :label="item.name"
                                     :value="item.id"
-                                />
+                                >
+                                    <div class="m-snapshot-xf-option">
+                                        <img :src="showMountIcon(item.id)" :alt="item.name" />
+                                        <span>{{ item.name }}</span>
+                                    </div>
+                                </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item class="u-add-action">
@@ -84,14 +102,16 @@
         <template #footer>
             <div class="m-snapshot-edit__footer">
                 <el-button @click="visible = false">取消</el-button>
-                <el-button type="primary" :loading="processing" :disabled="loading" @click="submit">保存修改</el-button>
+                <el-button type="primary" :loading="processing" :disabled="loading" @click="submit">
+                    {{ snapshotId ? "保存修改" : "确认补录" }}
+                </el-button>
             </div>
         </template>
     </el-dialog>
 </template>
 
 <script>
-import { editSnapshot, getSnapshot } from "@/service/team/snapshot.js";
+import { addSnapshot, editSnapshot, getSnapshot } from "@/service/team/snapshot.js";
 import { getMyPowerTeams } from "@/service/team/team.js";
 import { VueDraggable } from "vue-draggable-plus";
 import { ensureDragKey } from "@/utils/draggable";
@@ -112,6 +132,10 @@ export default {
             type: [Number, String],
             default: null,
         },
+        targetTeamId: {
+            type: [Number, String],
+            default: null,
+        },
     },
     emits: ["update:modelValue", "saved"],
     data() {
@@ -122,7 +146,7 @@ export default {
                 title: "",
                 desc: "",
             },
-            teamId: "",
+            selectedTeamId: "",
             teams: [],
             list: [],
             roleForm: {
@@ -147,6 +171,9 @@ export default {
                 this.$emit("update:modelValue", value);
             },
         },
+        dialogTitle() {
+            return this.snapshotId ? "修改快照" : "手动补录快照";
+        },
         teammate() {
             return this.list.map((item) => item.join(",")).join(";");
         },
@@ -156,12 +183,31 @@ export default {
     },
     watch: {
         modelValue(value) {
-            if (value && this.snapshotId) this.loadData();
+            if (!value) return;
+            if (this.snapshotId) {
+                this.loadData();
+            } else {
+                this.initCreateData();
+            }
         },
     },
     methods: {
         dragKey: ensureDragKey,
         showMountIcon,
+        async initCreateData() {
+            const requestId = ++this.loadRequestId;
+            this.loading = true;
+            try {
+                const teamsRes = await getMyPowerTeams("r_snapshot");
+                if (requestId !== this.loadRequestId || !this.modelValue || this.snapshotId) return;
+                this.teams = teamsRes.data.data.list || [];
+                const targetId = Number(this.targetTeamId);
+                const targetTeam = this.teams.find((item) => Number(item.ID) === targetId);
+                this.selectedTeamId = targetTeam ? targetId : this.teams[0]?.ID || "";
+            } finally {
+                if (requestId === this.loadRequestId) this.loading = false;
+            }
+        },
         async loadData() {
             const snapshotId = this.snapshotId;
             const requestId = ++this.loadRequestId;
@@ -176,7 +222,7 @@ export default {
                     title: data.title || "",
                     desc: data.desc || "",
                 };
-                this.teamId = data.team_id;
+                this.selectedTeamId = data.team_id;
                 this.teams = teamsRes.data.data.list || [];
                 this.list = (data.teammate || "")
                     .split(";")
@@ -197,15 +243,28 @@ export default {
             });
         },
         async submit() {
+            if (!this.selectedTeamId) {
+                this.$message.warning("请选择所属团队");
+                return;
+            }
             this.processing = true;
             try {
-                await editSnapshot(this.snapshotId, {
-                    ...this.form,
+                const payload = {
+                    team_id: this.selectedTeamId,
+                    title: this.form.title || "",
+                    desc: this.form.desc || "",
                     teammate: this.teammate,
-                });
-                this.$message.success("快照更新成功");
+                };
+                if (this.snapshotId) {
+                    await editSnapshot(this.snapshotId, payload);
+                } else {
+                    await addSnapshot(this.selectedTeamId, payload);
+                }
+                this.$message.success(this.snapshotId ? "快照更新成功" : "快照补录成功");
                 this.$emit("saved");
                 this.visible = false;
+            } catch (error) {
+                this.$message.error(error?.response?.data?.msg || "快照保存失败，请稍后重试");
             } finally {
                 this.processing = false;
             }
@@ -215,7 +274,7 @@ export default {
             this.loading = false;
             this.section = "基本信息";
             this.form = { title: "", desc: "" };
-            this.teamId = "";
+            this.selectedTeamId = "";
             this.teams = [];
             this.list = [];
             this.roleForm = { name: "", xf: "" };
@@ -249,7 +308,7 @@ export default {
 
     .el-dialog__footer {
         padding: @team-space-3 @team-space-4;
-        border-top: 1px solid @team-border-light;
+        border-top: 1px solid fade(@team-primary, 18%);
     }
 }
 
@@ -400,7 +459,7 @@ export default {
     height: 242px;
     padding: 0;
     overflow-y: auto;
-    border: 1px solid @team-border-light;
+    border: 1px solid fade(@team-primary, 18%);
     border-top: 0;
     border-radius: 0 0 12px 12px;
     background: @team-surface;
@@ -414,33 +473,36 @@ export default {
         min-width: 0;
         height: 48px;
         align-items: center;
-        padding: 0 36px 0 12px;
-        border-right: 2px solid #dbe4f0;
-        border-bottom: 1px solid @team-border;
+        padding: 0 40px 0 @team-space-3;
+        border-right: 1px solid fade(@team-primary, 14%);
+        border-bottom: 1px solid fade(@team-primary, 12%);
         border-radius: 0;
         background: @team-surface;
         cursor: move;
-        gap: 8px;
+        gap: @team-space-2;
+        transition: background-color @team-duration-fast @team-ease-standard;
 
         img {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             flex: none;
+            object-fit: contain;
         }
 
         span {
             min-width: 0;
             overflow: hidden;
             color: @team-text-regular;
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 500;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         button {
             position: absolute;
-            top: 12px;
-            right: 7px;
+            top: 10px;
+            right: 8px;
             width: 24px;
             height: 24px;
             padding: 0;
@@ -449,6 +511,9 @@ export default {
             background: transparent;
             color: @team-text-muted;
             cursor: pointer;
+            line-height: 24px;
+            transition: background-color @team-duration-fast @team-ease-standard,
+                color @team-duration-fast @team-ease-standard;
 
             &:hover {
                 background: #fef2f2;
@@ -461,7 +526,7 @@ export default {
         }
 
         &:hover {
-            background: @team-primary-soft;
+            background: fade(@team-primary, 5%);
         }
     }
 }
@@ -469,18 +534,21 @@ export default {
 .m-snapshot-edit__group-head {
     display: grid;
     overflow: hidden;
-    border: 1px solid #dbe4f0;
+    border: 1px solid fade(@team-primary, 18%);
+    border-bottom: 0;
     border-radius: 12px 12px 0 0;
-    background: #edf4fc;
+    background: @team-primary-soft;
     grid-template-columns: repeat(5, minmax(0, 1fr));
 
     span {
-        height: 30px;
-        border-right: 2px solid #dbe4f0;
-        color: #7088a5;
+        height: 36px;
+        border-right: 1px solid fade(@team-primary, 18%);
+        background: linear-gradient(180deg, #f5f3ff 0%, @team-primary-soft 100%);
+        color: @team-primary;
         font-size: 12px;
         font-weight: 700;
-        line-height: 30px;
+        letter-spacing: 1px;
+        line-height: 36px;
         text-align: center;
 
         &:last-child {
@@ -537,6 +605,13 @@ export default {
         width: 100%;
     }
 
+    .u-selected-xf-icon {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        object-fit: contain;
+    }
+
     .el-input__wrapper,
     .el-select__wrapper {
         min-height: 38px;
@@ -577,6 +652,33 @@ export default {
     }
 }
 
+.m-snapshot-xf-option {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+
+    img {
+        width: 28px;
+        height: 28px;
+        flex: none;
+        object-fit: contain;
+    }
+
+    span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.m-snapshot-xf-select .el-select-dropdown__item {
+    height: 42px;
+    padding: 7px 12px;
+    line-height: 28px;
+}
+
 .m-snapshot-edit__footer {
     display: flex;
     justify-content: flex-end;
@@ -613,11 +715,11 @@ export default {
 
         .u-member {
             height: 42px;
-            border: 1px solid @team-border-light;
+            border: 1px solid fade(@team-primary, 14%);
             border-radius: 9px;
 
             &:nth-child(5n) {
-                border-bottom: 1px solid @team-border-light;
+                border-bottom: 1px solid fade(@team-primary, 14%);
             }
         }
     }

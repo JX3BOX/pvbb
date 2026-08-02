@@ -4,17 +4,17 @@
             class="u-member-card-trigger"
             type="button"
             aria-haspopup="dialog"
-            :aria-label="`查看 ${(item.user_info && item.user_info.display_name) || item.uid} 的角色列表`"
+            :aria-label="$t('team.memberDialog.viewRoles', { name: memberName })"
             @click="roleDialogVisible = true"
         >
             <span class="u-member-profile">
                 <img class="u-avatar" :src="showAvatar(item.user_info && item.user_info.avatar)" alt="" />
                 <span class="u-member-copy">
-                    <b class="u-name">{{ (item.user_info && item.user_info.display_name) || "未注册" }}</b>
+                    <b class="u-name">{{ memberName }}</b>
                     <em>UID {{ item.uid || "--" }}</em>
                 </span>
             </span>
-            <span class="u-role-count">{{ localRoles.length }} 个角色</span>
+            <span class="u-role-count">{{ $t("team.memberDialog.roleCount", { count: localRoles.length }) }}</span>
             <el-icon class="u-open-icon" aria-hidden="true"><ArrowRight /></el-icon>
         </button>
     </article>
@@ -33,13 +33,13 @@
                     :href="authorLink(item.uid)"
                     target="_blank"
                     rel="noopener noreferrer"
-                    :aria-label="`查看 ${(item.user_info && item.user_info.display_name) || item.uid} 的账号主页`"
-                    title="查看账号主页"
+                    :aria-label="$t('team.memberDialog.viewProfile', { name: memberName })"
+                    :title="$t('team.memberDialog.viewProfileTitle')"
                 >
                     <img class="u-dialog-avatar" :src="showAvatar(item.user_info && item.user_info.avatar)" alt="" />
                     <span class="u-dialog-member-copy">
-                        <b>{{ (item.user_info && item.user_info.display_name) || "未注册" }}</b>
-                        <em>UID {{ item.uid || "--" }} · {{ localRoles.length }} 个角色</em>
+                        <b>{{ memberName }}</b>
+                        <em>UID {{ item.uid || "--" }} · {{ $t("team.memberDialog.roleCount", { count: localRoles.length }) }}</em>
                     </span>
                 </a>
             </div>
@@ -68,17 +68,17 @@
                     <button
                         class="u-remove-role"
                         type="button"
-                        :aria-label="`移除角色 ${role.roleInfo.name}`"
+                        :aria-label="$t('team.memberDialog.removeRoleLabel', { name: role.roleInfo.name })"
                         :disabled="removingRoleIds.includes(role.relation.role_id)"
                         @click="onRemoveRole(role)"
                     >
                         <el-icon><Close /></el-icon>
-                        <span>移除</span>
+                        <span>{{ $t("team.memberDialog.remove") }}</span>
                     </button>
                 </div>
             </div>
             <div v-else class="u-dialog-empty">
-                <span>该账号暂无角色</span>
+                <span>{{ $t("team.memberDialog.noRoles") }}</span>
             </div>
         </div>
 
@@ -88,14 +88,14 @@
                     v-if="item.uid"
                     class="u-remove-account"
                     type="button"
-                    :aria-label="`移除成员 ${(item.user_info && item.user_info.display_name) || item.uid}`"
+                    :aria-label="$t('team.memberDialog.removeMemberLabel', { name: memberName })"
                     :disabled="removingAccount"
                     @click="removeAccount"
                 >
                     <el-icon><Delete /></el-icon>
-                    <span>{{ removingAccount ? "正在移除" : "移除成员" }}</span>
+                    <span>{{ removingAccount ? $t("team.memberDialog.removing") : $t("team.memberDialog.removeMember") }}</span>
                 </button>
-                <button class="u-dialog-done" type="button" @click="roleDialogVisible = false">完成</button>
+                <button class="u-dialog-done" type="button" @click="roleDialogVisible = false">{{ $t("team.memberDialog.done") }}</button>
             </div>
         </template>
     </el-dialog>
@@ -127,6 +127,9 @@ export default {
         };
     },
     computed: {
+        memberName: function () {
+            return this.item.user_info?.display_name || this.$t("team.memberDialog.unregistered");
+        },
         team_id: function () {
             return this.id;
         },
@@ -143,9 +146,9 @@ export default {
         showBodyType,
         showSchoolIcon,
         removeAccount: function () {
-            this.$confirm("此操作会将该账号下所有角色移除，确定移除该账号？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("team.memberDialog.accountConfirm"), this.$t("team.memberDialog.prompt"), {
+                confirmButtonText: this.$t("team.memberDialog.confirm"),
+                cancelButtonText: this.$t("team.memberDialog.cancel"),
                 type: "warning",
             })
                 .then(() => {
@@ -153,8 +156,8 @@ export default {
                     return removeTeamRoleAll(this.team_id, this.item.uid)
                         .then(() => {
                             this.$notify({
-                                title: "移除成功",
-                                message: "已移除该账号",
+                                title: this.$t("team.memberDialog.removeSucceeded"),
+                                message: this.$t("team.memberDialog.accountRemoved"),
                                 type: "success",
                             });
                             this.$emit("remove", this.item.uid);
@@ -166,9 +169,9 @@ export default {
                 .catch(() => {});
         },
         onRemoveRole: function (role) {
-            this.$confirm("确定移除该角色？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
+            this.$confirm(this.$t("team.memberDialog.roleConfirm"), this.$t("team.memberDialog.prompt"), {
+                confirmButtonText: this.$t("team.memberDialog.confirm"),
+                cancelButtonText: this.$t("team.memberDialog.cancel"),
                 type: "warning",
             })
                 .then(() => {
@@ -177,8 +180,8 @@ export default {
                     return removeTeamRole(this.team_id, roleId)
                         .then(() => {
                             this.$notify({
-                                title: "移除成功",
-                                message: "已移除该角色",
+                                title: this.$t("team.memberDialog.removeSucceeded"),
+                                message: this.$t("team.memberDialog.roleRemoved"),
                                 type: "success",
                             });
                             this.localRoles = this.localRoles.filter((item) => item.relation.role_id != roleId);

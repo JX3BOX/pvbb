@@ -5,17 +5,15 @@
     width: 100%;
     align-content: start;
     overflow: hidden;
-    border: 1px solid #dbe4f0;
+    border: 1px solid fade(@team-primary, 18%);
     border-radius: 12px;
     background: @team-surface;
     grid-auto-columns: 20%;
     grid-auto-flow: column;
 
-    @row-height: 48px;
+    @row-height: 50px;
 
     &.row-0 {
-        border-top: 0;
-        border-radius: 0 0 12px 12px;
         grid-template-rows: repeat(5, @row-height);
     }
 
@@ -73,22 +71,22 @@
         height: 100%;
         min-width: 0;
         align-items: center;
-        padding: 0 @team-space-2;
-        border-right: 2px solid #dbe4f0;
-        border-bottom: 1px solid @team-border;
+        padding: 0 @team-space-3;
+        border-right: 1px solid fade(@team-primary, 14%);
+        border-bottom: 1px solid fade(@team-primary, 12%);
         background: @team-surface;
         cursor: pointer;
-        gap: @team-space-1;
+        gap: @team-space-2;
         transition: background-color @team-duration-fast @team-ease-standard;
 
         &:hover {
-            background: @team-primary-soft;
+            background: fade(@team-primary, 5%);
         }
     }
 
     .u-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         flex: none;
         object-fit: contain;
     }
@@ -97,16 +95,18 @@
         min-width: 0;
         overflow: hidden;
         color: @team-text-regular;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 500;
         line-height: 22px;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
 }
 
 @media screen and (max-width: @phone) {
     .m-snapshot-body {
-        border-top: 1px solid #dbe4f0;
+        gap: 0;
         border-radius: 12px;
         grid-auto-columns: auto;
         grid-auto-flow: row;
@@ -115,6 +115,9 @@
 
         .u-item {
             height: 48px;
+            border-right: 1px solid fade(@team-primary, 14%);
+            border-bottom: 1px solid fade(@team-primary, 12%);
+            border-radius: 0;
         }
     }
 }

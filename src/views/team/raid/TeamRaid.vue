@@ -1,6 +1,6 @@
 <template>
     <div class="v-raid-tlist">
-        <el-divider content-position="left"> <i class="el-icon-map-location"></i> 团队活动 </el-divider>
+        <el-divider content-position="left"> <i class="el-icon-map-location"></i> {{ $t("team.publicContent.activities") }} </el-divider>
         <template v-if="hasRight">
             <div class="m-raid-table" v-loading="loading">
                 <activity-item
@@ -9,11 +9,11 @@
                     :activity="item"
                     :is-home-page="isHomePage"
                 ></activity-item>
-                <div class="u-tip"><i class="el-icon-warning-outline"></i> 默认仅显示最近7天活动</div>
+                <div class="u-tip"><i class="el-icon-warning-outline"></i> {{ $t("team.publicContent.recentOnly") }}</div>
             </div>
         </template>
         <template v-else>
-            <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
+            <el-alert class="u-tip" :title="$t('team.publicContent.noPermission')" type="warning" show-icon></el-alert>
         </template>
     </div>
 </template>

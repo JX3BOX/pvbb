@@ -1,23 +1,23 @@
 <template>
     <section class="m-team-snapshot-password" :class="{ 'is-archive': variant === 'archive' }">
-        <div v-if="variant === 'archive'" class="m-archive-field-label">快照密码</div>
+        <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.snapshotPassword.title") }}</div>
         <header v-else class="u-password-heading">
             <span class="u-heading-icon" aria-hidden="true"><i class="el-icon-camera"></i></span>
             <div>
-                <h2>快照密码</h2>
-                <p>管理游戏内插件上传团队快照时使用的验证密码</p>
+                <h2>{{ $t("team.snapshotPassword.title") }}</h2>
+                <p>{{ $t("team.snapshotPassword.description") }}</p>
             </div>
         </header>
         <div class="u-password-box">
             <div v-if="variant !== 'archive'" class="u-password-notice">
                 <i class="el-icon-warning-outline" aria-hidden="true"></i>
                 <div>
-                    <strong>上传验证</strong>
-                    <p>上传团队快照前需要验证此密码。密码仅由 6 位数字组成，请妥善保管。</p>
+                    <strong>{{ $t("team.snapshotPassword.verification") }}</strong>
+                    <p>{{ $t("team.snapshotPassword.notice") }}</p>
                 </div>
             </div>
             <div class="u-password-field">
-                <label v-if="variant !== 'archive'" for="team-snapshot-password">团队快照密码</label>
+                <label v-if="variant !== 'archive'" for="team-snapshot-password">{{ $t("team.snapshotPassword.label") }}</label>
                 <div class="u-password">
                     <el-input
                         id="team-snapshot-password"
@@ -25,18 +25,18 @@
                         type="password"
                         v-model="password"
                         :maxlength="6"
-                        placeholder="请输入 6 位数字"
+                        :placeholder="$t('team.snapshotPassword.placeholder')"
                         inputmode="numeric"
                         autocomplete="new-password"
                         show-password
                         @input="formatPassword"
                     ></el-input>
                     <el-button class="u-btn" type="primary" @click="onSubmit" :disabled="!ready" :loading="saving"
-                        >{{ variant === "archive" ? "保存密码" : "保存设置" }}</el-button
+                        >{{ variant === "archive" ? $t("team.snapshotPassword.savePassword") : $t("team.snapshotPassword.saveSettings") }}</el-button
                     >
                 </div>
                 <div v-if="variant !== 'archive'" class="u-password-meta">
-                    <span>仅支持数字，输入满 6 位后即可保存</span>
+                    <span>{{ $t("team.snapshotPassword.hint") }}</span>
                     <span :class="{ 'is-complete': ready }">{{ password.length }}/6</span>
                 </div>
             </div>
@@ -78,7 +78,7 @@ export default {
                     this.password = "";
 
                     this.$notify({
-                        title: "设置密码成功",
+                        title: this.$t("team.snapshotPassword.success"),
                         type: "success",
                     });
                 })

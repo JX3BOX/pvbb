@@ -1,16 +1,16 @@
 <template>
-    <aside class="m-team-home-sidebar" aria-label="团队个人工作台">
+    <aside class="m-team-home-sidebar" :aria-label="$t('team.sidebar.ariaLabel')">
         <section class="m-team-home-sidebar__panel is-navigation is-discovery">
             <div class="m-team-home-sidebar__brand">
                 <span class="u-sidebar-brand-icon" aria-hidden="true">
                     <img :src="teamLogo" alt="" />
                 </span>
                 <div>
-                    <strong>团队平台</strong>
+                    <strong>{{ $t("team.common.platform") }}</strong>
                 </div>
             </div>
 
-            <nav class="m-team-home-sidebar__nav" aria-label="团队中心导航">
+            <nav class="m-team-home-sidebar__nav" :aria-label="$t('team.sidebar.navigation')">
                 <router-link
                     class="u-sidebar-nav-item"
                     :class="{ 'is-active': isTeamHome }"
@@ -21,8 +21,8 @@
                         ><el-icon><Search /></el-icon
                     ></span>
                     <span class="u-sidebar-nav-copy">
-                        <strong>团队广场</strong>
-                        <small>查找适合自己的团队</small>
+                        <strong>{{ $t("team.sidebar.plaza") }}</strong>
+                        <small>{{ $t("team.sidebar.plazaDescription") }}</small>
                     </span>
                     <el-icon class="u-sidebar-nav-arrow"><ArrowRight /></el-icon>
                 </router-link>
@@ -36,8 +36,8 @@
                         ><el-icon><Calendar /></el-icon
                     ></span>
                     <span class="u-sidebar-nav-copy">
-                        <strong>团队活动</strong>
-                        <small>查看团队公开招募活动</small>
+                        <strong>{{ $t("team.sidebar.activity") }}</strong>
+                        <small>{{ $t("team.sidebar.activityDescription") }}</small>
                     </span>
                     <el-icon class="u-sidebar-nav-arrow"><ArrowRight /></el-icon>
                 </router-link>
@@ -47,7 +47,7 @@
         <section class="m-team-home-sidebar__panel is-my-teams is-workspace" aria-labelledby="team-home-workspace-title">
             <header class="m-team-home-sidebar__section-header">
                 <div>
-                    <h2 id="team-home-workspace-title">团队工作区</h2>
+                    <h2 id="team-home-workspace-title">{{ $t("team.sidebar.workspace") }}</h2>
                 </div>
             </header>
 
@@ -55,12 +55,16 @@
                 <span class="u-sidebar-empty-icon" aria-hidden="true"
                     ><el-icon><Lock /></el-icon
                 ></span>
-                <strong>登录后查看团队工作区</strong>
-                <p>按管理者与成员身份进入不同的团队视图。</p>
-                <a :href="loginUrl">登录 / 注册</a>
+                <strong>{{ $t("team.sidebar.loginTitle") }}</strong>
+                <p>{{ $t("team.sidebar.loginDescription") }}</p>
+                <a :href="loginUrl">{{ $t("team.sidebar.login") }}</a>
             </div>
 
-            <div v-else-if="loading" class="m-team-home-sidebar__skeleton" aria-label="团队工作区加载中">
+            <div
+                v-else-if="loading"
+                class="m-team-home-sidebar__skeleton"
+                :aria-label="$t('team.sidebar.loading')"
+            >
                 <div v-for="index in 4" :key="index" class="u-sidebar-team-skeleton" aria-hidden="true">
                     <span></span>
                     <i></i>
@@ -71,9 +75,9 @@
                 <span class="u-sidebar-empty-icon" aria-hidden="true"
                     ><el-icon><Warning /></el-icon
                 ></span>
-                <strong>暂时无法加载</strong>
-                <p>团队广场仍可正常浏览。</p>
-                <button type="button" @click="loadTeams">重新加载</button>
+                <strong>{{ $t("team.sidebar.loadFailed") }}</strong>
+                <p>{{ $t("team.sidebar.loadFailedDescription") }}</p>
+                <button type="button" @click="loadTeams">{{ $t("team.common.retry") }}</button>
             </div>
 
             <div v-else-if="workspaceTeamCount" class="m-team-home-sidebar__groups">
@@ -89,7 +93,7 @@
                             <el-icon><Setting /></el-icon>
                         </span>
                         <span class="u-sidebar-group-copy">
-                            <strong>团队管理</strong>
+                            <strong>{{ $t("team.sidebar.management") }}</strong>
                         </span>
                         <span class="u-sidebar-group-count">{{ managedTeams.length }}</span>
                         <el-icon class="u-sidebar-group-arrow"><ArrowDown /></el-icon>
@@ -106,23 +110,31 @@
                             >
                                 <img
                                     :src="team.logo ? showLogo(team.logo) : defaultLogo"
-                                    :alt="`${team.name}团队 Logo`"
+                                    :alt="$t('team.common.teamLogoAlt', { name: team.name })"
                                     @error="useDefaultLogo"
                                 />
                                 <span class="u-sidebar-team-copy">
                                     <strong>{{ team.name }}</strong>
-                                    <small>{{ team.server || "服务器未填写" }}</small>
+                                    <small>{{ team.server || $t("team.common.serverMissing") }}</small>
                                 </span>
                                 <span
                                     class="u-sidebar-team-role"
                                     :class="team.super == uid ? 'is-founder' : 'is-admin'"
-                                    :title="team.super == uid ? '团队创始人' : '团队管理员'"
+                                    :title="
+                                        team.super == uid
+                                            ? $t('team.common.teamFounder')
+                                            : $t('team.common.teamAdministrator')
+                                    "
                                 >
-                                    {{ team.super == uid ? "创始人" : "管理员" }}
+                                    {{
+                                        team.super == uid
+                                            ? $t("team.common.founder")
+                                            : $t("team.common.administrator")
+                                    }}
                                 </span>
                             </router-link>
                         </template>
-                        <p v-else class="u-sidebar-group-empty">当前没有可管理的团队</p>
+                        <p v-else class="u-sidebar-group-empty">{{ $t("team.sidebar.noManagedTeams") }}</p>
                     </div>
                 </section>
 
@@ -138,7 +150,7 @@
                             <el-icon><School /></el-icon>
                         </span>
                         <span class="u-sidebar-group-copy">
-                            <strong>我的团队</strong>
+                            <strong>{{ $t("team.sidebar.myTeams") }}</strong>
                         </span>
                         <span class="u-sidebar-group-count">{{ teams.length }}</span>
                         <el-icon class="u-sidebar-group-arrow"><ArrowDown /></el-icon>
@@ -155,17 +167,17 @@
                             >
                                 <img
                                     :src="team.logo ? showLogo(team.logo) : defaultLogo"
-                                    :alt="`${team.name}团队 Logo`"
+                                    :alt="$t('team.common.teamLogoAlt', { name: team.name })"
                                     @error="useDefaultLogo"
                                 />
                                 <span class="u-sidebar-team-copy">
                                     <strong>{{ team.name }}</strong>
-                                    <small>{{ team.server || "服务器未填写" }}</small>
+                                    <small>{{ team.server || $t("team.common.serverMissing") }}</small>
                                 </span>
                                 <el-icon class="u-sidebar-team-arrow"><ArrowRight /></el-icon>
                             </router-link>
                         </template>
-                        <p v-else class="u-sidebar-group-empty">当前没有以成员身份加入的团队</p>
+                        <p v-else class="u-sidebar-group-empty">{{ $t("team.sidebar.noMemberTeams") }}</p>
                     </div>
                 </section>
             </div>
@@ -174,9 +186,9 @@
                 <span class="u-sidebar-empty-icon" aria-hidden="true"
                     ><el-icon><OfficeBuilding /></el-icon
                 ></span>
-                <strong>还没有加入团队</strong>
-                <p>从团队广场选择合适的伙伴，或者创建自己的团队。</p>
-                <router-link to="/org/add">创建团队</router-link>
+                <strong>{{ $t("team.sidebar.emptyTitle") }}</strong>
+                <p>{{ $t("team.sidebar.emptyDescription") }}</p>
+                <router-link to="/org/add">{{ $t("team.sidebar.createTeam") }}</router-link>
             </div>
 
             <a
@@ -189,7 +201,7 @@
                     <el-icon><User /></el-icon>
                 </span>
                 <span class="u-sidebar-group-copy">
-                    <strong>我的角色</strong>
+                    <strong>{{ $t("team.sidebar.myRoles") }}</strong>
                 </span>
                 <el-icon class="u-sidebar-nav-arrow"><TopRight /></el-icon>
             </a>
@@ -329,6 +341,8 @@ export default {
                         this.expandedGroups.manage = false;
                         this.expandedGroups.member = true;
                     }
+
+                    this.openFirstMemberTeam();
                 })
                 .finally(() => {
                     this.loading = false;
@@ -336,6 +350,11 @@ export default {
         },
         toggleGroup: function (group) {
             this.expandedGroups[group] = !this.expandedGroups[group];
+        },
+        openFirstMemberTeam: function () {
+            if (this.$route.name !== "view_my_org" || this.$route.params.id || !this.teams.length) return;
+            this.expandedGroups.member = true;
+            this.$router.replace(this.teamRoute(this.teams[0], "member"));
         },
         teamRoute: function (team, mode) {
             return {

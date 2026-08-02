@@ -20,11 +20,49 @@
     }
 
     .m-public-org__hero {
+        position: relative;
         min-height: 118px;
         padding: @team-space-4;
         overflow: hidden;
         border-radius: @team-radius-control;
         background: radial-gradient(circle at 94% 6%, fade(@team-primary, 8%), transparent 28%), @team-surface;
+
+        &::before,
+        &::after {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: min(920px, 100%);
+            height: 120px;
+            transform: translateY(-50%);
+            content: "";
+            pointer-events: none;
+        }
+
+        &::before {
+            display: none;
+            background-image: var(--team-banner-image);
+            background-position: right center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        &::after {
+            display: none;
+            background: linear-gradient(90deg, #fff 0%, fade(#fff, 92%) 5%, fade(#fff, 48%) 14%, transparent 28%);
+        }
+
+        &.has-banner {
+            &::before,
+            &::after {
+                display: block;
+            }
+        }
+
+        > .m-team-info {
+            position: relative;
+            z-index: 1;
+        }
     }
 
     .m-team-info {
@@ -76,9 +114,11 @@
             display: flex;
             min-width: 0;
             align-items: center;
+            justify-content: flex-start;
             grid-column: 2;
             margin: 0;
             font-weight: 600;
+            text-align: left;
             gap: @team-space-1;
         }
 
@@ -199,7 +239,6 @@
             grid-column: 3;
             grid-row: 1 / 4;
             padding-left: @team-space-4;
-            border-left: 1px solid @team-border-light;
             gap: @team-space-2;
 
             .u-feeling,
@@ -227,7 +266,7 @@
     .m-public-org__workspace {
         min-width: 0;
         margin-top: @team-space-3;
-        padding: 0 @team-space-4 @team-space-4;
+        padding: @team-space-4;
         overflow: hidden;
         border-radius: @team-radius-control;
     }
@@ -469,10 +508,18 @@
     .p-team-public {
         .m-public-org__hero {
             padding: @team-space-3;
+
+            &::after {
+                background: linear-gradient(90deg, fade(#fff, 98%) 0%, fade(#fff, 94%) 24%, fade(#fff, 72%) 48%, transparent 72%);
+            }
+        }
+
+        .m-team-info .m-team-admin {
+            border-top: 0;
         }
 
         .m-public-org__workspace {
-            padding: 0 @team-space-3 @team-space-3;
+            padding: @team-space-3;
         }
 
         .m-team-view > .el-tabs__header {
@@ -502,6 +549,13 @@
 
 @media screen and (max-width: 520px) {
     .p-team-public {
+        .m-public-org__hero {
+            &::before,
+            &::after {
+                display: none !important;
+            }
+        }
+
         .m-team-info {
             align-items: start;
             grid-template-columns: 56px minmax(0, 1fr);
@@ -510,6 +564,7 @@
             > .u-logo {
                 width: 56px;
                 height: 56px;
+                grid-row: 1;
                 border-radius: 14px;
             }
 
@@ -518,9 +573,11 @@
             }
 
             .u-title {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 3px;
+                align-self: center;
+                grid-row: 1;
+                align-items: center;
+                flex-direction: row;
+                gap: @team-space-1;
             }
 
             .u-team-name {
@@ -532,20 +589,28 @@
             .u-meta {
                 grid-column: 1 / -1;
                 margin-top: @team-space-1;
+                padding: 0;
+                background: transparent;
+                backdrop-filter: none;
             }
 
             .m-team-admin {
-                align-items: stretch;
-                flex-direction: column;
+                align-items: center;
+                flex-direction: row;
+                margin-top: @team-space-1;
+                padding-top: @team-space-1;
 
                 .u-feeling,
-                .u-panel,
-                .el-button {
-                    width: 100%;
+                .u-panel {
+                    width: auto;
                 }
 
                 .u-panel {
-                    flex-direction: column;
+                    flex-direction: row;
+                }
+
+                .el-button {
+                    width: auto;
                 }
             }
         }
