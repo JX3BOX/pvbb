@@ -9,29 +9,48 @@
             </div>
         </h1>
         <div class="m-raid-joined" v-loading="loading">
-            <div class="m-raid-myteams" v-if="displayData.length">
+            <div class="m-public-raid-toolbar">
+                <el-input
+                    v-model="search"
+                    :placeholder="$t('team.raid.manage.searchPlaceholder')"
+                    clearable
+                    :aria-label="$t('team.raid.manage.searchAria')"
+                ></el-input>
+                <span class="u-raid-total">{{ $t("team.raid.manage.total", { count: filteredDisplayData.length }) }}</span>
+            </div>
+            <div class="m-raid-myteams" v-if="filteredDisplayData.length">
                 <div class="m-raid-table">
-                    <template v-for="item in displayData" :key="item.id">
+                    <template v-for="item in filteredDisplayData" :key="item.activity.id">
                         <activity-item
-                            :activity="item.raid_info"
-                            :team-info="item.raid_team_info"
-                            :canQuit="true"
+                            :activity="item.activity"
+                            :team-info="item.teamInfo"
+                            :joined="item.joined"
+                            :can-quit="item.joined"
+                            :is-home-page="true"
                             @quit="handleQuit"
                         ></activity-item>
                     </template>
                 </div>
             </div>
-            <el-alert class="m-raid-myteams-null" :title="$t('team.raid.legacy.noRecent')" type="info" show-icon v-else></el-alert>
-            <div class="m-raid-myteam-tip"><i class="el-icon-warning-outline"></i> {{ $t("team.raid.legacy.recentHint") }}</div>
+            <div class="m-public-raid-empty" v-else-if="!loading">
+                <span class="u-empty-icon" aria-hidden="true"><el-icon><Calendar /></el-icon></span>
+                <h3>{{ $t(search ? "team.raid.manage.emptySearch" : "team.raid.legacy.noRecent") }}</h3>
+                <p v-if="search">{{ $t("team.raid.manage.retrySearch") }}</p>
+            </div>
+            <div class="m-raid-myteam-tip">
+                <i class="el-icon-warning-outline"></i>
+                {{ $t(showAll ? "team.publicContent.recentOnly" : "team.raid.legacy.recentHint") }}
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { getMyJoinedTeams } from "@/service/team/member.js";
-import { getMyTeamRaids } from "@/service/team/raid.js";
+import { getMemberTeamRaids, getMyTeamRaids } from "@/service/team/raid.js";
 import { moment } from "@jx3box/jx3box-common/js/moment";
 import ActivityItem from "@/components/team/raid/ActivityItem.vue";
+import { Calendar } from "@element-plus/icons-vue";
 export default {
     name: "MyTeamRaid",
     props: {
@@ -43,24 +62,57 @@ export default {
             type: Boolean,
             default: false,
         },
+        showAll: {
+            type: Boolean,
+            default: false,
+        },
     },
     components: {
         ActivityItem,
+        Calendar,
     },
     data: function () {
         return {
             teams: [],
             ids: [],
             data: [],
+            raids: [],
             loading: false,
+            search: "",
         };
     },
     computed: {
         displayData: function () {
-            if (!this.teamId) return this.data || [];
-            return (this.data || []).filter((item) => {
+            const joinedRaids = (this.data || []).filter((item) => {
                 const teamId = item?.raid_team_info?.ID || item?.raid_info?.team_id;
-                return String(teamId) === String(this.teamId);
+                return !this.teamId || String(teamId) === String(this.teamId);
+            });
+            const joinedMap = new Map(joinedRaids.map((item) => [String(item.raid_info?.id), item]));
+
+            if (this.showAll) {
+                return (this.raids || []).map((activity) => {
+                    const joinedItem = joinedMap.get(String(activity.id));
+                    return {
+                        activity,
+                        teamInfo: joinedItem?.raid_team_info || {},
+                        joined: !!joinedItem,
+                    };
+                });
+            }
+
+            return joinedRaids.map((item) => ({
+                activity: item.raid_info,
+                teamInfo: item.raid_team_info,
+                joined: true,
+            }));
+        },
+        filteredDisplayData: function () {
+            const keyword = this.search.trim().toLowerCase();
+            if (!keyword) return this.displayData;
+            return this.displayData.filter(({ activity }) => {
+                return [activity.name, activity.title, activity.server].some((value) =>
+                    String(value || "").toLowerCase().includes(keyword),
+                );
             });
         },
         is_guawang: function () {
@@ -101,9 +153,13 @@ export default {
         },
         loadRaids: function () {
             this.loading = true;
-            getMyTeamRaids()
-                .then((res) => {
-                    this.data = res.data.data;
+            const requests = [getMyTeamRaids()];
+            if (this.showAll && this.teamId) requests.push(getMemberTeamRaids(this.teamId));
+
+            Promise.all(requests)
+                .then(([joinedRes, raidsRes]) => {
+                    this.data = joinedRes.data?.data || [];
+                    this.raids = raidsRes?.data?.data || [];
                 })
                 .finally(() => {
                     this.loading = false;

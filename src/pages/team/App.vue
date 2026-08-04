@@ -104,7 +104,7 @@ export default {
             return this.$route.meta.isCreateTeam;
         },
         isModernWorkspace: function () {
-            return ["index", "view_org", "list_raid", "view_raid", "view_my_org", "manage_my_org", "add_org"].includes(
+            return ["index", "view_org", "list_raid", "view_raid", "view_my_org", "manage_my_org", "add_org", "view_role"].includes(
                 this.$route.name
             );
         },

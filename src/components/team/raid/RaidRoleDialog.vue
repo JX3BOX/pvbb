@@ -149,12 +149,17 @@ export default {
         },
         displayRole() {
             if (!this.role && !this.member) return null;
+            const boundRole = this.$store.state.roles.find(
+                (item) => String(item.ID || item.id) === String(this.roleId)
+            ) || {};
             const roleInfo = this.role?.role_info || this.role?.roleInfo || this.role?.info || {};
-            const roleMount = Number(this.role?.mount) || Number(roleInfo.mount) || 0;
+            const roleMount = Number(boundRole.mount) || Number(this.role?.mount) || Number(roleInfo.mount) || 0;
             const mount =
                 Number(this.member?.mount) ||
                 Number(this.member?.xf) ||
                 Number(this.member?.xfid) ||
+                Number(boundRole.xf) ||
+                Number(boundRole.xfid) ||
                 Number(this.role?.xf) ||
                 Number(this.role?.xfid) ||
                 Number(roleInfo.xf) ||
@@ -162,7 +167,12 @@ export default {
                 (roleMount >= 1000 ? roleMount : 0) ||
                 0;
             const mountSchool = Object.values(xfMap).find((item) => Number(item.id) === mount)?.school || 0;
-            const bodyType = normalizeBodyType(
+            const school = (roleMount > 0 && roleMount < 1000 ? roleMount : 0) || mountSchool;
+            const sourceBodyType = normalizeBodyType(
+                boundRole.body_type,
+                boundRole.bodyType,
+                boundRole.body,
+                boundRole.body_id,
                 this.role?.body_type,
                 this.role?.bodyType,
                 this.role?.body,
@@ -176,13 +186,15 @@ export default {
                 this.member?.body,
                 this.member?.body_id
             );
+            const bodyType = school === 4 && ![2, 6].includes(sourceBodyType) ? 6 : sourceBodyType;
             return {
                 ...(this.member || {}),
                 ...roleInfo,
                 ...(this.role || {}),
-                name: this.role?.name || roleInfo.name || this.member?.name,
-                server: this.role?.server || roleInfo.server || this.member?.server,
-                school: (roleMount > 0 && roleMount < 1000 ? roleMount : 0) || mountSchool,
+                ...boundRole,
+                name: boundRole.name || this.role?.name || roleInfo.name || this.member?.name,
+                server: boundRole.server || this.role?.server || roleInfo.server || this.member?.server,
+                school,
                 mount,
                 body_type: bodyType,
             };

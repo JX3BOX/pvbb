@@ -1,5 +1,14 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-raid-subbox .m-raid-members{
     .u-member-name {
         cursor: pointer !important;
     }
+}
+
+.m-raid-members__sub-item.el-popover.el-popper {
+    padding: 14px;
+    border-color: @team-border;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
 }

@@ -1,5 +1,46 @@
 @import (reference) "../design-system/_tokens.less";
 
+.m-public-raid-toolbar {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    margin-bottom: @team-space-4;
+    padding: @team-space-2;
+    border: 1px solid @team-border-light;
+    border-radius: 12px;
+    background: @team-surface-muted;
+    gap: @team-space-2;
+
+    .el-input {
+        width: 420px;
+        max-width: 100%;
+    }
+
+    .el-input__wrapper {
+        min-height: 40px;
+        border: 1px solid @team-border;
+        border-radius: @team-radius-small;
+        background: @team-surface;
+        box-shadow: none;
+
+        &.is-focus {
+            border-color: @team-border-focus;
+            box-shadow: @team-shadow-focus;
+        }
+    }
+
+    .u-raid-total {
+        margin-left: auto;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
 .p-team-activity-center {
     display: flex;
     min-width: 0;
@@ -131,7 +172,7 @@
     .m-activity-filter-form {
         display: grid;
         align-items: end;
-        grid-template-columns: minmax(140px, 0.8fr) minmax(140px, 0.8fr) minmax(220px, 1.5fr) minmax(150px, 0.9fr);
+        grid-template-columns: minmax(220px, 1.5fr) minmax(140px, 0.8fr) minmax(140px, 0.8fr) minmax(150px, 0.9fr);
         gap: @team-space-2;
 
         .el-form-item {

@@ -27,6 +27,35 @@
             </button>
         </div>
     </article>
+    <article v-else-if="isHomePage" class="m-activity-item is-home-page" @click="subscribe(activity.id)">
+        <div class="u-content">
+            <div class="u-title-row">
+                <h3 class="u-public-title">{{ activity.title || $t("team.raid.item.noTitle") }}</h3>
+            </div>
+            <div class="u-public-activity">
+                <span class="u-activity-tag">{{ activity.name || $t("team.publicContent.activityFallback") }}</span>
+            </div>
+            <div class="u-info">
+                <time><i class="el-icon-date"></i>{{ showPublicTime(activity.start_time) }} · {{ showRaidWeek(activity.start_time) }}</time>
+                <span><i :class="activity.auth ? 'el-icon-lock' : 'el-icon-unlock'"></i>{{ showAuth(activity.auth) }}</span>
+                <span><i class="el-icon-location-outline"></i>{{ activity.server || $t("team.publicContent.serverPending") }}</span>
+                <span v-if="activity.raid_creator_info"><i class="el-icon-user"></i>{{ getUserName(activity.raid_creator_info) }}</span>
+                <span v-if="activity.count_total"><i class="el-icon-s-custom"></i>{{ $t("team.raid.common.people", { count: `${activity.count_normal || 0}/${activity.count_total}` }) }}</span>
+            </div>
+        </div>
+        <div class="u-actions">
+            <el-button v-if="!canQuit" class="u-view" size="small" plain icon="View" @click.stop="subscribe(activity.id)">
+                {{ $t("team.raid.item.view") }}
+            </el-button>
+            <el-popconfirm v-else :title="$t('team.raid.member.quitConfirm')" @click.stop @confirm="quit(activity.id)">
+                <template #reference>
+                    <el-button class="u-quit" size="small" plain @click.stop>
+                        <i class="el-icon-s-flag"></i>{{ $t("team.raid.member.quit") }}
+                    </el-button>
+                </template>
+            </el-popconfirm>
+        </div>
+    </article>
     <div v-else class="m-activity-item" @click="subscribe(activity.id)">
         <router-link v-if="!isHomePage" class="u-logo" :to="'/org/' + activity.team_id" target="_blank" @click.stop>
             <img class="u-team-logo" :src="getTeamLogo(activity.team_logo || teamInfo.logo)" alt="" />
@@ -35,6 +64,7 @@
             <div class="u-header">
                 <span class="u-title" :to="'/raid/' + activity.id" target="_blank"
                     >{{ activity.name }}
+                    <span v-if="joined" class="u-joined"><i class="el-icon-circle-check"></i>{{ $t("team.raid.joined") }}</span>
                     <!-- <span class="u-today" v-if="isToday(activity.start_time)">★ 今天</span> -->
                 </span>
             </div>
@@ -78,6 +108,10 @@ export default {
             required: true,
         },
         canQuit: {
+            type: Boolean,
+            default: false,
+        },
+        joined: {
             type: Boolean,
             default: false,
         },
@@ -128,6 +162,15 @@ export default {
         },
         showRaidDate(d) {
             return moment(d).format("DD");
+        },
+        showPublicTime(d) {
+            return moment(d).format("YYYY-MM-DD HH:mm");
+        },
+        getUserName(user) {
+            return user?.display_name || this.$t("team.raid.common.unknown");
+        },
+        showAuth(val) {
+            return this.$t(`team.raid.auth.${val}`);
         },
     },
 };

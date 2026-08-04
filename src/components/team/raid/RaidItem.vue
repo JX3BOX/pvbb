@@ -10,18 +10,20 @@
                         :title="$t(data.sticky ? 'team.raid.item.unpin' : 'team.raid.item.pin')"
                         @click.stop="setSticky"
                     >
-                        <i class="el-icon-top"></i>
+                        <el-icon class="u-sticky-icon"><Download /></el-icon>
                     </button>
                     <router-link
                         class="u-title"
                         :to="{ name: 'view_raid', params: { id: data.id } }"
                         target="_blank"
                     >
-                        <span class="u-name">{{ data.name }}</span>
+                        <span class="u-name">{{ data.title || $t("team.raid.item.noTitle") }}</span>
                         <span v-if="data.is_public" class="u-public"><i class="el-icon-position"></i> {{ $t("team.raid.item.lobby") }}</span>
                     </router-link>
                 </div>
-                <p class="u-recruit" :title="data.title">{{ data.title || $t("team.raid.item.noTitle") }}</p>
+                <div class="u-activity-row">
+                    <el-tag class="u-activity-tag" size="small" effect="plain" round>{{ data.name }}</el-tag>
+                </div>
                 <div class="u-meta">
                     <time><i class="el-icon-date"></i>{{ showTime(data.start_time) }} · {{ showRaidWeek(data.start_time) }}</time>
                     <span><i :class="data.auth ? 'el-icon-lock' : 'el-icon-unlock'"></i>{{ showAuth(data.auth) }}</span>
@@ -30,13 +32,19 @@
                 </div>
             </div>
             <div class="u-op">
-                <el-button class="u-view" size="small" @click="viewRaidDetail">{{ $t("team.raid.item.view") }}</el-button>
-                <el-button class="u-edit" type="primary" size="small" plain icon="Edit" @click="edit(data.id)">{{ $t("team.raid.item.edit") }}</el-button>
+                <el-button class="u-view" size="small" plain icon="View" @click="viewRaidDetail">{{ $t("team.raid.item.view") }}</el-button>
                 <el-dropdown trigger="click" @command="handleCommand">
-                    <el-button class="u-more" size="small" :aria-label="$t('team.raid.item.more')"><i class="el-icon-more"></i></el-button>
+                    <el-button class="u-more" size="small" plain icon="MoreFilled">{{ $t("team.raid.item.more") }}</el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item command="delete"><i class="el-icon-delete"></i>{{ $t("team.raid.common.delete") }}</el-dropdown-item>
+                            <el-dropdown-item command="edit">
+                                <i class="el-icon-edit"></i>
+                                {{ $t("team.raid.item.edit") }}
+                            </el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>
+                                <i class="el-icon-delete"></i>
+                                {{ $t("team.raid.item.delete") }}
+                            </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -48,8 +56,7 @@
 <script>
 import raidAuthMap from "@/assets/data/team/raid_auth.json";
 import { deleteRaid, setRaidSticky } from "@/service/team/raid.js";
-import { moment } from "@jx3box/jx3box-common/js/moment";
-import { showRaidWeek, showTime } from "@/utils/filters";
+import { showTime } from "@/utils/filters";
 export default {
     name: "RaidItem",
     props: ["team_id", "data"],
@@ -69,6 +76,7 @@ export default {
             this.$emit("edit", id);
         },
         handleCommand(command) {
+            if (command === "edit") this.edit(this.data.id);
             if (command === "delete") this.del(this.data);
         },
         del: function (data) {
@@ -115,7 +123,9 @@ export default {
             return this.$t(`team.raid.auth.${val}`);
         },
         showRaidWeek: function (d) {
-            return moment(d).format("dddd");
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                weekday: "long",
+            }).format(new Date(d));
         },
         showTime,
     },

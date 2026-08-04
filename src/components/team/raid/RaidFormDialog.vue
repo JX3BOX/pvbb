@@ -68,6 +68,25 @@
                             <el-input v-else v-model="form.name" disabled />
                         </el-form-item>
 
+                        <el-form-item v-if="!isEdit && isCustomEvent" :label="$t('team.raid.form.size')" class="is-wide">
+                            <div class="m-raid-size-row">
+                                <el-select v-model="sample" value-key="label" @change="handleSizeChange">
+                                    <el-option
+                                        v-for="(item, key) in samples"
+                                        :key="key"
+                                        :label="showSampleLabel(item)"
+                                        :value="item"
+                                    />
+                                </el-select>
+                                <template v-if="isCustomSize">
+                                    <el-input-number v-model="form.row" :min="1" :max="5" controls-position="right" />
+                                    <span class="u-size-times">×</span>
+                                    <el-input-number v-model="form.col" :min="1" :max="5" controls-position="right" />
+                                </template>
+                                <span class="u-capacity">{{ $t("team.raid.form.capacity", { count: capacity }) }}</span>
+                            </div>
+                        </el-form-item>
+
                         <el-form-item :label="$t('team.raid.form.title')" prop="title" class="is-wide">
                             <el-input
                                 v-model.trim="form.title"
@@ -101,25 +120,6 @@
                                 :placeholder="$t('team.raid.form.leaderPlaceholder')"
                             />
                         </el-form-item>
-
-                        <el-form-item v-if="!isEdit && isCustomEvent" :label="$t('team.raid.form.size')" class="is-wide">
-                            <div class="m-raid-size-row">
-                                <el-select v-model="sample" value-key="label" @change="handleSizeChange">
-                                    <el-option
-                                        v-for="(item, key) in samples"
-                                        :key="key"
-                                        :label="showSampleLabel(item)"
-                                        :value="item"
-                                    />
-                                </el-select>
-                                <template v-if="isCustomSize">
-                                    <el-input-number v-model="form.row" :min="1" :max="5" controls-position="right" />
-                                    <span class="u-size-times">×</span>
-                                    <el-input-number v-model="form.col" :min="1" :max="5" controls-position="right" />
-                                </template>
-                                <span class="u-capacity">{{ $t("team.raid.form.capacity", { count: capacity }) }}</span>
-                            </div>
-                        </el-form-item>
                     </div>
                 </section>
 
@@ -139,6 +139,13 @@
                     <div class="m-raid-switch-list">
                         <label>
                             <span>
+                                <b>{{ $t("team.raid.form.public") }}</b>
+                                <small>{{ $t(isVerified ? "team.raid.form.publicOn" : "team.raid.form.broadcastVerifiedOnly") }}</small>
+                            </span>
+                            <el-switch v-model="form.is_public" :disabled="!isVerified" :active-value="1" :inactive-value="0" />
+                        </label>
+                        <label>
+                            <span>
                                 <b>{{ $t("team.raid.form.autoApprove") }}</b>
                                 <small>{{ $t(isVerified ? "team.raid.form.autoApproveOn" : "team.raid.form.verifiedOnly") }}</small>
                             </span>
@@ -150,13 +157,6 @@
                                 <small>{{ $t("team.raid.form.matchMountHint") }}</small>
                             </span>
                             <el-switch v-model="form.force_match" :disabled="!!form.auto_accept" :active-value="1" :inactive-value="0" />
-                        </label>
-                        <label>
-                            <span>
-                                <b>{{ $t("team.raid.form.public") }}</b>
-                                <small>{{ $t(isVerified ? "team.raid.form.publicOn" : "team.raid.form.broadcastVerifiedOnly") }}</small>
-                            </span>
-                            <el-switch v-model="form.is_public" :disabled="!isVerified" :active-value="1" :inactive-value="0" />
                         </label>
                     </div>
                 </section>
@@ -211,7 +211,7 @@ const createDefaultForm = () => ({
     leader: "",
     is_public: 0,
     auto_accept: 0,
-    force_match: 1,
+    force_match: 0,
     row: 5,
     col: 5,
     count: 25,

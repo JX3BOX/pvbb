@@ -20,7 +20,7 @@
                 >
                     <el-popover
                         placement="top-start"
-                        width="200"
+                        width="260"
                         trigger="hover"
                         popper-class="m-raid-members__sub-item"
                     >

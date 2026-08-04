@@ -451,10 +451,11 @@ test("team header actions follow management, member, and public route modes", as
 });
 
 test("team workspace separates management tools from the member view", async () => {
-    const [workspace, raidManager, myRaid] = await Promise.all([
+    const [workspace, raidManager, myRaid, publicRaid] = await Promise.all([
         read("../src/views/team/org/ViewMyOrg.vue"),
         read("../src/views/team/raid/ManageRaid.vue"),
         read("../src/views/team/raid/MyTeamRaid.vue"),
+        read("../src/views/team/raid/TeamRaid.vue"),
     ]);
     const topLevelLabels = [...workspace.matchAll(/<el-tab-pane :label="\$t\('([^']+)'\)"/g)].map((match) => match[1]);
     const managementStart = workspace.indexOf('<template v-if="isManagementMode">');
@@ -495,6 +496,18 @@ test("team workspace separates management tools from the member view", async () 
     assert.match(myRaid, /teamId:/);
     assert.match(myRaid, /displayData:\s*function/);
     assert.match(myRaid, /String\(teamId\) === String\(this\.teamId\)/);
+    assert.match(memberTemplate, /<MyTeamRaid :team-id="id" embedded show-all \/>/);
+    assert.match(myRaid, /getMemberTeamRaids\(this\.teamId\)/);
+    assert.match(myRaid, /joinedMap\.get\(String\(activity\.id\)\)/);
+    assert.match(myRaid, /return \(this\.raids \|\| \[\]\)\.map/);
+    assert.doesNotMatch(myRaid, /isUnfinished|is_public/);
+    assert.doesNotMatch(publicRaid, /is_public/);
+    assert.match(myRaid, /class="m-public-raid-toolbar"/);
+    assert.match(myRaid, /v-model="search"/);
+    assert.match(myRaid, /filteredDisplayData\.length/);
+    assert.match(myRaid, /\[activity\.name, activity\.title, activity\.server\]/);
+    assert.match(myRaid, /:joined="item\.joined"/);
+    assert.match(myRaid, /:can-quit="item\.joined"/);
     assert.match(memberTemplate, /name="comment"[\s\S]*?<ViewComment/);
     assert.match(memberTemplate, /name="video"[\s\S]*?<ViewVideo/);
     assert.match(workspace, /if \(!mode\) mode = routeMode \|\| \(MANAGEMENT_TAB_NAMES\.includes\(tab\) \? "manage" : "member"\)/);

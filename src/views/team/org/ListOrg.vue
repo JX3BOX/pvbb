@@ -8,6 +8,7 @@
                             <img :src="teamLogo" alt="" />
                         </span>
                         <div class="m-team-home__heading">
+                            <span>{{ $t("team.home.eyebrow") }}</span>
                             <h1 id="team-home-title">{{ $t("team.home.title") }}</h1>
                             <p>{{ $t("team.home.description") }}</p>
                         </div>

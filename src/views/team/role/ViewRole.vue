@@ -1,68 +1,93 @@
 <template>
     <div class="v-role-view">
-        <h1 class="m-title">
-            <i class="el-icon-user"></i> {{ $t("team.role.info") }}
-            <div class="u-op">
-                <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.role.back") }}</el-button>
-            </div>
-        </h1>
-        <div class="m-role-detail" v-if="data">
-            <div class="m-role-info">
-                <RoleAvatar class="u-avatar" :mount="data.mount" :body_type="data.body_type" />
-                <div class="u-meta u-name">
-                    <!-- <em>角色名</em> -->
-                    <img v-if="!~~data.custom" class="u-verify" svg-inline src="@/assets/img/team/verify.svg" />
-                    {{ data.name }}
+        <header class="m-role-header">
+            <h1>{{ $t("team.role.info") }}</h1>
+            <el-button class="u-back" icon="ArrowLeft" @click="goBack">{{ $t("team.role.back") }}</el-button>
+        </header>
+
+        <div v-if="loading" class="m-role-state" aria-live="polite">
+            <el-skeleton :rows="5" animated />
+        </div>
+
+        <template v-else-if="data">
+            <section class="m-role-profile-card">
+                <div class="m-role-identity">
+                    <div class="u-role-avatar-wrap">
+                        <RoleAvatar class="u-avatar" :mount="data.mount" :body_type="data.body_type" />
+                    </div>
+                    <div class="u-role-primary">
+                        <div class="u-role-name">
+                            <h2>{{ data.name }}</h2>
+                            <span v-if="!~~data.custom" class="u-verified">
+                                <img svg-inline src="@/assets/img/team/verify.svg" />
+                                {{ $t("team.role.verified") }}
+                            </span>
+                        </div>
+                        <span class="u-role-server">{{ data.server }}</span>
+                        <span class="u-author">
+                            <span class="u-author-label">{{ $t("team.raid.roleDialog.owner") }}</span>
+                            <img
+                                class="u-author-avatar"
+                                width="24"
+                                height="24"
+                                :src="showAvatar(data.user_avatar)"
+                                alt=""
+                            />
+                            <a
+                                class="u-author-name"
+                                :href="authorLink(data.uid)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ data.display_name }}
+                            </a>
+                        </span>
+                    </div>
                 </div>
-                <div class="u-meta">
-                    <span class="u-author">
-                        <img
-                            class="u-author-avatar"
-                            width="24"
-                            height="24"
-                            :src="showAvatar(data.user_avatar)"
-                            alt=""
-                        />
-                        <a class="u-author-name" :href="authorLink(data.uid)" target="_blank">
-                            {{ data.display_name }}
-                        </a>
-                    </span>
-                    <span class="u-server">
-                        <em>{{ $t("team.role.server") }}</em>
-                        {{ data.server }}
-                    </span>
-                    <span class="u-school">
-                        <em>{{ $t("team.role.school") }}</em>
-                        {{ showSchoolName(data.mount) }}
-                        <img class="u-icon" :src="showSchoolIcon(data.mount)" />
-                    </span>
-                    <span class="u-body">
-                        <em>{{ $t("team.role.bodyType") }}</em>
-                        {{ showBodyType(data.body_type) }}
-                    </span>
-                </div>
-            </div>
-            <div class="m-role-belongs" v-if="hasRight">
-                <el-divider content-position="left">
-                    <i class="el-icon-collection-tag"></i>
-                    {{ $t("team.role.joinTeam") }}
-                </el-divider>
+                <dl class="m-role-facts">
+                    <div>
+                        <dt>{{ $t("team.role.server") }}</dt>
+                        <dd>{{ data.server || "-" }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ $t("team.role.school") }}</dt>
+                        <dd><img :src="showSchoolIcon(data.mount)" />{{ showSchoolName(data.mount) }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ $t("team.role.bodyType") }}</dt>
+                        <dd>{{ showBodyType(data.body_type) }}</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section v-if="hasRight" class="m-role-belongs" aria-labelledby="role-team-title">
+                <header class="m-role-section-header">
+                    <div>
+                        <span class="u-section-icon"><el-icon><CollectionTag /></el-icon></span>
+                        <div>
+                            <h2 id="role-team-title">{{ $t("team.role.joinTeam") }}</h2>
+                            <p>{{ $t("team.role.teamsPrivate") }}</p>
+                        </div>
+                    </div>
+                    <span v-if="teams.length" class="u-team-count">{{ teams.length }}</span>
+                </header>
                 <template v-if="teams && teams.length">
                     <div class="u-teams">
-                        <router-link class="u-team" :to="'/org/' + item.team_id" v-for="(item, i) in teams" :key="i">
+                        <router-link class="u-team" :to="'/org/' + item.team_id" v-for="item in teams" :key="item.team_id">
                             <img class="u-team-logo" v-if="item.team_logo" :src="showTeamLogo(item.team_logo)" />
                             <img class="u-team-logo" v-else src="@/assets/img/team/null.png" />
                             <span class="u-team-name">{{ item.team_name }}</span>
+                            <el-icon><ArrowRight /></el-icon>
                         </router-link>
                     </div>
-                    <div class="u-lock"><i class="el-icon-lock"></i>{{ $t("team.role.teamsPrivate") }}</div>
                 </template>
                 <template v-else>
-                    <div class="u-lock"><i class="el-icon-warning-outline"></i>{{ $t("team.role.noTeam") }}</div>
+                    <div class="u-empty-team"><el-icon><CollectionTag /></el-icon><span>{{ $t("team.role.noTeam") }}</span></div>
                 </template>
-            </div>
-        </div>
-        <div class="m-role-null m-team-limit" v-if="warning_visible">
+            </section>
+        </template>
+
+        <div class="m-role-null m-team-limit" v-else-if="warning_visible">
             <p class="u-title">
                 <img class="u-icon" svg-inline src="@/assets/img/team/icons/warning.svg" />
                 Not Found
@@ -79,6 +104,7 @@ import { getRoleBelongTeams } from "@/service/team/member.js";
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
 import { getThumbnail, authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { showBodyType, showSchoolIcon, showSchoolName } from "@/utils/filters";
+import { ArrowRight, CollectionTag } from "@element-plus/icons-vue";
 export default {
     name: "ViewRole",
     props: [],
@@ -86,6 +112,7 @@ export default {
         return {
             data: "",
             warning_visible: false,
+            loading: true,
             teams: [],
             isLogin: User.isLogin(),
         };
@@ -95,7 +122,7 @@ export default {
             return ~~this.$route.params.id;
         },
         hasRight: function () {
-            return this.data.uid == User.getInfo().uid || User.isSuperAdmin();
+            return this.data && (this.data.uid == User.getInfo().uid || User.isSuperAdmin());
         },
         isCustom: function () {
             return this.data && this.data.custom;
@@ -126,14 +153,28 @@ export default {
             });
         },
         loadData: function () {
-            getRole(this.id).then((res) => {
-                this.data = res.data.data;
-                if (this.hasRight) {
-                    getRoleBelongTeams(this.id).then((res) => {
-                        this.teams = res.data.data;
-                    });
-                }
-            });
+            this.loading = true;
+            this.warning_visible = false;
+            getRole(this.id)
+                .then((res) => {
+                    this.data = res.data.data;
+                    if (this.hasRight) {
+                        return getRoleBelongTeams(this.id)
+                            .then((res) => {
+                                this.teams = res.data.data || [];
+                            })
+                            .catch(() => {
+                                this.teams = [];
+                            });
+                    }
+                })
+                .catch(() => {
+                    this.data = "";
+                    this.warning_visible = true;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         goBack: function () {
             this.$router.push("/role/manage");
@@ -151,6 +192,8 @@ export default {
         this.loadData();
     },
     components: {
+        ArrowRight,
+        CollectionTag,
         RoleAvatar,
     },
 };

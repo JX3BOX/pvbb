@@ -16,8 +16,12 @@
                     <span>{{ $t("team.raid.join.roleHint") }}</span>
                 </div>
                 <el-radio-group v-model="custom">
-                    <el-radio-button :value="0"><i class="el-icon-user"></i> {{ $t("team.raid.join.existing") }}</el-radio-button>
-                    <el-radio-button :value="1"><i class="el-icon-edit"></i> {{ $t("team.raid.join.custom") }}</el-radio-button>
+                    <el-radio-button :value="0">
+                        <span class="u-mode-label"><i class="el-icon-user"></i>{{ $t("team.raid.join.existing") }}</span>
+                    </el-radio-button>
+                    <el-radio-button :value="1">
+                        <span class="u-mode-label"><i class="el-icon-edit"></i>{{ $t("team.raid.join.custom") }}</span>
+                    </el-radio-button>
                 </el-radio-group>
             </div>
 
@@ -32,20 +36,14 @@
                 </header>
                 <div class="m-raid-joinpop-list" v-if="roleData && roleData.length">
                     <el-checkbox-group class="u-list" v-model="roles" @change="checkIsAll">
-                        <el-checkbox v-for="item in roleData" :value="item.ID" :key="item.ID" class="u-item" border>
-                            <el-tooltip
-                                class="item"
-                                effect="dark"
-                                :content="item.note || item.name"
-                                placement="bottom"
-                            >
-                                <div class="u-role-card">
-                                    <img class="u-item-avatar" :src="showAvatar(item.mount)" />
-
-                                    <span class="u-item-name">{{ item.name }}</span>
-                                    <span class="u-item-server">{{ item.server }}</span>
-                                </div>
-                            </el-tooltip>
+                        <el-checkbox v-for="item in roleData" :value="item.ID" :key="item.ID" class="u-role-card" border>
+                            <div class="u-role-card__content">
+                                <img class="u-item-avatar" :src="showAvatar(item.mount)" />
+                                <span class="u-role-card__copy">
+                                    <strong class="u-item-name" :title="item.note || item.name">{{ item.name }}</strong>
+                                    <small class="u-item-server" :title="item.server">{{ item.server }}</small>
+                                </span>
+                            </div>
                         </el-checkbox>
                     </el-checkbox-group>
                 </div>
@@ -70,7 +68,7 @@
             >
                 <div class="u-section-heading">
                     <div>
-                        <p class="u-label"><i class="el-icon-orange"></i> {{ $t("team.raid.join.mount") }} <b>{{ $t("team.raid.join.selectRequired") }}</b></p>
+                        <strong>{{ $t("team.raid.join.mount") }}</strong>
                         <span>{{ $t("team.raid.join.mountHint") }}</span>
                     </div>
                 </div>
@@ -87,7 +85,7 @@
                 class="m-raid-joinpop-section m-team-joinpop-block is-remark-block"
                 v-if="custom || (!custom && roleData && roleData.length)"
             >
-                <p class="u-label"><i class="el-icon-chat-line-square"></i> {{ $t("team.raid.join.remark") }} <span>{{ $t("team.raid.join.optional") }}</span></p>
+                <p class="u-label">{{ $t("team.raid.join.remark") }} <span>{{ $t("team.raid.join.optional") }}</span></p>
                 <el-input
                     v-model="form.remark"
                     :placeholder="$t('team.raid.join.remarkHint')"
@@ -112,7 +110,6 @@
 <script>
 import { getRoles, getAllMyRoles } from "@/service/team/role.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
-import { __cdn } from "@/utils/config";
 import User from "@jx3box/jx3box-common/js/user";
 import { showMountIcon } from "@/utils/filters";
 export default {
@@ -245,7 +242,7 @@ export default {
             }
         },
         showAvatar: function (mount, body_type) {
-            return __cdn + "image/school/" + mount + ".png";
+            return "https://img.jx3box.com/image/school/" + mount + ".png";
         },
         resetForm: function () {
             this.form = {

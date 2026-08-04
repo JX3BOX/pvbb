@@ -1,5 +1,5 @@
 <template>
-    <img :src="showAvatar(mount, body_type)" />
+    <img :src="showAvatar(mount, body_type)" @error="showSchoolAvatar" />
 </template>
 
 <script>
@@ -17,6 +17,10 @@ export default {
         showAvatar: function (mount, body_type) {
             const url = __cdn + "design/avatar/xisai/" + mount + "-" + body_type + ".png";
             return getThumbnail(url, 128);
+        },
+        showSchoolAvatar: function (event) {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = __cdn + "image/school/" + this.mount + ".png";
         },
     },
     filters: {},

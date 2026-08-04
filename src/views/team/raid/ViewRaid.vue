@@ -3,10 +3,17 @@
         <div ref="teamImage" class="m-raid-view-page" :class="{ 'm-teamImage': hideBtn }" :style="boxsize">
             <header class="m-raid-view-hero">
                 <div class="u-heading">
-                    <span class="u-eyebrow"><i class="el-icon-data-board"></i> {{ $t("team.raid.view.eyebrow") }}</span>
-                    <h1>{{ data.name || $t("team.raid.view.detail") }}</h1>
+                    <span class="u-eyebrow">
+                        <i class="el-icon-data-board"></i>
+                        {{ data.name || $t("team.raid.view.eyebrow") }}
+                    </span>
+                    <h1>{{ data.title || data.name || $t("team.raid.view.detail") }}</h1>
                     <p>
                         <span>{{ data.team_name || $t("team.raid.view.teamActivity") }}</span>
+                        <template v-if="info.server">
+                            <i></i>
+                            <span>{{ info.server }}</span>
+                        </template>
                         <i></i>
                         <span>{{ showTime(data.start_time) || $t("team.raid.view.timePending") }}</span>
                     </p>
@@ -18,12 +25,19 @@
                         type="warning"
                         icon="Edit"
                         @click="editRaid"
-                        v-if="isAdmin || canManage"
+                        v-if="canManage"
                         :disabled="isOldVersion"
                         >{{ $t("team.raid.common.edit") }}</el-button
                     >
-
-                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">{{ $t("team.raid.common.back") }}</el-button>
+                    <el-button
+                        v-if="flag && !isOldVersion"
+                        type="primary"
+                        icon="Right"
+                        @click="handleShowDialog"
+                        :disabled="!canJoin"
+                    >
+                        {{ $t("team.raid.view.reserve") }}
+                    </el-button>
                 </div>
             </header>
 
@@ -44,16 +58,11 @@
                 <section class="m-raid-view-section m-raid-view-overview">
                     <div class="m-raid-section-heading">
                         <div>
-                            <span class="u-section-icon"><i class="el-icon-tickets"></i></span>
                             <div>
                                 <h2>{{ $t("team.raid.view.info") }}</h2>
                                 <p>{{ $t("team.raid.view.infoHint") }}</p>
                             </div>
                         </div>
-                        <span class="u-auth" :class="{ 'is-disabled': !canJoin }">
-                            <i :class="canJoin ? 'el-icon-unlock' : 'el-icon-lock'"></i>
-                            {{ showAuth(data.auth) }}
-                        </span>
                     </div>
 
                     <el-alert
@@ -80,16 +89,16 @@
                             </div>
                         </div>
                         <div class="u-meta-item">
-                            <span class="u-icon"><i class="el-icon-user"></i></span>
+                            <span class="u-icon"><i :class="canJoin ? 'el-icon-unlock' : 'el-icon-lock'"></i></span>
                             <div>
-                                <em>{{ $t("team.raid.view.scale") }}</em>
-                                <strong>{{ data.count ? $t("team.raid.common.people", { count: data.count }) : $t("team.raid.view.arranged") }}</strong>
+                                <em>{{ $t("team.raid.form.condition") }}</em>
+                                <strong>{{ showAuth(data.auth) }}</strong>
                             </div>
                         </div>
                     </div>
 
                     <div class="m-raid-view-info">
-                        <h3>{{ data.title || data.name || $t("team.raid.view.teamActivity") }}</h3>
+                        <span class="u-label">活动说明</span>
                         <p>{{ data.desc || $t("team.raid.view.noDescription") }}</p>
                     </div>
 
@@ -114,9 +123,6 @@
                             </div>
                         </div>
                         <div class="u-actions">
-                            <el-button icon="FullScreen" :disabled="!canJoin" @click="showMiniprogramCode">
-                                {{ $t("team.raid.view.miniProgram") }}
-                            </el-button>
                             <el-button type="primary" icon="Right" @click="handleShowDialog" :disabled="!canJoin">
                                 {{ $t("team.raid.view.reserve") }}
                             </el-button>
@@ -156,9 +162,6 @@
                 </template>
             </template>
 
-            <el-dialog class="m-wx-dialog" v-model="miniprogramCode" width="255px" center top="30vh">
-                <el-image :src="miniprogramCodeUrl" class="wx-code"></el-image>
-            </el-dialog>
         </div>
         <div v-if="hideBtn" :style="boxsize"></div>
         <RaidFormDialog
@@ -175,9 +178,8 @@
 import html2canvas from "html2canvas";
 import { getTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user";
-import { getRaid, updateRaid, removeRaid, addTobeMember, getWxacode } from "@/service/team/raid.js";
+import { getRaid, updateRaid, removeRaid, addTobeMember } from "@/service/team/raid.js";
 import { checkMyAuthority } from "@/service/team/member.js";
-import { __ossMirror } from "@/utils/config";
 // components
 import Raid from "@/components/team/raid/Raid.vue";
 import team_info from "@/components/team/org/team_info.vue";
@@ -213,17 +215,12 @@ export default {
             formData: {},
             flag: false,
 
-            isAdmin: User.isAdmin(),
             visible: false,
 
             imgUrl: "",
             showImage: false,
             hideBtn: false,
             boxsize: {},
-
-            // 小程序码
-            miniprogramCodeUrl: "",
-            miniprogramCode: false,
 
             loading: true,
             loadError: false,
@@ -415,13 +412,6 @@ export default {
 
         // 其它
         // ===========================
-        goBack: function () {
-            if (document.referrer?.includes("manage")) {
-                this.$router.push("/raid/manage");
-            } else {
-                this.$router.push("/raid/list");
-            }
-        },
         editRaid: function () {
             this.formVisible = true;
         },
@@ -448,15 +438,6 @@ export default {
             // this.data.content = members;
         },
 
-        // 小程序码
-        // ===================================
-        showMiniprogramCode: function () {
-            this.miniprogramCode = true;
-            if (this.miniprogramCodeUrl) return;
-            getWxacode(this.id).then((res) => {
-                this.miniprogramCodeUrl = __ossMirror + res.data.data.meta_val;
-            });
-        },
         showAuth: function (val) {
             return this.$t(`team.raid.auth.${val}`);
         },
@@ -486,32 +467,6 @@ export default {
         .pa;
         .lt(-20px, -10px);
         padding: 10px 20px;
-    }
-}
-.m-wx-dialog {
-    .el-dialog__header {
-        padding: 0;
-    }
-    .el-dialog__body {
-        padding: 20px;
-    }
-    .wx-code {
-        img {
-            width: 215px;
-        }
-    }
-}
-
-@media screen and (max-width: @phone) {
-    .m-wx-dialog .el-dialog {
-        .size(100%) !important;
-        min-width: 0;
-        margin: 0 !important;
-        display: flex;
-        padding: 0;
-        justify-content: center;
-        height: 100%;
-        align-items: center;
     }
 }
 </style>

@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { __cdn } from "@/utils/config";
 import { Clock, Delete, Edit, Plus, VideoCamera, VideoPlay, WarningFilled } from "@element-plus/icons-vue";
 export default {
     name: "team_videos",
@@ -127,7 +126,7 @@ export default {
             this.$emit("toEmit", data);
         },
         showVideoCover(aid) {
-            return __cdn + "image/rank/videos/" + aid + ".png";
+            return "https://img.jx3box.com/image/rank/videos/" + aid + ".png";
         },
         statusText(status) {
             return Number(status) === 2 ? this.$t("team.video.rejected") : this.$t("team.video.pending");

@@ -27,12 +27,17 @@ test("activity center restores the public raid list inside the modern team shell
     assert.match(page, /<raid-list :data="data" :time="time" modern/);
     assert.match(page, /team\.raid\.center\.newActivity/);
     assert.match(page, /team\.raid\.center\.resultCount/);
+    assert.match(
+        page,
+        /team\.raid\.center\.searchActivity[\s\S]*team\.raid\.center\.server[\s\S]*team\.raid\.center\.activityName[\s\S]*team\.raid\.center\.date/
+    );
     assert.match(page, /<RaidFormDialog v-model="formVisible" :teams="teams" @saved="handleCreated"/);
     assert.match(page, /getMyPowerTeams\("r_raid"\)/);
     assert.match(page, /User\.isLogin\(\)/);
     assert.match(list, /:variant="modern \? 'center' : 'default'"/);
     assert.match(item, /variant === 'center'/);
     assert.match(item, /class="u-center-operation"/);
+    assert.match(item, /v-if="joined" class="u-joined"/);
     assert.match(item, /class="u-center-date"[\s\S]*<time :datetime="activity\.start_time"/);
     assert.doesNotMatch(item, /class="u-center-time"/);
     assert.match(item, /class="u-center-type">{{ activity\.name[\s\S]*class="u-center-title">{{ activity\.title/);

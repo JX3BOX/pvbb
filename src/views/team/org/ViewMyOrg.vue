@@ -26,7 +26,7 @@
                 <template v-if="isManagementMode">
                     <el-tab-pane :label="$t('team.workspace.memberManagement')" name="manage-member" lazy v-if="permissions.r_member || isSuper">
                         <template #label>
-                            <el-icon><Avatar /></el-icon>
+                            <el-icon><User /></el-icon>
                             <span>{{ $t("team.workspace.memberManagement") }}</span>
                             <i class="u-count" v-if="pendingCount">{{ pendingCount }}</i>
                         </template>
@@ -197,7 +197,7 @@
                             <el-icon><Calendar /></el-icon>
                             <span>{{ $t("team.workspace.teamActivities") }}</span>
                         </template>
-                        <MyTeamRaid :team-id="id" embedded />
+                        <MyTeamRaid :team-id="id" embedded show-all />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.teamSnapshots')" name="snapshot" lazy>
@@ -270,7 +270,6 @@ import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
 import { checkMyAuthority, getPendingCount } from "@/service/team/member.js";
 import {
-    Avatar,
     Calendar,
     Camera,
     ChatLineSquare,
@@ -620,7 +619,6 @@ export default {
         "team-form": team_form,
         "team-info": team_info,
         "team-advanced-setting": team_advanced_setting,
-        Avatar,
         Calendar,
         Camera,
         ChatLineSquare,

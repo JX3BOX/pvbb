@@ -27,16 +27,12 @@
                     <span v-if="!loading">{{ $t("team.raid.center.resultCount", { count: total }) }}</span>
                 </div>
                 <el-form ref="form" label-position="top" class="m-activity-filter-form">
-                    <el-form-item :label="$t('team.raid.center.activityName')" class="u-name">
-                        <el-select v-model="name" :placeholder="$t('team.raid.center.allActivities')">
-                            <el-option key="name-all" :label="$t('team.raid.common.all')" value=""></el-option>
-                            <el-option
-                                v-for="(item, i) in raidsWithClient"
-                                :key="i"
-                                :label="item.name"
-                                :value="item.name"
-                            ></el-option>
-                        </el-select>
+                    <el-form-item :label="$t('team.raid.center.searchActivity')" class="u-title">
+                        <el-input v-model="search" clearable :placeholder="$t('team.raid.center.searchPlaceholder')">
+                            <template #prefix>
+                                <el-icon><Search /></el-icon>
+                            </template>
+                        </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('team.raid.center.server')" class="u-server">
                         <el-select v-model="server" :placeholder="$t('team.raid.center.allServers')">
@@ -49,12 +45,16 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('team.raid.center.searchActivity')" class="u-title">
-                        <el-input v-model="search" clearable :placeholder="$t('team.raid.center.searchPlaceholder')">
-                            <template #prefix>
-                                <el-icon><Search /></el-icon>
-                            </template>
-                        </el-input>
+                    <el-form-item :label="$t('team.raid.center.activityName')" class="u-name">
+                        <el-select v-model="name" :placeholder="$t('team.raid.center.allActivities')">
+                            <el-option key="name-all" :label="$t('team.raid.common.all')" value=""></el-option>
+                            <el-option
+                                v-for="(item, i) in raidsWithClient"
+                                :key="i"
+                                :label="item.name"
+                                :value="item.name"
+                            ></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('team.raid.center.date')" class="u-time">
                         <el-select v-model="time" :placeholder="$t('team.raid.center.allDates')">
