@@ -146,7 +146,7 @@ export default {
                                 message: this.$t("team.role.deletedMessage"),
                                 type: "success",
                             });
-                            this.$router.push("/role/manage");
+                            this.goBack();
                         });
                     }
                 },
@@ -177,7 +177,7 @@ export default {
                 });
         },
         goBack: function () {
-            this.$router.push("/role/manage");
+            window.location.href = "/dashboard/role";
         },
         showTeamLogo: function (val) {
             return getThumbnail(val, 256);

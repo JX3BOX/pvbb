@@ -153,6 +153,7 @@
                     </section>
 
                     <join-pop
+                        :key="`raid-join-${id}`"
                         :title="$t('team.raid.view.reserve')"
                         v-model="joinShow"
                         :auth="data.auth"
@@ -165,6 +166,7 @@
         </div>
         <div v-if="hideBtn" :style="boxsize"></div>
         <RaidFormDialog
+            :key="`raid-form-${id}`"
             v-model="formVisible"
             :raid-id="id"
             :teams="editTeams"
@@ -224,6 +226,8 @@ export default {
 
             loading: true,
             loadError: false,
+            loadVersion: 0,
+            loadedRaidId: "",
         };
     },
     computed: {
@@ -297,18 +301,33 @@ export default {
         },
     },
     watch: {
+        id: {
+            immediate: true,
+            handler: function (value) {
+                if (value) this.init();
+            },
+        },
         data: {
             deep: true,
             handler() {
-                if (this.routerName === "view_raid" && this.flag) {
+                const raidId = this.id;
+                const version = this.loadVersion;
+                if (
+                    this.routerName === "view_raid" &&
+                    this.flag &&
+                    String(this.loadedRaidId) === String(raidId) &&
+                    Array.isArray(this.data?.content)
+                ) {
                     const count_normal = this.data.content.filter((item) => item.name).length;
                     const _data = cloneDeep(this.data);
                     _data.count_normal = count_normal;
-                    updateRaid(this.id, _data).then(() => {
-                        this.$message({
-                            message: this.$t("team.raid.view.updateSuccess"),
-                            type: "success",
-                        });
+                    updateRaid(raidId, _data).then(() => {
+                        if (this.isCurrentRaidLoad(raidId, version)) {
+                            this.$message({
+                                message: this.$t("team.raid.view.updateSuccess"),
+                                type: "success",
+                            });
+                        }
                     });
                 }
             },
@@ -350,41 +369,71 @@ export default {
         },
         // 数据加载
         // ==================================
-        getRaid: function () {
-            return getRaid(this.id).then((res) => {
-                this.data = res.data.data;
-            });
+        isCurrentRaidLoad: function (raidId, version) {
+            return (
+                this.$route.name === "view_raid" &&
+                version === this.loadVersion &&
+                String(raidId) === String(this.id)
+            );
         },
-        getTeam: function () {
-            return getTeam(this.team_id).then((res) => {
-                this.info = res.data.data;
-                this.$store.commit("SET_TEAM", this.info);
-            });
+        getRaid: function (raidId) {
+            return getRaid(raidId).then((res) => res.data.data);
         },
-        getAuthority: function () {
-            if (!User.isLogin()) return Promise.resolve();
-            return checkMyAuthority(this.team_id).then((res) => {
-                this.authority = res.data.data.authority;
-                this.auth_map = res.data.data;
-                this.$store.commit("setManageStatus", this.auth_map.r_raid === 1 || this.auth_map.authority === 99);
-                this.$store.commit("setIsTeammate", this.authority >= 2);
-            });
+        getTeam: function (teamId) {
+            return getTeam(teamId).then((res) => res.data.data);
+        },
+        getAuthority: function (teamId) {
+            if (!User.isLogin()) return Promise.resolve({ authority: 0, r_raid: 0 });
+            return checkMyAuthority(teamId).then((res) => res.data.data || { authority: 0, r_raid: 0 });
         },
         init: async function () {
+            const raidId = this.id;
+            const version = ++this.loadVersion;
+
             this.loading = true;
             this.loadError = false;
+            this.data = "";
+            this.info = "";
             this.authority = 0;
             this.auth_map = { r_raid: 0 };
+            this.loadedRaidId = "";
+            this.flag = false;
+            this.joinShow = false;
+            this.formVisible = false;
+            this.$store.commit("SET_TEAM", {});
             this.$store.commit("setManageStatus", false);
             this.$store.commit("setIsTeammate", false);
             try {
-                await this.getRaid();
-                await Promise.allSettled([this.getTeam(), this.getAuthority()]);
+                const raid = await this.getRaid(raidId);
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
+
+                this.data = raid;
+                this.loadedRaidId = raidId;
+                const teamId = raid?.team_id;
+                const [teamResult, authorityResult] = await Promise.allSettled([
+                    this.getTeam(teamId),
+                    this.getAuthority(teamId),
+                ]);
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
+
+                if (teamResult.status === "fulfilled") {
+                    this.info = teamResult.value;
+                    this.$store.commit("SET_TEAM", this.info);
+                }
+                if (authorityResult.status === "fulfilled") {
+                    this.auth_map = authorityResult.value;
+                    this.authority = this.auth_map.authority || 0;
+                    this.$store.commit(
+                        "setManageStatus",
+                        this.auth_map.r_raid === 1 || this.auth_map.authority === 99,
+                    );
+                    this.$store.commit("setIsTeammate", this.authority >= 2);
+                }
                 this.flag = true;
             } catch (e) {
-                this.loadError = true;
+                if (this.isCurrentRaidLoad(raidId, version)) this.loadError = true;
             } finally {
-                this.loading = false;
+                if (this.isCurrentRaidLoad(raidId, version)) this.loading = false;
             }
         },
 
@@ -399,8 +448,12 @@ export default {
             this.Join();
         },
         Join: function () {
+            const raidId = this.id;
+            const version = this.loadVersion;
+            const role = this.chosenRole;
             // 提交到报名接口
-            addTobeMember(this.id, this.chosenRole).then((res) => {
+            addTobeMember(raidId, role).then((res) => {
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
                 this.$message({
                     message: this.$t("team.raid.view.applySuccess"),
                     type: "success",
@@ -416,12 +469,13 @@ export default {
             this.formVisible = true;
         },
         handleRaidSaved: async function () {
-            this.flag = false;
-            await this.getRaid();
-            this.flag = true;
+            await this.init();
         },
         rmRaid: function () {
-            removeRaid(this.id).then((res) => {
+            const raidId = this.id;
+            const version = this.loadVersion;
+            removeRaid(raidId).then((res) => {
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
                 this.$message({
                     message: this.$t("team.raid.common.deleted"),
                     type: "success",
@@ -443,9 +497,6 @@ export default {
         },
         showTime,
         showMountIcon,
-    },
-    created: function () {
-        this.init();
     },
 };
 </script>

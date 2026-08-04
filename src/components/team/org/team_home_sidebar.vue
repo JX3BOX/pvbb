@@ -317,7 +317,7 @@ export default {
             return `/account/login?redirect=${encodeURIComponent(window.location.href)}`;
         },
         isTeamHome: function () {
-            return ["index", "view_org"].includes(this.$route.name);
+            return ["index", "list_org", "view_org"].includes(this.$route.name);
         },
         isTeamActivity: function () {
             return ["list_raid", "view_raid"].includes(this.$route.name);

@@ -345,15 +345,15 @@ export default {
                 this.setMain(max);
             }
         },
-        submitTv: function () {
+        submitTv: function (teamId = this.id) {
             const data = this.tv_list.map((item) => {
-                if (item.main) item.weight = 1;
-                else item.weight = 0;
-                return _.omit(item, ["main"]);
+                return {
+                    ..._.omit(item, ["main"]),
+                    team_id: ~~teamId,
+                    weight: item.main ? 1 : 0,
+                };
             });
-            createTeamLiveList(this.id, data).catch((e) => {
-                console.log(e);
-            });
+            return createTeamLiveList(teamId, data);
         },
         loadTv: function () {
             if (!this.id) return;

@@ -162,10 +162,10 @@ test("team member workspace redirects non-members to the public team page", asyn
     assert.match(workspace, /import \{ checkMyAuthority, getPendingCount \}/);
     assert.match(workspace, /v-if="id && accessGranted"/);
     assert.match(workspace, /checkMyAuthority\(requestedId\)/);
-    assert.match(workspace, /res\.data\.data\.authority < 2/);
+    assert.match(workspace, /authority\.authority < 2/);
     assert.match(workspace, /name: "view_org",[\s\S]*?params: \{ id: requestedId \}/);
     assert.match(workspace, /\["view_my_org", "manage_my_org"\]\.includes\(this\.\$route\.name\)/);
-    assert.match(workspace, /if \(!isCurrentWorkspace \|\| this\.id !== requestedId\) return/);
+    assert.match(workspace, /if \(!this\.isCurrentLoad\(requestedId, version\)\) return/);
 });
 
 test("team management uses a canonical route without the mode query", async () => {
@@ -200,8 +200,8 @@ test("team public homepage shares the modern shell and keeps public modules inta
         read("../src/assets/css/team/app.less"),
     ]);
 
-    assert.match(app, /"index", "view_org"/);
-    assert.match(sidebar, /\["index", "view_org"\]\.includes\(this\.\$route\.name\)/);
+    assert.match(app, /"index",[\s\S]*?"list_org",[\s\S]*?"view_org"/);
+    assert.match(sidebar, /\["index", "list_org", "view_org"\]\.includes\(this\.\$route\.name\)/);
     assert.match(router, /name:\s*"view_org"[\s\S]*?path:\s*"\/org\/:id"[\s\S]*?isPublic:\s*true/);
     assert.match(page, /class="v-org-view p-team-public"/);
     assert.match(page, /class="m-public-org__hero"/);
@@ -496,8 +496,8 @@ test("team workspace separates management tools from the member view", async () 
     assert.match(myRaid, /teamId:/);
     assert.match(myRaid, /displayData:\s*function/);
     assert.match(myRaid, /String\(teamId\) === String\(this\.teamId\)/);
-    assert.match(memberTemplate, /<MyTeamRaid :team-id="id" embedded show-all \/>/);
-    assert.match(myRaid, /getMemberTeamRaids\(this\.teamId\)/);
+    assert.match(memberTemplate, /<MyTeamRaid :key="`member-raids-\$\{id\}`" :team-id="id" embedded show-all \/>/);
+    assert.match(myRaid, /getMemberTeamRaids\(teamId\)/);
     assert.match(myRaid, /joinedMap\.get\(String\(activity\.id\)\)/);
     assert.match(myRaid, /return \(this\.raids \|\| \[\]\)\.map/);
     assert.doesNotMatch(myRaid, /isUnfinished|is_public/);
@@ -891,9 +891,9 @@ test("member workspace exposes team snapshots as a read-only tab before videos",
     assert.match(workspace, /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
     assert.match(
         workspace,
-        /:label="\$t\('team\.workspace\.teamSnapshots'\)" name="snapshot"[\s\S]*?<SnapshotList :team-id="id" read-only \/>[\s\S]*?:label="\$t\('team\.workspace\.teamDkp'\)" name="my-dkp"[\s\S]*?<MyDkp :team-id="id" \/>[\s\S]*?:label="\$t\('team\.workspace\.videos'\)" name="video"/,
+        /:label="\$t\('team\.workspace\.teamSnapshots'\)" name="snapshot"[\s\S]*?<SnapshotList :key="`member-snapshots-\$\{id\}`" :team-id="id" read-only \/>[\s\S]*?:label="\$t\('team\.workspace\.teamDkp'\)" name="my-dkp"[\s\S]*?<MyDkp :key="`member-dkp-\$\{id\}`" :team-id="id" \/>[\s\S]*?:label="\$t\('team\.workspace\.videos'\)" name="video"/,
     );
-    assert.match(workspace, /<SnapshotList :team-id="id" :can-configure-password="isSuper" \/>/);
+    assert.match(workspace, /<SnapshotList[\s\S]*?:key="`snapshot-management-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-configure-password="isSuper"/);
     assert.match(snapshot, /:read-only="readOnly"/);
     assert.match(snapshot, /:support-dkp-sync="false"/);
 });

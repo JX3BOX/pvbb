@@ -7,8 +7,8 @@ const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 test("public raid detail restores the roster for signed-out visitors", async () => {
     const page = await read("../src/views/team/raid/ViewRaid.vue");
 
-    assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\)/);
-    assert.match(page, /await Promise\.allSettled\(\[this\.getTeam\(\), this\.getAuthority\(\)\]\)/);
+    assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\{ authority: 0, r_raid: 0 \}\)/);
+    assert.match(page, /await Promise\.allSettled\(\[[\s\S]*?this\.getTeam\(teamId\),[\s\S]*?this\.getAuthority\(teamId\)/);
     assert.match(page, /this\.\$store\.commit\("setManageStatus", false\)/);
     assert.match(page, /this\.\$store\.commit\("setIsTeammate", false\)/);
     assert.match(page, /this\.flag = true/);
@@ -136,10 +136,10 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(page, /<RaidFormDialog[\s\S]*v-model="formVisible"[\s\S]*:raid-id="id"[\s\S]*@saved="handleRaidSaved"/);
     assert.match(page, /editRaid:\s*function\s*\(\)\s*\{\s*this\.formVisible = true/);
     assert.doesNotMatch(page, /this\.\$router\.push\(`\/raid\/edit\/\$\{this\.id\}`\)/);
-    assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.getRaid\(\)/);
+    assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.init\(\)/);
     assert.match(page, /team\.raid\.view\.description/);
     assert.doesNotMatch(page, />活动说明</);
-    assert.match(page, /<el-button icon="FullScreen" disabled @click="showMiniprogramCode">/);
+    assert.doesNotMatch(page, /showMiniprogramCode|icon="FullScreen"/);
     assert.match(sidebar, /this\.\$route\.name === "view_raid"/);
     assert.match(sidebar, /this\.\$store\.state\.team\?\.ID/);
     assert.match(appStyles, /\.m-title[\s\S]*\.u-op[\s\S]*min-height:\s*38px/);

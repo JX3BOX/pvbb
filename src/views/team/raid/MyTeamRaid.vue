@@ -79,9 +79,13 @@ export default {
             raids: [],
             loading: false,
             search: "",
+            loadVersion: 0,
         };
     },
     computed: {
+        requestKey: function () {
+            return `${this.teamId || ""}|${this.showAll ? 1 : 0}`;
+        },
         displayData: function () {
             const joinedRaids = (this.data || []).filter((item) => {
                 const teamId = item?.raid_team_info?.ID || item?.raid_info?.team_id;
@@ -119,7 +123,14 @@ export default {
             return !this.teams?.length;
         },
     },
-    watch: {},
+    watch: {
+        requestKey: {
+            immediate: true,
+            handler: function () {
+                this.loadRaids();
+            },
+        },
+    },
     methods: {
         goTeamList: function () {
             this.$router.push("/org/list");
@@ -151,18 +162,38 @@ export default {
         isToday: function (d) {
             return moment(d).format("MM-DD") == moment(new Date()).format("MM-DD");
         },
+        isCurrentRaidRequest: function (teamId, showAll, version) {
+            return (
+                version === this.loadVersion &&
+                String(teamId || "") === String(this.teamId || "") &&
+                showAll === this.showAll
+            );
+        },
         loadRaids: function () {
-            this.loading = true;
-            const requests = [getMyTeamRaids()];
-            if (this.showAll && this.teamId) requests.push(getMemberTeamRaids(this.teamId));
+            const teamId = this.teamId;
+            const showAll = this.showAll;
+            const version = ++this.loadVersion;
 
-            Promise.all(requests)
+            this.loading = true;
+            this.data = [];
+            this.raids = [];
+            this.search = "";
+            const requests = [getMyTeamRaids()];
+            if (showAll && teamId) requests.push(getMemberTeamRaids(teamId));
+
+            return Promise.all(requests)
                 .then(([joinedRes, raidsRes]) => {
+                    if (!this.isCurrentRaidRequest(teamId, showAll, version)) return;
                     this.data = joinedRes.data?.data || [];
                     this.raids = raidsRes?.data?.data || [];
                 })
+                .catch(() => {
+                    if (!this.isCurrentRaidRequest(teamId, showAll, version)) return;
+                    this.data = [];
+                    this.raids = [];
+                })
                 .finally(() => {
-                    this.loading = false;
+                    if (this.isCurrentRaidRequest(teamId, showAll, version)) this.loading = false;
                 });
         },
         subscribe: function (id) {
@@ -185,12 +216,6 @@ export default {
         showRaidDate: function (d) {
             return moment(d).format("DD");
         },
-    },
-    created: function () {},
-    mounted: function () {
-        // this.loadTeams().then(() => {
-        this.loadRaids();
-        // });
     },
 };
 </script>

@@ -61,7 +61,7 @@ export default {
     },
     computed: {
         isTeamHome: function () {
-            return this.$route.name === "index";
+            return ["index", "list_org"].includes(this.$route.name);
         },
         formattedTeamTotal: function () {
             return Number(this.teamTotal || 0).toLocaleString("zh-CN");
