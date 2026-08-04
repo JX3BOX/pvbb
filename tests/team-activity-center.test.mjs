@@ -49,3 +49,15 @@ test("activity center restores the public raid list inside the modern team shell
     assert.match(styles, /\.u-center-type/);
     assert.match(styles, /\.u-center-title/);
 });
+
+test("activity center weekdays follow the active i18n locale", async () => {
+    const [activityItem, listRaid] = await Promise.all([
+        read("../src/components/team/raid/ActivityItem.vue"),
+        read("../src/views/team/raid/ListRaid.vue"),
+    ]);
+
+    for (const source of [activityItem, listRaid]) {
+        assert.match(source, /Intl\.DateTimeFormat\(this\.\$i18n\?\.locale \|\| "zh-CN"/);
+        assert.doesNotMatch(source, /showRaidWeek[^}]+moment\(d\)\.format\("dddd"\)/);
+    }
+});

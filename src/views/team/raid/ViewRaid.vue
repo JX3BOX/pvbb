@@ -98,7 +98,7 @@
                     </div>
 
                     <div class="m-raid-view-info">
-                        <span class="u-label">活动说明</span>
+                        <span class="u-label">{{ $t("team.raid.view.description") }}</span>
                         <p>{{ data.desc || $t("team.raid.view.noDescription") }}</p>
                     </div>
 

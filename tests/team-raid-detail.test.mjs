@@ -137,6 +137,8 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(page, /editRaid:\s*function\s*\(\)\s*\{\s*this\.formVisible = true/);
     assert.doesNotMatch(page, /this\.\$router\.push\(`\/raid\/edit\/\$\{this\.id\}`\)/);
     assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.getRaid\(\)/);
+    assert.match(page, /team\.raid\.view\.description/);
+    assert.doesNotMatch(page, />活动说明</);
     assert.match(page, /<el-button icon="FullScreen" disabled @click="showMiniprogramCode">/);
     assert.match(sidebar, /this\.\$route\.name === "view_raid"/);
     assert.match(sidebar, /this\.\$store\.state\.team\?\.ID/);

@@ -155,7 +155,9 @@ export default {
             return moment(d).format("HH:mm");
         },
         showRaidWeek(d) {
-            return moment(d).format("dddd");
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                weekday: "long",
+            }).format(new Date(d));
         },
         showRaidMonth(d) {
             return moment(d).format("MM");
