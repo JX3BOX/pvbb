@@ -22,7 +22,6 @@
                 <section class="m-raid-form-section">
                     <header>
                         <h4>{{ $t("team.raid.form.basic") }}</h4>
-                        <span>{{ $t(isEdit ? "team.raid.form.editHint" : "team.raid.form.createHint") }}</span>
                     </header>
                     <div class="m-raid-form-grid">
                         <el-form-item :label="$t('team.raid.form.team')" prop="team_id">
@@ -126,7 +125,6 @@
                 <section class="m-raid-form-section">
                     <header>
                         <h4>{{ $t("team.raid.form.signup") }}</h4>
-                        <span>{{ $t("team.raid.form.signupHint") }}</span>
                     </header>
                     <el-form-item :label="$t('team.raid.form.condition')" prop="auth" class="u-auth-options">
                         <el-radio-group v-model.number="form.auth">
@@ -164,7 +162,6 @@
                 <section class="m-raid-form-section">
                     <header>
                         <h4>{{ $t("team.raid.form.notes") }}</h4>
-                        <span>{{ $t("team.raid.form.notesHint") }}</span>
                     </header>
                     <el-form-item prop="desc" class="u-desc-field">
                         <el-input

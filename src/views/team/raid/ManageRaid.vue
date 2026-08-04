@@ -5,7 +5,7 @@
             <span class="u-txt">{{ $t("team.raid.common.activities") }}</span>
             <div class="u-op">
                 <a href="/tool/23805" class="u-help" target="_blank"> <i class="el-icon-info"></i> {{ $t("team.raid.common.help") }} </a>
-                <el-button type="primary" size="small" v-if="orgs.length" @click="openCreateDialog">
+                <el-button class="u-create-button" type="primary" size="small" v-if="orgs.length" @click="openCreateDialog">
                     <i class="el-icon-circle-plus-outline"></i>
                     {{ $t("team.raid.common.create") }}
                 </el-button>
@@ -16,7 +16,7 @@
                 <h2>{{ $t("team.raid.manage.title") }}</h2>
                 <p>{{ $t("team.raid.manage.description") }}</p>
             </div>
-            <el-button v-if="orgs.length" type="primary" @click="openCreateDialog">
+            <el-button class="u-create-button" v-if="orgs.length" type="primary" @click="openCreateDialog">
                 <i class="el-icon-circle-plus-outline"></i>
                 {{ $t("team.raid.common.create") }}
             </el-button>
@@ -40,12 +40,9 @@
                     :placeholder="$t('team.raid.manage.searchPlaceholder')"
                     clearable
                     :aria-label="$t('team.raid.manage.searchAria')"
-                    @clear="submitSearch"
-                    @keyup.enter="submitSearch"
                 >
                     <template #prefix><i class="el-icon-search"></i></template>
                 </el-input>
-                <el-button type="primary" plain @click="submitSearch">{{ $t("team.raid.common.search") }}</el-button>
                 <span class="u-raid-total">{{ $t("team.raid.manage.total", { count: total }) }}</span>
             </div>
 
@@ -99,6 +96,7 @@ import RaidItem from "@/components/team/raid/RaidItem.vue";
 import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
 
 import localforage from "localforage";
+import debounce from "lodash/debounce";
 
 export default {
     name: "ManageRaid",
@@ -178,12 +176,6 @@ export default {
         handleSaved() {
             this.loadData();
         },
-        submitSearch() {
-            const value = this.searchDraft.trim();
-            if (this.page !== 1) this.page = 1;
-            if (this.search === value) this.loadData();
-            else this.search = value;
-        },
         changeTeam: function () {
             // 将当前团队的信息保存在localStorage
             const currentTeam = this.orgs.find((org) => String(org.ID) === String(this.team_id));
@@ -219,7 +211,21 @@ export default {
     mounted: function () {
         this.init();
     },
+    created: function () {
+        this.updateSearch = debounce((value) => {
+            const search = value.trim();
+            if (this.search === search) return;
+            if (this.page !== 1) this.page = 1;
+            this.search = search;
+        }, 300);
+    },
+    beforeUnmount: function () {
+        this.updateSearch.cancel();
+    },
     watch: {
+        searchDraft: function (value) {
+            this.updateSearch(value);
+        },
         teamId: function (value) {
             if (~~value) this.loadTeams();
         },

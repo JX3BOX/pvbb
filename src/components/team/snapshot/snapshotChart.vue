@@ -175,6 +175,7 @@ export default {
 
                     teammate.forEach((mate) => {
                         const [name, , , mount] = mate.split(",");
+                        if (!name) return;
                         // 统计心法次数
                         if (!pieData[mount]) {
                             pieData[mount] = 1;

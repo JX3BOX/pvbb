@@ -177,6 +177,7 @@ export default {
 
                     teammate.forEach((mate) => {
                         const [name, unknownId, guid, mount] = mate.split(",");
+                        if (!name) return;
 
                         const role = data.find((d) => d?.guid === guid && d?.name === name);
 

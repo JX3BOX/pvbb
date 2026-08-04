@@ -27,7 +27,7 @@
                         <div class="u-record-meta">
                             <span><Clock />{{ showTime(item.created_at) }}</span>
                             <span><User />{{ uploaderName(item) }}</span>
-                            <span><UserFilled />{{ $t("team.snapshotEdit.people", { count: formatTeammate(item.teammate).length }) }}</span>
+                            <span><UserFilled />{{ $t("team.snapshotEdit.people", { count: formatTeammate(item.teammate).filter((member) => member.name).length }) }}</span>
                         </div>
                     </div>
                     <el-button class="u-view-team" plain icon="Camera" @click="openRoster(item)">{{ $t("team.snapshotEdit.viewRoster") }}</el-button>

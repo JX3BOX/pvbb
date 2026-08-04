@@ -32,18 +32,25 @@
                         <h3>{{ $t("team.snapshotEdit.participants") }}</h3>
                         <p>{{ $t("team.snapshotEdit.participantHint") }}</p>
                     </div>
-                    <span>{{ $t("team.snapshotEdit.people", { count: list.length }) }}</span>
+                    <span>{{ $t("team.snapshotEdit.people", { count: memberCount }) }}</span>
                 </div>
                 <div class="m-snapshot-edit__group-head" :aria-label="$t('team.snapshotEdit.groupAria')">
                     <span v-for="group in 5" :key="group">{{ $t("team.snapshotEdit.group", { group }) }}</span>
                 </div>
-                <VueDraggable v-model="list" class="m-snapshot-edit__member-list">
-                    <div v-for="(item, index) in list" :key="dragKey(item, 'snapshot-dialog-role')" class="u-member">
-                        <img :src="showMountIcon(item[3])" alt="" />
-                        <span>{{ item[0] }}</span>
-                        <button type="button" :aria-label="$t('team.snapshotEdit.remove')" @click.stop="delRole(index)">
-                            <i class="el-icon-close"></i>
-                        </button>
+                <VueDraggable v-model="list" class="m-snapshot-edit__member-list" :animation="150">
+                    <div
+                        v-for="(item, index) in list"
+                        :key="dragKey(item, 'snapshot-dialog-role')"
+                        class="u-member"
+                        :class="{ 'is-empty': !item[0] }"
+                    >
+                        <template v-if="item[0]">
+                            <img :src="showMountIcon(item[3])" alt="" />
+                            <span>{{ item[0] }}</span>
+                            <button type="button" :aria-label="$t('team.snapshotEdit.remove')" @click.stop="delRole(index)">
+                                <i class="el-icon-close"></i>
+                            </button>
+                        </template>
                     </div>
                 </VueDraggable>
                 <div class="m-snapshot-edit__role-adder">
@@ -118,6 +125,14 @@ import { ensureDragKey } from "@/utils/draggable";
 import { showMountIcon } from "@/utils/filters";
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
 
+const SNAPSHOT_SLOT_COUNT = 25;
+const createEmptySlot = () => ["", 0, 0, ""];
+const fillSnapshotSlots = (members = []) => {
+    const slots = members.slice(0, SNAPSHOT_SLOT_COUNT);
+    while (slots.length < SNAPSHOT_SLOT_COUNT) slots.push(createEmptySlot());
+    return slots;
+};
+
 export default {
     name: "EditSnapshotDialog",
     components: {
@@ -147,7 +162,7 @@ export default {
             },
             selectedTeamId: "",
             teams: [],
-            list: [],
+            list: fillSnapshotSlots(),
             roleForm: {
                 name: "",
                 xf: "",
@@ -184,6 +199,9 @@ export default {
         teammate() {
             return this.list.map((item) => item.join(",")).join(";");
         },
+        memberCount() {
+            return this.list.filter((item) => item[0]).length;
+        },
         xflist() {
             return Object.values(xfmap).filter((item) => item.id !== 0);
         },
@@ -211,6 +229,7 @@ export default {
                 const targetId = Number(this.targetTeamId);
                 const targetTeam = this.teams.find((item) => Number(item.ID) === targetId);
                 this.selectedTeamId = targetTeam ? targetId : this.teams[0]?.ID || "";
+                this.list = fillSnapshotSlots();
             } finally {
                 if (requestId === this.loadRequestId) this.loading = false;
             }
@@ -231,21 +250,24 @@ export default {
                 };
                 this.selectedTeamId = data.team_id;
                 this.teams = teamsRes.data.data.list || [];
-                this.list = (data.teammate || "")
+                const members = (data.teammate || "")
                     .split(";")
                     .filter(Boolean)
                     .map((item) => item.split(","));
+                this.list = fillSnapshotSlots(members);
             } finally {
                 if (requestId === this.loadRequestId) this.loading = false;
             }
         },
         delRole(index) {
-            this.list.splice(index, 1);
+            this.list.splice(index, 1, createEmptySlot());
         },
         addMember() {
             this.$refs.roleForm.validate((valid) => {
                 if (!valid) return;
-                this.list.push([this.roleForm.name, 0, 0, this.roleForm.xf]);
+                const emptyIndex = this.list.findIndex((item) => !item[0]);
+                if (emptyIndex === -1) return;
+                this.list.splice(emptyIndex, 1, [this.roleForm.name, 0, 0, this.roleForm.xf]);
                 this.$refs.roleForm.resetFields();
             });
         },
@@ -283,7 +305,7 @@ export default {
             this.form = { title: "", desc: "" };
             this.selectedTeamId = "";
             this.teams = [];
-            this.list = [];
+            this.list = fillSnapshotSlots();
             this.roleForm = { name: "", xf: "" };
         },
     },

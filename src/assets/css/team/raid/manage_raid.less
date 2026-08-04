@@ -3,6 +3,10 @@
 .v-raid-list {
     min-width: 0;
 
+    .u-create-button i {
+        margin-right: 5px;
+    }
+
     .m-raid-embedded-header {
         display: flex;
         align-items: flex-start;
@@ -237,6 +241,13 @@
         .u-edit {
             border-color: fade(@team-primary, 28%);
             color: @team-primary;
+
+            &:hover,
+            &:focus {
+                border-color: @team-primary;
+                background: @team-primary;
+                color: #fff;
+            }
         }
 
         .u-more {
