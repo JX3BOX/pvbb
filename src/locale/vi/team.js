@@ -1,4 +1,7 @@
 export default {
+    publicActivityEmpty: "Không có hoạt động đội gần đây",
+    publicIntroEmpty: "Đội này chưa thêm phần giới thiệu",
+    publicRecruitEmpty: "Đội này chưa đăng thông tin tuyển thành viên",
     common: {
         platform: "Nền tảng đội", retry: "Tải lại", loginRequired: "Vui lòng đăng nhập", loginRequiredDescription: "Đăng nhập để sử dụng tính năng này.",
         teamInfo: "Thông tin đội", teamName: "Tên đội", serverName: "Máy chủ", teamDescription: "Giới thiệu đội",
@@ -18,6 +21,7 @@ export default {
         management: "Quản lý đội", myTeams: "Đội của tôi", noManagedTeams: "Không có đội nào để quản lý",
         noMemberTeams: "Bạn chưa tham gia đội nào với tư cách thành viên", emptyTitle: "Bạn chưa tham gia đội nào",
         emptyDescription: "Tìm đồng đội trong quảng trường hoặc tạo đội của riêng bạn.", createTeam: "Tạo đội", myRoles: "Nhân vật của tôi",
+        mobileOpen: "Mở điều hướng đội", mobileClose: "Đóng điều hướng đội",
     },
     home: {
         title: "Nền tảng đội", description: "Tìm đội, quản lý nhân vật và đồng hành cùng những người chơi chung chí hướng", plaza: "Quảng trường đội",

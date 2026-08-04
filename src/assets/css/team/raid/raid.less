@@ -283,6 +283,13 @@
             box-shadow: inset 0 0 0 1px @team-border-focus;
         }
     }
+
+    // 正式排表外框会裁切溢出内容，团长徽标需完整放在成员格内。
+    .u-member-leader {
+        z-index: 1;
+        top: 4px;
+        left: 4px;
+    }
 }
 
 .m-raid-corebox.qkmode .m-raid-members {

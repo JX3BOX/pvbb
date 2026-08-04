@@ -104,6 +104,7 @@ import { getMyPowerTeams } from "@/service/team/team.js";
 import RaidList from "@/components/team/raid/RaidList.vue";
 import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
 import User from "@jx3box/jx3box-common/js/user";
+import debounce from "lodash/debounce";
 export default {
     name: "Listraid",
     props: [],
@@ -113,6 +114,8 @@ export default {
             server: "",
             title: "",
             search: "",
+            debouncedSearch: "",
+            updateSearch: null,
             time: "-1",
             dates: [],
 
@@ -136,7 +139,7 @@ export default {
                 name: this.name,
                 server: this.server,
                 time: this.time,
-                search: this.search,
+                search: this.debouncedSearch,
                 page: this.page,
                 per: this.per,
                 is_public: 1,
@@ -251,6 +254,15 @@ export default {
         this.init();
         this.loadTeams();
     },
+    created: function () {
+        this.updateSearch = debounce((search) => {
+            this.page = 1;
+            this.debouncedSearch = search;
+        }, 300);
+    },
+    beforeUnmount: function () {
+        this.updateSearch.cancel();
+    },
     watch: {
         params: {
             deep: true,
@@ -267,8 +279,8 @@ export default {
         time: function () {
             this.page = 1;
         },
-        search: function () {
-            this.page = 1;
+        search: function (search) {
+            this.updateSearch(search);
         },
     },
     components: {

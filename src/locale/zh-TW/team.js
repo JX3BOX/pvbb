@@ -1,4 +1,7 @@
 export default {
+    publicActivityEmpty: "暫無近期團隊活動",
+    publicIntroEmpty: "該團隊暫未填寫團隊介紹",
+    publicRecruitEmpty: "該團隊暫未發佈招募資訊",
     common: {
         platform: "團隊平台", retry: "重新載入", loginRequired: "請先登入", loginRequiredDescription: "使用本功能請先登入",
         teamInfo: "團隊資訊", teamName: "團隊名稱", serverName: "伺服器名稱", teamDescription: "團隊介紹",
@@ -18,6 +21,7 @@ export default {
         management: "團隊管理", myTeams: "我的團隊", noManagedTeams: "目前沒有可管理的團隊",
         noMemberTeams: "目前沒有以成員身分加入的團隊", emptyTitle: "還沒有加入團隊",
         emptyDescription: "從團隊廣場選擇合適的夥伴，或者建立自己的團隊。", createTeam: "建立團隊", myRoles: "我的角色",
+        mobileOpen: "開啟團隊導覽", mobileClose: "關閉團隊導覽",
     },
     home: {
         title: "團隊平台", description: "尋找團隊、管理角色，與志同道合的夥伴並肩江湖", plaza: "團隊廣場",

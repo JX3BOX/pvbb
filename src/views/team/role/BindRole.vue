@@ -39,7 +39,7 @@
 
 <script>
 import { getToken } from "@/service/team/role.js";
-import { __imgPath, __ossMirror } from "@/utils/config";
+import { __ossMirror } from "@/utils/config";
 import roleform from "@/components/team/role/roleform.vue";
 import { createRole } from "@/service/team/role.js";
 export default {

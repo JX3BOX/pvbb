@@ -57,7 +57,6 @@
 </template>
 <script>
 import snapshotRole from "@/components/team/snapshot/snapshotRole.vue";
-import { __imgPath } from "@/utils/config";
 import { editSnapshot, addSnapshot, getSnapshot } from "@/service/team/snapshot.js";
 import { getMyPowerTeams } from "@/service/team/team.js";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";

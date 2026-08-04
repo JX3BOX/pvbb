@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { __imgPath } from "@/utils/config";
 import { showSchoolIcon } from "@/utils/filters";
 
 export default {

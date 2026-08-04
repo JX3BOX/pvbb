@@ -26,7 +26,7 @@
                     v-model="name"
                     :placeholder="$t('team.homeFilters.searchTeams')"
                     size="large"
-                    @change="searchTeam"
+                    @keyup.enter="submitSearch"
                     style="width: 100%"
                 >
                     <template #prepend v-if="!homeMode">
@@ -47,7 +47,7 @@
                         </el-select>
                     </template>
                     <template #suffix>
-                        <i class="el-icon-search" @click="loadData"></i>
+                        <i class="el-icon-search" @click="submitSearch"></i>
                     </template>
                 </el-input>
             </div>
@@ -197,8 +197,10 @@ import { getThumbnail, showAvatar, authorLink } from "@jx3box/jx3box-common/js/u
 import { __ossMirror, __cdn } from "@/utils/config";
 import { getTeams } from "@/service/team/team.js";
 import { uniq } from "lodash";
+import debounce from "lodash/debounce";
 
 const TEAM_NAME_LIMIT = 12;
+const SEARCH_DEBOUNCE_DELAY = 400;
 
 export default {
     name: "TeamList",
@@ -214,6 +216,8 @@ export default {
             data: [],
             loading: true,
             name: "",
+            searchName: "",
+            debouncedSearchTeam: null,
             server: "",
             servers,
             isVerified: false,
@@ -230,7 +234,7 @@ export default {
                 pageSize: this.per,
                 // recruit: 1,
                 server: this.server,
-                name: this.name,
+                name: this.searchName,
                 tag: this.tag && this.tag.length ? this.tag.join(",") : "",
                 client: this.client,
             };
@@ -295,7 +299,20 @@ export default {
         changeServer: function () {
             this.page = 1;
         },
-        searchTeam: function () {},
+        searchTeam: function () {
+            this.page = 1;
+            this.searchName = this.name.trim();
+        },
+        submitSearch: function () {
+            this.debouncedSearchTeam.cancel();
+
+            const searchName = this.name.trim();
+            const hasQueryChange = this.page !== 1 || this.searchName !== searchName;
+            this.page = 1;
+            this.searchName = searchName;
+
+            if (!hasQueryChange) this.loadData();
+        },
         clearFilters: function () {
             this.isVerified = false;
             this.tag = [];
@@ -319,11 +336,16 @@ export default {
         },
     },
     watch: {
+        name: function () {
+            this.debouncedSearchTeam();
+        },
         params: function (newparams) {
             this.loadData();
         },
     },
-    created: function () {},
+    created: function () {
+        this.debouncedSearchTeam = debounce(this.searchTeam, SEARCH_DEBOUNCE_DELAY);
+    },
     mounted: function () {
         this.paginationMediaQuery = window.matchMedia("(max-width: 560px)");
         this.updatePaginationViewport(this.paginationMediaQuery);
@@ -331,6 +353,7 @@ export default {
         this.loadData();
     },
     beforeUnmount: function () {
+        this.debouncedSearchTeam.cancel();
         this.paginationMediaQuery?.removeEventListener("change", this.updatePaginationViewport);
     },
 };

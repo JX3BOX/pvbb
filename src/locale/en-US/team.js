@@ -1,4 +1,7 @@
 export default {
+    publicActivityEmpty: "No recent team events",
+    publicIntroEmpty: "This team has not added an introduction yet",
+    publicRecruitEmpty: "This team has not posted recruitment information yet",
     common: {
         platform: "Team Platform", retry: "Reload", loginRequired: "Please sign in", loginRequiredDescription: "Sign in to use this feature.",
         teamInfo: "Team details", teamName: "Team name", serverName: "Server", teamDescription: "Team description",
@@ -18,6 +21,7 @@ export default {
         management: "Team Management", myTeams: "My Teams", noManagedTeams: "No teams available to manage",
         noMemberTeams: "You have not joined any teams as a member", emptyTitle: "You have not joined a team yet",
         emptyDescription: "Find teammates in Team Plaza or create your own team.", createTeam: "Create Team", myRoles: "My Characters",
+        mobileOpen: "Open team navigation", mobileClose: "Close team navigation",
     },
     home: {
         title: "Team Platform", description: "Discover teams, manage your characters, and find players to adventure with", plaza: "Team Plaza",

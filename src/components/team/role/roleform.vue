@@ -50,12 +50,11 @@
 </template>
 
 <script>
-import { showSchoolIcon } from "@jx3box/jx3box-common/js/utils";
+import { showSchoolIcon } from "@/utils/filters";
 import servers from "@jx3box/jx3box-data/data/server/server_list.json";
 import school_map from "@jx3box/jx3box-data/data/xf/schoolid.json";
 import bodyData from "@jx3box/jx3box-facedat/assets/data/index.json";
 const { bodyMap } = bodyData;
-import { __imgPath } from "@/utils/config";
 export default {
     props: ["data", "btn_txt", "processing"],
     data: function () {

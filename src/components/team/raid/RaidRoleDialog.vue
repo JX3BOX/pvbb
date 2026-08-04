@@ -29,7 +29,12 @@
 
             <template v-else-if="displayRole">
                 <section class="m-raid-role-profile">
-                    <img class="u-role-icon" :src="showMountIcon(displayRole.mount)" :alt="displayRole.name" />
+                    <RoleAvatar
+                        class="u-role-icon"
+                        :mount="displayRole.school"
+                        :body_type="displayRole.body_type"
+                        :alt="displayRole.name"
+                    />
                     <div class="u-role-copy">
                         <div class="u-name-line">
                             <strong>{{ displayRole.name || member.name || $t("team.raid.roleDialog.unnamed") }}</strong>
@@ -42,17 +47,21 @@
                 </section>
 
                 <section class="m-raid-role-meta">
-                    <div>
-                        <span>{{ $t("team.raid.roleDialog.school") }}</span>
-                        <strong>{{ showRoleSchool(displayRole.mount) || $t("team.raid.common.unknown") }}</strong>
+                    <div class="u-meta-item">
+                        <span class="u-meta-label">{{ $t("team.raid.roleDialog.school") }}</span>
+                        <strong class="u-meta-value">
+                            {{ showSchoolName(displayRole.school) || $t("team.raid.common.unknown") }}
+                        </strong>
                     </div>
-                    <div>
-                        <span>{{ $t("team.raid.roleDialog.mount") }}</span>
-                        <strong>{{ showMountName(displayRole.mount) || $t("team.raid.common.unknown") }}</strong>
+                    <div class="u-meta-item">
+                        <span class="u-meta-label">{{ $t("team.raid.roleDialog.mount") }}</span>
+                        <strong class="u-meta-value">
+                            {{ showMountName(displayRole.mount) || $t("team.raid.common.unknown") }}
+                        </strong>
                     </div>
-                    <div>
-                        <span>{{ $t("team.raid.roleDialog.bodyType") }}</span>
-                        <strong>{{ showBodyType(displayRole.body_type) || $t("team.raid.common.unknown") }}</strong>
+                    <div class="u-meta-item">
+                        <span class="u-meta-label">{{ $t("team.raid.roleDialog.bodyType") }}</span>
+                        <strong class="u-meta-value">{{ showBodyType(displayRole.body_type) || $t("team.raid.common.unknown") }}</strong>
                     </div>
                 </section>
 
@@ -85,11 +94,37 @@
 <script>
 import { getRole } from "@/service/team/role.js";
 import { showAvatar } from "@jx3box/jx3box-common/js/utils";
-import { showBodyType, showMountIcon, showMountName, showSchoolName } from "@/utils/filters";
+import {
+    showBodyType,
+    showMountName,
+    showSchoolName,
+} from "@/utils/filters";
+import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
 import xfMap from "@jx3box/jx3box-data/data/xf/xf.json";
+
+const BODY_TYPE_MAP = {
+    1: 1,
+    2: 2,
+    5: 5,
+    6: 6,
+    m2: 1,
+    f2: 2,
+    m1: 5,
+    f1: 6,
+    "\u6210\u7537": 1,
+    "\u6210\u5973": 2,
+    "\u6b63\u592a": 5,
+    "\u841d\u8389": 6,
+};
+
+function normalizeBodyType(...values) {
+    const value = values.find((item) => Object.prototype.hasOwnProperty.call(BODY_TYPE_MAP, item));
+    return value === undefined ? 0 : BODY_TYPE_MAP[value];
+}
 
 export default {
     name: "RaidRoleDialog",
+    components: { RoleAvatar },
     props: {
         modelValue: { type: Boolean, default: false },
         roleId: { type: [Number, String], default: "" },
@@ -114,13 +149,42 @@ export default {
         },
         displayRole() {
             if (!this.role && !this.member) return null;
+            const roleInfo = this.role?.role_info || this.role?.roleInfo || this.role?.info || {};
+            const roleMount = Number(this.role?.mount) || Number(roleInfo.mount) || 0;
+            const mount =
+                Number(this.member?.mount) ||
+                Number(this.member?.xf) ||
+                Number(this.member?.xfid) ||
+                Number(this.role?.xf) ||
+                Number(this.role?.xfid) ||
+                Number(roleInfo.xf) ||
+                Number(roleInfo.xfid) ||
+                (roleMount >= 1000 ? roleMount : 0) ||
+                0;
+            const mountSchool = Object.values(xfMap).find((item) => Number(item.id) === mount)?.school || 0;
+            const bodyType = normalizeBodyType(
+                this.role?.body_type,
+                this.role?.bodyType,
+                this.role?.body,
+                this.role?.body_id,
+                roleInfo.body_type,
+                roleInfo.bodyType,
+                roleInfo.body,
+                roleInfo.body_id,
+                this.member?.body_type,
+                this.member?.bodyType,
+                this.member?.body,
+                this.member?.body_id
+            );
             return {
                 ...(this.member || {}),
+                ...roleInfo,
                 ...(this.role || {}),
-                name: this.role?.name || this.member?.name,
-                server: this.role?.server || this.member?.server,
-                mount: Number(this.role?.mount) || Number(this.member?.mount) || 0,
-                body_type: this.role?.body_type || this.member?.body_type,
+                name: this.role?.name || roleInfo.name || this.member?.name,
+                server: this.role?.server || roleInfo.server || this.member?.server,
+                school: (roleMount > 0 && roleMount < 1000 ? roleMount : 0) || mountSchool,
+                mount,
+                body_type: bodyType,
             };
         },
     },
@@ -150,13 +214,8 @@ export default {
         },
         showAvatar,
         showBodyType,
-        showMountIcon,
         showMountName,
         showSchoolName,
-        showRoleSchool(mount) {
-            const school = Object.values(xfMap).find((item) => Number(item.id) === Number(mount))?.school;
-            return school ? showSchoolName(school) : "";
-        },
     },
 };
 </script>

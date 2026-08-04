@@ -137,8 +137,8 @@
 </template>
 
 <script>
-import { __imgPath } from "@/utils/config";
-import { authorLink, showAvatar } from "@jx3box/jx3box-common/js/utils";
+import { __cdn } from "@/utils/config";
+import { authorLink, getThumbnail, showAvatar } from "@jx3box/jx3box-common/js/utils";
 import { getLeaders } from "@/service/team/admin.js";
 import { getTeamMembers, getTeamBirthDay } from "@/service/team/member.js";
 import { Lock, Present, User, UserFilled, WarningFilled } from "@element-plus/icons-vue";
@@ -178,7 +178,8 @@ export default {
     },
     methods: {
         showRoleAvatar: function (mount, body_type) {
-            return __imgPath + "image/roles/" + mount + "-" + body_type + ".png";
+            const url = __cdn + "design/avatar/xisai/" + mount + "-" + body_type + ".png";
+            return getThumbnail(url, 88);
         },
         loadLeaders: function () {
             this.leadersLoading = true;

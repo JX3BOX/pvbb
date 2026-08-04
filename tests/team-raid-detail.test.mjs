@@ -77,7 +77,9 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.doesNotMatch(sub + tobe, /:to="`\/role\/\$\{member\.role_id\}`"/);
     assert.match(roleDialog, /getRole\(this\.roleId\)/);
     assert.match(roleDialog, /class="m-raid-role-meta"/);
-    assert.match(roleDialog, /Object\.values\(xfMap\)\.find/);
+    assert.match(roleDialog, /<RoleAvatar[\s\S]*?:mount="displayRole\.school"[\s\S]*?:body_type="displayRole\.body_type"/);
+    assert.match(roleDialog, /showSchoolName\(displayRole\.school\)/);
+    assert.match(roleDialog, /Number\(this\.member\?\.mount\)/);
 
     for (const source of [normalV1, normalV2, sub, tobe, page]) {
         assert.match(source, /import bus from "@\/utils\/bus"/);

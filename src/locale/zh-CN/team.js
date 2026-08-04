@@ -1,4 +1,7 @@
 export default {
+    publicActivityEmpty: "暂无近期团队活动",
+    publicIntroEmpty: "该团队暂未填写团队介绍",
+    publicRecruitEmpty: "该团队暂未发布招募信息",
     common: {
         platform: "团队平台",
         retry: "重新加载",
