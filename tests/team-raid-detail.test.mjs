@@ -7,8 +7,8 @@ const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 test("public raid detail restores the roster for signed-out visitors", async () => {
     const page = await read("../src/views/team/raid/ViewRaid.vue");
 
-    assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\)/);
-    assert.match(page, /await Promise\.allSettled\(\[this\.getTeam\(\), this\.getAuthority\(\)\]\)/);
+    assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\{ authority: 0, r_raid: 0 \}\)/);
+    assert.match(page, /await Promise\.allSettled\(\[[\s\S]*?this\.getTeam\(teamId\),[\s\S]*?this\.getAuthority\(teamId\)/);
     assert.match(page, /this\.\$store\.commit\("setManageStatus", false\)/);
     assert.match(page, /this\.\$store\.commit\("setIsTeammate", false\)/);
     assert.match(page, /this\.flag = true/);
@@ -31,7 +31,7 @@ test("snapshot editor submits a writable field whitelist and handles request err
 
     assert.doesNotMatch(dialog, /const payload = \{\s*\.\.\.this\.form/);
     assert.match(dialog, /const payload = \{[\s\S]*?team_id: this\.selectedTeamId,[\s\S]*?title: this\.form\.title \|\| "",[\s\S]*?desc: this\.form\.desc \|\| "",[\s\S]*?teammate: this\.teammate/);
-    assert.match(dialog, /catch \(error\) \{[\s\S]*?error\?\.response\?\.data\?\.msg \|\| "快照保存失败，请稍后重试"/);
+    assert.match(dialog, /catch \(error\) \{[\s\S]*?error\?\.response\?\.data\?\.msg \|\| this\.\$t\("team\.snapshotEdit\.saveFailed"\)/);
 });
 
 test("raid detail only shows legacy conflict-free mounts for legacy content", async () => {
@@ -65,6 +65,9 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.doesNotMatch(raid, /<raid-normal-v[12][\s\S]*?v-model="members"/);
     assert.match(raid, /<raid-normal-v1[\s\S]*?:data="members"/);
     assert.match(raid, /<raid-normal-v2[\s\S]*?:data="members"/);
+    for (const source of [normalV1, normalV2, sub, tobe]) {
+        assert.match(source, /props:\s*\[[^\]]*"header"/);
+    }
     assert.doesNotMatch(normalV1 + normalV2, /\bmodel:\s*\{/);
     assert.match(normalV1 + normalV2, /import RaidRoleDialog from "@\/components\/team\/raid\/RaidRoleDialog\.vue"/);
     assert.match(normalV1 + normalV2, /class="u-member-role-trigger"/);
@@ -77,7 +80,9 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.doesNotMatch(sub + tobe, /:to="`\/role\/\$\{member\.role_id\}`"/);
     assert.match(roleDialog, /getRole\(this\.roleId\)/);
     assert.match(roleDialog, /class="m-raid-role-meta"/);
-    assert.match(roleDialog, /Object\.values\(xfMap\)\.find/);
+    assert.match(roleDialog, /<RoleAvatar[\s\S]*?:mount="displayRole\.school"[\s\S]*?:body_type="displayRole\.body_type"/);
+    assert.match(roleDialog, /showSchoolName\(displayRole\.school\)/);
+    assert.match(roleDialog, /Number\(this\.member\?\.mount\)/);
 
     for (const source of [normalV1, normalV2, sub, tobe, page]) {
         assert.match(source, /import bus from "@\/utils\/bus"/);
@@ -98,14 +103,14 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.match(join, /width="920px"/);
     assert.match(join, /class="m-raid-joinpop-mode"/);
     assert.match(join, /v-for="item in roleData"/);
-    assert.match(join, /确认报名/);
+    assert.match(join, /team\.raid\.join\.confirm/);
     assert.doesNotMatch(join, /team\/member\/joinpop\.less/);
     assert.doesNotMatch(join, /!custom\s*&\s*isLogin/);
     assert.match(memberSetting, /emits:\s*\["close", "updateRole"\]/);
     assert.match(memberSetting, /\bteleported\b/);
     assert.match(memberSetting, /class="m-raid-member-setting"/);
     assert.match(memberSetting, /class="m-raid-selected-role"/);
-    assert.match(memberSetting, /或填写临时角色/);
+    assert.match(memberSetting, /team\.raid\.memberSetting\.orTemporary/);
     assert.match(memberSetting, /:src="showSchoolIcon\(role\.mount\)"/);
     assert.match(memberSetting, /this\.selectedSchool = Number\(member\.mount\) \|\| 0/);
     assert.match(memberSetting, /this\.form\.mount = this\.xfMaps\[0\]\?\.id \|\| ""/);
@@ -131,7 +136,10 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(page, /<RaidFormDialog[\s\S]*v-model="formVisible"[\s\S]*:raid-id="id"[\s\S]*@saved="handleRaidSaved"/);
     assert.match(page, /editRaid:\s*function\s*\(\)\s*\{\s*this\.formVisible = true/);
     assert.doesNotMatch(page, /this\.\$router\.push\(`\/raid\/edit\/\$\{this\.id\}`\)/);
-    assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.getRaid\(\)/);
+    assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.init\(\)/);
+    assert.match(page, /team\.raid\.view\.description/);
+    assert.doesNotMatch(page, />活动说明</);
+    assert.doesNotMatch(page, /showMiniprogramCode|icon="FullScreen"/);
     assert.match(sidebar, /this\.\$route\.name === "view_raid"/);
     assert.match(sidebar, /this\.\$store\.state\.team\?\.ID/);
     assert.match(appStyles, /\.m-title[\s\S]*\.u-op[\s\S]*min-height:\s*38px/);
@@ -145,6 +153,7 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal \.m-raid-flag\s*\{[\s\S]*display:\s*flex/);
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal[\s\S]*border-radius:\s*18px/);
     assert.match(normalV1 + normalV2, /--raid-columns/);
-    assert.match(normalV1 + normalV2, /\{\{\s*f\s*\}\}\s*队/);
+    assert.match(normalV1 + normalV2, /team\.raid\.board\.group/);
+    assert.doesNotMatch(normalV1 + normalV2, /canDrag\(\)[\s\S]*?routerName\s*!==\s*["']view_raid["']/);
     assert.doesNotMatch(normalV2, /class="m-raid-tobebox m-raid-normalbox"/);
 });

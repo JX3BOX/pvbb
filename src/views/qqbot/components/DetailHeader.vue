@@ -166,4 +166,82 @@ export default {
         }
     }
 }
+
+.header {
+    gap: 12px;
+    align-items: stretch;
+
+    .info {
+        min-width: 0;
+        padding: 14px 16px;
+        gap: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.22);
+
+        .tittle {
+            height: 30px;
+            gap: 10px;
+
+            .tag {
+                width: auto;
+                height: 26px;
+                padding: 0 10px;
+                border-color: rgba(255, 255, 255, 0.16);
+                border-radius: 13px;
+                color: rgba(255, 255, 255, 0.56);
+                font-size: 12px;
+                line-height: 24px;
+
+                &.active {
+                    border: 1px solid rgba(138, 214, 62, 0.34);
+                    background: rgba(138, 214, 62, 0.12);
+                    color: #a7e86a;
+                }
+            }
+            .activity-name {
+                height: 30px;
+                font-size: 20px;
+                line-height: 30px;
+            }
+        }
+        .detail {
+            height: auto;
+            padding: 0;
+            gap: 28px;
+
+            .detail-item {
+                height: auto;
+                .item-title {
+                    color: rgba(255, 255, 255, 0.36);
+                }
+                .item-text {
+                    color: rgba(255, 255, 255, 0.78);
+                }
+            }
+        }
+    }
+    .remark {
+        width: 220px;
+        min-height: 94px;
+        padding: 12px 14px;
+        gap: 6px;
+        border: 1px solid rgba(255, 195, 0, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 195, 0, 0.04);
+        box-shadow: none;
+
+        .remark-title {
+            height: auto;
+            color: #eac45b;
+            font-size: 13px;
+            line-height: 20px;
+        }
+        .remark-content {
+            width: 100%;
+            color: rgba(255, 255, 255, 0.56);
+            line-height: 18px;
+        }
+    }
+}
 </style>

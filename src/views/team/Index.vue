@@ -2,61 +2,61 @@
     <div class="v-index">
         <div class="m-index-panel">
             <div class="m-index-panel-block">
-                <h2 class="u-title">我是团员</h2>
+                <h2 class="u-title">{{ $t("team.legacyHome.member") }}</h2>
                 <div class="u-list">
-                    <router-link to="/role/bind" title="插件绑定角色">
+                    <router-link to="/role/bind" :title="$t('team.role.pluginBind')">
                         <i class="u-icon el-icon-connection"></i>
-                        <span class="u-txt">绑定角色</span>
+                        <span class="u-txt">{{ $t("team.role.bind") }}</span>
                     </router-link>
                     <!-- <router-link to="/role/add" title="手动添加角色">
                         <i class="u-icon el-icon-circle-plus-outline"></i>
                         <span class="u-txt">添加角色</span>
                     </router-link> -->
-                    <router-link to="/role/manage" title="我的角色列表">
+                    <router-link to="/role/manage" :title="$t('team.role.myRoles')">
                         <i class="u-icon el-icon-user"></i>
-                        <span class="u-txt">角色管理</span>
+                        <span class="u-txt">{{ $t("team.legacyHome.roleManagement") }}</span>
                     </router-link>
                     <router-link to="/role/group">
                         <i class="u-icon el-icon-school"></i>
-                        <span class="u-txt">我的团队</span>
+                        <span class="u-txt">{{ $t("team.role.myTeams") }}</span>
                     </router-link>
                     <router-link to="/dkp/my">
                         <i class="u-icon el-icon-coin"></i>
-                        <span class="u-txt">我的DKP</span>
+                        <span class="u-txt">{{ $t("team.myDkp.title") }}</span>
                     </router-link>
                     <router-link to="/raid/my">
                         <i class="u-icon el-icon-add-location"></i>
-                        <span class="u-txt">报名活动</span>
+                        <span class="u-txt">{{ $t("team.legacyHome.register") }}</span>
                     </router-link>
                 </div>
             </div>
 
             <div class="m-index-panel-block">
-                <h2 class="u-title">我是团长</h2>
+                <h2 class="u-title">{{ $t("team.legacyHome.leader") }}</h2>
                 <div class="u-list">
                     <router-link to="/org/add">
                         <i class="u-icon el-icon-circle-plus-outline"></i>
-                        <span class="u-txt">创建团队</span>
+                        <span class="u-txt">{{ $t("team.orgLegacy.create") }}</span>
                     </router-link>
                     <router-link to="/org/manage/">
                         <i class="u-icon el-icon-setting"></i>
-                        <span class="u-txt">团队设置</span>
+                        <span class="u-txt">{{ $t("team.orgLegacy.settings") }}</span>
                     </router-link>
                     <router-link to="/member/list">
                         <i class="u-icon el-icon-news"></i>
-                        <span class="u-txt">队员管理</span>
+                        <span class="u-txt">{{ $t("team.legacyHome.memberManagement") }}</span>
                     </router-link>
                     <router-link to="/dkp/manage">
                         <i class="u-icon el-icon-coin"></i>
-                        <span class="u-txt">DKP管理</span>
+                        <span class="u-txt">{{ $t("team.workspace.dkpManagement") }}</span>
                     </router-link>
                     <router-link to="/snapshot/list">
                         <i class="u-icon el-icon-camera"></i>
-                        <span class="u-txt">团队快照</span>
+                        <span class="u-txt">{{ $t("team.workspace.teamSnapshots") }}</span>
                     </router-link>
                     <router-link to="/raid/manage">
                         <i class="u-icon el-icon-date"></i>
-                        <span class="u-txt">团队活动</span>
+                        <span class="u-txt">{{ $t("team.workspace.teamActivities") }}</span>
                     </router-link>
                 </div>
             </div>
@@ -67,31 +67,31 @@
         </div>
         <div class="m-index-board">
             <div class="m-team-list-header">
-                <h2 class="u-title"><i class="el-icon-date"></i> 活动大厅</h2>
+                <h2 class="u-title"><i class="el-icon-date"></i> {{ $t("team.legacyHome.lobby") }}</h2>
                 <el-select
                     class="u-server u-select u-filter"
                     v-model="server"
-                    placeholder="选择服务器"
+                    :placeholder="$t('team.legacyHome.selectServer')"
                     size="small"
                     filterable
                 >
-                    <el-option key="all" label="全部服务器" value></el-option>
+                    <el-option key="all" :label="$t('team.legacyHome.allServers')" value></el-option>
                     <el-option v-for="(item,i) in servers" :key="i" :label="item" :value="item"></el-option>
                 </el-select>
-                <el-input class="u-name u-filter" v-model="search" placeholder="查找活动" size="small">
+                <el-input class="u-name u-filter" v-model="search" :placeholder="$t('team.legacyHome.findActivity')" size="small">
                     <template #append>
                         <i class="el-icon-search" @click="loadRaids"></i>
                     </template>
                 </el-input>
                 <router-link class="u-more el-button el-button--primary is-plain el-button--mini" to="/raid/list"
-                    >查看更多&raquo;</router-link
+                    >{{ $t("team.legacyHome.more") }}&raquo;</router-link
                 >
             </div>
             <div v-loading="loading">
                 <template v-if="data && data.length">
-                    <raid-list :data="data" time="全部" :isIndex="true" />
+                    <raid-list :data="data" time="-1" :isIndex="true" />
                 </template>
-                <el-alert v-else title="没有找到符合条件的记录" type="info" show-icon></el-alert>
+                <el-alert v-else :title="$t('team.legacyHome.empty')" type="info" show-icon></el-alert>
             </div>
         </div>
     </div>

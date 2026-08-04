@@ -30,6 +30,10 @@ function getRaids(team_id) {
     return $cms().get(`/api/cms/team/raids/${team_id}`);
 }
 
+function getMemberTeamRaids(team_id) {
+    return $cms().get(`/api/cms/team/raids/member/${team_id}`);
+}
+
 function searchRaids(params) {
     return $cms().get(`/api/cms/team/raids`, {
         params: params,
@@ -156,6 +160,7 @@ export {
     removeRaid,
     manageRaid,
     getRaids,
+    getMemberTeamRaids,
     searchRaids,
     getMyTeamRaids,
     getRoles,

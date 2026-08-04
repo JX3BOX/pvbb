@@ -7,36 +7,44 @@
                         type="button"
                         class="u-sticky-button"
                         :class="{ 'is-sticky': data.sticky }"
-                        :title="data.sticky ? '取消置顶' : '置顶活动'"
+                        :title="$t(data.sticky ? 'team.raid.item.unpin' : 'team.raid.item.pin')"
                         @click.stop="setSticky"
                     >
-                        <i class="el-icon-top"></i>
+                        <el-icon class="u-sticky-icon"><Download /></el-icon>
                     </button>
                     <router-link
                         class="u-title"
                         :to="{ name: 'view_raid', params: { id: data.id } }"
                         target="_blank"
                     >
-                        <span class="u-name">{{ data.name }}</span>
-                        <span v-if="data.is_public" class="u-public"><i class="el-icon-position"></i> 活动大厅</span>
+                        <span class="u-name">{{ data.title || $t("team.raid.item.noTitle") }}</span>
+                        <span v-if="data.is_public" class="u-public"><i class="el-icon-position"></i> {{ $t("team.raid.item.lobby") }}</span>
                     </router-link>
                 </div>
-                <p class="u-recruit" :title="data.title">{{ data.title || "暂未填写活动标题" }}</p>
+                <div class="u-activity-row">
+                    <el-tag class="u-activity-tag" size="small" effect="plain" round>{{ data.name }}</el-tag>
+                </div>
                 <div class="u-meta">
                     <time><i class="el-icon-date"></i>{{ showTime(data.start_time) }} · {{ showRaidWeek(data.start_time) }}</time>
                     <span><i :class="data.auth ? 'el-icon-lock' : 'el-icon-unlock'"></i>{{ showAuth(data.auth) }}</span>
                     <span><i class="el-icon-user"></i>{{ getUserName(data.raid_creator_info) }}</span>
-                    <span v-if="data.count_total"><i class="el-icon-s-custom"></i>{{ data.count_normal || 0 }}/{{ data.count_total }} 人</span>
+                    <span v-if="data.count_total"><i class="el-icon-s-custom"></i>{{ $t("team.raid.common.people", { count: `${data.count_normal || 0}/${data.count_total}` }) }}</span>
                 </div>
             </div>
             <div class="u-op">
-                <el-button class="u-view" size="small" @click="viewRaidDetail">查看排表</el-button>
-                <el-button class="u-edit" type="primary" size="small" plain icon="Edit" @click="edit(data.id)">编辑</el-button>
+                <el-button class="u-view" size="small" plain icon="View" @click="viewRaidDetail">{{ $t("team.raid.item.view") }}</el-button>
                 <el-dropdown trigger="click" @command="handleCommand">
-                    <el-button class="u-more" size="small" aria-label="更多操作"><i class="el-icon-more"></i></el-button>
+                    <el-button class="u-more" size="small" plain icon="MoreFilled">{{ $t("team.raid.item.more") }}</el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item command="delete"><i class="el-icon-delete"></i>删除活动</el-dropdown-item>
+                            <el-dropdown-item command="edit">
+                                <i class="el-icon-edit"></i>
+                                {{ $t("team.raid.item.edit") }}
+                            </el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>
+                                <i class="el-icon-delete"></i>
+                                {{ $t("team.raid.item.delete") }}
+                            </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -48,8 +56,7 @@
 <script>
 import raidAuthMap from "@/assets/data/team/raid_auth.json";
 import { deleteRaid, setRaidSticky } from "@/service/team/raid.js";
-import { moment } from "@jx3box/jx3box-common/js/moment";
-import { showRaidWeek, showTime } from "@/utils/filters";
+import { showTime } from "@/utils/filters";
 export default {
     name: "RaidItem",
     props: ["team_id", "data"],
@@ -69,17 +76,18 @@ export default {
             this.$emit("edit", id);
         },
         handleCommand(command) {
+            if (command === "edit") this.edit(this.data.id);
             if (command === "delete") this.del(this.data);
         },
         del: function (data) {
-            this.$alert("确定删除这条记录吗？", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.raid.item.deleteConfirm"), this.$t("team.raid.item.message"), {
+                confirmButtonText: this.$t("team.raid.common.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
                         deleteRaid(data.team_id, data.id).then((res) => {
                             this.$message({
                                 type: "success",
-                                message: `删除成功`,
+                                message: this.$t("team.raid.common.deleted"),
                             });
                             this.$emit("dropItem");
                         });
@@ -96,7 +104,7 @@ export default {
             window.open(href, "_blank");
         },
         getUserName(user) {
-            return user?.display_name || "未知";
+            return user?.display_name || this.$t("team.raid.common.unknown");
         },
         // 置顶
         setSticky() {
@@ -106,16 +114,18 @@ export default {
             setRaidSticky(this.data.id, data).then((res) => {
                 this.$message({
                     type: "success",
-                    message: `${data.sticky ? "置顶" : "取消置顶"}成功`,
+                    message: this.$t(data.sticky ? "team.raid.item.pinSuccess" : "team.raid.item.unpinSuccess"),
                 });
                 this.$emit("sticky");
             });
         },
         showAuth: function (val) {
-            return raidAuthMap[val] || "未知";
+            return this.$t(`team.raid.auth.${val}`);
         },
         showRaidWeek: function (d) {
-            return moment(d).format("dddd");
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                weekday: "long",
+            }).format(new Date(d));
         },
         showTime,
     },

@@ -13,12 +13,12 @@ test("related snapshots dialog uses the Vue 3 v-model contract", async () => {
     assert.match(detail, /this\.\$emit\("update:modelValue", value\)/);
     assert.match(detail, /v-for="\(item, index\) in pagedSnapshotList"/);
     assert.match(detail, /class="m-snapshot-detail__summary"/);
-    assert.match(detail, /class="u-view-team" plain icon="Camera" @click="openRoster\(item\)">查看阵容/);
+    assert.match(detail, /class="u-view-team" plain icon="Camera" @click="openRoster\(item\)">\{\{ \$t\("team\.snapshotEdit\.viewRoster"\) \}\}/);
     assert.match(detail, /v-model:current-page="currentPage"/);
     assert.match(detail, /snapshotList\.slice\(start, start \+ this\.pageSize\)/);
     assert.match(detail, /class="m-snapshot-roster-dialog"/);
     assert.match(detail, /<div class="m-snapshot-flags">/);
-    assert.match(detail, /v-for="group of 5"[^>]*>\{\{ group \}\} 队/);
+    assert.match(detail, /v-for="group of 5"[^>]*>\{\{ \$t\("team\.snapshotEdit\.group", \{ group \}\) \}\}/);
     assert.match(detail, /<snapshot-body :data="currentRoster" class="row-5"/);
     assert.doesNotMatch(detail, /currentGroups/);
     assert.doesNotMatch(detail, /<el-popover/);

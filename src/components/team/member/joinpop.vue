@@ -92,7 +92,6 @@
 </template>
 
 <script>
-import { __imgPath } from "@/utils/config";
 import { getMyPureRoles, joinTeam } from "@/service/team/member.js";
 import { UserFilled } from "@element-plus/icons-vue";
 
@@ -207,7 +206,7 @@ export default {
             this.isIndeterminate = value.length > 0 && value.length < total;
         },
         showAvatar: function (mount) {
-            return __imgPath + "image/school/" + mount + ".png";
+            return "https://img.jx3box.com/image/school/" + mount + ".png";
         },
     },
     beforeUnmount: function () {

@@ -1,14 +1,14 @@
 <template>
     <div class="v-snapshot-view">
         <el-divider content-position="left">
-            <i class="el-icon-camera"></i> 快照记录
+            <i class="el-icon-camera"></i> {{ $t("team.snapshotEdit.record") }}
         </el-divider>
         <div class="m-dkp-overview">
             <template v-if="hasRight">
                 <snapshot-list :org="org" :readOnly="true"/>
             </template>
             <template v-else>
-                <el-alert class="u-tip" title="没有查看权限" type="warning" show-icon></el-alert>
+                <el-alert class="u-tip" :title="$t('team.snapshotEdit.noPermission')" type="warning" show-icon></el-alert>
             </template>
         </div>
     </div>

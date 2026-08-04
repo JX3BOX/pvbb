@@ -2,7 +2,7 @@
     <el-dialog
         v-model="visible"
         class="m-raid-form-dialog"
-        :title="isEdit ? '编辑活动' : '创建活动'"
+        :title="isEdit ? $t('team.raid.common.edit') : $t('team.raid.common.create')"
         width="920px"
         align-center
         append-to-body
@@ -15,35 +15,34 @@
                 v-if="!loading"
                 ref="formRef"
                 :model="form"
-                :rules="rules"
+                :rules="localizedRules"
                 label-position="top"
                 class="m-raid-dialog-form"
             >
                 <section class="m-raid-form-section">
                     <header>
-                        <h4>基础信息</h4>
-                        <span>{{ isEdit ? "修改开团信息，保存后立即生效" : "填写活动归属与开团安排，创建后可继续维护详细名单" }}</span>
+                        <h4>{{ $t("team.raid.form.basic") }}</h4>
                     </header>
                     <div class="m-raid-form-grid">
-                        <el-form-item label="所属团队" prop="team_id">
+                        <el-form-item :label="$t('team.raid.form.team')" prop="team_id">
                             <el-select
                                 v-model.number="form.team_id"
                                 :disabled="isEdit"
                                 filterable
-                                placeholder="请选择团队"
+                                :placeholder="$t('team.raid.form.selectTeam')"
                                 @change="handleTeamChange"
                             >
                                 <el-option v-for="item in teams" :key="item.ID" :label="item.name" :value="item.ID" />
                             </el-select>
                         </el-form-item>
 
-                        <el-form-item label="活动名称" prop="name">
+                        <el-form-item :label="$t('team.raid.form.name')" prop="name">
                             <div v-if="!isEdit" class="m-raid-event-field">
                                 <el-input
                                     v-if="isCustomEvent"
                                     v-model.trim="form.name"
                                     maxlength="20"
-                                    placeholder="请输入活动名称"
+                                    :placeholder="$t('team.raid.form.inputName')"
                                     clearable
                                 />
                                 <el-select
@@ -51,7 +50,7 @@
                                     v-model="preset"
                                     value-key="map_id"
                                     filterable
-                                    placeholder="请选择活动"
+                                    :placeholder="$t('team.raid.form.selectActivity')"
                                     @change="handlePresetChange"
                                 >
                                     <el-option
@@ -62,53 +61,19 @@
                                     />
                                 </el-select>
                                 <el-button link type="primary" @click="toggleCustomEvent">
-                                    {{ isCustomEvent ? "使用预设" : "自定义" }}
+                                    {{ $t(isCustomEvent ? "team.raid.form.preset" : "team.raid.form.custom") }}
                                 </el-button>
                             </div>
                             <el-input v-else v-model="form.name" disabled />
                         </el-form-item>
 
-                        <el-form-item label="活动标题" prop="title" class="is-wide">
-                            <el-input
-                                v-model.trim="form.title"
-                                maxlength="50"
-                                show-word-limit
-                                placeholder="不填写时将自动使用团队名和活动名称"
-                            />
-                        </el-form-item>
-
-                        <el-form-item label="活动时间" prop="start_time">
-                            <el-date-picker
-                                v-model="form.start_time"
-                                type="datetime"
-                                placeholder="请选择开团时间"
-                                format="YYYY-MM-DD HH:mm"
-                                value-format="YYYY-MM-DD HH:mm:ss"
-                            />
-                        </el-form-item>
-
-                        <el-form-item label="开组角色" prop="leader">
-                            <template #label>
-                                <span>开组角色</span>
-                                <el-tooltip content="用于游戏内插件点击指定角色进组" placement="top">
-                                    <i class="el-icon-info u-label-help"></i>
-                                </el-tooltip>
-                            </template>
-                            <el-input
-                                v-model.trim="form.leader"
-                                maxlength="12"
-                                show-word-limit
-                                placeholder="请输入队长角色名"
-                            />
-                        </el-form-item>
-
-                        <el-form-item v-if="!isEdit && isCustomEvent" label="队伍规格" class="is-wide">
+                        <el-form-item v-if="!isEdit && isCustomEvent" :label="$t('team.raid.form.size')" class="is-wide">
                             <div class="m-raid-size-row">
                                 <el-select v-model="sample" value-key="label" @change="handleSizeChange">
                                     <el-option
                                         v-for="(item, key) in samples"
                                         :key="key"
-                                        :label="item.label"
+                                        :label="showSampleLabel(item)"
                                         :value="item"
                                     />
                                 </el-select>
@@ -117,54 +82,86 @@
                                     <span class="u-size-times">×</span>
                                     <el-input-number v-model="form.col" :min="1" :max="5" controls-position="right" />
                                 </template>
-                                <span class="u-capacity">上限 {{ capacity }} 人</span>
+                                <span class="u-capacity">{{ $t("team.raid.form.capacity", { count: capacity }) }}</span>
                             </div>
+                        </el-form-item>
+
+                        <el-form-item :label="$t('team.raid.form.title')" prop="title" class="is-wide">
+                            <el-input
+                                v-model.trim="form.title"
+                                maxlength="50"
+                                show-word-limit
+                                :placeholder="$t('team.raid.form.titleHint')"
+                            />
+                        </el-form-item>
+
+                        <el-form-item :label="$t('team.raid.form.time')" prop="start_time">
+                            <el-date-picker
+                                v-model="form.start_time"
+                                type="datetime"
+                                :placeholder="$t('team.raid.form.selectTime')"
+                                format="YYYY-MM-DD HH:mm"
+                                value-format="YYYY-MM-DD HH:mm:ss"
+                            />
+                        </el-form-item>
+
+                        <el-form-item :label="$t('team.raid.form.leader')" prop="leader">
+                            <template #label>
+                                <span>{{ $t("team.raid.form.leader") }}</span>
+                                <el-tooltip :content="$t('team.raid.form.leaderHint')" placement="top">
+                                    <i class="el-icon-info u-label-help"></i>
+                                </el-tooltip>
+                            </template>
+                            <el-input
+                                v-model.trim="form.leader"
+                                maxlength="12"
+                                show-word-limit
+                                :placeholder="$t('team.raid.form.leaderPlaceholder')"
+                            />
                         </el-form-item>
                     </div>
                 </section>
 
                 <section class="m-raid-form-section">
                     <header>
-                        <h4>报名设置</h4>
-                        <span>控制谁可以报名以及审批方式</span>
+                        <h4>{{ $t("team.raid.form.signup") }}</h4>
                     </header>
-                    <el-form-item label="报名条件" prop="auth" class="u-auth-options">
+                    <el-form-item :label="$t('team.raid.form.condition')" prop="auth" class="u-auth-options">
                         <el-radio-group v-model.number="form.auth">
-                            <el-radio-button :value="0">所有人</el-radio-button>
-                            <el-radio-button :value="1">认证角色</el-radio-button>
-                            <el-radio-button :value="2">仅团员</el-radio-button>
-                            <el-radio-button :value="3">管理员指定</el-radio-button>
+                            <el-radio-button :value="0">{{ $t("team.raid.form.everyone") }}</el-radio-button>
+                            <el-radio-button :value="1">{{ $t("team.raid.form.verifiedRole") }}</el-radio-button>
+                            <el-radio-button :value="2">{{ $t("team.raid.form.membersOnly") }}</el-radio-button>
+                            <el-radio-button :value="3">{{ $t("team.raid.form.adminOnly") }}</el-radio-button>
                         </el-radio-group>
                     </el-form-item>
                     <div class="m-raid-switch-list">
                         <label>
                             <span>
-                                <b>自动批准申请</b>
-                                <small>{{ isVerified ? "报名后自动进入正式名单" : "仅认证团队可以开启" }}</small>
+                                <b>{{ $t("team.raid.form.public") }}</b>
+                                <small>{{ $t(isVerified ? "team.raid.form.publicOn" : "team.raid.form.broadcastVerifiedOnly") }}</small>
+                            </span>
+                            <el-switch v-model="form.is_public" :disabled="!isVerified" :active-value="1" :inactive-value="0" />
+                        </label>
+                        <label>
+                            <span>
+                                <b>{{ $t("team.raid.form.autoApprove") }}</b>
+                                <small>{{ $t(isVerified ? "team.raid.form.autoApproveOn" : "team.raid.form.verifiedOnly") }}</small>
                             </span>
                             <el-switch v-model="form.auto_accept" :disabled="!isVerified" :active-value="1" :inactive-value="0" />
                         </label>
                         <label>
                             <span>
-                                <b>审批时匹配心法</b>
-                                <small>自动审批开启时无法同时启用</small>
+                                <b>{{ $t("team.raid.form.matchMount") }}</b>
+                                <small>{{ $t("team.raid.form.matchMountHint") }}</small>
                             </span>
                             <el-switch v-model="form.force_match" :disabled="!!form.auto_accept" :active-value="1" :inactive-value="0" />
-                        </label>
-                        <label>
-                            <span>
-                                <b>展示在活动大厅</b>
-                                <small>{{ isVerified ? "允许其他玩家在活动大厅看到" : "仅认证团队可以广播" }}</small>
-                            </span>
-                            <el-switch v-model="form.is_public" :disabled="!isVerified" :active-value="1" :inactive-value="0" />
                         </label>
                     </div>
                 </section>
 
                 <section class="m-raid-form-section">
                     <header>
-                        <h4>补充说明</h4>
-                        <span>可选填拍卖、补贴或集合要求</span>
+                        <h4>{{ $t("team.raid.form.notes") }}</h4>
                     </header>
                     <el-form-item prop="desc" class="u-desc-field">
                         <el-input
@@ -173,7 +170,7 @@
                             :rows="3"
                             maxlength="300"
                             show-word-limit
-                            placeholder="请输入活动说明"
+                            :placeholder="$t('team.raid.form.notesPlaceholder')"
                         />
                     </el-form-item>
                 </section>
@@ -182,9 +179,9 @@
 
         <template #footer>
             <div class="m-raid-dialog-footer">
-                <el-button @click="visible = false">取消</el-button>
+                <el-button @click="visible = false">{{ $t("team.raid.common.cancel") }}</el-button>
                 <el-button type="primary" :loading="processing" :disabled="loading" @click="submit">
-                    {{ isEdit ? "保存修改" : "创建活动" }}
+                    {{ $t(isEdit ? "team.raid.common.save" : "team.raid.common.create") }}
                 </el-button>
             </div>
         </template>
@@ -211,7 +208,7 @@ const createDefaultForm = () => ({
     leader: "",
     is_public: 0,
     auto_accept: 0,
-    force_match: 1,
+    force_match: 0,
     row: 5,
     col: 5,
     count: 25,
@@ -239,11 +236,6 @@ export default {
             processing: false,
             openRequestId: 0,
             presetRequestId: 0,
-            rules: {
-                team_id: [{ required: true, message: "请选择所属团队", trigger: "change" }],
-                name: [{ required: true, message: "请选择或填写活动名称", trigger: "change" }],
-                start_time: [{ required: true, message: "请选择活动时间", trigger: "change" }],
-            },
         };
     },
     computed: {
@@ -270,6 +262,13 @@ export default {
         currentClient() {
             return serverMap[this.form.server]?.client || this.$store.state.client;
         },
+        localizedRules() {
+            return {
+                team_id: [{ required: true, message: this.$t("team.raid.form.teamRequired"), trigger: "change" }],
+                name: [{ required: true, message: this.$t("team.raid.form.nameRequired"), trigger: "change" }],
+                start_time: [{ required: true, message: this.$t("team.raid.form.timeRequired"), trigger: "change" }],
+            };
+        },
     },
     watch: {
         modelValue(value) {
@@ -280,6 +279,9 @@ export default {
         },
     },
     methods: {
+        showSampleLabel(item) {
+            return item?.key === "custom" ? this.$t("team.raid.form.custom") : `${item.row}×${item.col}`;
+        },
         async open() {
             this.reset();
             const requestId = ++this.openRequestId;
@@ -399,7 +401,7 @@ export default {
             this.processing = true;
             try {
                 const res = this.isEdit ? await updateRaid(this.raidId, data) : await addRaid(data);
-                this.$message.success(this.isEdit ? "活动已更新" : "活动创建成功");
+                this.$message.success(this.$t(this.isEdit ? "team.raid.common.updated" : "team.raid.common.created"));
                 this.$emit("saved", res?.data?.data || data);
                 this.visible = false;
             } finally {

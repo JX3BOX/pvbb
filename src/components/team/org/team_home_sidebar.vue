@@ -1,5 +1,44 @@
 <template>
-    <aside class="m-team-home-sidebar" :aria-label="$t('team.sidebar.ariaLabel')">
+    <aside
+        class="m-team-home-sidebar"
+        :class="{ 'is-mobile-drawer-open': mobileDrawerOpen }"
+        :aria-label="$t('team.sidebar.ariaLabel')"
+    >
+        <button
+            class="u-team-mobile-navigation-trigger"
+            type="button"
+            aria-controls="team-mobile-navigation-drawer"
+            :aria-expanded="mobileDrawerOpen"
+            :aria-label="$t('team.sidebar.mobileOpen')"
+            :title="$t('team.sidebar.mobileOpen')"
+            @click="openMobileDrawer"
+        >
+            <el-icon><ArrowRight /></el-icon>
+        </button>
+
+        <button
+            v-if="mobileDrawerOpen"
+            class="u-team-mobile-navigation-mask"
+            type="button"
+            :aria-label="$t('team.sidebar.mobileClose')"
+            @click="closeMobileDrawer"
+        ></button>
+
+        <div
+            id="team-mobile-navigation-drawer"
+            class="m-team-home-sidebar__drawer"
+            :class="{ 'is-open': mobileDrawerOpen }"
+        >
+            <header class="m-team-mobile-navigation-header">
+                <div>
+                    <img :src="teamLogo" alt="" />
+                    <strong>{{ $t("team.common.platform") }}</strong>
+                </div>
+                <button type="button" :aria-label="$t('team.sidebar.mobileClose')" @click="closeMobileDrawer">
+                    <el-icon><Close /></el-icon>
+                </button>
+            </header>
+
         <section class="m-team-home-sidebar__panel is-navigation is-discovery">
             <div class="m-team-home-sidebar__brand">
                 <span class="u-sidebar-brand-icon" aria-hidden="true">
@@ -16,6 +55,7 @@
                     :class="{ 'is-active': isTeamHome }"
                     to="/"
                     :aria-current="isTeamHome ? 'page' : undefined"
+                    @click="closeMobileDrawer"
                 >
                     <span class="u-sidebar-nav-icon"
                         ><el-icon><Search /></el-icon
@@ -31,6 +71,7 @@
                     :class="{ 'is-active': isTeamActivity }"
                     to="/raid/list"
                     :aria-current="isTeamActivity ? 'page' : undefined"
+                    @click="closeMobileDrawer"
                 >
                     <span class="u-sidebar-nav-icon"
                         ><el-icon><Calendar /></el-icon
@@ -57,7 +98,7 @@
                 ></span>
                 <strong>{{ $t("team.sidebar.loginTitle") }}</strong>
                 <p>{{ $t("team.sidebar.loginDescription") }}</p>
-                <a :href="loginUrl">{{ $t("team.sidebar.login") }}</a>
+                <a :href="loginUrl" @click="closeMobileDrawer">{{ $t("team.sidebar.login") }}</a>
             </div>
 
             <div
@@ -107,6 +148,7 @@
                                 class="u-sidebar-team"
                                 :class="{ 'is-active': isActiveTeam(team, 'manage') }"
                                 :to="teamRoute(team, 'manage')"
+                                @click="closeMobileDrawer"
                             >
                                 <img
                                     :src="team.logo ? showLogo(team.logo) : defaultLogo"
@@ -164,6 +206,7 @@
                                 class="u-sidebar-team"
                                 :class="{ 'is-active': isActiveTeam(team, 'member') }"
                                 :to="teamRoute(team, 'member')"
+                                @click="closeMobileDrawer"
                             >
                                 <img
                                     :src="team.logo ? showLogo(team.logo) : defaultLogo"
@@ -188,7 +231,7 @@
                 ></span>
                 <strong>{{ $t("team.sidebar.emptyTitle") }}</strong>
                 <p>{{ $t("team.sidebar.emptyDescription") }}</p>
-                <router-link to="/org/add">{{ $t("team.sidebar.createTeam") }}</router-link>
+                <router-link to="/org/add" @click="closeMobileDrawer">{{ $t("team.sidebar.createTeam") }}</router-link>
             </div>
 
             <a
@@ -196,6 +239,7 @@
                 :href="dashboardRoleUrl"
                 target="_blank"
                 rel="noopener noreferrer"
+                @click="closeMobileDrawer"
             >
                 <span class="u-sidebar-group-icon is-role" aria-hidden="true">
                     <el-icon><User /></el-icon>
@@ -206,6 +250,7 @@
                 <el-icon class="u-sidebar-nav-arrow"><TopRight /></el-icon>
             </a>
         </section>
+        </div>
     </aside>
 </template>
 
@@ -219,6 +264,7 @@ import {
     ArrowDown,
     ArrowRight,
     Calendar,
+    Close,
     Lock,
     OfficeBuilding,
     Search,
@@ -235,6 +281,7 @@ export default {
         ArrowDown,
         ArrowRight,
         Calendar,
+        Close,
         Lock,
         OfficeBuilding,
         Search,
@@ -257,6 +304,7 @@ export default {
             loadError: false,
             loading: false,
             managedTeams: [],
+            mobileDrawerOpen: false,
             teams: [],
             uid: userInfo.uid || 0,
         };
@@ -269,7 +317,7 @@ export default {
             return `/account/login?redirect=${encodeURIComponent(window.location.href)}`;
         },
         isTeamHome: function () {
-            return ["index", "view_org"].includes(this.$route.name);
+            return ["index", "list_org", "view_org"].includes(this.$route.name);
         },
         isTeamActivity: function () {
             return ["list_raid", "view_raid"].includes(this.$route.name);
@@ -289,6 +337,12 @@ export default {
         },
     },
     watch: {
+        "$route.fullPath": function () {
+            this.closeMobileDrawer();
+        },
+        mobileDrawerOpen: function (isOpen) {
+            document.body.classList.toggle("is-team-navigation-open", isOpen);
+        },
         workspaceMode: {
             immediate: true,
             handler: function (mode) {
@@ -304,8 +358,22 @@ export default {
     },
     mounted: function () {
         if (this.isLogin) this.loadTeams();
+        document.addEventListener("keydown", this.handleMobileDrawerKeydown);
+    },
+    beforeUnmount: function () {
+        document.removeEventListener("keydown", this.handleMobileDrawerKeydown);
+        document.body.classList.remove("is-team-navigation-open");
     },
     methods: {
+        openMobileDrawer: function () {
+            this.mobileDrawerOpen = true;
+        },
+        closeMobileDrawer: function () {
+            this.mobileDrawerOpen = false;
+        },
+        handleMobileDrawerKeydown: function (event) {
+            if (event.key === "Escape") this.closeMobileDrawer();
+        },
         extractTeams: function (response) {
             const data = response?.data?.data;
             if (Array.isArray(data)) return data;

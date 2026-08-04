@@ -65,7 +65,7 @@
                             @dragstart="dragStart($event, item)"
                             @drag="drag($event)"
                             @dragover.prevent
-                            @drop="drop('altetnateList')"
+                            @drop.stop="drop('altetnateList')"
                             @dragend="dragEnd"
                             style="height: 66px"
                         >
@@ -88,7 +88,7 @@
                             @dragstart="dragStart($event, item)"
                             @drag="drag($event)"
                             @dragover.prevent
-                            @drop="drop('queueList')"
+                            @drop.stop="drop('queueList')"
                             @dragend="dragEnd"
                             :id="`item-${item?.id}`"
                         >
@@ -139,10 +139,8 @@ export default {
                 x: 0,
                 y: 0,
             },
+            loadRequestId: 0,
         };
-    },
-    created() {
-        this.getRaidDetail();
     },
     computed: {
         queueList() {
@@ -162,13 +160,32 @@ export default {
             return list;
         },
     },
+    watch: {
+        "$route.query.id": {
+            immediate: true,
+            handler(id) {
+                this.getRaidDetail(id);
+            },
+        },
+    },
+    beforeUnmount() {
+        this.loadRequestId += 1;
+        this.clearDragPreview();
+    },
     methods: {
-        getRaidDetail() {
-            getRaidDetail(this.$route.query.id).then((res) => {
-                this.raidDetail = res.data.data;
-            });
+        async getRaidDetail(id = this.$route.query.id) {
+            const requestId = ++this.loadRequestId;
+            this.raidDetail = {};
+            if (!id) return;
+            try {
+                const res = await getRaidDetail(id);
+                if (requestId === this.loadRequestId) this.raidDetail = res.data?.data || {};
+            } catch (error) {
+                if (requestId === this.loadRequestId) this.raidDetail = {};
+            }
         },
         drag(event) {
+            if (!this.dragEle) return;
             const last = !event.clientX && !event.clientY;
             this.dragEle.style.transform = `translate(${last ? 0 : event.clientX - this.dragOffset.x}px, ${
                 last ? 0 : event.clientY - this.dragOffset.y
@@ -202,42 +219,43 @@ export default {
             this.dragEle = ele;
             document.body.appendChild(ele);
         },
-        dragEnd() {
-            if (!this.dragEle) return;
-            document.body.removeChild(this.dragEle);
+        clearDragPreview() {
+            if (this.dragEle?.parentNode) this.dragEle.parentNode.removeChild(this.dragEle);
             this.dragEle = null;
             this.dragOffset = {
                 x: 0,
                 y: 0,
             };
+        },
+        dragEnd() {
+            this.clearDragPreview();
             this.dragItem = null;
         },
         async drop(item, index, member) {
-            if (this.dragEle) {
-                document.body.removeChild(this.dragEle);
-                this.dragEle = null;
-                this.dragOffset = {
-                    x: 0,
-                    y: 0,
-                };
+            this.clearDragPreview();
+            if (!this.dragItem) return;
+            const dragItem = this.dragItem;
+            const raidId = this.$route.query.id;
+            if (member && member.id === dragItem.id) {
+                this.dragItem = null;
+                return;
             }
-            if (member && member.id === this.dragItem.id) return;
-            const dragIndex = this.raidDetail.members.findIndex((item) => item.id === this.dragItem.id);
+            const dragIndex = this.raidDetail.members.findIndex((item) => item.id === dragItem.id);
             let dropIndex = null;
             if (member) {
                 dropIndex = this.raidDetail.members.findIndex((item) => item.id === member.id);
             }
 
             if (
-                (item === "queueList" && this.dragItem.identity_status !== 3) ||
-                (item === "altetnateList" && this.dragItem.identity_status !== 2)
+                (item === "queueList" && dragItem.identity_status !== 3) ||
+                (item === "altetnateList" && dragItem.identity_status !== 2)
             ) {
                 const newStatus = item === "queueList" ? 3 : 2;
-                this.changgeMembers([{ index: dragIndex, data: { ...this.dragItem, identity_status: newStatus } }]);
-                await this.handleChangeStatus(newStatus, dragIndex);
+                this.changgeMembers([{ index: dragIndex, data: { ...dragItem, identity_status: newStatus } }]);
+                await this.handleChangeStatus(newStatus, dragIndex, dragItem, raidId);
             }
             if (item === "memberList") {
-                if (this.dragItem.identity_status !== 1) {
+                if (dragItem.identity_status !== 1) {
                     if (member) {
                         this.$message.error("请拖动到无人的位置");
                         return (this.dragItem = null);
@@ -246,74 +264,89 @@ export default {
                         {
                             index: dragIndex,
                             data: {
-                                ...this.dragItem,
+                                ...dragItem,
                                 identity_status: 1,
                                 group_x: Math.floor(index / 5),
                                 group_y: index % 5,
                             },
                         },
                     ]);
-                    const res = await this.handleChangeStatus(1, dragIndex);
-                    if (res.data.code !== 0) return (this.dragItem = null);
-                    await this.handleChangePosition(index, dragIndex);
+                    const statusChanged = await this.handleChangeStatus(1, dragIndex, dragItem, raidId);
+                    if (!statusChanged) {
+                        if (this.dragItem === dragItem) this.dragItem = null;
+                        return;
+                    }
+                    await this.handleChangePosition(
+                        index,
+                        { ...dragItem, identity_status: 1 },
+                        raidId
+                    );
                 } else if (member) {
-                    await this.handleSwitchPosition(member, dragIndex, dropIndex);
+                    await this.handleSwitchPosition(member, dragIndex, dropIndex, dragItem, raidId);
                 } else {
                     this.changgeMembers([
                         {
                             index: dragIndex,
-                            data: { ...this.dragItem, group_x: Math.floor(index / 5), group_y: index % 5 },
+                            data: { ...dragItem, group_x: Math.floor(index / 5), group_y: index % 5 },
                         },
                     ]);
-                    await this.handleChangePosition(index, dragIndex);
+                    await this.handleChangePosition(index, dragItem, raidId);
                 }
             }
-            this.dragItem = null;
+            if (this.dragItem === dragItem) this.dragItem = null;
         },
-        async handleSwitchPosition(member, dragIndex, dropIndex) {
-            const new_x = this.dragItem.group_x;
-            const new_y = this.dragItem.group_y;
+        async handleSwitchPosition(member, dragIndex, dropIndex, dragItem, raidId) {
+            const new_x = dragItem.group_x;
+            const new_y = dragItem.group_y;
             const old_x = member.group_x;
             const old_y = member.group_y;
             this.changgeMembers([
-                { index: dragIndex, data: { ...this.dragItem, group_x: old_x, group_y: old_y } },
+                { index: dragIndex, data: { ...dragItem, group_x: old_x, group_y: old_y } },
                 { index: dropIndex, data: { ...member, group_x: new_x, group_y: new_y } },
             ]);
             try {
-                await switchPosition(this.$route.query.id, {
-                    new_member_id: this.dragItem.id,
+                await switchPosition(raidId, {
+                    new_member_id: dragItem.id,
                     original_member_id: member.id,
                 });
             } catch (error) {
-                this.changgeMembers([
-                    { index: dragIndex, data: { ...this.dragItem, group_x: new_x, group_y: new_y } },
-                    { index: dropIndex, data: { ...member, group_x: old_x, group_y: old_y } },
-                ]);
+                if (this.isCurrentRaid(raidId)) {
+                    this.changgeMembers([
+                        { index: dragIndex, data: { ...dragItem, group_x: new_x, group_y: new_y } },
+                        { index: dropIndex, data: { ...member, group_x: old_x, group_y: old_y } },
+                    ]);
+                }
             }
         },
-        async handleChangeStatus(newStatus, dragIndex) {
-            const status = this.dragItem.identity_status;
+        async handleChangeStatus(newStatus, dragIndex, dragItem, raidId) {
+            const status = dragItem.identity_status;
             try {
-                const res = await updateMemberStatus(this.$route.query.id, this.dragItem.id, {
+                await updateMemberStatus(raidId, dragItem.id, {
                     identity_status: newStatus,
                 });
-                return res;
+                return true;
             } catch (error) {
-                this.changgeMembers([{ index: dragIndex, data: { ...this.dragItem, identity_status: status } }]);
+                if (this.isCurrentRaid(raidId)) {
+                    this.changgeMembers([{ index: dragIndex, data: { ...dragItem, identity_status: status } }]);
+                }
+                return false;
             }
         },
-        async handleChangePosition(index, dragIndex) {
-            const x = this.dragItem.group_x;
-            const y = this.dragItem.group_y;
+        async handleChangePosition(index, dragItem, raidId) {
             try {
-                await setMemberPosition(this.$route.query.id, {
-                    member_id: this.dragItem.id,
+                await setMemberPosition(raidId, {
+                    member_id: dragItem.id,
                     group_x: Math.floor(index / 5),
                     group_y: index % 5,
                 });
             } catch (error) {
-                this.changgeMembers([{ index: dragIndex, data: { ...this.dragItem, group_x: x, group_y: y } }]);
+                if (this.isCurrentRaid(raidId)) {
+                    await this.getRaidDetail(raidId);
+                }
             }
+        },
+        isCurrentRaid(raidId) {
+            return String(this.$route.query.id || "") === String(raidId || "");
         },
         handleClear(list) {
             if (this[list]?.length === 0) return;
@@ -331,6 +364,7 @@ export default {
             });
         },
         changgeMembers(arr) {
+            if (!Array.isArray(this.raidDetail.members)) return;
             arr.forEach((item) => {
                 this.raidDetail.members.splice(item.index, 1, item.data);
             });
@@ -353,7 +387,8 @@ export default {
 
 <style lang="less" scoped>
 .m-raid-detail {
-    width: 1254px;
+    width: 100%;
+    min-width: 1254px;
     .m-raid-detail__toolbar {
         display: flex;
         margin: 12px 0;
@@ -549,6 +584,194 @@ export default {
                     transform: scale(0.5);
                     transform-origin: 0 0;
                     pointer-events: none;
+                }
+            }
+        }
+    }
+}
+
+// 详情页使用 QQBotLayout 的实际内容宽度，避免固定宽度将右侧名单推出视口。
+.m-raid-detail {
+    min-width: 0;
+    padding: 24px 0 40px;
+    box-sizing: border-box;
+
+    .m-raid-detail__toolbar {
+        align-items: center;
+        margin: 0 0 16px;
+
+        .back-button {
+            width: auto;
+            height: 36px;
+            padding: 0 14px;
+            margin-right: auto;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.72);
+            transition: 0.2s ease;
+
+            &:hover {
+                border-color: rgba(255, 255, 255, 0.24);
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+        }
+        .edit-button-group {
+            width: auto;
+            gap: 10px;
+
+            .handle-button {
+                width: auto;
+                height: 36px;
+                padding: 0 14px;
+                border-radius: 8px;
+                gap: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                transition: 0.2s ease;
+            }
+            .edit-button {
+                border: 1px solid rgba(96, 151, 255, 0.34);
+                background: rgba(64, 128, 255, 0.1);
+                color: #8bb2ff;
+                &:hover {
+                    border-color: rgba(96, 151, 255, 0.58);
+                    background: rgba(64, 128, 255, 0.18);
+                    color: #b1caff;
+                }
+            }
+            .delete-button {
+                border: 1px solid rgba(255, 107, 135, 0.3);
+                background: rgba(227, 60, 100, 0.1);
+                color: #ff8aa2;
+                &:hover {
+                    background: rgba(227, 60, 100, 0.18);
+                }
+            }
+        }
+    }
+
+    .raid-detail-content {
+        height: auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        align-items: stretch;
+        gap: 16px;
+
+        .left {
+            width: auto;
+            min-width: 0;
+            height: auto;
+            min-height: 733px;
+            padding: 20px;
+            gap: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            background:
+                radial-gradient(circle at 90% 0, rgba(64, 128, 255, 0.12), transparent 30%),
+                linear-gradient(145deg, rgba(43, 45, 52, 0.98), rgba(26, 28, 33, 0.98));
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+
+            &::after {
+                display: none;
+            }
+            .member-list,
+            .altetnate-list {
+                gap: 8px;
+            }
+            .member-list .list-header {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                height: 20px;
+                gap: 8px;
+
+                .list-header-item {
+                    width: auto;
+                    height: 20px;
+                    line-height: 20px;
+                    color: rgba(255, 255, 255, 0.38);
+                    border-radius: 6px;
+                    background: rgba(0, 0, 0, 0.24);
+                }
+            }
+            .member-list .member-list-content {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 8px;
+
+                > div {
+                    min-width: 0;
+                }
+                .active {
+                    transform: scale(1.08);
+                }
+            }
+            .altetnate-list .altetnate-list-content {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                align-content: flex-start;
+                gap: 8px;
+                padding: 10px;
+                border: 1px dashed rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                background: rgba(0, 0, 0, 0.2);
+                box-shadow: none;
+                overflow-y: auto;
+
+                > div {
+                    min-width: 0;
+                }
+            }
+            :deep(.member-list-content .card),
+            :deep(.altetnate-list-content .card),
+            :deep(.member-list-content .card-fotter),
+            :deep(.altetnate-list-content .card-fotter) {
+                width: 100%;
+            }
+        }
+
+        .right {
+            width: auto;
+            min-width: 0;
+            gap: 0;
+
+            .queue-list {
+                padding: 18px 12px;
+                gap: 12px;
+                border: 1px solid rgba(255, 195, 0, 0.24);
+                border-radius: 16px;
+                background: linear-gradient(145deg, rgba(52, 45, 30, 0.78), rgba(29, 27, 24, 0.92));
+
+                &::after {
+                    display: none;
+                }
+                .queue-list-header {
+                    min-height: 28px;
+                    height: auto;
+
+                    .queue-list-title {
+                        font-size: 14px;
+                        line-height: 20px;
+                        color: #ffd15a;
+                    }
+                    .clear-button-queue {
+                        width: auto;
+                        height: 24px;
+                        padding: 0 8px;
+                        border-color: rgba(255, 255, 255, 0.12);
+                        border-radius: 6px;
+                        line-height: 22px;
+                        color: rgba(255, 255, 255, 0.42);
+                    }
+                }
+                .queue-list-content {
+                    > div,
+                    :deep(.card),
+                    :deep(.card-fotter) {
+                        width: 100%;
+                    }
                 }
             }
         }

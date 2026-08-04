@@ -40,14 +40,14 @@
         </template>
 
         <template v-else>
-            <h3>【认证团队信息】</h3>
+            <h3>{{ $t("team.verification.application") }}</h3>
 
             <el-form ref="form" :model="form" label-width="100px" :label-position="position">
-                <el-form-item label="团队ID">
-                    <el-input v-model="form.team_id" placeholder="团队ID" disabled></el-input>
+                <el-form-item :label="$t('team.verification.teamId')">
+                    <el-input v-model="form.team_id" :placeholder="$t('team.verification.teamId')" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="团队名称">
-                    <el-input v-model="form.name" placeholder="团队名加载中...." disabled>
+                <el-form-item :label="$t('team.verification.teamName')">
+                    <el-input v-model="form.name" :placeholder="$t('team.sidebar.loading')" disabled>
                         <!-- <i
                         slot="prefix"
                         v-if="!isVerified"
@@ -55,8 +55,8 @@
                     ></i> -->
                     </el-input>
                 </el-form-item>
-                <el-form-item label="服务器">
-                    <el-input v-model="form.server" placeholder="服务器名加载中...." disabled>
+                <el-form-item :label="$t('team.verification.server')">
+                    <el-input v-model="form.server" :placeholder="$t('team.sidebar.loading')" disabled>
                         <!-- <i
                         slot="prefix"
                         v-if="!isVerified"
@@ -64,8 +64,8 @@
                     ></i> -->
                     </el-input>
                 </el-form-item>
-                <el-form-item label="QQ号">
-                    <el-input v-model="form.proposer" placeholder="请填写您的QQ号" :disabled="!canApply"></el-input>
+                <el-form-item :label="$t('team.verification.contactQq')">
+                    <el-input v-model="form.proposer" :placeholder="$t('team.verification.contactPlaceholder')" :disabled="!canApply"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button class="u-btn" type="primary" @click="submit" :disabled="!canApply">{{

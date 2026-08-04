@@ -17,15 +17,15 @@ test("member management uses the current workspace tabs and compact account card
     ]);
 
     assert.match(memberList, /class="m-member-subnav"/);
-    assert.match(memberList, /\{ label: "正式团员", value: "user" \}/);
-    assert.match(memberList, /\{ label: "加入申请", value: "pending" \}/);
+    assert.match(memberList, /\{ label: this\.\$t\("team\.member\.officialMembers"\), value: "user" \}/);
+    assert.match(memberList, /\{ label: this\.\$t\("team\.member\.joinRequests"\), value: "pending" \}/);
     assert.match(memberList, /class="u-subnav-count"/);
     assert.match(memberList, /pendingCount/);
     assert.match(memberList, /@pending-count-change="updatePendingCount"/);
     assert.doesNotMatch(memberList, /el-radio-group|el-radio-button|class="m-filter m-title"/);
     assert.match(userList, /class="m-member-card-grid"/);
-    assert.match(userList, /<h2>正式团员<\/h2>/);
-    assert.doesNotMatch(userList, /按账号查看成员及其所属角色/);
+    assert.match(userList, /team\.member\.officialMembers/);
+    assert.doesNotMatch(userList, /team\.member\.memberHint/);
     assert.doesNotMatch(userList, /v-loading/);
     assert.match(userList, /v-if="loading"/);
     assert.match(userList, /class="m-member-card-grid m-member-skeleton-grid"/);
@@ -40,12 +40,12 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(memberItem, /append-to-body/);
     assert.match(memberItem, /class="u-remove-role"/);
     assert.match(memberItem, /class="u-dialog-member-link"/);
-    assert.doesNotMatch(memberItem, />\s*查看账号主页\s*</);
+    assert.match(memberItem, /team\.memberDialog\.viewProfile/);
     assert.doesNotMatch(memberItem, /TopRight/);
     assert.doesNotMatch(memberItem, /class="u-member-item-content"/);
     assert.doesNotMatch(memberItem, /height:\s*170px/);
     assert.match(pendingList, /class="m-pending-card-grid"/);
-    assert.match(pendingList, /<h2>加入申请<\/h2>/);
+    assert.match(pendingList, /team\.member\.joinRequests/);
     assert.doesNotMatch(pendingList, /v-loading/);
     assert.match(pendingList, /class="m-pending-card-grid m-pending-skeleton-grid"/);
     assert.match(pendingList, /v-for="index in per"/);
@@ -61,8 +61,8 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(pendingList, /findIndex\(\(item\) => item\.relation\.role_id === role_id\)/);
     assert.doesNotMatch(pendingList, /checkRole\(item\.relation\.team_id/);
     assert.doesNotMatch(pendingList, /deleteRole\(this\.team_id, role_id\)/);
-    assert.match(pendingList, /this\.\$confirm\("确定拒绝该角色的加入申请/);
-    assert.match(pendingList, /confirmButtonText:\s*"确认拒绝"/);
+    assert.match(pendingList, /this\.\$confirm\(this\.\$t\("team\.member\.rejectConfirm"\)/);
+    assert.match(pendingList, /confirmButtonText:\s*this\.\$t\("team\.member\.confirmReject"\)/);
     assert.match(pendingList, /per:\s*12/);
     assert.match(listStyles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
     assert.match(listStyles, /\.m-member-subnav[\s\S]*background:\s*@team-surface-muted/);

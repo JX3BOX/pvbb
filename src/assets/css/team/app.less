@@ -160,13 +160,20 @@
 }
 
 @media screen and (max-width: 820px) {
-    .p-team .m-team-modern-shell__content {
+    .p-team .m-team-modern-shell__sidebar {
+        position: absolute;
+        width: 0;
+        height: 0;
         order: 1;
     }
 
-    .p-team .m-team-modern-shell__sidebar {
+    .p-team .m-team-modern-shell__content {
         order: 2;
     }
+}
+
+body.is-team-navigation-open {
+    overflow: hidden;
 }
 @media screen and (max-width: @phone) {
     .p-team .m-main {
@@ -298,11 +305,8 @@
             font-size: 13px;
             font-weight: 600;
             line-height: 36px;
-            transition:
-                color 150ms cubic-bezier(0.2, 0, 0, 1),
-                border-color 150ms cubic-bezier(0.2, 0, 0, 1),
-                background-color 150ms cubic-bezier(0.2, 0, 0, 1),
-                box-shadow 150ms cubic-bezier(0.2, 0, 0, 1);
+            transition: color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1),
+                background-color 150ms cubic-bezier(0.2, 0, 0, 1), box-shadow 150ms cubic-bezier(0.2, 0, 0, 1);
 
             &:focus-visible {
                 outline: none;

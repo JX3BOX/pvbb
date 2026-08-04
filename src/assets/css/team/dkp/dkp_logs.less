@@ -102,10 +102,21 @@
         td.el-table__cell {
             height: 58px;
             padding: 6px 0;
+            vertical-align: middle;
         }
 
         .cell {
+            display: flex;
+            align-items: center;
             line-height: 28px;
+        }
+
+        th.el-table__cell > .cell {
+            min-height: 44px;
+        }
+
+        td.el-table__cell > .cell {
+            min-height: 46px;
         }
 
         .u-character-logo {

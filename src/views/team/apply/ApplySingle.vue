@@ -1,27 +1,27 @@
 <template>
     <div class="m-apply-event" v-loading="loading">
-        <el-button class="u-goback" icon="ArrowLeft" @click="goBack">返回</el-button>
+        <el-button class="u-goback" icon="ArrowLeft" @click="goBack">{{ $t("team.apply.back") }}</el-button>
         <h3><i class="el-icon-present"></i>{{ data.name }}</h3>
         <div class="m-apply-info">
-            <h4>【申请条件】</h4>
+            <h4>{{ $t("team.apply.conditions") }}</h4>
             <div v-html="data.desc"></div>
         </div>
 
         <div class="m-apply-info m-apply-form">
-            <h4>【申请步骤】</h4>
-            <p>① 一旦提交后不可再次更改信息，请务确认信息准确，由用户填写错误所带来的后果由用户自行承担。</p>
+            <h4>{{ $t("team.apply.steps") }}</h4>
+            <p>① {{ $t("team.apply.step1") }}</p>
             <p>
                 ②
-                实物类奖品不会寄送至海外或港澳台地区，请填写国内快递可达地址，由于国家管控造成的物流问题，由用户自行承担。
+                {{ $t("team.apply.step2") }}
             </p>
-            <p>③ 申请提交后，会在7个工作日内进行处理，审核驳回后需重新填写正确的信息并提交进行审核。</p>
-            <p>④ 其它问题或异常请联系认证团长群（Q群：1048059072）管理人员。</p>
+            <p>③ {{ $t("team.apply.step3") }}</p>
+            <p>④ {{ $t("team.apply.step4") }}</p>
 
             <div class="u-box" v-if="data.status">
                 <el-alert v-if="team_id && alert_info" :title="alert_info" type="warning" show-icon> </el-alert>
                 <div class="u-team">
-                    <span class="u-label">选择团队</span>
-                    <el-select v-model="team_id" placeholder="选择申请的团队">
+                    <span class="u-label">{{ $t("team.apply.selectTeam") }}</span>
+                    <el-select v-model="team_id" :placeholder="$t('team.apply.selectTeamPlaceholder')">
                         <el-option v-for="(item, index) in team_list" :key="index" :label="item.name" :value="item.ID">
                         </el-option>
                     </el-select>
@@ -29,32 +29,32 @@
                 <component :is="template" @isEmit="applyEmit" ref="template"></component>
                 <div class="u-submit">
                     <el-button type="primary" @click="toSubmit" :loading="submitLoading" :disabled="!canSubmit"
-                        >提交</el-button
+                        >{{ $t("team.apply.submit") }}</el-button
                     >
                 </div>
             </div>
 
-            <el-alert :title="`活动未开启或已结束`" type="info" :closable="false" show-icon v-else></el-alert>
+            <el-alert :title="$t('team.apply.unavailable')" type="info" :closable="false" show-icon v-else></el-alert>
         </div>
         <div class="m-apply-logs" v-if="logs.length">
-            <h4>申请记录</h4>
+            <h4>{{ $t("team.apply.records") }}</h4>
             <el-table :data="logs" style="width: 100%">
-                <el-table-column label="申请日期" width="180">
+                <el-table-column :label="$t('team.apply.date')" width="180">
                     <template #default="scope">
                         {{ showTime(scope.row.created_at) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="申请状态" width="120">
+                <el-table-column :label="$t('team.apply.status')" width="120">
                     <template #default="scope">
                         <span :class="`u-status${scope.row.status}`">{{ logStatus(scope.row.status) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="申请团队" width="120">
+                <el-table-column :label="$t('team.apply.team')" width="120">
                     <template #default="scope">
                         {{ logTeam(scope.row.team_id) }}
                     </template>
                 </el-table-column>
-                <el-table-column label="申请详情">
+                <el-table-column :label="$t('team.apply.details')">
                     <template #default="scope">
                         <extend :data="scope.row.extend" v-if="scope.row.extend" />
                     </template>
@@ -125,8 +125,8 @@ export default {
             postApplyRecord(_params)
                 .then(() => {
                     this.$notify({
-                        title: "提交成功",
-                        message: "请耐心等待审核",
+                        title: this.$t("team.apply.submitted"),
+                        message: this.$t("team.apply.wait"),
                         type: "success",
                     });
                     this.loadLogs();
@@ -154,13 +154,13 @@ export default {
             if (this.extend) {
                 this.alert_info = "";
             } else {
-                this.alert_info = "请填写申请详情";
+                this.alert_info = this.$t("team.apply.fillDetails");
             }
         },
 
         // 申请记录返回状态
         logStatus(status) {
-            return ["申请驳回", "审核中", "申请通过"][status + 1];
+            return [this.$t("team.apply.rejected"), this.$t("team.apply.reviewing"), this.$t("team.apply.approved")][status + 1];
         },
         // 申请记录团队名
         logTeam(team_id) {

@@ -3,7 +3,10 @@
         <el-divider content-position="left">
             <i class="el-icon-umbrella"></i> {{ $t("team.publicContent.recruit") }}
         </el-divider>
-        <div class="m-team-txt u-content">{{ recruit }}</div>
+        <div class="m-team-txt u-content" v-if="content">{{ content }}</div>
+        <div class="u-null" v-else>
+            <i class="el-icon-warning-outline"></i> {{ $t("team.publicRecruitEmpty") }}
+        </div>
         <div class="m-team-tags" v-if="tags && tags.length">
             <span
                 class="u-tag"
@@ -23,8 +26,8 @@ export default {
         return {};
     },
     computed: {
-        data: function () {
-            return this.recruit;
+        content: function () {
+            return this.recruit?.trim() || "";
         },
     },
     methods: {},

@@ -3,7 +3,7 @@
         class="w-like-heart"
         type="button"
         :class="{ 'is-liked': liked, 'is-animating': animating }"
-        :aria-label="`${liked ? '已' : ''}${txt || '喜欢'}，当前 ${total}`"
+        :aria-label="$t('team.raid.misc.likeAria', { state: liked ? $t('team.raid.misc.liked') : txt || $t('team.raid.misc.like'), count: total })"
         :aria-pressed="liked ? 'true' : 'false'"
         :disabled="submitting"
         @click="blast"
@@ -15,7 +15,7 @@
                 />
             </svg>
         </span>
-        <span class="u-text">{{ txt || "喜欢" }}</span>
+        <span class="u-text">{{ txt || $t("team.raid.misc.like") }}</span>
         <span v-if="showCount" class="u-count">{{ total }}</span>
         <span v-if="animating" class="u-like-feedback" aria-hidden="true">+1</span>
     </button>
@@ -33,7 +33,7 @@ export default {
         },
         txt: {
             type: String,
-            default: "喜欢",
+            default: "",
         },
         showCount: {
             type: Boolean,
@@ -94,8 +94,8 @@ export default {
                 this.total = Math.max(Number(this.total || 1) - 1, 0);
                 this.liked = false;
                 this.$notify({
-                    title: "好评失败",
-                    message: error?.response?.data?.msg || "请稍后再试",
+                    title: this.$t("team.raid.misc.praiseFailed"),
+                    message: error?.response?.data?.msg || this.$t("team.raid.misc.retry"),
                     type: "error",
                 });
             } finally {

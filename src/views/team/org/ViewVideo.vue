@@ -76,12 +76,7 @@ export default {
 
             video: {},
             eventsList: [],
-            rules: {
-                title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
-                url: [{ required: true, message: "视频链接不能为空", trigger: "blur" }],
-                event_id: [{ required: true, message: "请选择赛事", trigger: " change" }],
-                aid: [{ required: true, message: "请选择BOSS", trigger: " change" }],
-            },
+            rules: {},
         };
     },
     computed: {
@@ -190,14 +185,14 @@ export default {
         },
         // 删除
         del(id) {
-            this.$alert("确认删除吗", "消息", {
-                confirmButtonText: "确定",
+            this.$alert(this.$t("team.video.deleteConfirm"), this.$t("team.video.message"), {
+                confirmButtonText: this.$t("team.video.confirm"),
                 callback: (action) => {
                     if (action == "confirm") {
                         deleteVideo(id).then((res) => {
                             this.$message({
                                 type: "success",
-                                message: `删除成功`,
+                                message: this.$t("team.video.deleted"),
                             });
                             this.videos_list = this.videos_list.filter((item) => item.ID !== id);
                         });
@@ -213,7 +208,7 @@ export default {
                         updateVideo(this.video.ID, this.video).then((res) => {
                             this.$message({
                                 type: "success",
-                                message: `更新成功`,
+                                message: this.$t("team.video.updated"),
                             });
                             this.dialogVisible = false;
                             this.videos_list.forEach((item, key) => {
@@ -227,7 +222,7 @@ export default {
                         addVideo(this.video).then((res) => {
                             this.$message({
                                 type: "success",
-                                message: `发布成功`,
+                                message: this.$t("team.video.published"),
                             });
                             this.dialogVisible = false;
                             location.reload();

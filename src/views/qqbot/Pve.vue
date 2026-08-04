@@ -4,12 +4,14 @@
             <Baizhan :id="id"></Baizhan>
             <BaizhanRobotBottom :type="type"></BaizhanRobotBottom>
         </template>
+        <div v-else class="m-pve-empty">未找到对应的 PVE 类型</div>
     </div>
 </template>
 
 <script>
 import Baizhan from "@/views/qqbot/components/Baizhan.vue";
 import BaizhanRobotBottom from "@/views/qqbot/components/Bottom.vue";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 export default {
     name: "QqbotPve",
     components: {
@@ -25,6 +27,21 @@ export default {
         },
         id() {
             return this.$route.query.id || "";
+        },
+    },
+    watch: {
+        type: {
+            immediate: true,
+            handler(type) {
+                if (type === "baizhan") return;
+                const readyType = type;
+                resetQQBotReady();
+                setQQBotDataReady(true);
+                this.$nextTick(() => {
+                    if (readyType !== this.type || this.type === "baizhan") return;
+                    markQQBotReady({ root: this.$el });
+                });
+            },
         },
     },
 };
@@ -43,5 +60,16 @@ export default {
 
     padding: 20px;
     box-sizing: border-box;
+}
+
+.m-pve-empty {
+    width: 560px;
+    padding: 12px;
+    border: 1px solid #6e6e6e;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, 0.75);
+    background: linear-gradient(to top, #383838 0%, #000 100%);
+    text-align: center;
 }
 </style>

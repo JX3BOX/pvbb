@@ -1,121 +1,465 @@
+@import (reference) "../design-system/_tokens.less";
+
 .v-role-view {
-    .m-title {
-        .el-button {
-            .h(28px);
-            .y(bottom);
-        }
-    }
-}
-.m-role-info {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    .u-avatar {
-        .lt(0);
-        .size(122px);
-    }
-    em {
-        margin-right: 5px;
-        padding: 2px 5px;
-        border-radius: 2px;
-        font-style: normal;
-        background-color: #f2f6fc;
-        color: #888;
-        .fz(13px);
-        .w(50px);
-        .dbi;
-        .x;
-    }
-    .u-meta {
-        .fz(14px);
-        .mt(10px);
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    color: @team-text-primary;
+    gap: @team-space-3;
 
-        .u-author-avatar {
-            .pr;
-            top: 6px;
+    &,
+    * {
+        box-sizing: border-box;
+    }
+
+    .m-role-header {
+        display: flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: space-between;
+        gap: @team-space-3;
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 650;
+            line-height: 34px;
+            letter-spacing: -0.02em;
         }
 
-        &>span{
-            .mr(10px);
+        .u-back {
+            flex: none;
+            border-color: @team-border;
+            border-radius: @team-radius-small;
+            background: fade(@team-surface, 92%);
+            color: @team-text-secondary;
         }
     }
-    .u-school {
+
+    .m-role-profile-card,
+    .m-role-belongs,
+    .m-role-state,
+    .m-role-null {
+        overflow: hidden;
+        border: 1px solid fade(@team-border, 78%);
+        border-radius: 18px;
+        background: @team-surface;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+    }
+
+    .m-role-state {
+        padding: 36px;
+    }
+
+    .m-role-profile-card {
+        display: grid;
+        min-height: 190px;
+        grid-template-columns: minmax(380px, 520px) minmax(0, 1fr);
+    }
+
+    .m-role-identity {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        padding: 30px 32px;
+        overflow: hidden;
+        border-right: 1px solid @team-border-light;
+        background: linear-gradient(135deg, @team-primary-soft 0%, #f8faff 54%, @team-surface 100%);
+        gap: 22px;
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: -54px;
+            bottom: -76px;
+            width: 190px;
+            height: 190px;
+            border: 32px solid fade(@team-primary, 4%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    }
+
+    .u-role-avatar-wrap {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        width: 108px;
+        height: 108px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        overflow: hidden;
+        border: 4px solid @team-surface;
+        border-radius: 22px;
+        background: @team-surface-muted;
+        box-shadow: 0 10px 26px rgba(67, 56, 202, 0.14);
+
+        .u-avatar {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .u-role-primary {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        min-width: 0;
+        flex: 1;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .u-role-name {
+        display: flex;
+        max-width: 100%;
+        min-width: 0;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+
+        h2 {
+            max-width: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-size: 28px;
+            font-weight: 650;
+            line-height: 38px;
+            letter-spacing: -0.02em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .u-verified {
+        display: inline-flex;
+        min-width: max-content;
+        align-items: center;
+        flex: none;
+        padding: 4px 9px;
+        border: 1px solid #bbf7d0;
+        border-radius: 999px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 18px;
+        gap: 5px;
+        white-space: nowrap;
+
         img {
-            .size(24px);
-            .y(-6px);
-            .ml(5px);
+            width: 15px;
+            height: 15px;
+            flex: none;
         }
     }
-    .u-icon{
-        .size(24px);
-    }
-    .u-verify{
-        .size(18px);
-        .y;
-    }
-    .u-name{
-        .fz(20px);
-    }
-    .u-author{
-        a{
-            .underline(@v4primary);
-        }
-    }
-    // border-bottom:1px dashed #eee;
-}
-.m-role-belongs {
-    .mt(30px);
-    // .el-divider__text {
-    //     color: #888;
-    // }
 
-    .u-teams{
-        .clearfix;
+    .u-role-server {
+        display: inline-flex;
+        max-width: 100%;
+        padding: 3px 9px;
+        overflow: hidden;
+        border: 1px solid fade(@team-primary, 12%);
+        border-radius: 7px;
+        background: fade(@team-surface, 86%);
+        color: @team-text-secondary;
+        font-size: 12px;
+        line-height: 18px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .u-team {
-        .fl;
-        .db;
-        .w(128px + 5px*2);
-        .mb(20px);
-        .mr(20px);
+
+    .u-author {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        color: @team-text-muted;
+        font-size: 12px;
+        line-height: 20px;
+        gap: 7px;
+    }
+
+    .u-author-label {
+        flex: none;
+    }
+
+    .u-author-avatar {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        border: 1px solid fade(@team-border, 72%);
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .u-author-name {
+        min-width: 0;
+        overflow: hidden;
+        color: @team-primary;
+        font-weight: 500;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         &:hover {
-            .u-team-logo{background-color: #f2f6fc;}
-            .u-team-name{color:@pink;}
+            color: @team-primary-hover;
+            text-decoration: underline;
         }
     }
-    .u-team-logo {
-        .db;
-        .size(128px);
-        .r(3px);
-        border:1px solid #eee;
-        padding:5px;
 
-        background-color: @bg-light;
+    .m-role-facts {
+        display: grid;
+        min-width: 0;
+        align-content: center;
+        margin: 0;
+        padding: 28px 30px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+
+        > div {
+            min-width: 0;
+            padding: 15px 17px;
+            border: 1px solid @team-border-light;
+            border-radius: 12px;
+            background: @team-surface-muted;
+        }
+
+        dt {
+            margin-bottom: 7px;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        dd {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+            color: @team-text-regular;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 24px;
+            gap: 7px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            img {
+                width: 22px;
+                height: 22px;
+                flex: none;
+                object-fit: contain;
+            }
+        }
     }
+
+    .m-role-section-header {
+        display: flex;
+        min-height: 70px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        border-bottom: 1px solid @team-border-light;
+        gap: @team-space-3;
+
+        > div {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 {
+            margin: 0;
+            color: @team-text-primary;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 24px;
+        }
+
+        p {
+            margin: 1px 0 0;
+            color: @team-text-muted;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    .u-section-icon {
+        display: inline-flex;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        border-radius: 10px;
+        background: @team-primary-soft;
+        color: @team-primary;
+        font-size: 17px;
+    }
+
+    .u-team-count {
+        min-width: 26px;
+        flex: none;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: @team-surface-muted;
+        color: @team-text-secondary;
+        font-size: 12px;
+        line-height: 20px;
+        text-align: center;
+    }
+
+    .u-teams {
+        display: flex;
+        align-items: stretch;
+        padding: 20px 24px 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .u-team {
+        display: grid;
+        width: 340px;
+        max-width: 100%;
+        min-width: 0;
+        min-height: 70px;
+        align-items: center;
+        flex: 0 1 340px;
+        padding: 11px 13px;
+        border: 1px solid @team-border;
+        border-radius: 12px;
+        background: @team-surface;
+        color: @team-text-regular;
+        grid-template-columns: 46px minmax(0, 1fr) 16px;
+        gap: 11px;
+        text-decoration: none;
+        transition: color @team-duration-fast @team-ease-standard,
+            border-color @team-duration-fast @team-ease-standard,
+            background-color @team-duration-fast @team-ease-standard,
+            transform @team-duration-fast @team-ease-standard;
+
+        &:hover {
+            border-color: fade(@team-primary, 26%);
+            background: fade(@team-primary-soft, 58%);
+            color: @team-primary;
+            transform: translateY(-1px);
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: @team-shadow-focus;
+        }
+
+        > .el-icon {
+            color: @team-text-muted;
+        }
+    }
+
+    .u-team-logo {
+        width: 46px;
+        height: 46px;
+        padding: 3px;
+        border: 1px solid @team-border-light;
+        border-radius: 10px;
+        background: @team-surface;
+        object-fit: cover;
+    }
+
     .u-team-name {
-        .db;
-        .nobreak;
-        .fz(12px, 2.5);
-        .x;
+        overflow: hidden;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .u-lock {
-        .x;
-        .fz(12px);
-        color: #999;
-        font-weight: normal;
-        i {
-            .mr(2px);
+
+    .u-empty-team {
+        display: flex;
+        min-height: 130px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: @team-text-muted;
+        font-size: 13px;
+        gap: 10px;
+
+        > .el-icon {
+            font-size: 28px;
+        }
+    }
+
+    .m-role-null {
+        margin: 0;
+        padding: 56px 24px;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .v-role-view {
+        .m-role-profile-card {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .m-role-identity {
+            border-right: 0;
+            border-bottom: 1px solid @team-border-light;
         }
     }
 }
 
-.m-role-player{
-    .u-null{
-        padding:50px;
-        .x;
-        .fz(14px);
-        color:#f00;
+@media screen and (max-width: 600px) {
+    .v-role-view {
+        gap: @team-space-2;
+
+        .m-role-header {
+            min-height: 40px;
+
+            h1 {
+                font-size: 21px;
+                line-height: 30px;
+            }
+        }
+
+        .m-role-identity {
+            align-items: flex-start;
+            padding: 24px 20px;
+            gap: 16px;
+        }
+
+        .u-role-avatar-wrap {
+            width: 82px;
+            height: 82px;
+            border-radius: 18px;
+        }
+
+        .u-role-name h2 {
+            font-size: 22px;
+            line-height: 30px;
+        }
+
+        .m-role-facts {
+            padding: 18px 20px;
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .m-role-section-header {
+            padding: 0 18px;
+        }
+
+        .u-teams {
+            padding: 16px 18px 20px;
+        }
+
+        .u-team {
+            width: 100%;
+            flex-basis: 100%;
+        }
     }
 }

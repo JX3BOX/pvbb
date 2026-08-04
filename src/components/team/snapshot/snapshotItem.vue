@@ -75,7 +75,6 @@
     </div>
 </template>
 <script>
-import { __imgPath } from "@/utils/config";
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
 import { delSnapshot } from "@/service/team/snapshot.js";
 import { syncSnapshotDkp } from "@/service/team/dkp.js";
@@ -99,7 +98,7 @@ export default {
     },
     computed: {
         list: function () {
-            let list = this.data.teammate.split(";");
+            let list = (this.data.teammate || "").split(";");
             let _list = [];
             list.forEach((item, i) => {
                 item = item.split(",");
@@ -111,6 +110,10 @@ export default {
                 };
                 _list.push(_item);
             });
+            _list = _list.slice(0, 25);
+            while (_list.length < 25) {
+                _list.push({ name: "", id: 0, jx3id: 0, mount: "" });
+            }
             return _list;
         },
         autoname() {

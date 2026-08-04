@@ -1,11 +1,11 @@
 <template>
     <div class="v-plan-list">
         <h1 class="m-title">
-            <i class="el-icon-date"></i> 活动规划
+            <i class="el-icon-date"></i> {{ $t("team.plan.planning") }}
             <el-select
                 class="m-select-org"
                 v-model.number="org"
-                placeholder="请选择团队"
+                :placeholder="$t('team.plan.selectTeam')"
                 size="medium"
                 filterable
                 popper-class="m-select-org-options"
@@ -18,29 +18,29 @@
             </el-select>
             <div class="u-op">
                 <router-link to="/plan/add" class="el-button el-button--success el-button--mini">
-                    <i class="el-icon-circle-plus-outline"></i> 创建计划
+                    <i class="el-icon-circle-plus-outline"></i> {{ $t("team.plan.create") }}
                 </router-link>
             </div>
         </h1>
         <div class="m-plan-list">
             <div class="m-list-box">
                 <div class="m-list-txt">
-                    <div class="title">14周一团活动计划</div>
-                    <div class="time">计划时间：2020-02-02 至 2020-02-09</div>
+                    <div class="title">{{ $t("team.plan.sampleTitle") }}</div>
+                    <div class="time">{{ $t("team.plan.samplePeriod", { start: "2020-02-02", end: "2020-02-09" }) }}</div>
                 </div>
                 <div class="m-list-btn">
-                    <el-button type="primary" size="small" icon="Edit">修改</el-button>
-                    <el-button type size="small" icon="Delete">删除</el-button>
+                    <el-button type="primary" size="small" icon="Edit">{{ $t("team.plan.edit") }}</el-button>
+                    <el-button type size="small" icon="Delete">{{ $t("team.plan.delete") }}</el-button>
                 </div>
             </div>
             <div class="m-list-box">
                 <div class="m-list-txt">
-                    <div class="title">15周二团活动计划</div>
-                    <div class="time">计划时间：2020-02-02 至 2020-02-09</div>
+                    <div class="title">{{ $t("team.plan.sampleTitle") }}</div>
+                    <div class="time">{{ $t("team.plan.samplePeriod", { start: "2020-02-02", end: "2020-02-09" }) }}</div>
                 </div>
                 <div class="m-list-btn">
-                    <el-button type="primary" size="small" icon="Edit">修改</el-button>
-                    <el-button type size="small" icon="Delete">删除</el-button>
+                    <el-button type="primary" size="small" icon="Edit">{{ $t("team.plan.edit") }}</el-button>
+                    <el-button type size="small" icon="Delete">{{ $t("team.plan.delete") }}</el-button>
                 </div>
             </div>
         </div>

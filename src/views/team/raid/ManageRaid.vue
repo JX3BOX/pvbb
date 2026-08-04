@@ -2,25 +2,15 @@
     <div class="v-raid-list" :class="{ 'is-embedded': embedded }">
         <h1 v-if="!embedded" class="m-title">
             <i class="el-icon-date"></i>
-            <span class="u-txt">团队活动</span>
+            <span class="u-txt">{{ $t("team.raid.common.activities") }}</span>
             <div class="u-op">
-                <a href="/tool/23805" class="u-help" target="_blank"> <i class="el-icon-info"></i> 帮助文档 </a>
+                <a href="/tool/23805" class="u-help" target="_blank"> <i class="el-icon-info"></i> {{ $t("team.raid.common.help") }} </a>
                 <el-button type="primary" size="small" v-if="orgs.length" @click="openCreateDialog">
                     <i class="el-icon-circle-plus-outline"></i>
-                    创建活动
+                    {{ $t("team.raid.common.create") }}
                 </el-button>
             </div>
         </h1>
-        <header v-else class="m-raid-embedded-header">
-            <div>
-                <h2>排表管理</h2>
-                <p>创建和维护当前团队的活动排表。</p>
-            </div>
-            <el-button v-if="orgs.length" type="primary" @click="openCreateDialog">
-                <i class="el-icon-circle-plus-outline"></i>
-                创建活动
-            </el-button>
-        </header>
         <div class="m-raid-box" v-if="orgs.length">
             <div v-if="!embedded && orgs.length > 1" class="m-raid-tab">
                 <el-tabs v-model="team_id" type="card" class="m-raid-card-tabs">
@@ -28,25 +18,23 @@
                         <template #label>
                             <img class="u-org-logo" :src="getThumbnail(item.logo, 84)" v-if="item.logo" />
                             <img class="u-org-logo" src="@/assets/img/team/null.png" v-else />
-                            <span class="u-org-name">{{ item.name || "未知" }}</span>
+                            <span class="u-org-name">{{ item.name || $t("team.raid.manage.unknownTeam") }}</span>
                         </template>
                     </el-tab-pane>
                 </el-tabs>
             </div>
 
             <div class="m-raid-toolbar">
+                <el-button v-if="embedded" class="u-create" type="primary" icon="Plus" @click="openCreateDialog">
+                    {{ $t("team.raid.common.create") }}
+                </el-button>
                 <el-input
                     v-model="searchDraft"
-                    placeholder="搜索活动名称、标题或创建人"
+                    :placeholder="$t('team.raid.manage.searchPlaceholder')"
                     clearable
-                    aria-label="搜索活动"
-                    @clear="submitSearch"
-                    @keyup.enter="submitSearch"
-                >
-                    <template #prefix><i class="el-icon-search"></i></template>
-                </el-input>
-                <el-button type="primary" plain @click="submitSearch">搜索</el-button>
-                <span class="u-raid-total">共 {{ total }} 个活动</span>
+                    :aria-label="$t('team.raid.manage.searchAria')"
+                ></el-input>
+                <span class="u-raid-total">{{ $t("team.raid.manage.total", { count: total }) }}</span>
             </div>
 
             <div class="m-raid-container" v-loading="loading">
@@ -74,13 +62,13 @@
 
                 <div class="m-raid-empty" v-else-if="!loading">
                     <span class="u-empty-icon" aria-hidden="true"><i class="el-icon-date"></i></span>
-                    <h3>{{ search ? "没有找到匹配的活动" : "还没有团队活动" }}</h3>
-                    <p>{{ search ? "尝试更换关键词后重新搜索。" : "创建活动后，可在这里维护排表和报名规则。" }}</p>
-                    <el-button v-if="!search" type="primary" @click="openCreateDialog">创建第一个活动</el-button>
+                    <h3>{{ $t(search ? "team.raid.manage.emptySearch" : "team.raid.manage.empty") }}</h3>
+                    <p>{{ $t(search ? "team.raid.manage.retrySearch" : "team.raid.manage.emptyHint") }}</p>
+                    <el-button v-if="!search" type="primary" @click="openCreateDialog">{{ $t("team.raid.manage.createFirst") }}</el-button>
                 </div>
             </div>
         </div>
-        <el-alert v-else title="你当前没有任何团队的排表管理权限" type="info" show-icon></el-alert>
+        <el-alert v-else :title="$t('team.raid.manage.noPermission')" type="info" show-icon></el-alert>
         <RaidFormDialog
             v-model="formVisible"
             :raid-id="editingId"
@@ -99,6 +87,7 @@ import RaidItem from "@/components/team/raid/RaidItem.vue";
 import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
 
 import localforage from "localforage";
+import debounce from "lodash/debounce";
 
 export default {
     name: "ManageRaid",
@@ -219,7 +208,16 @@ export default {
     mounted: function () {
         this.init();
     },
+    created: function () {
+        this.submitSearchDebounced = debounce(this.submitSearch, 300);
+    },
+    beforeUnmount: function () {
+        this.submitSearchDebounced.cancel();
+    },
     watch: {
+        searchDraft: function () {
+            this.submitSearchDebounced();
+        },
         teamId: function (value) {
             if (~~value) this.loadTeams();
         },

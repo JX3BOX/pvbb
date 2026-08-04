@@ -30,7 +30,7 @@
                         v-if="isTeamSuper && showManageAction !== false"
                         class="u-status isNotVerified"
                         :title="$t('team.header.verifyAction')"
-                        :to="'/org/verify/' + id"
+                        :to="verifyLink"
                     >
                         <img svg-inline src="@/assets/img/team/notverify.svg" /> {{ $t("team.header.unverified") }}
                     </router-link>
@@ -169,6 +169,13 @@ export default {
         },
         leaderName: function () {
             return this.data?.super_info?.display_name || this.$t("team.header.unknown");
+        },
+        verifyLink: function () {
+            return {
+                name: "manage_my_org",
+                params: { id: this.id },
+                query: { tab: "setting", subtab: "verify" },
+            };
         },
     },
     methods: {

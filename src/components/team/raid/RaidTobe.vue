@@ -3,7 +3,7 @@
         <h5 class="u-title">
             <span>
                 <i class="el-icon-news"></i>
-                申请名单
+                {{ header || $t("team.raid.board.candidates") }}
                 <span class="u-count">({{ count }})</span>
             </span>
         </h5>
@@ -39,7 +39,7 @@
                                         class="u-member-role-trigger"
                                         type="button"
                                         v-if="member.role_id && linkVisible"
-                                        :aria-label="`查看角色 ${showMemberName(member['name'])} 的信息`"
+                                        :aria-label="$t('team.raid.board.viewRole', { name: showMemberName(member['name']) })"
                                         @mousedown.stop
                                         @click.stop="openRoleDialog(member)"
                                     >
@@ -58,27 +58,27 @@
                         <!-- </el-tooltip> -->
                     </el-popover>
                     <span class="u-member-op" v-if="canManage">
-                        <el-tooltip class="item" effect="dark" content="设为正式队员" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.toNormal')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否将该角色转为正式成员？" @confirm="pass(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.toNormalConfirm')" @confirm="pass(member, i)">
                                     <template #reference>
                                         <i class="u-member-reset el-icon-check"></i>
                                     </template>
                                 </el-popconfirm>
                             </span>
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="设为替补队员" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.toSubstitute')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否将该角色转为替补成员？" @confirm="pending(member, i)">
+                                <el-popconfirm :title="$t('team.raid.member.toSubstituteConfirm')" @confirm="pending(member, i)">
                                     <template #reference>
                                         <i class="u-member-reset el-icon-first-aid-kit"></i>
                                     </template>
                                 </el-popconfirm>
                             </span>
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="拒绝申请" placement="top-start">
+                        <el-tooltip class="item" effect="dark" :content="$t('team.raid.member.reject')" placement="top-start">
                             <span>
-                                <el-popconfirm title="是否拒绝申请？" @confirm="reject(member, i)">
+                                <el-popconfirm :title="$t('team.member.rejectConfirm')" @confirm="reject(member, i)">
                                     <template #reference>
                                         <i class="u-member-delete el-icon-close"></i>
                                     </template>
@@ -89,7 +89,7 @@
                 </div>
             </ul>
         </div>
-        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> 当前没有任何名单</div>
+        <div class="m-raid-null" v-else><i class="el-icon-warning-outline"></i> {{ $t("team.raid.board.empty") }}</div>
         <raid-role-dialog
             v-model="roleDialogVisible"
             :role-id="roleDialogMember && roleDialogMember.role_id"
@@ -108,7 +108,7 @@ import { showMountIcon, showMountName } from "@/utils/filters";
 import bus from "@/utils/bus";
 export default {
     name: "RaidTobe",
-    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace"],
+    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace", "header"],
     emits: ["pass", "pending"],
     components: {
         RaidRoleDialog,
@@ -214,8 +214,8 @@ export default {
                 } else {
                     this.$notify({
                         type: "warning",
-                        title: "提示",
-                        message: "当前团队人数已满或无匹配职责空位",
+                        title: this.$t("team.raid.common.tip"),
+                        message: this.$t("team.raid.member.teamFull"),
                     });
                 }
             } catch (e) {
@@ -223,18 +223,20 @@ export default {
             }
         },
         // 设为替补
-        pending(member, i) {
-            covertTobe2Sub(this.raid_id, member?.id).then(() => {
-                this.$emit("pending", member);
-                this.data.splice(i, 1);
-            });
+        async pending(member) {
+            try {
+                await covertTobe2Sub(this.raid_id, member?.id);
+                this.$emit("pending");
+            } catch (e) {
+                console.error("covertTobe2Sub", e);
+            }
         },
         // 删除候选（拒绝申请）
         reject(member, i) {
             rejectMember(this.raid_id, member?.id).then(() => {
                 this.$notify({
-                    title: "操作成功",
-                    message: `已拒绝${member?.name || ""}的申请`,
+                    title: this.$t("team.raid.member.operationSuccess"),
+                    message: this.$t("team.raid.member.rejected", { name: member?.name || "" }),
                     type: "success",
                 });
                 this.data.splice(i, 1);
@@ -252,15 +254,15 @@ export default {
         },
         onCopy(text) {
             this.$notify({
-                title: "复制成功",
-                message: "复制内容 : " + text,
+                title: this.$t("team.raid.member.copied"),
+                message: this.$t("team.raid.member.copiedText", { text }),
                 type: "success",
             });
         },
         onError() {
             this.$notify.error({
-                title: "复制失败",
-                message: "请手动复制",
+                title: this.$t("team.raid.member.copyFailed"),
+                message: this.$t("team.raid.member.copyManually"),
             });
         },
 
@@ -278,17 +280,17 @@ export default {
                     customClass: "m-raid-contextmenu",
                     items: [
                         {
-                            label: "批准",
+                            label: this.$t("team.raid.member.approve"),
                             customClass: "item",
                             onClick: () => this.pass(this.selectedMember, this.selectedIndex),
                         },
                         {
-                            label: "待定",
+                            label: this.$t("team.raid.common.pending"),
                             customClass: "item",
                             onClick: () => this.pending(this.selectedMember, this.selectedIndex),
                         },
                         {
-                            label: "拒绝",
+                            label: this.$t("team.raid.member.reject"),
                             customClass: "item",
                             onClick: () => this.reject(this.selectedMember, this.selectedIndex),
                         },

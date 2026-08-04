@@ -2,15 +2,14 @@
     <div class="v-org-list">
         <h1 class="m-title">
             <i class="el-icon-school"></i>
-            <span class="u-txt">我的团队</span>
+            <span class="u-txt">{{ $t("team.role.myTeams") }}</span>
             <span class="u-team-link">
-                <i class="el-icon-s-home"></i> 前往 [<a class="u-link" :href="team_link.value">{{ team_link.label }}</a
-                >] 主页
+                <i class="el-icon-s-home"></i> {{ $t("team.roleCommon.visit") }} [<a class="u-link" :href="team_link.value">{{ team_link.label }}</a>]
             </span>
             <div class="u-op">
                 <router-link to="/org/list" class="el-button el-button--primary el-button--mini">
                     <i class="el-icon-circle-plus-outline"></i>
-                    寻找团队
+                    {{ $t("team.role.findTeam") }}
                 </router-link>
             </div>
         </h1>
@@ -25,18 +24,18 @@
                                 v-if="item.team_info && item.team_info.logo"
                             />
                             <img class="u-org-logo" src="@/assets/img/team/null.png" v-else />
-                            <span class="u-org-name">{{ (item.team_info && item.team_info.name) || "未知" }}</span>
+                            <span class="u-org-name">{{ (item.team_info && item.team_info.name) || $t("team.raid.common.unknown") }}</span>
                         </template>
                         <div class="m-group-role-box" v-if="item.roles && item.roles.length">
                             <table class="m-group-role-table">
                                 <thead>
                                     <tr>
-                                        <th>角色名</th>
-                                        <th>心法</th>
-                                        <th>体型</th>
-                                        <th>加入时间</th>
-                                        <th>是否公开</th>
-                                        <th>操作</th>
+                                        <th>{{ $t("team.role.roleName") }}</th>
+                                        <th>{{ $t("team.raid.roleDialog.mount") }}</th>
+                                        <th>{{ $t("team.role.bodyType") }}</th>
+                                        <th>{{ $t("team.role.joinedAt") }}</th>
+                                        <th>{{ $t("team.role.public") }}</th>
+                                        <th>{{ $t("team.role.operation") }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,20 +64,20 @@
                                                 size="small"
                                                 plain
                                                 @click="quitTeam(item.team_info.ID, role.info.ID, item.roles, i)"
-                                                >退出</el-button
+                                                >{{ $t("team.role.quit") }}</el-button
                                             >
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <el-alert title="当前团队没有任何角色" type="info" show-icon v-else></el-alert>
+                        <el-alert :title="$t('team.role.noRoles')" type="info" show-icon v-else></el-alert>
                     </el-tab-pane>
                 </el-tabs>
             </template>
             <template v-else>
                 <div class="m-team-list-null">
-                    <el-alert title="当前没有加入任何团队" type="info" show-icon></el-alert>
+                    <el-alert :title="$t('team.role.noJoinedTeams')" type="info" show-icon></el-alert>
                 </div>
             </template>
         </div>
@@ -105,7 +104,7 @@ export default {
 
             org: "",
             team_link: {
-                label: " 查看团队 ",
+                label: this.$t("team.role.viewTeam"),
                 value: "",
             },
         };
@@ -125,8 +124,8 @@ export default {
         setPublic: function (team_id, role_id, isPublic) {
             changeRolePublic(team_id, role_id, isPublic).then((res) => {
                 this.$notify({
-                    title: "设置成功",
-                    message: "更新设置成功",
+                    title: this.$t("team.role.settingSuccess"),
+                    message: this.$t("team.role.settingUpdated"),
                     type: "success",
                 });
             });
@@ -134,8 +133,8 @@ export default {
         quitTeam: function (team_id, role_id, list, i) {
             quitTeam(team_id, role_id).then((res) => {
                 this.$notify({
-                    title: "退出成功",
-                    message: "角色成功退出队伍",
+                    title: this.$t("team.role.quitSuccess"),
+                    message: this.$t("team.role.quitMessage"),
                     type: "success",
                 });
                 list.splice(i, 1);

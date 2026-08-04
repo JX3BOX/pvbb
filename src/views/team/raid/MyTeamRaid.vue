@@ -2,36 +2,55 @@
     <div class="v-raid-myteams" :class="{ 'is-embedded': embedded }">
         <h1 v-if="!embedded" class="m-title">
             <i class="el-icon-s-flag"></i>
-            <span class="u-txt">我的活动</span>
+            <span class="u-txt">{{ $t("team.raid.legacy.myActivities") }}</span>
             <div class="u-op">
-                <el-button class="u-join" size="small" icon="Plus" @click="goTeamList">加入团队</el-button>
-                <el-button class="u-back" size="small" icon="Search" @click="goRaidList">活动大厅</el-button>
+                <el-button class="u-join" size="small" icon="Plus" @click="goTeamList">{{ $t("team.raid.legacy.joinTeam") }}</el-button>
+                <el-button class="u-back" size="small" icon="Search" @click="goRaidList">{{ $t("team.raid.legacy.lobby") }}</el-button>
             </div>
         </h1>
         <div class="m-raid-joined" v-loading="loading">
-            <div class="m-raid-myteams" v-if="displayData.length">
+            <div class="m-public-raid-toolbar">
+                <el-input
+                    v-model="search"
+                    :placeholder="$t('team.raid.manage.searchPlaceholder')"
+                    clearable
+                    :aria-label="$t('team.raid.manage.searchAria')"
+                ></el-input>
+                <span class="u-raid-total">{{ $t("team.raid.manage.total", { count: filteredDisplayData.length }) }}</span>
+            </div>
+            <div class="m-raid-myteams" v-if="filteredDisplayData.length">
                 <div class="m-raid-table">
-                    <template v-for="item in displayData" :key="item.id">
+                    <template v-for="item in filteredDisplayData" :key="item.activity.id">
                         <activity-item
-                            :activity="item.raid_info"
-                            :team-info="item.raid_team_info"
-                            :canQuit="true"
+                            :activity="item.activity"
+                            :team-info="item.teamInfo"
+                            :joined="item.joined"
+                            :can-quit="item.joined"
+                            :is-home-page="true"
                             @quit="handleQuit"
                         ></activity-item>
                     </template>
                 </div>
             </div>
-            <el-alert class="m-raid-myteams-null" title="没有近期的活动" type="info" show-icon v-else></el-alert>
-            <div class="m-raid-myteam-tip"><i class="el-icon-warning-outline"></i> 此处仅显示我报名的近期的活动</div>
+            <div class="m-public-raid-empty" v-else-if="!loading">
+                <span class="u-empty-icon" aria-hidden="true"><el-icon><Calendar /></el-icon></span>
+                <h3>{{ $t(search ? "team.raid.manage.emptySearch" : "team.raid.legacy.noRecent") }}</h3>
+                <p v-if="search">{{ $t("team.raid.manage.retrySearch") }}</p>
+            </div>
+            <div class="m-raid-myteam-tip">
+                <i class="el-icon-warning-outline"></i>
+                {{ $t(showAll ? "team.publicContent.recentOnly" : "team.raid.legacy.recentHint") }}
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { getMyJoinedTeams } from "@/service/team/member.js";
-import { getMyTeamRaids } from "@/service/team/raid.js";
+import { getMemberTeamRaids, getMyTeamRaids } from "@/service/team/raid.js";
 import { moment } from "@jx3box/jx3box-common/js/moment";
 import ActivityItem from "@/components/team/raid/ActivityItem.vue";
+import { Calendar } from "@element-plus/icons-vue";
 export default {
     name: "MyTeamRaid",
     props: {
@@ -43,31 +62,75 @@ export default {
             type: Boolean,
             default: false,
         },
+        showAll: {
+            type: Boolean,
+            default: false,
+        },
     },
     components: {
         ActivityItem,
+        Calendar,
     },
     data: function () {
         return {
             teams: [],
             ids: [],
             data: [],
+            raids: [],
             loading: false,
+            search: "",
+            loadVersion: 0,
         };
     },
     computed: {
+        requestKey: function () {
+            return `${this.teamId || ""}|${this.showAll ? 1 : 0}`;
+        },
         displayData: function () {
-            if (!this.teamId) return this.data || [];
-            return (this.data || []).filter((item) => {
+            const joinedRaids = (this.data || []).filter((item) => {
                 const teamId = item?.raid_team_info?.ID || item?.raid_info?.team_id;
-                return String(teamId) === String(this.teamId);
+                return !this.teamId || String(teamId) === String(this.teamId);
+            });
+            const joinedMap = new Map(joinedRaids.map((item) => [String(item.raid_info?.id), item]));
+
+            if (this.showAll) {
+                return (this.raids || []).map((activity) => {
+                    const joinedItem = joinedMap.get(String(activity.id));
+                    return {
+                        activity,
+                        teamInfo: joinedItem?.raid_team_info || {},
+                        joined: !!joinedItem,
+                    };
+                });
+            }
+
+            return joinedRaids.map((item) => ({
+                activity: item.raid_info,
+                teamInfo: item.raid_team_info,
+                joined: true,
+            }));
+        },
+        filteredDisplayData: function () {
+            const keyword = this.search.trim().toLowerCase();
+            if (!keyword) return this.displayData;
+            return this.displayData.filter(({ activity }) => {
+                return [activity.name, activity.title, activity.server].some((value) =>
+                    String(value || "").toLowerCase().includes(keyword),
+                );
             });
         },
         is_guawang: function () {
             return !this.teams?.length;
         },
     },
-    watch: {},
+    watch: {
+        requestKey: {
+            immediate: true,
+            handler: function () {
+                this.loadRaids();
+            },
+        },
+    },
     methods: {
         goTeamList: function () {
             this.$router.push("/org/list");
@@ -99,14 +162,38 @@ export default {
         isToday: function (d) {
             return moment(d).format("MM-DD") == moment(new Date()).format("MM-DD");
         },
+        isCurrentRaidRequest: function (teamId, showAll, version) {
+            return (
+                version === this.loadVersion &&
+                String(teamId || "") === String(this.teamId || "") &&
+                showAll === this.showAll
+            );
+        },
         loadRaids: function () {
+            const teamId = this.teamId;
+            const showAll = this.showAll;
+            const version = ++this.loadVersion;
+
             this.loading = true;
-            getMyTeamRaids()
-                .then((res) => {
-                    this.data = res.data.data;
+            this.data = [];
+            this.raids = [];
+            this.search = "";
+            const requests = [getMyTeamRaids()];
+            if (showAll && teamId) requests.push(getMemberTeamRaids(teamId));
+
+            return Promise.all(requests)
+                .then(([joinedRes, raidsRes]) => {
+                    if (!this.isCurrentRaidRequest(teamId, showAll, version)) return;
+                    this.data = joinedRes.data?.data || [];
+                    this.raids = raidsRes?.data?.data || [];
+                })
+                .catch(() => {
+                    if (!this.isCurrentRaidRequest(teamId, showAll, version)) return;
+                    this.data = [];
+                    this.raids = [];
                 })
                 .finally(() => {
-                    this.loading = false;
+                    if (this.isCurrentRaidRequest(teamId, showAll, version)) this.loading = false;
                 });
         },
         subscribe: function (id) {
@@ -129,12 +216,6 @@ export default {
         showRaidDate: function (d) {
             return moment(d).format("DD");
         },
-    },
-    created: function () {},
-    mounted: function () {
-        // this.loadTeams().then(() => {
-        this.loadRaids();
-        // });
     },
 };
 </script>

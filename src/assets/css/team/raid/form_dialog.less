@@ -105,7 +105,7 @@
 
     > header {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         margin-bottom: @team-space-2;
         gap: @team-space-2;
 
@@ -134,6 +134,7 @@
         span {
             color: @team-text-muted;
             font-size: 11px;
+            line-height: 22px;
         }
     }
 }
@@ -175,6 +176,13 @@
 
     .el-input-number {
         width: 118px;
+
+        &.is-controls-right {
+            .el-input-number__increase,
+            .el-input-number__decrease {
+                --el-input-number-controls-height: 19px;
+            }
+        }
     }
 
     .u-size-times,

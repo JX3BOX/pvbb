@@ -73,7 +73,7 @@ app.use(ElementPlus, {
 });
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component);
+    if (!app.component(key)) app.component(key, component);
 }
 
 // 6.3 Tailwind
@@ -81,9 +81,6 @@ import "@/assets/css/tailwind.css";
 
 // 7. 其它扩展
 import VueSvgInlinePlugin from "vue-svg-inline-plugin";
-
-// use Vue plugin without options
-app.use(VueSvgInlinePlugin);
 
 // use Vue plugin with options
 app.use(VueSvgInlinePlugin, {

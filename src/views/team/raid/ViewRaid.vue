@@ -3,12 +3,19 @@
         <div ref="teamImage" class="m-raid-view-page" :class="{ 'm-teamImage': hideBtn }" :style="boxsize">
             <header class="m-raid-view-hero">
                 <div class="u-heading">
-                    <span class="u-eyebrow"><i class="el-icon-data-board"></i> RAID 排表</span>
-                    <h1>{{ data.name || "活动详情" }}</h1>
+                    <span class="u-eyebrow">
+                        <i class="el-icon-data-board"></i>
+                        {{ data.name || $t("team.raid.view.eyebrow") }}
+                    </span>
+                    <h1>{{ data.title || data.name || $t("team.raid.view.detail") }}</h1>
                     <p>
-                        <span>{{ data.team_name || "团队活动" }}</span>
+                        <span>{{ data.team_name || $t("team.raid.view.teamActivity") }}</span>
+                        <template v-if="info.server">
+                            <i></i>
+                            <span>{{ info.server }}</span>
+                        </template>
                         <i></i>
-                        <span>{{ showTime(data.start_time) || "时间待定" }}</span>
+                        <span>{{ showTime(data.start_time) || $t("team.raid.view.timePending") }}</span>
                     </p>
                 </div>
                 <div class="u-op">
@@ -18,19 +25,26 @@
                         type="warning"
                         icon="Edit"
                         @click="editRaid"
-                        v-if="isAdmin || canManage"
+                        v-if="canManage"
                         :disabled="isOldVersion"
-                        >编辑活动</el-button
+                        >{{ $t("team.raid.common.edit") }}</el-button
                     >
-
-                    <el-button class="u-back" size="small" icon="ArrowLeft" @click="goBack">返回列表</el-button>
+                    <el-button
+                        v-if="flag && !isOldVersion"
+                        type="primary"
+                        icon="Right"
+                        @click="handleShowDialog"
+                        :disabled="!canJoin"
+                    >
+                        {{ $t("team.raid.view.reserve") }}
+                    </el-button>
                 </div>
             </header>
 
             <el-alert
                 v-if="loadError"
                 class="m-raid-view-error"
-                title="活动详情加载失败，请稍后重试"
+                :title="$t('team.raid.view.loadFailed')"
                 type="error"
                 show-icon
                 :closable="false"
@@ -44,21 +58,16 @@
                 <section class="m-raid-view-section m-raid-view-overview">
                     <div class="m-raid-section-heading">
                         <div>
-                            <span class="u-section-icon"><i class="el-icon-tickets"></i></span>
                             <div>
-                                <h2>活动信息</h2>
-                                <p>开团安排与报名说明</p>
+                                <h2>{{ $t("team.raid.view.info") }}</h2>
+                                <p>{{ $t("team.raid.view.infoHint") }}</p>
                             </div>
                         </div>
-                        <span class="u-auth" :class="{ 'is-disabled': !canJoin }">
-                            <i :class="canJoin ? 'el-icon-unlock' : 'el-icon-lock'"></i>
-                            {{ showAuth(data.auth) }}
-                        </span>
                     </div>
 
                     <el-alert
                         v-if="isOldVersion"
-                        title="这是旧版排表，仅支持查看。"
+                        :title="$t('team.raid.view.legacy')"
                         type="warning"
                         show-icon
                         :closable="false"
@@ -68,33 +77,33 @@
                         <div class="u-meta-item">
                             <span class="u-icon"><i class="el-icon-date"></i></span>
                             <div>
-                                <em>开团时间</em>
-                                <strong>{{ showTime(data.start_time) || "待定" }}</strong>
+                                <em>{{ $t("team.raid.view.startTime") }}</em>
+                                <strong>{{ showTime(data.start_time) || $t("team.raid.common.pending") }}</strong>
                             </div>
                         </div>
                         <div class="u-meta-item">
                             <span class="u-icon"><i class="el-icon-microphone"></i></span>
                             <div>
-                                <em>队长指挥</em>
-                                <strong>{{ data.leader || "暂未填写" }}</strong>
+                                <em>{{ $t("team.raid.view.leader") }}</em>
+                                <strong>{{ data.leader || $t("team.raid.view.leaderPending") }}</strong>
                             </div>
                         </div>
                         <div class="u-meta-item">
-                            <span class="u-icon"><i class="el-icon-user"></i></span>
+                            <span class="u-icon"><i :class="canJoin ? 'el-icon-unlock' : 'el-icon-lock'"></i></span>
                             <div>
-                                <em>活动规模</em>
-                                <strong>{{ data.count ? `${data.count} 人` : "按排表安排" }}</strong>
+                                <em>{{ $t("team.raid.form.condition") }}</em>
+                                <strong>{{ showAuth(data.auth) }}</strong>
                             </div>
                         </div>
                     </div>
 
                     <div class="m-raid-view-info">
-                        <h3>{{ data.title || data.name || "团队活动" }}</h3>
-                        <p>{{ data.desc || "暂无补充说明" }}</p>
+                        <span class="u-label">{{ $t("team.raid.view.description") }}</span>
+                        <p>{{ data.desc || $t("team.raid.view.noDescription") }}</p>
                     </div>
 
                     <div class="m-raid-lackmount" v-if="lackMounts.length">
-                        <h3><i class="el-icon-circle-check"></i> 以下职业无冲突</h3>
+                        <h3><i class="el-icon-circle-check"></i> {{ $t("team.raid.view.noConflict") }}</h3>
                         <ul class="u-list">
                             <li class="u-item" v-for="mount in lackMounts" :key="mount.id">
                                 <img class="u-icon" :src="showMountIcon(mount.id)" :alt="mount.name" />
@@ -109,16 +118,13 @@
                         <div class="u-copy">
                             <span class="u-icon"><i class="el-icon-s-promotion"></i></span>
                             <div>
-                                <h3>{{ canJoin ? "报名通道已开放" : "当前暂不可报名" }}</h3>
+                                <h3>{{ $t(canJoin ? "team.raid.view.joinOpen" : "team.raid.view.joinClosed") }}</h3>
                                 <p>{{ showAuth(data.auth) }}</p>
                             </div>
                         </div>
                         <div class="u-actions">
-                            <el-button icon="FullScreen" :disabled="!canJoin" @click="showMiniprogramCode">
-                                微信小程序
-                            </el-button>
                             <el-button type="primary" icon="Right" @click="handleShowDialog" :disabled="!canJoin">
-                                预约报名
+                                {{ $t("team.raid.view.reserve") }}
                             </el-button>
                         </div>
                     </div>
@@ -128,8 +134,8 @@
                             <div>
                                 <span class="u-section-icon"><i class="el-icon-user"></i></span>
                                 <div>
-                                    <h2>活动排表</h2>
-                                    <p>正式队员、替补队员与候选名单</p>
+                                    <h2>{{ $t("team.raid.view.board") }}</h2>
+                                    <p>{{ $t("team.raid.view.boardHint") }}</p>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +153,8 @@
                     </section>
 
                     <join-pop
-                        title="预约报名"
+                        :key="`raid-join-${id}`"
+                        :title="$t('team.raid.view.reserve')"
                         v-model="joinShow"
                         :auth="data.auth"
                         :client="client"
@@ -156,12 +163,10 @@
                 </template>
             </template>
 
-            <el-dialog class="m-wx-dialog" v-model="miniprogramCode" width="255px" center top="30vh">
-                <el-image :src="miniprogramCodeUrl" class="wx-code"></el-image>
-            </el-dialog>
         </div>
         <div v-if="hideBtn" :style="boxsize"></div>
         <RaidFormDialog
+            :key="`raid-form-${id}`"
             v-model="formVisible"
             :raid-id="id"
             :teams="editTeams"
@@ -173,12 +178,10 @@
 
 <script>
 import html2canvas from "html2canvas";
-import raid_auth from "@/assets/data/team/raid_auth.json";
 import { getTeam } from "@/service/team/team.js";
 import User from "@jx3box/jx3box-common/js/user";
-import { getRaid, updateRaid, removeRaid, addTobeMember, getWxacode } from "@/service/team/raid.js";
+import { getRaid, updateRaid, removeRaid, addTobeMember } from "@/service/team/raid.js";
 import { checkMyAuthority } from "@/service/team/member.js";
-import { __ossMirror } from "@/utils/config";
 // components
 import Raid from "@/components/team/raid/Raid.vue";
 import team_info from "@/components/team/org/team_info.vue";
@@ -204,7 +207,6 @@ export default {
             info: "",
             data: "",
 
-            raid_auth,
             authority: 0,
             auth_map: {
                 r_raid: 0,
@@ -215,7 +217,6 @@ export default {
             formData: {},
             flag: false,
 
-            isAdmin: User.isAdmin(),
             visible: false,
 
             imgUrl: "",
@@ -223,12 +224,10 @@ export default {
             hideBtn: false,
             boxsize: {},
 
-            // 小程序码
-            miniprogramCodeUrl: "",
-            miniprogramCode: false,
-
             loading: true,
             loadError: false,
+            loadVersion: 0,
+            loadedRaidId: "",
         };
     },
     computed: {
@@ -302,18 +301,33 @@ export default {
         },
     },
     watch: {
+        id: {
+            immediate: true,
+            handler: function (value) {
+                if (value) this.init();
+            },
+        },
         data: {
             deep: true,
             handler() {
-                if (this.routerName === "view_raid" && this.flag) {
+                const raidId = this.id;
+                const version = this.loadVersion;
+                if (
+                    this.routerName === "view_raid" &&
+                    this.flag &&
+                    String(this.loadedRaidId) === String(raidId) &&
+                    Array.isArray(this.data?.content)
+                ) {
                     const count_normal = this.data.content.filter((item) => item.name).length;
                     const _data = cloneDeep(this.data);
                     _data.count_normal = count_normal;
-                    updateRaid(this.id, _data).then(() => {
-                        this.$message({
-                            message: "更新成功",
-                            type: "success",
-                        });
+                    updateRaid(raidId, _data).then(() => {
+                        if (this.isCurrentRaidLoad(raidId, version)) {
+                            this.$message({
+                                message: this.$t("team.raid.view.updateSuccess"),
+                                type: "success",
+                            });
+                        }
                     });
                 }
             },
@@ -355,41 +369,71 @@ export default {
         },
         // 数据加载
         // ==================================
-        getRaid: function () {
-            return getRaid(this.id).then((res) => {
-                this.data = res.data.data;
-            });
+        isCurrentRaidLoad: function (raidId, version) {
+            return (
+                this.$route.name === "view_raid" &&
+                version === this.loadVersion &&
+                String(raidId) === String(this.id)
+            );
         },
-        getTeam: function () {
-            return getTeam(this.team_id).then((res) => {
-                this.info = res.data.data;
-                this.$store.commit("SET_TEAM", this.info);
-            });
+        getRaid: function (raidId) {
+            return getRaid(raidId).then((res) => res.data.data);
         },
-        getAuthority: function () {
-            if (!User.isLogin()) return Promise.resolve();
-            return checkMyAuthority(this.team_id).then((res) => {
-                this.authority = res.data.data.authority;
-                this.auth_map = res.data.data;
-                this.$store.commit("setManageStatus", this.auth_map.r_raid === 1 || this.auth_map.authority === 99);
-                this.$store.commit("setIsTeammate", this.authority >= 2);
-            });
+        getTeam: function (teamId) {
+            return getTeam(teamId).then((res) => res.data.data);
+        },
+        getAuthority: function (teamId) {
+            if (!User.isLogin()) return Promise.resolve({ authority: 0, r_raid: 0 });
+            return checkMyAuthority(teamId).then((res) => res.data.data || { authority: 0, r_raid: 0 });
         },
         init: async function () {
+            const raidId = this.id;
+            const version = ++this.loadVersion;
+
             this.loading = true;
             this.loadError = false;
+            this.data = "";
+            this.info = "";
             this.authority = 0;
             this.auth_map = { r_raid: 0 };
+            this.loadedRaidId = "";
+            this.flag = false;
+            this.joinShow = false;
+            this.formVisible = false;
+            this.$store.commit("SET_TEAM", {});
             this.$store.commit("setManageStatus", false);
             this.$store.commit("setIsTeammate", false);
             try {
-                await this.getRaid();
-                await Promise.allSettled([this.getTeam(), this.getAuthority()]);
+                const raid = await this.getRaid(raidId);
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
+
+                this.data = raid;
+                this.loadedRaidId = raidId;
+                const teamId = raid?.team_id;
+                const [teamResult, authorityResult] = await Promise.allSettled([
+                    this.getTeam(teamId),
+                    this.getAuthority(teamId),
+                ]);
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
+
+                if (teamResult.status === "fulfilled") {
+                    this.info = teamResult.value;
+                    this.$store.commit("SET_TEAM", this.info);
+                }
+                if (authorityResult.status === "fulfilled") {
+                    this.auth_map = authorityResult.value;
+                    this.authority = this.auth_map.authority || 0;
+                    this.$store.commit(
+                        "setManageStatus",
+                        this.auth_map.r_raid === 1 || this.auth_map.authority === 99,
+                    );
+                    this.$store.commit("setIsTeammate", this.authority >= 2);
+                }
                 this.flag = true;
             } catch (e) {
-                this.loadError = true;
+                if (this.isCurrentRaidLoad(raidId, version)) this.loadError = true;
             } finally {
-                this.loading = false;
+                if (this.isCurrentRaidLoad(raidId, version)) this.loading = false;
             }
         },
 
@@ -404,10 +448,14 @@ export default {
             this.Join();
         },
         Join: function () {
+            const raidId = this.id;
+            const version = this.loadVersion;
+            const role = this.chosenRole;
             // 提交到报名接口
-            addTobeMember(this.id, this.chosenRole).then((res) => {
+            addTobeMember(raidId, role).then((res) => {
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
                 this.$message({
-                    message: "申请成功,请等待团长审核",
+                    message: this.$t("team.raid.view.applySuccess"),
                     type: "success",
                 });
                 this.joinShow = false;
@@ -417,25 +465,19 @@ export default {
 
         // 其它
         // ===========================
-        goBack: function () {
-            if (document.referrer?.includes("manage")) {
-                this.$router.push("/raid/manage");
-            } else {
-                this.$router.push("/raid/list");
-            }
-        },
         editRaid: function () {
             this.formVisible = true;
         },
         handleRaidSaved: async function () {
-            this.flag = false;
-            await this.getRaid();
-            this.flag = true;
+            await this.init();
         },
         rmRaid: function () {
-            removeRaid(this.id).then((res) => {
+            const raidId = this.id;
+            const version = this.loadVersion;
+            removeRaid(raidId).then((res) => {
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
                 this.$message({
-                    message: "删除成功",
+                    message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.visible = false;
@@ -450,23 +492,11 @@ export default {
             // this.data.content = members;
         },
 
-        // 小程序码
-        // ===================================
-        showMiniprogramCode: function () {
-            this.miniprogramCode = true;
-            if (this.miniprogramCodeUrl) return;
-            getWxacode(this.id).then((res) => {
-                this.miniprogramCodeUrl = __ossMirror + res.data.data.meta_val;
-            });
-        },
         showAuth: function (val) {
-            return raid_auth[val];
+            return this.$t(`team.raid.auth.${val}`);
         },
         showTime,
         showMountIcon,
-    },
-    created: function () {
-        this.init();
     },
 };
 </script>
@@ -488,32 +518,6 @@ export default {
         .pa;
         .lt(-20px, -10px);
         padding: 10px 20px;
-    }
-}
-.m-wx-dialog {
-    .el-dialog__header {
-        padding: 0;
-    }
-    .el-dialog__body {
-        padding: 20px;
-    }
-    .wx-code {
-        img {
-            width: 215px;
-        }
-    }
-}
-
-@media screen and (max-width: @phone) {
-    .m-wx-dialog .el-dialog {
-        .size(100%) !important;
-        min-width: 0;
-        margin: 0 !important;
-        display: flex;
-        padding: 0;
-        justify-content: center;
-        height: 100%;
-        align-items: center;
     }
 }
 </style>

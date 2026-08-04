@@ -11,8 +11,8 @@
             <div class="m-raid-member-setting__title">
                 <span class="u-title-icon"><i class="el-icon-user"></i></span>
                 <div>
-                    <strong>{{ title || "角色设置" }}</strong>
-                    <span>设置排表成员使用的角色、心法与备注</span>
+                    <strong>{{ title || $t("team.raid.board.roleSettings") }}</strong>
+                    <span>{{ $t("team.raid.memberSetting.hint") }}</span>
                 </div>
             </div>
         </template>
@@ -20,15 +20,15 @@
         <el-form ref="roleForm" class="m-raid-member-setting__form" :model="form" :rules="rules" label-position="top">
             <section class="m-raid-member-setting__section">
                 <header>
-                    <strong>角色信息</strong>
-                    <span>可以选择团队中的已绑定角色，也可以填写临时角色</span>
+                    <strong>{{ $t("team.raid.memberSetting.roleInfo") }}</strong>
+                    <span>{{ $t("team.raid.memberSetting.roleInfoHint") }}</span>
                 </header>
 
-                <el-form-item label="角色名称" prop="name">
+                <el-form-item :label="$t('team.raid.memberSetting.roleName')" prop="name">
                     <el-input
                         v-if="!['normal', 'sub'].includes(mode)"
                         v-model="form.name"
-                        placeholder="请输入角色名称"
+                        :placeholder="$t('team.raid.memberSetting.rolePlaceholder')"
                         :disabled="!canEdit"
                         clearable
                     />
@@ -38,9 +38,9 @@
                             <img :src="showMountIcon(form.mount)" :alt="form.name" />
                             <div>
                                 <strong>{{ form.name }}</strong>
-                                <span>已绑定团队角色，心法可在下方调整</span>
+                                <span>{{ $t("team.raid.memberSetting.boundHint") }}</span>
                             </div>
-                            <el-button link type="primary" :disabled="!canEdit" @click="removeRole">更换角色</el-button>
+                            <el-button link type="primary" :disabled="!canEdit" @click="removeRole">{{ $t("team.raid.memberSetting.changeRole") }}</el-button>
                         </div>
                         <template v-else>
                             <el-select
@@ -49,7 +49,7 @@
                                 teleported
                                 filterable
                                 clearable
-                                placeholder="选择团队中的已绑定角色"
+                                :placeholder="$t('team.raid.memberSetting.selectBound')"
                                 :disabled="!canEdit"
                                 @change="handleChange"
                             >
@@ -61,10 +61,10 @@
                                     </div>
                                 </el-option>
                             </el-select>
-                            <div class="m-raid-member-divider"><span>或填写临时角色</span></div>
+                            <div class="m-raid-member-divider"><span>{{ $t("team.raid.memberSetting.orTemporary") }}</span></div>
                             <el-input
                                 v-model="form.name"
-                                placeholder="请输入临时角色名称"
+                                :placeholder="$t('team.raid.memberSetting.temporaryPlaceholder')"
                                 :disabled="!canEdit"
                                 clearable
                             />
@@ -75,11 +75,11 @@
 
             <section class="m-raid-member-setting__section">
                 <header>
-                    <strong>排表设置</strong>
-                    <span>用于排表展示与队伍配置</span>
+                    <strong>{{ $t("team.raid.memberSetting.rosterSettings") }}</strong>
+                    <span>{{ $t("team.raid.memberSetting.rosterHint") }}</span>
                 </header>
-                <el-form-item label="指定心法" prop="mount">
-                    <el-select v-model="form.mount" placeholder="请选择心法" filterable clearable>
+                <el-form-item :label="$t('team.raid.memberSetting.mount')" prop="mount">
+                    <el-select v-model="form.mount" :placeholder="$t('team.raid.memberSetting.selectMount')" filterable clearable>
                         <el-option v-for="xf in xfMaps" :key="xf.id" :value="xf.id" :label="xf.name">
                             <div class="m-raid-member-option">
                                 <img :src="showMountIcon(xf.id)" :alt="xf.name" />
@@ -89,7 +89,7 @@
                     </el-select>
                 </el-form-item>
 
-                <el-form-item label="备注内容" prop="remark">
+                <el-form-item :label="$t('team.raid.memberSetting.remark')" prop="remark">
                     <el-input
                         v-model="form.remark"
                         type="textarea"
@@ -97,7 +97,7 @@
                         resize="none"
                         show-word-limit
                         :maxlength="20"
-                        placeholder="可填写分组、职责或其他排表说明"
+                        :placeholder="$t('team.raid.memberSetting.remarkPlaceholder')"
                     />
                 </el-form-item>
             </section>
@@ -105,8 +105,8 @@
 
         <template #footer>
             <div class="m-raid-member-setting__footer">
-                <el-button @click="handleCancel">取消</el-button>
-                <el-button type="primary" :loading="addLoading" @click="handleSave">保存设置</el-button>
+                <el-button @click="handleCancel">{{ $t("team.raid.common.cancel") }}</el-button>
+                <el-button type="primary" :loading="addLoading" @click="handleSave">{{ $t("team.raid.memberSetting.save") }}</el-button>
             </div>
         </template>
     </el-dialog>
@@ -116,7 +116,6 @@
 import { getRoles, addNormalMember, addSubMember, updateMember } from "@/service/team/raid.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import mountg from "@jx3box/jx3box-data/data/xf/mount_group.json";
-import { __imgPath } from "@/utils/config";
 import cloneDeep from "lodash/cloneDeep";
 import pick from "lodash/pick";
 import { showMountIcon, showSchoolIcon } from "@/utils/filters";
@@ -232,8 +231,8 @@ export default {
                     this.add();
                 } else {
                     this.$notify({
-                        title: "提示",
-                        message: "成员数已达模板上限，不能继续添加",
+                        title: this.$t("team.raid.common.tip"),
+                        message: this.$t("team.raid.board.full"),
                         type: "warning",
                     });
                 }

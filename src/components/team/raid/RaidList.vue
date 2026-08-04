@@ -136,7 +136,11 @@ export default {
             return moment(d).format("HH:mm");
         },
         showRaidFullDate: function (d) {
-            return moment(d).format("MM") + "月" + moment(d).format("DD") + "日" + ` (${moment(d).format("dddd")})`;
+            return new Intl.DateTimeFormat(this.$i18n?.locale || "zh-CN", {
+                month: "2-digit",
+                day: "2-digit",
+                weekday: "long",
+            }).format(new Date(d));
         },
     },
     created: function () {},

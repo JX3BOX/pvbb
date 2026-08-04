@@ -1,17 +1,17 @@
 <template>
     <el-form class="u-form" label-width="80px">
-        <el-form-item label="游戏大区">
-            <el-select v-model="form.zone" placeholder="请选择">
+        <el-form-item :label="$t('team.apply.zone')">
+            <el-select v-model="form.zone" :placeholder="$t('team.apply.select')">
                 <el-option v-for="(item, index) in options" :key="index" :label="item" :value="item"> </el-option>
             </el-select>
         </el-form-item>
-        <el-form-item label="激活账号">
-            <el-input v-model.lazy="form.account" placeholder="请填写正确的游戏账号"></el-input>
-            <div class="u-tip">* 请填写正确的游戏账号，非角色名！</div>
+        <el-form-item :label="$t('team.apply.account')">
+            <el-input v-model.lazy="form.account" :placeholder="$t('team.apply.accountPlaceholder')"></el-input>
+            <div class="u-tip">* {{ $t("team.apply.accountHint") }}</div>
         </el-form-item>
-        <el-form-item label="确认账号">
-            <el-input v-model.lazy="form.accounts" placeholder="请再输入一次游戏账号"></el-input>
-            <div class="u-tip" v-if="!agreement">* 你输入的账号不一致!</div>
+        <el-form-item :label="$t('team.apply.confirmAccount')">
+            <el-input v-model.lazy="form.accounts" :placeholder="$t('team.apply.confirmPlaceholder')"></el-input>
+            <div class="u-tip" v-if="!agreement">* {{ $t("team.apply.mismatch") }}</div>
         </el-form-item>
     </el-form>
 </template>

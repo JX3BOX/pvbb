@@ -9,7 +9,7 @@
                                 <div class="u-tag">{{ post.tags?.length ? post.tags[0] : "其他" }}</div>
                                 <div class="u-header-title">{{ post.post_title }}</div>
                                 <img
-                                    v-if="!post.include_video"
+                                    v-if="post.include_video"
                                     class="u-video"
                                     src="@/assets/img/qqbot/jx3box_qqbot_video.svg"
                                     alt=""
@@ -26,7 +26,7 @@
                                     class="u-avatar"
                                 />
                                 <div class="u-name">{{ post?.author_info?.display_name || "匿名" }}</div>
-                                <div v-if="post?.is_super_author" class="u-info-tag u-super">签约作者</div>
+                                <div v-if="post?.author_info?.is_super_author" class="u-info-tag u-super">签约作者</div>
                                 <div class="u-info-tag u-level">Lv.{{ post?.level || 0 }}</div>
                                 <div v-if="post?.is_pro" class="u-info-tag u-pro">PRO</div>
                             </div>
@@ -73,7 +73,7 @@
                                             </i>
                                         </span>
                                     </div>
-                                    <div class="m-desc" v-if="data?.post_meta?.talent_desc && item.desc">
+                                    <div class="m-desc" v-if="item.desc">
                                         <div class="u-sub-title">连招说明</div>
                                         <span class="u-desc" v-html="item.desc"></span>
                                     </div>
@@ -124,6 +124,8 @@ export default {
             zlpList: zlp.all_map,
 
             imagesLoaded: false,
+            loadRequestId: 0,
+            loadError: "",
         };
     },
     computed: {
@@ -165,14 +167,16 @@ export default {
             }
         },
         skills() {
-            return this.data?.post_meta?.data;
+            return this.data?.post_meta?.data || [];
         },
         visible: function () {
             return !!this.post?._check;
         },
         null_tip: function () {
+            if (this.loadError) return this.loadError;
+            if (!this.id) return "缺少攻略 ID";
             let str = "作者设置了【";
-            str += JX3BOX.__visibleMap[this.post?.visible];
+            str += JX3BOX.__visibleMap[this.post?.visible] || "不可见";
             str += "】";
             return str;
         },
@@ -180,8 +184,8 @@ export default {
             return this.post?.client || "all";
         },
     },
-    mounted() {
-        this.loadData();
+    beforeUnmount() {
+        this.loadRequestId += 1;
     },
     methods: {
         showTime,
@@ -198,87 +202,113 @@ export default {
         nl2br(str) {
             return str && str.replace(/\n/g, "<br/>");
         },
-        initImageLoader() {
+        initImageLoader(requestId) {
             this.$nextTick(() => {
-                this.setGlobalReady();
+                if (requestId !== this.loadRequestId) return;
+                this.setGlobalReady(requestId);
             });
         },
 
         // 设置全局就绪状态
-        setGlobalReady() {
+        setGlobalReady(requestId) {
+            if (requestId !== this.loadRequestId) return;
             if (this.imagesLoaded) return; // 避免重复设置
 
             this.imagesLoaded = true;
             markQQBotReady({ root: this.$el });
         },
         async loadData() {
-            if (!this.id) {
-                return;
-            }
+            const requestId = ++this.loadRequestId;
             resetQQBotReady();
             this.imagesLoaded = false;
+            this.loadError = "";
+            this.post = {};
+            this.stat = {};
+            this.talentDriver = null;
             this.loading = true;
+            const id = this.id;
             const authorTasks = [];
-            await getPost(this.id)
-                .then((res) => {
-                    this.post = res.data.data;
+            try {
+                if (!id) {
+                    this.loadError = "缺少攻略 ID";
+                    return;
+                }
 
-                    document.title = this.post?.post_title;
-                    if (this.post?.post_author) {
-                        authorTasks.push(
-                            getUserInfo(this.post.post_author).then((res) => {
-                                if (res.data?.data) {
-                                    this.post.author_info = {
-                                        ...(this.post.author_info || {}),
-                                        ...res.data.data,
-                                    };
-                                    this.post.level = User.getLevel(this.post.author_info?.experience || 0);
-                                }
-                            })
-                        );
-                        authorTasks.push(
-                            isSuperAuthor(this.post.post_author).then((res) => {
-                                this.post.author_info = {
-                                    ...(this.post.author_info || {}),
-                                    is_super_author: !!res.data?.data,
-                                };
-                            })
-                        );
-                    }
-                    this.$nextTick(() => {
-                        if (this.visible) this.installTalent();
-                    });
-                })
-                .finally(() => {
+                const res = await getPost(id);
+                if (requestId !== this.loadRequestId) return;
+                this.post = res.data?.data || {};
+                if (!this.post?.ID) this.loadError = "未找到对应攻略";
+
+                if (this.post?.post_title) document.title = this.post.post_title;
+                if (this.post?.post_author) {
+                    const authorId = this.post.post_author;
+                    authorTasks.push(
+                        getUserInfo(authorId).then((authorRes) => {
+                            if (requestId !== this.loadRequestId || !authorRes.data?.data) return;
+                            this.post.author_info = {
+                                ...(this.post.author_info || {}),
+                                ...authorRes.data.data,
+                            };
+                            this.post.level = User.getLevel(this.post.author_info?.experience || 0);
+                        })
+                    );
+                    authorTasks.push(
+                        isSuperAuthor(authorId).then((authorRes) => {
+                            if (requestId !== this.loadRequestId) return;
+                            this.post.author_info = {
+                                ...(this.post.author_info || {}),
+                                is_super_author: !!authorRes.data?.data,
+                            };
+                        })
+                    );
+                }
+
+                await Promise.allSettled([
+                    getStat(appKey, id).then((statRes) => {
+                        if (requestId === this.loadRequestId) this.stat = statRes.data;
+                    }),
+                    ...authorTasks,
+                    postStat(appKey, id),
+                ]);
+                if (requestId !== this.loadRequestId) return;
+                await this.$nextTick();
+                if (this.visible) await this.installTalent(requestId);
+            } catch (error) {
+                if (requestId === this.loadRequestId) {
+                    this.post = {};
+                    this.loadError = "攻略加载失败，请稍后再试";
+                }
+            } finally {
+                if (requestId === this.loadRequestId) {
                     this.loading = false;
-                });
+                    setQQBotDataReady(true);
 
-            await getStat(appKey, this.id).then((res) => {
-                this.stat = res.data;
-            });
-            await Promise.allSettled(authorTasks);
-            await postStat(appKey, this.id);
-            setQQBotDataReady(true);
-
-            // 请注意，为防止QQBOT无法抓取完全，请不要删除
-            // 数据加载后启动奇遇流程中的图片检测
-            this.initImageLoader();
+                    // 请注意，为防止QQBOT无法抓取完全，请不要删除
+                    // 数据加载后启动图片检测
+                    this.initImageLoader(requestId);
+                }
+            }
         },
-        installTalent() {
+        async installTalent(requestId) {
             if (!this.visible) return;
             if (!Object.keys(this.talent || {}).length) return;
 
             const containerSelector = `.m-qx-container-${this.data?.ID}`;
             if (!this.data?.ID || !document.querySelector(containerSelector)) return;
 
-            this.talentDriver = new JX3_QIXUE({
-                container: containerSelector,
-                version: this.talent.version,
-                xf: this.talent.xf,
-                editable: false,
-                sq: this.talent.sq,
-                client: this.talent.client || "std",
-            });
+            try {
+                const driver = await new JX3_QIXUE({
+                    container: containerSelector,
+                    version: this.talent.version,
+                    xf: this.talent.xf,
+                    editable: false,
+                    sq: this.talent.sq,
+                    client: this.talent.client || "std",
+                });
+                if (requestId === this.loadRequestId) this.talentDriver = driver;
+            } catch (error) {
+                if (requestId === this.loadRequestId) this.talentDriver = null;
+            }
         },
         xficon: function (val) {
             return JX3BOX.__imgPath + "image/xf/" + val + ".png";
@@ -288,16 +318,10 @@ export default {
         },
     },
     watch: {
-        community_id: {
+        id: {
             immediate: true,
-            handler(val) {
-                if (val && val != 0) {
-                    // 防止死循环
-                    if (location.href.includes(`/community/${val}`)) {
-                        return;
-                    }
-                    location.href = `/community/${val}`;
-                }
+            handler() {
+                this.loadData();
             },
         },
     },

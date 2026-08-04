@@ -2,7 +2,7 @@
     <div class="m-raid-core" v-loading="loading">
         <el-alert
             v-if="!isPublic && !isTeammate"
-            title="当前活动为私有活动，仅团队成员可见"
+            :title="$t('team.raid.board.private')"
             type="warning"
             center
             show-icon>
@@ -12,7 +12,7 @@
             <raid-normal-v1
                 class="m-raid-normal"
                 v-if="content"
-                header="正式队员"
+                :header="$t('team.raid.board.normal')"
                 mode="normal"
                 :data="members"
                 :teamId="teamId"
@@ -24,7 +24,7 @@
 
             <raid-normal-v2
                 v-else
-                header="正式队员"
+                :header="$t('team.raid.board.normal')"
                 mode="normal"
                 :data="members"
                 :teamId="teamId"
@@ -41,7 +41,7 @@
                 v-if="id && !content"
                 ref="subRaid"
                 class="m-raid-sub"
-                header="替补队员"
+                :header="$t('team.raid.board.substitute')"
                 mode="sub"
                 :teamId="teamId"
                 :id="id"
@@ -55,7 +55,7 @@
             <raid-tobe
                 v-if="id && !content"
                 class="m-raid-tobe"
-                header="候选名单"
+                :header="$t('team.raid.board.candidates')"
                 mode="tobe"
                 :teamId="teamId"
                 :id="id"
@@ -184,39 +184,33 @@ export default {
          */
         handlePass({ member }) {
             this.loadMembers();
-            this.notify(`【${member.name}】已成为正式队员`);
+            this.notify(this.$t("team.raid.board.promoted", { name: member.name }));
         },
         handleReplace(member) {
             const index = this.members.findIndex(m => m.mount == member.mount && !m.is_valid);
             if (index > -1) {
                 this.members[index] = member;
-                this.notify(`【${member.name}】已成为正式队员`)
+                this.notify(this.$t("team.raid.board.promoted", { name: member.name }));
             } else {
                 const _index = this.members.findIndex(m => !m.is_valid);
                 if (_index) {
                     this.members[_index] = member;
-                    this.notify(`【${member.name}】已成为正式队员`)
+                    this.notify(this.$t("team.raid.board.promoted", { name: member.name }));
                 }
             }
         },
         notify(message) {
             this.$notify({
-                title: "提示",
+                title: this.$t("team.raid.common.tip"),
                 message,
                 type: "success",
             });
         },
         /**
          * 候补人员转为替补人员
-         * @param {Object} val 选择的队员
          */
-        handlePending(val) {
-            const subRaid = this.$refs.subRaid;
-            const copy_members = lodash.cloneDeep(subRaid.data);
-
-            copy_members.push(val);
-
-            subRaid.data = copy_members;
+        handlePending() {
+            this.loadMembers();
         },
         loadMembers() {
             // 兼容旧版数据

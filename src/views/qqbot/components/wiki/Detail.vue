@@ -1,10 +1,10 @@
 <template>
     <div class="p-qqrobot-wiki-detail">
         <div class="m-wiki__container">
-            <CjSingle v-if="type === 'cj'" :source-id="id" />
-            <KnowledgeSingle v-else-if="type === 'knowledge'" :source-id="id" />
-            <QuestSingle v-else-if="type === 'quest'" :source-id="id" />
-            <ItemSingle v-else-if="type === 'item'" :source-id="id" />
+            <CjSingle v-if="hasValidTarget && type === 'cj'" :source-id="id" />
+            <KnowledgeSingle v-else-if="hasValidTarget && type === 'knowledge'" :source-id="id" />
+            <QuestSingle v-else-if="hasValidTarget && type === 'quest'" :source-id="id" />
+            <ItemSingle v-else-if="hasValidTarget && type === 'item'" :source-id="id" />
             <div v-else class="m-wiki-post-empty is-robot-empty">未找到对应的百科类型</div>
         </div>
     </div>
@@ -15,6 +15,7 @@ import CjSingle from "./CjSingle.vue";
 import KnowledgeSingle from "./KnowledgeSingle.vue";
 import QuestSingle from "./QuestSingle.vue";
 import ItemSingle from "./ItemSingle.vue";
+import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 
 export default {
     name: "QQRobotWikiDetail",
@@ -30,6 +31,27 @@ export default {
         },
         id() {
             return this.$route.query.id || "";
+        },
+        hasValidTarget() {
+            return !!this.id && ["cj", "knowledge", "quest", "item"].includes(this.type);
+        },
+        readyKey() {
+            return `${this.type}:${this.id}:${this.hasValidTarget}`;
+        },
+    },
+    watch: {
+        readyKey: {
+            immediate: true,
+            handler() {
+                if (this.hasValidTarget) return;
+                const readyKey = this.readyKey;
+                resetQQBotReady();
+                setQQBotDataReady(true);
+                this.$nextTick(() => {
+                    if (readyKey !== this.readyKey || this.hasValidTarget) return;
+                    markQQBotReady({ root: this.$el });
+                });
+            },
         },
     },
 };

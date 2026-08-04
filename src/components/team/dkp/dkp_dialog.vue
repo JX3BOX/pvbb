@@ -139,6 +139,16 @@ import { searchItem, updateDkp } from "@/service/team/dkp.js";
 import { showAvatar } from "@jx3box/jx3box-common/js/utils";
 import cloneDeep from "lodash/cloneDeep";
 import { showSchoolIcon, authorLink } from "@/utils/filters";
+
+const createDefaultForm = () => ({
+    reason: "manual",
+    role_id: "",
+    drop_item_id: "",
+    action: 0,
+    remark: "",
+    score: "",
+});
+
 export default {
     name: "dkp_dialog",
     props: {
@@ -168,14 +178,7 @@ export default {
             }
         };
         return {
-            form: {
-                reason: "manual",
-                role_id: "",
-                drop_item_id: "",
-                action: 0,
-                remark: "",
-                score: "",
-            },
+            form: createDefaultForm(),
             fetchSelectItemsloading: false,
             fetchedSelectItemsOptions: [],
             fetchSelectNoDataText: this.$t("team.dkpDialog.enterTwo"),
@@ -228,7 +231,7 @@ export default {
         show(val) {
             this.$emit("update:modelValue", val);
             if (!val) {
-                this.form = this.$options.data().form;
+                this.form = createDefaultForm();
                 this.$refs.editForm.clearValidate();
                 this.fetchedSelectItemsOptions = [];
             }

@@ -1,11 +1,11 @@
 <template>
     <div class="m-team-activity">
         <el-divider content-position="left">
-            <i class="el-icon-date"></i> 近期计划
+            <i class="el-icon-date"></i> {{ $t("team.plan.recent") }}
         </el-divider>
         <planItem />
         <router-link class="el-button moreplan" :to="'/plan/' + team_id + '/all'">
-            <span class="u-txt">&raquo; 查看更多活动计划</span>
+            <span class="u-txt">&raquo; {{ $t("team.plan.more") }}</span>
         </router-link>
         <!-- <div class="u-list" v-if="data && data.length">
           <planItem />

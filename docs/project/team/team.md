@@ -44,6 +44,8 @@
 
 应用外壳把 `index`、`view_my_org`、`manage_my_org`、`add_org` 等视为现代工作区；其它历史路由仍使用面包屑和 `Nav2.vue` 旧侧栏。
 
+现代工作区的响应式导航统一遵循 [`docs/design/TEAM_MOBILE_NAVIGATION_GUIDE.md`](../../design/TEAM_MOBILE_NAVIGATION_GUIDE.md)：桌面端保留共享左侧工作台，`820px` 以下使用纯图标左侧悬浮按钮和左侧侧滑抽屉；触发按钮不展示当前团队身份，也不得把完整侧栏排列到长正文底部或在业务页面复制移动端团队列表。
+
 ## 3. 核心入口与两种视图
 
 ### 3.1 团队广场

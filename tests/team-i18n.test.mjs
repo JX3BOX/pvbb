@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 const locales = ["zh-CN", "en-US", "zh-TW", "vi"];
@@ -23,6 +23,18 @@ function placeholders(value) {
     return [...String(value || "").matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]).sort();
 }
 
+async function collectSourceFiles(directory) {
+    const entries = await readdir(directory, { withFileTypes: true });
+    const files = await Promise.all(
+        entries.map((entry) => {
+            const target = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directory);
+            if (entry.isDirectory()) return collectSourceFiles(target);
+            return /\.(?:js|vue)$/.test(entry.name) ? [target] : [];
+        })
+    );
+    return files.flat();
+}
+
 test("team locale modules keep identical keys and placeholders", async () => {
     const messages = Object.fromEntries(
         await Promise.all(locales.map(async (locale) => [locale, flatten(await loadModule(locale, "team"))]))
@@ -42,68 +54,42 @@ test("team locale modules keep identical keys and placeholders", async () => {
     }
 });
 
-test("migrated team shell and battle surfaces contain no user-facing Chinese literals", async () => {
-    const files = [
-        "../src/pages/team/App.vue",
-        "../src/components/team/org/team_home_sidebar.vue",
-        "../src/views/team/org/ListOrg.vue",
-        "../src/views/team/org/ViewOrg.vue",
-        "../src/views/team/org/ViewMyOrg.vue",
-        "../src/views/team/battle/battleItem.vue",
-        "../src/views/team/battle/el-select-loading.vue",
-        "../src/views/team/battle/index.vue",
-        "../src/views/team/battle/myBattle.vue",
-        "../src/views/team/battle/relevance.vue",
-        "../src/views/team/battle/teamItem.vue",
-        "../src/components/team/Wrapper.vue",
-        "../src/components/team/widget/Nav.vue",
-        "../src/components/team/widget/Nav2.vue",
-        "../src/components/team/widget/Goback.vue",
-        "../src/views/team/member/ListMember.vue",
-        "../src/views/team/member/UserList.vue",
-        "../src/views/team/member/PendingList.vue",
-        "../src/views/team/member/MemberItem.vue",
-        "../src/views/team/snapshot/ListSnapshot.vue",
-        "../src/views/team/snapshot/EditPassword.vue",
-        "../src/components/team/snapshot/snapshotItem.vue",
-        "../src/components/team/snapshot/snapshotStat.vue",
-        "../src/components/team/snapshot/snapshotChart.vue",
-        "../src/components/team/snapshot/snapshotList.vue",
-        "../src/views/team/dkp/ManageDkp.vue",
-        "../src/components/team/dkp/dkp_list.vue",
-        "../src/components/team/dkp/dkp_logs.vue",
-        "../src/components/team/dkp/drop_item.vue",
-        "../src/components/team/dkp/dkp_dialog.vue",
-        "../src/views/team/org/ManageVideo.vue",
-        "../src/components/team/org/team_videos.vue",
-        "../src/components/team/org/teamform.vue",
-        "../src/components/team/org/team_role.vue",
-        "../src/components/team/org/team_info.vue",
-        "../src/views/team/dkp/MyDkp.vue",
-        "../src/views/team/org/EditPermission.vue",
-        "../src/views/team/org/EditOrgConfig.vue",
-        "../src/components/team/org/team_verify_logs.vue",
-        "../src/components/team/org/team_intro.vue",
-        "../src/components/team/org/team_recruit.vue",
-        "../src/components/team/org/team_trophy.vue",
-        "../src/components/team/org/team_medals.vue",
-        "../src/views/team/member/ViewMember.vue",
-        "../src/views/team/raid/TeamRaid.vue",
-        "../src/views/team/org/ViewComment.vue",
-        "../src/components/team/org/team_panel.vue",
-        "../src/views/team/org/EditNamespace.vue",
-        "../src/components/team/org/team_advanced_setting.vue",
-        "../src/components/team/org/team_list.vue",
-        "../src/components/team/member/joinpop.vue",
-    ];
+test("all team application sources contain no user-facing Chinese literals", async () => {
+    const roots = ["../src/pages/team/", "../src/views/team/", "../src/components/team/"];
+    const files = (await Promise.all(roots.map((root) => collectSourceFiles(new URL(root, import.meta.url))))).flat();
 
-    for (const path of files) {
-        const source = await readFile(new URL(path, import.meta.url), "utf8");
+    for (const file of files) {
+        const source = await readFile(file, "utf8");
         const withoutComments = source
             .replace(/<!--[\s\S]*?-->/g, "")
             .replace(/\/\/.*$/gm, "")
-            .replace(/\/\*[\s\S]*?\*\//g, "");
-        assert.doesNotMatch(withoutComments, /[\p{Script=Han}]/u, `${path} still contains Chinese UI copy`);
+            .replace(/\/\*[\s\S]*?\*\//g, "")
+            // These are API-provided role-function enum values used only for branching;
+            // their rendered abbreviations are localized through team.raid.roles.*.
+            .replace(/case "(?:内攻|外攻|坦克|治疗)":/g, "");
+        assert.doesNotMatch(withoutComments, /[\p{Script=Han}]/u, `${file.pathname} still contains Chinese UI copy`);
+    }
+});
+
+test("static team i18n usages resolve in every locale", async () => {
+    const messages = Object.fromEntries(
+        await Promise.all(locales.map(async (locale) => [locale, flatten(await loadModule(locale, "team"))]))
+    );
+    const roots = ["../src/pages/team/", "../src/views/team/", "../src/components/team/"];
+    const files = (await Promise.all(roots.map((root) => collectSourceFiles(new URL(root, import.meta.url))))).flat();
+    const usedKeys = new Set();
+
+    for (const file of files) {
+        const source = await readFile(file, "utf8");
+        for (const match of source.matchAll(/\$t\(\s*["'](team\.[^"']+)["']/g)) {
+            usedKeys.add(match[1].replace(/^team\./, ""));
+        }
+    }
+
+    for (const locale of locales) {
+        for (const key of usedKeys) {
+            assert.ok(Object.hasOwn(messages[locale], key), `${locale} is missing team.${key}`);
+        }
     }
 });
 

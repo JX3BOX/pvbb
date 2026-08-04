@@ -1,16 +1,16 @@
 <template>
     <el-form class="m-author-form" label-width="110px">
         <el-form-item>
-            <el-button class="u-add-author" type="success" @click="addAuthor" icon="Plus">添加作者</el-button>
+            <el-button class="u-add-author" type="success" @click="addAuthor" icon="Plus">{{ $t("team.apply.addAuthor") }}</el-button>
         </el-form-item>
-        <el-form-item v-for="(item, index) in authors" :key="index" :label="`签约作者`">
-            <el-input class="u-author" placeholder="作者UID" v-model.lazy="authors[index]">
+        <el-form-item v-for="(item, index) in authors" :key="index" :label="$t('team.apply.contractedAuthor')">
+            <el-input class="u-author" :placeholder="$t('team.apply.authorUid')" v-model.lazy="authors[index]">
                 <template #prepend>https://www.jx3box.com/author/</template>
             </el-input>
-            <el-button class="u-add-author" type="danger" @click="delAuthor(index)">删除</el-button>
+            <el-button class="u-add-author" type="danger" @click="delAuthor(index)">{{ $t("team.apply.delete") }}</el-button>
         </el-form-item>
-        <el-form-item label="备注">
-            <el-input type="textarea" rows="2" resize="none" placeholder="填写申请信息" v-model.lazy="desc"> </el-input>
+        <el-form-item :label="$t('team.apply.remark')">
+            <el-input type="textarea" rows="2" resize="none" :placeholder="$t('team.apply.fillInfo')" v-model.lazy="desc"> </el-input>
         </el-form-item>
     </el-form>
 </template>

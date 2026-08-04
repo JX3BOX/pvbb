@@ -2,7 +2,7 @@
     <section class="m-team-dkp-rule" :class="{ 'is-archive': variant === 'archive' }" v-loading="loading">
         <div v-if="variant === 'archive'" class="m-archive-field-label">{{ $t("team.settingSections.dkpRule") }}</div>
         <el-divider v-else content-position="left">
-            <i class="el-icon-document"></i> DKP制度
+            <i class="el-icon-document"></i> {{ $t("team.raid.misc.dkpRule") }}
         </el-divider>
         <el-input
             type="textarea"
@@ -14,7 +14,7 @@
             <span>{{ $t("team.settingSections.ruleHint") }}</span>
             <el-button class="u-btn" type="primary" @click="handleSubmitDkpRule">{{ $t("team.settingSections.saveRule") }}</el-button>
         </div>
-        <el-button v-else class="u-btn" type="primary" @click="handleSubmitDkpRule">提交</el-button>
+        <el-button v-else class="u-btn" type="primary" @click="handleSubmitDkpRule">{{ $t("team.settingSections.submit") }}</el-button>
     </section>
 </template>
 

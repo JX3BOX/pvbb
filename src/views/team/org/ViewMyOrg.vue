@@ -26,11 +26,11 @@
                 <template v-if="isManagementMode">
                     <el-tab-pane :label="$t('team.workspace.memberManagement')" name="manage-member" lazy v-if="permissions.r_member || isSuper">
                         <template #label>
-                            <el-icon><Avatar /></el-icon>
+                            <el-icon><User /></el-icon>
                             <span>{{ $t("team.workspace.memberManagement") }}</span>
                             <i class="u-count" v-if="pendingCount">{{ pendingCount }}</i>
                         </template>
-                        <ListMember :id="id" />
+                        <ListMember :key="`member-management-${id}`" :id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.battleManagement')" name="manage-battle" lazy v-if="permissions.r_race || isSuper">
@@ -38,7 +38,7 @@
                             <el-icon><Trophy /></el-icon>
                             <span>{{ $t("team.workspace.battleManagement") }}</span>
                         </template>
-                        <ManageBattle :team-id="id" />
+                        <ManageBattle :key="`battle-management-${id}`" :team-id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.activityManagement')" name="manage-raid" lazy v-if="permissions.r_raid || isSuper">
@@ -46,7 +46,7 @@
                             <el-icon><Calendar /></el-icon>
                             <span>{{ $t("team.workspace.activityManagement") }}</span>
                         </template>
-                        <ManageRaid :team-id="id" embedded />
+                        <ManageRaid :key="`raid-management-${id}`" :team-id="id" embedded />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.snapshotManagement')" name="manage-snapshot" lazy v-if="permissions.r_snapshot || isSuper">
@@ -54,7 +54,11 @@
                             <el-icon><Camera /></el-icon>
                             <span>{{ $t("team.workspace.snapshotManagement") }}</span>
                         </template>
-                        <SnapshotList :team-id="id" :can-configure-password="isSuper" />
+                        <SnapshotList
+                            :key="`snapshot-management-${id}`"
+                            :team-id="id"
+                            :can-configure-password="isSuper"
+                        />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.dkpManagement')" name="manage-dkp" lazy v-if="permissions.r_dkp || isSuper">
@@ -62,7 +66,7 @@
                             <el-icon><Coin /></el-icon>
                             <span>{{ $t("team.workspace.dkpManagement") }}</span>
                         </template>
-                        <ManageDkp :team-id="id" />
+                        <ManageDkp :key="`dkp-management-${id}`" :team-id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.videoManagement')" name="video" lazy v-if="canManageVideo">
@@ -130,6 +134,7 @@
 
                         <team-form
                             v-if="archiveSection === 'basic'"
+                            :key="`team-form-${id}`"
                             ref="teamForm"
                             variant="archive"
                             :data="data"
@@ -144,7 +149,12 @@
                             :team-id="id"
                             :team-data="data"
                         />
-                        <EditPermission v-else-if="archiveSection === 'permission'" variant="archive" :team-id="id" />
+                        <EditPermission
+                            v-else-if="archiveSection === 'permission'"
+                            :key="`permission-${id}`"
+                            variant="archive"
+                            :team-id="id"
+                        />
                         <div
                             v-else-if="archiveSection === 'feature'"
                             :key="`feature-${id}`"
@@ -181,7 +191,7 @@
                             <el-icon><User /></el-icon>
                             <span>{{ $t("team.workspace.myRoles") }}</span>
                         </template>
-                        <team-role v-if="isLogin" :team_id="id" />
+                        <team-role v-if="isLogin" :key="`member-roles-${id}`" :team_id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.myBattles')" name="battle" lazy>
@@ -189,7 +199,7 @@
                             <el-icon><Trophy /></el-icon>
                             <span>{{ $t("team.workspace.myBattles") }}</span>
                         </template>
-                        <myBattle :team-id="id" />
+                        <myBattle :key="`member-battles-${id}`" :team-id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.teamActivities')" name="my-raid" lazy>
@@ -197,7 +207,7 @@
                             <el-icon><Calendar /></el-icon>
                             <span>{{ $t("team.workspace.teamActivities") }}</span>
                         </template>
-                        <MyTeamRaid :team-id="id" embedded />
+                        <MyTeamRaid :key="`member-raids-${id}`" :team-id="id" embedded show-all />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.teamSnapshots')" name="snapshot" lazy>
@@ -205,7 +215,7 @@
                             <el-icon><Camera /></el-icon>
                             <span>{{ $t("team.workspace.teamSnapshots") }}</span>
                         </template>
-                        <SnapshotList :team-id="id" read-only />
+                        <SnapshotList :key="`member-snapshots-${id}`" :team-id="id" read-only />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.teamDkp')" name="my-dkp" lazy>
@@ -213,7 +223,7 @@
                             <el-icon><Coin /></el-icon>
                             <span>{{ $t("team.workspace.teamDkp") }}</span>
                         </template>
-                        <MyDkp :team-id="id" />
+                        <MyDkp :key="`member-dkp-${id}`" :team-id="id" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.videos')" name="video" lazy>
@@ -221,7 +231,7 @@
                             <el-icon><VideoPlay /></el-icon>
                             <span>{{ $t("team.workspace.videos") }}</span>
                         </template>
-                        <ViewVideo v-if="done" />
+                        <ViewVideo v-if="done" :key="`member-videos-${id}`" />
                     </el-tab-pane>
 
                     <el-tab-pane :label="$t('team.workspace.comments')" name="comment" lazy>
@@ -231,6 +241,7 @@
                         </template>
                         <ViewComment
                             v-if="done"
+                            :key="`member-comments-${id}`"
                             :v="data.v_comment"
                             :super="data.super"
                             :authority="authority"
@@ -270,7 +281,6 @@ import { resolveImagePath } from "@jx3box/jx3box-common/js/utils";
 import { getTeam, updateTeam, getTeamPermissions } from "@/service/team/team.js";
 import { checkMyAuthority, getPendingCount } from "@/service/team/member.js";
 import {
-    Avatar,
     Calendar,
     Camera,
     ChatLineSquare,
@@ -300,6 +310,26 @@ const LEGACY_TAB_MAP = {
     other: { mode: "manage", tab: "setting", section: "other" },
 };
 
+function createDefaultTeam(t, id = 0) {
+    return {
+        ID: id,
+        status: 0,
+        name: t("team.common.teamName"),
+        server: t("team.common.serverName"),
+        logo: "",
+        desc: t("team.common.teamDescription"),
+        uid: 0,
+        recruit: "",
+        honors: [],
+        medals: [],
+        tags: [t("team.common.teachable"), t("team.common.fixedTeam")],
+        v_member: 0,
+        v_activity: 0,
+        v_dkp: 2,
+        v_comment: 0,
+    };
+}
+
 export default {
     name: "ViewMyOrg",
     data: function () {
@@ -309,23 +339,9 @@ export default {
             syncingRoute: false,
             loadError: false,
             accessGranted: false,
-            data: {
-                status: 0,
-                name: this.$t("team.common.teamName"),
-                server: this.$t("team.common.serverName"),
-                logo: "",
-                desc: this.$t("team.common.teamDescription"),
-                uid: 0,
-                recruit: "",
-                honors: [],
-                medals: [],
-                tags: [this.$t("team.common.teachable"), this.$t("team.common.fixedTeam")],
-                v_member: 0,
-                v_activity: 0,
-                v_dkp: 2,
-                v_comment: 0,
-            },
+            data: createDefaultTeam(this.$t),
             loading: false,
+            loadVersion: 0,
             done: false,
             processing: false,
             authority: {
@@ -431,54 +447,65 @@ export default {
         },
     },
     methods: {
-        getTeam: function () {
-            return getTeam(this.id).then((res) => {
-                this.data = res.data.data;
-                this.$store.commit("SET_TEAM", this.data);
-            });
+        isCurrentLoad: function (requestedId, version) {
+            return (
+                version === this.loadVersion &&
+                this.id === requestedId &&
+                ["view_my_org", "manage_my_org"].includes(this.$route.name)
+            );
         },
         loadData: function () {
             if (!this.id) return;
             const requestedId = this.id;
+            const version = ++this.loadVersion;
 
             this.loading = true;
             this.loadError = false;
             this.accessGranted = this.isManagementMode;
+            this.data = createDefaultTeam(this.$t, requestedId);
+            this.$store.commit("SET_TEAM", this.data);
             this.authority = { authority: 0 };
             this.permissionsLoaded = false;
             this.done = false;
+            this.processing = false;
             Object.keys(this.permissions).forEach((key) => {
                 this.permissions[key] = 0;
             });
 
-            const teamRequest = this.getTeam()
-                .then(() => {
-                    postStat("team", this.id);
+            const teamRequest = getTeam(requestedId)
+                .then((res) => {
+                    if (!this.isCurrentLoad(requestedId, version)) return;
+                    this.data = res.data.data;
+                    this.$store.commit("SET_TEAM", this.data);
+                    postStat("team", requestedId).catch(() => {});
                     this.done = true;
                 })
                 .catch(() => {
-                    this.loadError = true;
+                    if (this.isCurrentLoad(requestedId, version)) this.loadError = true;
                 });
 
             const permissionsRequest = User.isLogin()
-                ? getTeamPermissions(this.id)
+                ? getTeamPermissions(requestedId)
                       .then((res) => {
+                          if (!this.isCurrentLoad(requestedId, version)) return;
                           Object.keys(this.permissions).forEach((key) => {
                               this.permissions[key] = res.data.data[key];
                           });
                       })
                       .finally(() => {
-                          this.permissionsLoaded = true;
+                          if (this.isCurrentLoad(requestedId, version)) this.permissionsLoaded = true;
                       })
                 : Promise.resolve().then(() => {
-                      this.permissionsLoaded = true;
+                      if (this.isCurrentLoad(requestedId, version)) this.permissionsLoaded = true;
                   });
 
             const authorityRequest = this.isManagementMode
                 ? Promise.resolve()
                 : checkMyAuthority(requestedId).then((res) => {
-                      this.authority = res.data.data || { authority: 0 };
-                      if (res.data.data.authority < 2) {
+                      if (!this.isCurrentLoad(requestedId, version)) return;
+                      const authority = res.data.data || { authority: 0 };
+                      this.authority = authority;
+                      if (authority.authority < 2) {
                           return this.$router.replace({
                               name: "view_org",
                               params: { id: requestedId },
@@ -488,8 +515,7 @@ export default {
                   });
 
             Promise.allSettled([teamRequest, permissionsRequest, authorityRequest]).finally(() => {
-                const isCurrentWorkspace = ["view_my_org", "manage_my_org"].includes(this.$route.name);
-                if (!isCurrentWorkspace || this.id !== requestedId) return;
+                if (!this.isCurrentLoad(requestedId, version)) return;
                 this.loading = false;
                 this.applyRouteState();
             });
@@ -597,22 +623,39 @@ export default {
                 this.loadPendingCount();
             }
         },
-        submit: function () {
+        submit: async function () {
+            const requestedId = this.id;
+            const version = this.loadVersion;
+            const form = this.$refs.teamForm;
+            const payload = JSON.parse(JSON.stringify(this.data));
+
             this.processing = true;
             this.done = false;
-            updateTeam(this.id, this.data)
-                .then((res) => {
+            try {
+                const res = await updateTeam(requestedId, payload);
+                await form?.submitTv(requestedId);
+
+                if (this.isCurrentLoad(requestedId, version)) {
+                    this.data = res.data.data;
+                    this.$store.commit("SET_TEAM", this.data);
                     this.$message({
                         message: this.$t("team.common.updated"),
                         type: "success",
                     });
-                    this.data = res.data.data;
+                }
+            } catch (error) {
+                if (this.isCurrentLoad(requestedId, version)) {
+                    this.$message({
+                        message: error?.response?.data?.msg || this.$t("team.publicActions.operationFailed"),
+                        type: "error",
+                    });
+                }
+            } finally {
+                if (this.isCurrentLoad(requestedId, version)) {
                     this.done = true;
-                    this.$refs.teamForm?.submitTv();
-                })
-                .finally(() => {
                     this.processing = false;
-                });
+                }
+            }
         },
     },
     components: {
@@ -620,7 +663,6 @@ export default {
         "team-form": team_form,
         "team-info": team_info,
         "team-advanced-setting": team_advanced_setting,
-        Avatar,
         Calendar,
         Camera,
         ChatLineSquare,
