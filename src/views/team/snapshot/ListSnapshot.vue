@@ -3,11 +3,21 @@
         <div class="m-snapshot-workspace">
             <nav class="m-snapshot-subnav" :aria-label="$t('team.snapshot.aria')">
                 <button type="button" :class="{ 'is-active': tab === 'list' }" @click="switchTab('list')">
-                    {{ $t("team.snapshot.teamSnapshots") }}
+                    <el-icon><Camera /></el-icon>
+                    <span>{{ $t("team.snapshot.teamSnapshots") }}</span>
                 </button>
-                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="switchTab('stat')">{{ $t("team.snapshot.memberStats") }}</button>
-                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="switchTab('chart')">{{ $t("team.snapshot.snapshotStats") }}</button>
-                <button v-if="canConfigurePassword" type="button" :class="{ 'is-active': tab === 'password' }" @click="switchTab('password')">{{ $t("team.snapshot.password") }}</button>
+                <button type="button" :class="{ 'is-active': tab === 'stat' }" @click="switchTab('stat')">
+                    <el-icon><User /></el-icon>
+                    <span>{{ $t("team.snapshot.memberStats") }}</span>
+                </button>
+                <button type="button" :class="{ 'is-active': tab === 'chart' }" @click="switchTab('chart')">
+                    <el-icon><DataAnalysis /></el-icon>
+                    <span>{{ $t("team.snapshot.snapshotStats") }}</span>
+                </button>
+                <button v-if="canConfigurePassword" type="button" :class="{ 'is-active': tab === 'password' }" @click="switchTab('password')">
+                    <el-icon><Lock /></el-icon>
+                    <span>{{ $t("team.snapshot.password") }}</span>
+                </button>
                 <a class="u-snapshot-help" href="/tool/23783" target="_blank" rel="noopener noreferrer">
                     <i class="el-icon-document" aria-hidden="true"></i>
                     <span>{{ $t("team.snapshot.help") }}</span>
@@ -30,6 +40,7 @@ import snapshotList from "@/components/team/snapshot/snapshotList.vue";
 import snapshotStat from "@/components/team/snapshot/snapshotStat.vue";
 import snapshotChart from "@/components/team/snapshot/snapshotChart.vue";
 import EditPassword from "./EditPassword.vue";
+import { Camera, DataAnalysis, Lock, User } from "@element-plus/icons-vue";
 
 import { getMyPowerTeams } from "@/service/team/team.js";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
@@ -130,6 +141,10 @@ export default {
         },
     },
     components: {
+        Camera,
+        DataAnalysis,
+        Lock,
+        User,
         "snapshot-list": snapshotList,
         "snapshot-stat": snapshotStat,
         "snapshot-chart": snapshotChart,
@@ -166,8 +181,12 @@ export default {
         }
 
         button {
+            display: inline-flex;
             min-width: max-content;
             min-height: 34px;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
             padding: 0 @team-space-3;
             border: 0;
             border-radius: 9px;
@@ -180,6 +199,10 @@ export default {
             transition: color @team-duration-fast @team-ease-standard,
                 background-color @team-duration-fast @team-ease-standard,
                 box-shadow @team-duration-fast @team-ease-standard;
+
+            .el-icon {
+                font-size: 15px;
+            }
 
             &:hover {
                 color: @team-primary;

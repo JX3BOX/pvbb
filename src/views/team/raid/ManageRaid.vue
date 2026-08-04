@@ -11,16 +11,6 @@
                 </el-button>
             </div>
         </h1>
-        <header v-else class="m-raid-embedded-header">
-            <div>
-                <h2>{{ $t("team.raid.manage.title") }}</h2>
-                <p>{{ $t("team.raid.manage.description") }}</p>
-            </div>
-            <el-button v-if="orgs.length" type="primary" @click="openCreateDialog">
-                <i class="el-icon-circle-plus-outline"></i>
-                {{ $t("team.raid.common.create") }}
-            </el-button>
-        </header>
         <div class="m-raid-box" v-if="orgs.length">
             <div v-if="!embedded && orgs.length > 1" class="m-raid-tab">
                 <el-tabs v-model="team_id" type="card" class="m-raid-card-tabs">
@@ -35,17 +25,15 @@
             </div>
 
             <div class="m-raid-toolbar">
+                <el-button v-if="embedded" class="u-create" type="primary" icon="Plus" @click="openCreateDialog">
+                    {{ $t("team.raid.common.create") }}
+                </el-button>
                 <el-input
                     v-model="searchDraft"
                     :placeholder="$t('team.raid.manage.searchPlaceholder')"
                     clearable
                     :aria-label="$t('team.raid.manage.searchAria')"
-                    @clear="submitSearch"
-                    @keyup.enter="submitSearch"
-                >
-                    <template #prefix><i class="el-icon-search"></i></template>
-                </el-input>
-                <el-button type="primary" plain @click="submitSearch">{{ $t("team.raid.common.search") }}</el-button>
+                ></el-input>
                 <span class="u-raid-total">{{ $t("team.raid.manage.total", { count: total }) }}</span>
             </div>
 
@@ -99,6 +87,7 @@ import RaidItem from "@/components/team/raid/RaidItem.vue";
 import RaidFormDialog from "@/components/team/raid/RaidFormDialog.vue";
 
 import localforage from "localforage";
+import debounce from "lodash/debounce";
 
 export default {
     name: "ManageRaid",
@@ -219,7 +208,16 @@ export default {
     mounted: function () {
         this.init();
     },
+    created: function () {
+        this.submitSearchDebounced = debounce(this.submitSearch, 300);
+    },
+    beforeUnmount: function () {
+        this.submitSearchDebounced.cancel();
+    },
     watch: {
+        searchDraft: function () {
+            this.submitSearchDebounced();
+        },
         teamId: function (value) {
             if (~~value) this.loadTeams();
         },
