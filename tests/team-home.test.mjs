@@ -679,7 +679,7 @@ test("DKP tables follow the archive certification table language", async () => {
 });
 
 test("DKP snapshot association reuses the five-team roster styling", async () => {
-    const [item, itemStyles, bodyStyles, list, listStyles, stat, statStyles, chart, chartData] = await Promise.all([
+    const [item, itemStyles, bodyStyles, list, listStyles, stat, statStyles, chart, chartData, zhCn, zhTw] = await Promise.all([
         read("../src/components/team/snapshot/snapshotItem.vue"),
         read("../src/assets/css/team/snapshot/item.less"),
         read("../src/assets/css/team/snapshot/body.less"),
@@ -689,9 +689,13 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
         read("../src/assets/css/team/snapshot/stat.less"),
         read("../src/components/team/snapshot/snapshotChart.vue"),
         read("../src/assets/data/team/snapshot_chart.json"),
+        read("../src/locale/zh-CN/team.js"),
+        read("../src/locale/zh-TW/team.js"),
     ]);
 
     assert.match(item, /v-for="group of 5"[\s\S]*?team\.snapshot\.group/);
+    assert.match(zhCn, /uploadedInGame: "\{time\}\{'@'\}\{name\} 游戏内上传"/);
+    assert.match(zhTw, /uploadedInGame: "\{time\}\{'@'\}\{name\} 遊戲內上傳"/);
     assert.match(item, /v-if="supportDkpSync && data\.dkp"[\s\S]*?el-icon-check[\s\S]*?team\.snapshot\.dkpSynced/);
     assert.match(item, /:loading="syncingDkp"[\s\S]*?:disabled="syncingDkp"/);
     assert.match(item, /if \(!Number\.isInteger\(score\)\)/);
