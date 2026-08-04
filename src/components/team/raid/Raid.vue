@@ -208,15 +208,9 @@ export default {
         },
         /**
          * 候补人员转为替补人员
-         * @param {Object} val 选择的队员
          */
-        handlePending(val) {
-            const subRaid = this.$refs.subRaid;
-            const copy_members = lodash.cloneDeep(subRaid.data);
-
-            copy_members.push(val);
-
-            subRaid.data = copy_members;
+        handlePending() {
+            this.loadMembers();
         },
         loadMembers() {
             // 兼容旧版数据

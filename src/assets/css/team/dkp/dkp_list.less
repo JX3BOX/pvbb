@@ -17,7 +17,7 @@
     --el-table-header-bg-color: @team-surface-muted;
     --el-table-row-hover-bg-color: #fafbff;
 
-    th.el-table__cell {
+    :deep(th.el-table__cell) {
         height: 44px;
         padding: 0;
         background: @team-surface-muted;
@@ -27,9 +27,24 @@
         text-align: left;
     }
 
-    td.el-table__cell {
+    :deep(td.el-table__cell) {
         height: 58px;
         padding: 6px 0;
+        vertical-align: middle;
+    }
+
+    :deep(th.el-table__cell > .cell),
+    :deep(td.el-table__cell > .cell) {
+        display: flex;
+        align-items: center;
+    }
+
+    :deep(th.el-table__cell > .cell) {
+        min-height: 44px;
+    }
+
+    :deep(td.el-table__cell > .cell) {
+        min-height: 46px;
     }
 
     .u-character-logo {

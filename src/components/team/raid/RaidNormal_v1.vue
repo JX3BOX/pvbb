@@ -190,7 +190,7 @@ const item_demo = {
 
 export default {
     name: "RaidNormal",
-    props: ["data", "teamId", "leader", "row", "col"],
+    props: ["data", "teamId", "leader", "row", "col", "header"],
     emits: ["updateMembers"],
     components: {
         MemberSetting,
@@ -248,7 +248,7 @@ export default {
             return this.$store.state.canManage;
         },
         canDrag() {
-            return this.canManage && this.routerName !== "view_raid";
+            return this.canManage;
         },
         linkVisible() {
             return this.$store.state.isTeammate;

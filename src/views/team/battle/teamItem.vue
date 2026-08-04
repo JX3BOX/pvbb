@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { __cdn } from "@/utils/config";
+import { __imgPath } from "@/utils/config";
 import { getThumbnail, getLink } from "@jx3box/jx3box-common/js/utils";
 import { showTime } from "@jx3box/jx3box-common/js/moment";
 export default {
@@ -64,7 +64,7 @@ export default {
     created() {},
     methods: {
         getRankImg: function (num) {
-            return __cdn + "image/rank/common/rank_" + num + ".png";
+            return __imgPath + "image/rank/common/rank_" + num + ".png";
         },
         teamLogo: function (val, mode) {
             if (!val) return "";
@@ -81,7 +81,7 @@ export default {
             return this.$t("pages.team.battle.duration", { minutes: ~~(s / 60), seconds: ~~(s % 60) });
         },
         showMount: function (member) {
-            let mountIcon = __cdn + "image/xf/" + member + ".png";
+            let mountIcon = __imgPath + "image/xf/" + member + ".png";
             return mountIcon;
         },
         copy(text) {
