@@ -21,10 +21,24 @@ export default {
             default: "",
         },
     },
-    mounted() {
-        resetQQBotReady();
-        setQQBotDataReady(true);
-        markQQBotReady({ root: this.$el });
+    computed: {
+        readyKey() {
+            return `${this.type}:${this.id}`;
+        },
+    },
+    watch: {
+        readyKey: {
+            immediate: true,
+            handler() {
+                const readyKey = this.readyKey;
+                resetQQBotReady();
+                setQQBotDataReady(true);
+                this.$nextTick(() => {
+                    if (readyKey !== this.readyKey) return;
+                    markQQBotReady({ root: this.$el });
+                });
+            },
+        },
     },
 };
 </script>

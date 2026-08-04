@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import { __imgPath, __cdn } from "@/utils/config";
 import Nav from "@/components/qqbot/Nav.vue";
 export default {
     name: "AppLayout",
@@ -39,11 +38,14 @@ export default {
     data() {
         return {
             url: "https://cdn.jx3box.com/design/pve/team/",
-        }
+        };
     },
     computed: {
         onlyTable() {
-            return this.$route.query?.onlyTable;
+            const query = this.$route.query || {};
+            if (!Object.prototype.hasOwnProperty.call(query, "onlyTable")) return false;
+            const value = Array.isArray(query.onlyTable) ? query.onlyTable[0] : query.onlyTable;
+            return !["0", "false"].includes(String(value).toLowerCase());
         },
     },
 };
@@ -51,7 +53,7 @@ export default {
 
 <style lang="less">
 .p-qqbot {
-    min-width: 1420px;
+    min-width: 0;
     .pr;
     .c-main {
         margin-top: 59px;
@@ -70,39 +72,89 @@ export default {
     display: flex;
     justify-content: center;
     overflow: hidden;
-
     position: relative;
-    .flex;
-    gap: 100px;
+    padding: 0 252px 48px 280px;
+    box-sizing: border-box;
 
     .u-girl {
-        position: absolute;
+        position: fixed;
         bottom: 0;
         left: 0;
         width: 20rem;
-        // height: 581px;
         pointer-events: none;
-    }
-    @media screen and (max-width: 1440px) {
-        .girl {
-            .none;
-        }
+        z-index: 1;
     }
     .m-content {
-        .w(1048px);
+        width: min(1280px, 100%);
+        min-width: 0;
+    }
+
+    .m-qqbot-nav {
+        position: fixed;
+        top: 80px;
+        left: 40px;
+        z-index: 2;
+    }
+}
+
+@media screen and (max-width: 1680px) {
+    .m-create-team {
+        padding-right: 32px;
+        padding-left: 236px;
+
+        .u-girl {
+            .none;
+        }
+
+        .m-qqbot-nav {
+            left: 20px;
+        }
+    }
+}
+
+@media screen and (max-width: 1279px) {
+    .m-create-team {
+        padding: 0 20px 32px 216px;
+
+        .m-content {
+            width: 100%;
+        }
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .p-qqbot .c-main {
+        height: auto;
+        min-height: calc(100vh - 59px);
+    }
+
+    .m-create-team {
+        display: block;
+        padding: 0 16px 32px;
+
+        .m-qqbot-nav {
+            position: static;
+        }
+
+        .m-content {
+            width: 100%;
+        }
     }
 }
 
 .p-qqbot.onlyTable {
-    .girl,
+    .u-girl,
     .c-header,
+    .c-footer,
     .m-qqbot-nav,
     .m-raid-detail .m-raid-detail__toolbar {
         .none;
     }
-    .create-team {
+    .m-create-team {
         height: 100vh;
-        .content {
+        padding: 0;
+
+        .m-content {
             width: auto;
         }
     }

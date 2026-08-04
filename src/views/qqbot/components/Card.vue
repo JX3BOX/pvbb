@@ -1,7 +1,7 @@
 <template>
-    <div class="card" :class="[role, item ? '' : 'notext']">
+    <div class="card" :class="[role, item ? '' : 'notext', { 'is-readonly': readonly }]">
         <template v-if="item">
-            <div class="card-header" @click="dialogVisible = true">
+            <div class="card-header" @click="openEditor">
                 <div class="card-header-left">
                     <img :src="`https://img.jx3box.com/image/xf/${item.mount}.png`" alt="" class="icon" />
                 </div>
@@ -9,7 +9,7 @@
                     {{ item.game_role }}
                 </div>
                 <div class="card-header-right">
-                    <i class="el-icon-close" @click.stop="handleDelete"></i>
+                    <i v-if="!readonly" class="el-icon-close" @click.stop="handleDelete"></i>
                 </div>
             </div>
             <div class="card-fotter" :title="item.remark">{{ item.remark }}</div>
@@ -17,75 +17,57 @@
         <template v-else>
             <div class="null-text">虚位以待</div>
         </template>
-        <el-dialog v-model="dialogVisible" title="修改人员信息" class="edit-dialog" width="1000px">
-            <el-form :model="form" label-width="120px">
-                <el-form-item label="角色名称" style="width: 500px">
-                    <el-input v-model="form.game_role" />
-                </el-form-item>
-                <el-form-item label="指定职业">
-                    <div class="role-selection-container">
-                        <div class="role-table">
-                            <table class="role-grid">
-                                <thead>
-                                    <tr>
-                                        <th class="role-header">坦克</th>
-                                        <th class="role-header">治疗</th>
-                                        <th class="role-header">内功</th>
-                                        <th class="role-header">内功</th>
-                                        <th class="role-header">外功</th>
-                                        <th class="role-header">外功</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(row, rowIndex) in roleRows" :key="rowIndex">
-                                        <td
-                                            v-for="(cell, colIndex) in row"
-                                            :key="colIndex"
-                                            class="role-cell"
-                                            :class="{ selected: form.mount === cell?.id, empty: !cell }"
-                                            @click="selectRole(cell)"
-                                        >
-                                            <template v-if="cell">
-                                                <img
-                                                    :src="`https://img.jx3box.com/image/xf/${cell.id}.png`"
-                                                    alt=""
-                                                    class="role-icon"
-                                                />
-                                                <span class="role-name">{{ cell.name }}</span>
-                                            </template>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            class="role-cell"
-                                            @click="selectRole(null)"
-                                            :class="{ selected: form.mount === 0 }"
-                                        >
-                                            <img
-                                                :src="`https://img.jx3box.com/image/xf/0.png`"
-                                                alt=""
-                                                class="role-icon"
-                                            />
-                                            <span class="role-name">待定</span>
-                                        </td>
-                                        <td class="role-cell empty"></td>
-                                        <td class="role-cell empty"></td>
-                                        <td class="role-cell empty"></td>
-                                        <td class="role-cell empty"></td>
-                                        <td class="role-cell empty"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <el-dialog v-if="!readonly" v-model="dialogVisible" class="edit-dialog" width="680px">
+            <template #header>
+                <div class="edit-dialog__heading">
+                    <div class="edit-dialog__icon"><i class="el-icon-user"></i></div>
+                    <div>
+                        <div class="edit-dialog__title">编辑成员</div>
+                        <div class="edit-dialog__subtitle">修改角色信息并指定团队职业</div>
                     </div>
+                </div>
+            </template>
+            <el-form :model="form" label-width="84px">
+                <el-form-item label="角色名称" class="basic-form-item">
+                    <el-input v-model="form.game_role" placeholder="请输入角色名称" />
                 </el-form-item>
-                <el-form-item label="备注" style="width: 500px">
-                    <el-input v-model="form.remark" />
+                <el-form-item label="指定职业" class="role-form-item">
+                    <el-select
+                        v-model="form.mount"
+                        class="role-select"
+                        filterable
+                        popper-class="role-select-popper"
+                        placeholder="请选择或搜索心法"
+                    >
+                        <template #prefix>
+                            <img
+                                v-if="selectedRole"
+                                class="role-select__selected-icon"
+                                :src="`https://img.jx3box.com/image/xf/${selectedRole.id}.png`"
+                                alt=""
+                            />
+                        </template>
+                        <el-option
+                            v-for="role in roleOptions"
+                            :key="role.id"
+                            :label="role.name"
+                            :value="role.id"
+                        >
+                            <div class="role-select__option">
+                                <img :src="`https://img.jx3box.com/image/xf/${role.id}.png`" alt="" />
+                                <span>{{ role.name }}</span>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="备注" class="basic-form-item">
+                    <el-input v-model="form.remark" placeholder="添加成员备注（选填）" />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button type="primary" @click="handleEdit">确 定</el-button>
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="handleEdit">保存修改</el-button>
                 </div>
             </template>
         </el-dialog>
@@ -93,18 +75,21 @@
 </template>
 <script>
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
-import typeMap from "@jx3box/jx3box-data/data/xf/mount_group.json";
 import { deleteMember, updateMember, updateMemberStatus } from "@/service/qqbot";
 export default {
     name: "Card",
     props: {
         item: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         role: {
             type: String,
             default: "",
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -125,45 +110,11 @@ export default {
             maps["待定"] = { id: 0, name: "待定" };
             return maps;
         },
-        typeMap() {
-            const map = { T: [], NDPS: [], WDPS: [], HPS: [] };
-            const T = typeMap.mount_group["坦克"],
-                n = typeMap.mount_group["内攻"],
-                w = typeMap.mount_group["外攻"],
-                h = typeMap.mount_group["治疗"];
-            for (const key in this.xfmaps) {
-                if (T.includes(this.xfmaps[key].id)) {
-                    map.T.push(this.xfmaps[key]);
-                } else if (n.includes(this.xfmaps[key].id)) {
-                    map.NDPS.push(this.xfmaps[key]);
-                } else if (w.includes(this.xfmaps[key].id)) {
-                    map.WDPS.push(this.xfmaps[key]);
-                } else if (h.includes(this.xfmaps[key].id)) {
-                    map.HPS.push(this.xfmaps[key]);
-                }
-            }
-            return map;
+        roleOptions() {
+            return Object.values(this.xfmaps);
         },
-        roleRows() {
-            const splitArray = (arr) => {
-                const mid = Math.ceil(arr.length / 2);
-                return [arr.slice(0, mid), arr.slice(mid)];
-            };
-            const [ndps1, ndps2] = splitArray(this.typeMap.NDPS);
-            const [wdps1, wdps2] = splitArray(this.typeMap.WDPS);
-            const categories = [this.typeMap.T, this.typeMap.HPS, ndps1, ndps2, wdps1, wdps2];
-            const maxRows = Math.max(...categories.map((cat) => cat.length));
-            const rows = [];
-            for (let rowIndex = 0; rowIndex < maxRows; rowIndex++) {
-                const row = [];
-                for (let colIndex = 0; colIndex < 6; colIndex++) {
-                    const category = categories[colIndex];
-                    row.push(category[rowIndex] || null);
-                }
-                rows.push(row);
-            }
-
-            return rows;
+        selectedRole() {
+            return this.roleOptions.find((role) => role.id === this.form.mount);
         },
     },
     watch: {
@@ -177,14 +128,11 @@ export default {
         },
     },
     methods: {
-        selectRole(role) {
-            if (role) {
-                this.form.mount = role.id;
-            } else {
-                this.form.mount = 0;
-            }
+        openEditor() {
+            if (!this.readonly) this.dialogVisible = true;
         },
         handleEdit() {
+            if (this.readonly) return;
             updateMember(this.$route.query.id, this.item.id, { ...this.form, serial_no: this.item.serial_no }).then(
                 (res) => {
                     this.$message.success("修改成功");
@@ -194,6 +142,7 @@ export default {
             );
         },
         handleDelete() {
+            if (this.readonly) return;
             if (this.item.identity_status === 1 || this.item.identity_status === 2) {
                 this.$confirm(
                     `确定把该成员移动到${this.item.identity_status === 1 ? "替补名单" : "排队名单"}中吗？`,
@@ -243,6 +192,15 @@ export default {
         background: linear-gradient(0deg, rgba(56, 56, 56, 1) 0%, rgba(0, 0, 0, 1) 100%);
         border: 1px solid rgba(110, 110, 110, 1);
         box-shadow: inset 0px 10px 5px rgba(0, 0, 0, 1);
+    }
+    &.is-readonly {
+        .card-header {
+            cursor: default;
+        }
+
+        &:hover {
+            border-color: transparent;
+        }
     }
     .card-header {
         height: 44px;
@@ -416,6 +374,542 @@ export default {
                     }
                 }
             }
+        }
+    }
+
+    // 编队卡片采用轻量层级，避免大面积黑色渐变和内阴影造成视觉压迫。
+    & {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.2);
+        transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    }
+    &.notext {
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.14);
+        box-shadow: none;
+    }
+    .card-header {
+        height: 44px;
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 5px 7px;
+
+        .card-header-left {
+            width: 32px;
+            height: 32px;
+        }
+        .card-header-mid {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 13px;
+            text-align: left;
+        }
+        .card-header-right {
+            color: rgba(255, 255, 255, 0.24);
+            &:hover {
+                color: #ff8299;
+            }
+        }
+    }
+    .card-fotter {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .null-text {
+        width: auto;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 12px;
+    }
+    &.HPS {
+        border-left: 2px solid rgba(88, 190, 130, 0.7);
+        background: rgba(68, 130, 93, 0.08);
+    }
+    &.T {
+        border-left: 2px solid rgba(202, 132, 91, 0.7);
+        background: rgba(140, 91, 63, 0.08);
+    }
+    &.DPS {
+        border-left: 2px solid rgba(78, 140, 209, 0.72);
+        background: rgba(60, 98, 140, 0.08);
+    }
+    &:hover,
+    &.active {
+        border-width: 1px;
+        border-color: rgba(89, 145, 255, 0.7);
+        background: rgba(69, 131, 255, 0.1);
+        box-shadow: none;
+
+        .card-header {
+            height: 44px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+    }
+}
+
+:deep(.edit-dialog) {
+    --el-dialog-bg-color: #202228;
+    --el-text-color-primary: rgba(255, 255, 255, 0.88);
+    --el-text-color-regular: rgba(255, 255, 255, 0.68);
+    --el-border-color: rgba(255, 255, 255, 0.1);
+    --el-fill-color-blank: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 90% 0, rgba(64, 128, 255, 0.12), transparent 34%),
+        #202228;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
+
+    :deep(.el-dialog__header) {
+        margin: 0;
+        padding: 22px 24px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    :deep(.el-dialog__headerbtn) {
+        top: 18px;
+        right: 18px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        &:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .el-dialog__close {
+            color: rgba(255, 255, 255, 0.48);
+        }
+    }
+    :deep(.el-dialog__body) {
+        padding: 22px 24px 10px;
+        color: rgba(255, 255, 255, 0.72);
+    }
+    :deep(.el-dialog__footer) {
+        padding: 14px 24px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .edit-dialog__heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .edit-dialog__icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid rgba(89, 145, 255, 0.28);
+        border-radius: 12px;
+        background: rgba(64, 128, 255, 0.12);
+        color: #78a7ff;
+        font-size: 18px;
+    }
+    .edit-dialog__title {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 26px;
+    }
+    .edit-dialog__subtitle {
+        color: rgba(255, 255, 255, 0.38);
+        font-size: 12px;
+        line-height: 18px;
+    }
+    :deep(.el-form-item) {
+        margin-bottom: 18px;
+    }
+    :deep(.el-form-item__label) {
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 13px;
+    }
+    .basic-form-item {
+        width: 520px;
+    }
+    :deep(.el-input__wrapper) {
+        min-height: 38px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: none;
+        &:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        &.is-focus {
+            border-color: rgba(69, 131, 255, 0.72);
+            box-shadow: 0 0 0 3px rgba(69, 131, 255, 0.1);
+        }
+    }
+    :deep(.el-input__inner) {
+        color: rgba(255, 255, 255, 0.82);
+        &::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+    }
+    .role-form-item {
+        margin-top: 2px;
+    }
+    .role-select {
+        width: 520px;
+        height: 40px;
+    }
+    .role-select__selected-icon {
+        width: 22px;
+        height: 22px;
+        margin-right: 4px;
+    }
+    .role-select__option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        img {
+            width: 24px;
+            height: 24px;
+        }
+        span {
+            color: rgba(255, 255, 255, 0.72);
+        }
+    }
+    :deep(.role-select .el-select__wrapper) {
+        min-height: 40px;
+    }
+    :deep(.role-select .el-select-dropdown) {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #26282f;
+    }
+    :deep(.role-select .el-select-dropdown__item) {
+        height: 40px;
+        line-height: 40px;
+        color: rgba(255, 255, 255, 0.68);
+
+        &.hover,
+        &:hover {
+            background: rgba(69, 131, 255, 0.1);
+        }
+        &.is-selected {
+            background: rgba(69, 131, 255, 0.16);
+            color: #8bb2ff;
+        }
+    }
+    .role-selection-container {
+        width: 100%;
+        display: block;
+    }
+    .role-table {
+        width: 100%;
+        max-width: none;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+    }
+    .role-grid {
+        width: 100%;
+        table-layout: fixed;
+        border: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        box-shadow: none;
+
+        .role-header {
+            width: auto;
+            height: 34px;
+            border: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.055);
+            color: rgba(255, 255, 255, 0.52);
+            font-size: 12px;
+
+            &::after {
+                display: none;
+            }
+        }
+        .role-cell {
+            width: auto;
+            height: 44px;
+            padding: 0 8px;
+            border: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.1);
+            transition: background-color 0.16s ease, box-shadow 0.16s ease;
+
+            &:not(.empty) {
+                background: rgba(0, 0, 0, 0.1);
+                &:hover {
+                    border-color: transparent;
+                    background: rgba(69, 131, 255, 0.1);
+                }
+                &.selected {
+                    border-color: transparent;
+                    background: rgba(69, 131, 255, 0.18);
+                    box-shadow: inset 3px 0 #518cff;
+
+                    .role-name {
+                        color: #8bb2ff;
+                    }
+                }
+            }
+            &.empty {
+                border-color: rgba(255, 255, 255, 0.06);
+                background: rgba(0, 0, 0, 0.06);
+            }
+            .role-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 5px;
+            }
+            .role-name {
+                color: rgba(255, 255, 255, 0.68);
+                font-size: 11px;
+            }
+        }
+    }
+    .dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+
+        :deep(.el-button) {
+            height: 36px;
+            margin-left: 0;
+            padding: 0 18px;
+            border-color: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.62);
+            &:hover {
+                border-color: rgba(255, 255, 255, 0.22);
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+            &.el-button--primary {
+                border-color: #4080ff;
+                background: #4080ff;
+                color: #fff;
+                &:hover {
+                    background: #5590ff;
+                }
+            }
+        }
+    }
+}
+
+// 弹窗通过 Teleport 渲染，职业表格需要显式覆盖旧版高权重样式。
+:deep(.edit-dialog .role-selection-container .role-table .role-grid) {
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+    box-shadow: none;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-header) {
+    border: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.055) !important;
+    color: rgba(255, 255, 255, 0.52) !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-header::after) {
+    display: none;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell),
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell:not(.empty)) {
+    border: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: none !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell:not(.empty):hover) {
+    background: rgba(69, 131, 255, 0.1) !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell.selected) {
+    background: rgba(69, 131, 255, 0.18) !important;
+    box-shadow: inset 3px 0 #518cff !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell.empty) {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    background: rgba(0, 0, 0, 0.06) !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell .role-name) {
+    color: rgba(255, 255, 255, 0.68) !important;
+}
+:deep(.edit-dialog .role-selection-container .role-table .role-grid .role-cell.selected .role-name) {
+    color: #8bb2ff !important;
+}
+
+:deep(.edit-dialog .el-select__popper) {
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    background: #26282f !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42) !important;
+}
+:deep(.edit-dialog .el-select__popper .el-popper__arrow::before) {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    background: #26282f !important;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__wrap) {
+    max-height: 260px;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__list) {
+    padding: 6px;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item) {
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 7px;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.68) !important;
+    line-height: 40px;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item.hover),
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item.is-hovering),
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item:hover) {
+    background: rgba(69, 131, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item.is-selected) {
+    background: rgba(69, 131, 255, 0.16) !important;
+    color: #8bb2ff !important;
+}
+:deep(.edit-dialog .el-select__popper .el-select-dropdown__item.is-selected.is-hovering) {
+    background: rgba(69, 131, 255, 0.22) !important;
+    color: #a9c4ff !important;
+}
+:deep(.edit-dialog .el-select__popper .role-select__option) {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+:deep(.edit-dialog .el-select__popper .role-select__option img) {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+:deep(.edit-dialog .el-select__popper .role-select__option span) {
+    overflow: hidden;
+    color: inherit;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:deep(.role-select-popper) {
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    background: #26282f !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42) !important;
+}
+:deep(.role-select-popper .el-popper__arrow::before) {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    background: #26282f !important;
+}
+:deep(.role-select-popper .el-select-dropdown__wrap) {
+    max-height: 320px;
+}
+:deep(.role-select-popper .el-select-dropdown__list) {
+    padding: 6px;
+}
+:deep(.role-select-popper .el-select-dropdown__item) {
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 7px;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.68) !important;
+    line-height: 40px;
+}
+:deep(.role-select-popper .el-select-dropdown__item.hover),
+:deep(.role-select-popper .el-select-dropdown__item.is-hovering),
+:deep(.role-select-popper .el-select-dropdown__item:hover) {
+    background: rgba(69, 131, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+:deep(.role-select-popper .el-select-dropdown__item.is-selected) {
+    background: rgba(69, 131, 255, 0.16) !important;
+    color: #8bb2ff !important;
+}
+:deep(.role-select-popper .el-select-dropdown__item.is-selected.is-hovering) {
+    background: rgba(69, 131, 255, 0.22) !important;
+    color: #a9c4ff !important;
+}
+:deep(.role-select-popper .role-select__option) {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+:deep(.role-select-popper .role-select__option img) {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+:deep(.role-select-popper .role-select__option span) {
+    overflow: hidden;
+    color: inherit;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+
+<style lang="less">
+.role-select-popper {
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    background: #26282f !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42) !important;
+
+    .el-popper__arrow::before {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        background: #26282f !important;
+    }
+    .el-select-dropdown__wrap {
+        height: 320px;
+        max-height: 320px !important;
+    }
+    .el-select-dropdown__list {
+        padding: 6px;
+    }
+    .el-select-dropdown__item {
+        height: 40px;
+        padding: 0 10px;
+        border-radius: 7px;
+        background: transparent !important;
+        color: rgba(255, 255, 255, 0.68) !important;
+        line-height: 40px;
+
+        &.hover,
+        &.is-hovering,
+        &:hover {
+            background: rgba(69, 131, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.82) !important;
+        }
+        &.is-selected {
+            background: rgba(69, 131, 255, 0.16) !important;
+            color: #8bb2ff !important;
+        }
+        &.is-selected.is-hovering {
+            background: rgba(69, 131, 255, 0.22) !important;
+            color: #a9c4ff !important;
+        }
+    }
+    .role-select__option {
+        width: 100%;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        img {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        span {
+            overflow: hidden;
+            color: inherit;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }

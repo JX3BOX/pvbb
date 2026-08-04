@@ -3,41 +3,67 @@
         <div class="m-qqbot-bind">
             <div class="m-qqbot">
                 <div class="m-qqbot-header">
-                    <img class="u-icon" svg-inline :src="icon('qqbot')" />
-                    <span class="u-icon-title"> QQ机器人绑定 </span>
-                </div>
-                <div class="m-qqbot-content">
-                    <template v-if="!checkStatus">
-                        <div class="u-top-tip">
-                            请私聊QQ机器人 <b class="u-qq" @click="onCopy(qq)">QQ: {{ qq }}</b> 发送下方指令
+                    <div class="u-icon-box">
+                        <img class="u-icon" src="@/assets/img/qqbot/qqbot.svg" alt="魔盒QQ机器人" />
+                    </div>
+                    <div>
+                        <span class="u-kicker">JX3BOX QQ BOT</span>
+                        <h1 class="u-icon-title">QQ机器人绑定</h1>
+                        <p class="u-subtitle">连接魔盒账号，随时在 QQ 中查询你的游戏数据</p>
+                    </div>
+                    <div v-if="checkStatus" class="u-status-actions">
+                        <div class="u-status-pill">
+                            <i class="el-icon-success"></i>
+                            <span>已绑定</span>
                         </div>
-                        <div class="u-token" title="点击复制" @click="onCopy(bindText)">
-                            <i class="el-icon-document-copy"></i>
-                            {{ bindText }}
+                        <button class="u-unbind-btn" type="button" @click="unbind">取消绑定</button>
+                    </div>
+                </div>
+                <div class="m-qqbot-content" :class="{ 'is-bound-content': checkStatus }">
+                    <template v-if="!checkStatus">
+                        <div class="u-step">
+                            <span class="u-step-index">1</span>
+                            <div class="u-step-content">
+                                <span class="u-step-label">添加并私聊魔盒机器人</span>
+                                <button class="u-qq" type="button" title="点击复制QQ号" @click="onCopy(qq)">
+                                    QQ {{ qq }}
+                                    <i class="el-icon-document-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="u-step">
+                            <span class="u-step-index">2</span>
+                            <div class="u-step-content">
+                                <span class="u-step-label">向机器人发送绑定指令</span>
+                                <div class="u-token" title="点击复制指令" @click="onCopy(bindText)">
+                                    <code>{{ bindText }}</code>
+                                    <i class="el-icon-document-copy"></i>
+                                </div>
+                            </div>
                         </div>
                     </template>
-                    <div class="u-actions">
-                        <el-button class="u-btn" type="primary" round @click="onCopy(bindText)" v-if="!checkStatus">
+                    <div v-if="!checkStatus" class="u-actions">
+                        <el-button class="u-btn" type="primary" round @click="onCopy(bindText)">
                             {{ btnText }}
                         </el-button>
-                        <button
-                            v-else
-                            class="el-button u-btn el-button--primary is-round"
-                            :class="{ 'is-bind': checkStatus }"
-                            @click="unbind"
-                            @mouseover.prevent="btnText = '取消绑定'"
-                            @mouseout.prevent="btnText = '已绑定'"
-                        >
-                            <span>{{ btnText }}</span>
-                        </button>
                     </div>
 
                     <div class="u-bottom-tip">
-                        魔盒机器人为玩家提供免费的PVE、PVP、PVX等多项查询功能，包括但不限于全门派宏、成就查询、任务攻略、剑三百科。
+                        <i class="el-icon-info"></i>
+                        <span>绑定后可免费使用 PVE、PVP、PVX 查询，以及门派宏、成就、任务攻略与剑三百科等功能。</span>
                     </div>
                 </div>
             </div>
             <div class="m-qqbot m-qq-bind">
+                <div class="u-bind-heading">
+                    <span class="u-bind-icon">
+                        <img src="@/assets/img/qqbot/qq.svg" alt="QQ" />
+                    </span>
+                    <div>
+                        <h2>补充绑定 QQ</h2>
+                        <p>用于个人信息识别，不会在站内公开展示</p>
+                    </div>
+                </div>
                 <div class="m-qq-input-wrapper">
                     <el-input
                         v-model="userQQ"
@@ -49,9 +75,10 @@
                             <span class="u-confirm-button" @click="onConfirm">确定</span>
                         </template>
                     </el-input>
+                    <div class="u-qq-tip">
+                        <i class="el-icon-lock"></i> 你的 QQ 号仅用于账号识别，我们会妥善保护个人信息
+                    </div>
                 </div>
-
-                <div class="u-qq-tip">盒子娘温馨提醒：魔盒不会公开用户的QQ，仅为了方便用户自身进行信息识别区分~</div>
             </div>
             <Pin></Pin>
         </div>
@@ -60,7 +87,6 @@
 
 <script>
 import QQBotLayout from "@/layouts/QQBotLayout.vue";
-import { __cdn } from "@/utils/config";
 import { getQQbotToken, unbindQQbot, checkOAuth, getProfile, setProfile } from "@/service/qqbot";
 import Pin from "@/views/qqbot/components/Pin.vue";
 import User from "@jx3box/jx3box-common/js/user";
@@ -114,10 +140,6 @@ export default {
             checkOAuth().then((res) => {
                 this.data = res.data.data;
 
-                if (this.checkStatus) {
-                    this.btnText = "已绑定";
-                }
-
                 if (!this.data.qqbot) this.bind();
             });
 
@@ -125,9 +147,6 @@ export default {
                 this.userInfo = res.data.data;
                 this.userQQ = this.userInfo.qq_number || "";
             });
-        },
-        icon: function (type) {
-            return __cdn + "design/user/" + "qqbot.png";
         },
         bind: function () {
             getQQbotToken().then((res) => {
@@ -195,155 +214,359 @@ export default {
 </script>
 
 <style lang="less">
+.m-qqbot-bind {
+    padding-bottom: 48px;
+}
+
 .m-qqbot {
     width: 100%;
-    border-radius: 16px;
-    background: linear-gradient(180deg, rgba(56, 56, 56, 1) 0%, rgba(0, 0, 0, 1) 100%);
-    border: 0.5px solid rgba(255, 255, 255, 1);
-    box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.25);
-    padding: 48px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 88% 0, rgba(64, 128, 255, 0.16), transparent 34%),
+        linear-gradient(145deg, rgba(38, 42, 52, 0.96), rgba(10, 12, 18, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+    padding: 44px 56px;
     margin-top: 24px;
 }
 
 .m-qqbot-header {
     .flex;
-    align-items: flex-end;
-    justify-content: center;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    max-width: 680px;
+    margin: 0 auto;
+
+    .u-icon-box {
+        .size(72px);
+        .flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(64, 128, 255, 0.25), rgba(64, 128, 255, 0.08));
+        border: 1px solid rgba(102, 169, 255, 0.3);
+    }
     .u-icon {
-        .size(60px);
+        .size(48px);
+    }
+    .u-kicker {
+        display: block;
+        margin-bottom: 5px;
+        color: #66a9ff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
     }
     .u-icon-title {
-        font-size: 36px;
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
         color: #fff;
         font-weight: 700;
     }
-}
-.m-qqbot-content {
-    margin-top: 24px;
-    .u-top-tip {
-        font-size: 16px;
-        color: #fff;
-        margin-bottom: 24px;
-        .x;
-    }
-    .u-bottom-tip {
+    .u-subtitle {
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.58);
         font-size: 14px;
-        color: #fff;
-        margin-top: 64px;
-        text-align: center;
-        line-height: 20px;
     }
-    .u-qq {
-        border: 1px solid #fff;
-        border-radius: 4px;
-        padding: 2px 4px;
-        .pointer;
+    .u-status-actions {
+        .flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
     }
-    .u-token {
-        .fz(24px);
-        background-color: #438235;
-        border: 1px solid #69ff61;
-        color: #69ff61;
-        padding: 20px;
-        margin: 0 auto;
-        width: max-content;
-        .r(4px);
+    .u-status-pill {
+        .flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 15px;
+        border: 1px solid rgba(93, 224, 151, 0.35);
+        border-radius: 999px;
+        background: rgba(56, 180, 112, 0.12);
+        color: #68e39f;
+        font-size: 14px;
+        font-weight: 700;
 
         i {
-            .fz(20px);
-            .y;
+            font-size: 16px;
         }
+    }
+    .u-unbind-btn {
+        appearance: none;
+        padding: 9px 15px;
+        border: 1px solid rgba(255, 108, 116, 0.48);
+        border-radius: 999px;
+        background: rgba(218, 65, 74, 0.08);
+        color: #ff8990;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+
+        &:hover {
+            background: #d94b54;
+            border-color: #d94b54;
+            color: #fff;
+        }
+    }
+}
+.m-qqbot-content {
+    max-width: 680px;
+    margin: 36px auto 0;
+
+    .u-step {
+        .flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 18px 20px;
+        margin-top: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .u-step-index {
+        .size(28px);
+        .flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #4080ff;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 0 0 5px rgba(64, 128, 255, 0.1);
+    }
+    .u-step-content {
+        min-width: 0;
+        flex: 1;
+    }
+    .u-step-label {
+        display: block;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 13px;
+    }
+    .u-bottom-tip {
+        .flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 28px;
+        line-height: 1.7;
+
+        i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+    }
+    .u-qq {
+        appearance: none;
+        padding: 9px 13px;
+        border: 1px solid rgba(102, 169, 255, 0.35);
+        border-radius: 8px;
+        background: rgba(64, 128, 255, 0.12);
+        color: #8ebaff;
+        font-size: 15px;
+        font-weight: 700;
         .pointer;
+        transition: 0.2s ease;
+
+        &:hover {
+            background: rgba(64, 128, 255, 0.22);
+            border-color: #66a9ff;
+        }
+        i {
+            margin-left: 8px;
+        }
+    }
+    .u-token {
+        .flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 14px;
+        border: 1px solid rgba(104, 224, 153, 0.28);
+        border-radius: 8px;
+        background: rgba(72, 170, 112, 0.1);
+        color: #78e6a5;
+        .pointer;
+        transition: 0.2s ease;
+
+        code {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 16px;
+        }
+
+        i {
+            .fz(18px);
+        }
+        &:hover {
+            background: rgba(72, 170, 112, 0.18);
+            border-color: rgba(120, 230, 165, 0.65);
+        }
     }
 
     .u-actions {
         .x;
-        margin-top: 36px;
+        margin-top: 24px;
     }
 
     .u-btn {
-        width: 240px;
-        height: 50px;
+        min-width: 210px;
+        height: 46px;
         border-radius: 99px;
-        background-color: #0099ff;
-        font-size: 18px;
+        border-color: #4080ff;
+        background: linear-gradient(90deg, #3478f6, #5598ff);
+        box-shadow: 0 8px 22px rgba(64, 128, 255, 0.22);
+        font-size: 16px;
         color: #fff;
         font-weight: 700;
+        transition: 0.2s ease;
 
         &:hover {
-            background-color: #fff;
-            color: #000;
-            border: #fff;
+            transform: translateY(-1px);
+            border-color: #73b0ff;
+            background: linear-gradient(90deg, #4080ff, #6aabff);
+            color: #fff;
         }
     }
 
-    .is-bind {
-        background-color: #595959;
-        border-color: #595959;
-
-        &:hover {
-            background-color: #d43030;
-            border-color: #d43030;
-            color: #fff;
+    &.is-bound-content {
+        .u-bottom-tip {
+            margin-top: 42px;
         }
     }
 }
 
 .m-qq-bind {
-    .x;
+    .flex;
+    align-items: center;
+    gap: 48px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+    .u-bind-heading {
+        .flex;
+        align-items: center;
+        gap: 14px;
+        flex: 1;
+        text-align: left;
+    }
+    .u-bind-icon {
+        .size(48px);
+        .flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #4389ff, #2e68d0);
+        color: #fff;
+        font-weight: 800;
+
+        img {
+            .size(30px);
+            display: block;
+        }
+    }
+    h2 {
+        margin: 0 0 6px;
+        color: #fff;
+        font-size: 20px;
+    }
+    p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 13px;
+    }
 
     .u-qq-tip {
-        font-size: 14px;
-        color: rgba(255, 133, 167, 1);
-        margin: 24px auto 0;
-        text-align: center;
-        width: max-content;
-        border: 1px solid rgba(255, 133, 167, 1);
-        padding: 4px 12px;
-        border-radius: 4px;
+        width: 100%;
+        margin-top: 12px;
+        color: rgba(255, 255, 255, 0.42);
+        font-size: 12px;
+        text-align: left;
     }
 }
 
 .m-qq-input-wrapper {
-    width: 420px;
+    width: 430px;
+    flex-shrink: 0;
 
-    margin: 0 auto;
     .m-qq-input {
+        .el-input__wrapper {
+            min-height: 50px;
+            padding: 0 3px 0 18px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+            transition: 0.2s ease;
+
+            &:hover {
+                border-color: rgba(102, 169, 255, 0.55);
+            }
+
+            &.is-focus {
+                border-color: #66a9ff;
+                box-shadow: 0 0 0 3px rgba(64, 128, 255, 0.12);
+            }
+        }
         .el-input__inner {
-            background-color: #fff;
-            color: #000;
-            border: none;
-            border-radius: 999px;
-            padding-right: 60px; // 给 suffix 留出空间
-            padding-left: 16px;
-            height: 50px;
-            line-height: 50px;
-            font-size: 18px;
-            .x;
+            height: 48px;
+            padding: 0;
+            background: transparent;
+            color: #fff;
+            font-size: 15px;
+            text-align: left;
         }
 
         .el-input__suffix {
-            right: 10px;
             height: 100%;
             display: flex;
             align-items: center;
-
         }
         .u-confirm-button {
+            min-width: 82px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
             color: #fff;
-            background-color: #0099ff;
+            background: linear-gradient(135deg, #3478f6, #5598ff);
             font-weight: bold;
+            font-size: 15px;
             cursor: pointer;
-            padding: 0 10px;
             user-select: none;
-            transition: color 0.2s;
-            padding: 8px 16px;
-            border-radius: 99px;
+            transition: 0.2s ease;
+            padding: 0 20px;
+            border-radius: 11px;
+            box-shadow: 0 4px 12px rgba(64, 128, 255, 0.22);
 
             &:hover {
-                background-color: #007acc;
+                background: linear-gradient(135deg, #4080ff, #6aabff);
+                box-shadow: 0 6px 16px rgba(64, 128, 255, 0.32);
             }
         }
+    }
+}
+
+@media screen and (max-width: 1500px) {
+    .m-qqbot {
+        padding: 36px 44px;
+    }
+    .m-qq-bind {
+        gap: 32px;
     }
 }
 </style>

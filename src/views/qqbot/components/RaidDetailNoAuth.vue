@@ -15,7 +15,7 @@
                     <ListStatistic
                         :name="'正式编队'"
                         :list="memberList"
-                        @clear="handleClear('memberList')"
+                        :clearable="false"
                         :count="raidDetail.members?.filter((item) => item.identity_status === 1)?.length || 0"
                     />
                     <div class="list-header">
@@ -29,14 +29,8 @@
                         <div
                             v-for="(item, index) in memberList"
                             :key="index"
-                            :draggable="item"
-                            @dragstart="dragStart($event, item)"
-                            @drag="drag($event)"
-                            @dragover.prevent
-                            @drop="drop('memberList', index, item)"
-                            @dragend="dragEnd"
                         >
-                            <Card :item="item" :role="getRole(item?.mount)" @update="getRaidDetail"></Card>
+                            <Card :item="item" :role="getRole(item?.mount)" readonly></Card>
                         </div>
                     </div>
                 </div>
@@ -44,22 +38,16 @@
                     <ListStatistic
                         :name="'替补编队'"
                         :list="altetnateList"
-                        @clear="handleClear('altetnateList')"
+                        :clearable="false"
                         :count="altetnateList?.length || 0"
                     />
-                    <div class="altetnate-list-content" @dragover.prevent @drop="drop('altetnateList')">
+                    <div class="altetnate-list-content">
                         <div
                             v-for="item in altetnateList"
                             :key="item?.id"
-                            :draggable="item"
-                            @dragstart="dragStart($event, item)"
-                            @drag="drag($event)"
-                            @dragover.prevent
-                            @drop="drop('altetnateList')"
-                            @dragend="dragEnd"
                             style="height: 66px"
                         >
-                            <Card :item="item" :role="getRole(item?.mount)" @update="getRaidDetail"></Card>
+                            <Card :item="item" :role="getRole(item?.mount)" readonly></Card>
                         </div>
                     </div>
                 </div>
@@ -69,21 +57,14 @@
 </template>
 
 <script>
-import {
-    getRaidDetail,
-    clearList,
-    updateMemberStatus,
-    setMemberPosition,
-    switchPosition,
-    deleteActivity,
-} from "@/service/qqbot";
+import { getRaidDetail } from "@/service/qqbot";
 import typeMap from "@jx3box/jx3box-data/data/xf/mount_group.json";
 import { markQQBotReady, resetQQBotReady, setQQBotDataReady } from "@/utils/qqbot-ready";
 import Card from "./Card.vue";
 import ListStatistic from "./ListStatistic.vue";
 import DetailHeader from "./DetailHeader.vue";
 export default {
-    name: "RaidDetail",
+    name: "RaidDetailNoAuth",
     components: {
         Card,
         ListStatistic,
@@ -92,22 +73,10 @@ export default {
     data() {
         return {
             raidDetail: {},
-            dragItem: null,
-            editDialogVisible: false,
-            dragEle: null,
-            dragOffset: {
-                x: 0,
-                y: 0,
-            },
+            loadRequestId: 0,
         };
     },
-    created() {
-        this.getRaidDetail();
-    },
     computed: {
-        queueList() {
-            return this.raidDetail.members?.filter((item) => item.identity_status === 3);
-        },
         altetnateList() {
             return this.raidDetail.members?.filter((item) => item.identity_status === 2);
         },
@@ -122,25 +91,37 @@ export default {
             return list;
         },
     },
+    watch: {
+        "$route.query.id": {
+            immediate: true,
+            handler(id) {
+                this.getRaidDetail(id);
+            },
+        },
+    },
+    beforeUnmount() {
+        this.loadRequestId += 1;
+    },
     methods: {
-        getRaidDetail() {
+        async getRaidDetail(id = this.$route.query.id) {
+            const requestId = ++this.loadRequestId;
             resetQQBotReady();
-            getRaidDetail(this.$route.query.id)
-                .then((res) => {
-                    this.raidDetail = res.data.data;
-                })
-                .finally(() => {
+            this.raidDetail = {};
+            try {
+                if (!id) return;
+                const res = await getRaidDetail(id);
+                if (requestId === this.loadRequestId) this.raidDetail = res.data?.data || {};
+            } catch (error) {
+                if (requestId === this.loadRequestId) this.raidDetail = {};
+            } finally {
+                if (requestId === this.loadRequestId) {
                     setQQBotDataReady(true);
                     this.$nextTick(() => {
+                        if (requestId !== this.loadRequestId) return;
                         markQQBotReady({ root: this.$el || "#app" });
                     });
-                });
-        },
-        drag(event) {
-            const last = !event.clientX && !event.clientY;
-            this.dragEle.style.transform = `translate(${last ? 0 : event.clientX - this.dragOffset.x}px, ${
-                last ? 0 : event.clientY - this.dragOffset.y
-            }px) rotate(${last ? 0 : 3}deg)`;
+                }
+            }
         },
         getRole(role) {
             if (typeMap.mount_group["治疗"].includes(role)) {
@@ -152,176 +133,14 @@ export default {
             }
             return "other";
         },
-        dragStart(event, member) {
-            this.dragItem = member;
-            this.dragOffset.x = event.clientX;
-            this.dragOffset.y = event.clientY;
-            const img = new Image();
-            img.src = "";
-            event.dataTransfer.setDragImage(img, 10, 10);
-            const ele = event.target.cloneNode(true);
-            ele.style.position = "fixed";
-            ele.style.top = `${event.clientY - event.offsetY}px`;
-            ele.style.left = `${event.clientX - event.offsetX}px`;
-            ele.style.zIndex = "1000";
-            ele.style.transform = `rotate(3deg)`;
-            ele.style.pointerEvents = "none";
-            ele.children[0].classList.add("active");
-            this.dragEle = ele;
-            document.body.appendChild(ele);
-        },
-        dragEnd() {
-            if (!this.dragEle) return;
-            document.body.removeChild(this.dragEle);
-            this.dragEle = null;
-            this.dragOffset = {
-                x: 0,
-                y: 0,
-            };
-            this.dragItem = null;
-        },
-        async drop(item, index, member) {
-            if (this.dragEle) {
-                document.body.removeChild(this.dragEle);
-                this.dragEle = null;
-                this.dragOffset = {
-                    x: 0,
-                    y: 0,
-                };
-            }
-            if (member && member.id === this.dragItem.id) return;
-            const dragIndex = this.raidDetail.members.findIndex((item) => item.id === this.dragItem.id);
-            let dropIndex = null;
-            if (member) {
-                dropIndex = this.raidDetail.members.findIndex((item) => item.id === member.id);
-            }
-
-            if (
-                (item === "queueList" && this.dragItem.identity_status !== 3) ||
-                (item === "altetnateList" && this.dragItem.identity_status !== 2)
-            ) {
-                const newStatus = item === "queueList" ? 3 : 2;
-                this.changeMembers([{ index: dragIndex, data: { ...this.dragItem, identity_status: newStatus } }]);
-                await this.handleChangeStatus(newStatus, dragIndex);
-            }
-            if (item === "memberList") {
-                if (this.dragItem.identity_status !== 1) {
-                    if (member) {
-                        this.$message.error("请拖动到无人的位置");
-                        return (this.dragItem = null);
-                    }
-                    this.changeMembers([
-                        {
-                            index: dragIndex,
-                            data: {
-                                ...this.dragItem,
-                                identity_status: 1,
-                                group_x: Math.floor(index / 5),
-                                group_y: index % 5,
-                            },
-                        },
-                    ]);
-                    const res = await this.handleChangeStatus(1, dragIndex);
-                    if (res.data.code !== 0) return (this.dragItem = null);
-                    await this.handleChangePosition(index, dragIndex);
-                } else if (member) {
-                    await this.handleSwitchPosition(member, dragIndex, dropIndex);
-                } else {
-                    this.changeMembers([
-                        {
-                            index: dragIndex,
-                            data: { ...this.dragItem, group_x: Math.floor(index / 5), group_y: index % 5 },
-                        },
-                    ]);
-                    await this.handleChangePosition(index, dragIndex);
-                }
-            }
-            this.dragItem = null;
-        },
-        async handleSwitchPosition(member, dragIndex, dropIndex) {
-            const new_x = this.dragItem.group_x;
-            const new_y = this.dragItem.group_y;
-            const old_x = member.group_x;
-            const old_y = member.group_y;
-            this.changeMembers([
-                { index: dragIndex, data: { ...this.dragItem, group_x: old_x, group_y: old_y } },
-                { index: dropIndex, data: { ...member, group_x: new_x, group_y: new_y } },
-            ]);
-            try {
-                await switchPosition(this.$route.query.id, {
-                    new_member_id: this.dragItem.id,
-                    original_member_id: member.id,
-                });
-            } catch (error) {
-                this.changeMembers([
-                    { index: dragIndex, data: { ...this.dragItem, group_x: new_x, group_y: new_y } },
-                    { index: dropIndex, data: { ...member, group_x: old_x, group_y: old_y } },
-                ]);
-            }
-        },
-        async handleChangeStatus(newStatus, dragIndex) {
-            const status = this.dragItem.identity_status;
-            try {
-                const res = await updateMemberStatus(this.$route.query.id, this.dragItem.id, {
-                    identity_status: newStatus,
-                });
-                return res;
-            } catch (error) {
-                this.changeMembers([{ index: dragIndex, data: { ...this.dragItem, identity_status: status } }]);
-            }
-        },
-        async handleChangePosition(index, dragIndex) {
-            const x = this.dragItem.group_x;
-            const y = this.dragItem.group_y;
-            try {
-                await setMemberPosition(this.$route.query.id, {
-                    member_id: this.dragItem.id,
-                    group_x: Math.floor(index / 5),
-                    group_y: index % 5,
-                });
-            } catch (error) {
-                this.changeMembers([{ index: dragIndex, data: { ...this.dragItem, group_x: x, group_y: y } }]);
-            }
-        },
-        handleClear(list) {
-            if (this[list]?.length === 0) return;
-            this.$confirm("确定清空吗？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-            }).then(() => {
-                const member_id_list = [];
-                this[list]?.forEach((item) => item && member_id_list.push(item.id));
-                clearList(this.$route.query.id, { member_id_list }).then((res) => {
-                    this.$message.success("清空成功");
-                    this.getRaidDetail();
-                });
-            });
-        },
-        changeMembers(arr) {
-            arr.forEach((item) => {
-                this.raidDetail.members.splice(item.index, 1, item.data);
-            });
-        },
-        handleDelete() {
-            this.$confirm("确定删除吗？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-            }).then(() => {
-                deleteActivity(this.$route.query.id).then((res) => {
-                    this.$message.success("删除成功");
-                    this.$router.push({ name: "raid-list" });
-                });
-            });
-        },
     },
 };
 </script>
 
 <style lang="less" scoped>
 .m-raid-detail {
-    width: 1254px;
+    width: 100%;
+    min-width: 1254px;
     .m-raid-detail__toolbar {
         display: flex;
         margin: 12px 0;

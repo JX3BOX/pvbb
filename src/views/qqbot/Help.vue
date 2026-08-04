@@ -42,22 +42,28 @@ export default {
 
 <style lang="less">
 .m-help-content {
-    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 40px;
     // height: 862px;
     .m-example-list{
+        min-width: 0;
         max-height: calc(100vh - @header-height);
         overflow: auto;
+        padding-right: 8px;
         &::-webkit-scrollbar{
             .none;
         }
     }
     .m-help-item {
-        width: 640px;
+        width: 100%;
         &:last-child{
             margin-bottom: 40px;
         }
         .title {
-            margin: 24px 0;
+            margin: 28px 0 18px;
             width: 100%;
             height: 53px;
             font-size: 36px;
@@ -69,10 +75,35 @@ export default {
         }
     }
     .m-right {
-        margin-left: 48px;
-        width: 360px;
+        width: 100%;
         box-sizing: border-box;
+        position: sticky;
+        top: 20px;
+        align-self: start;
     }
 
+}
+
+@media screen and (max-width: 1279px) {
+    .m-help-content {
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 24px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .m-help-content {
+        display: block;
+
+        .m-example-list {
+            max-height: none;
+            overflow: visible;
+        }
+
+        .m-right {
+            margin-top: 24px;
+            position: static;
+        }
+    }
 }
 </style>

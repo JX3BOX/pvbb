@@ -62,6 +62,8 @@ export default {
             mount: "",
             defaultRole: "",
             treasureLayout: null,
+            loadRequestId: 0,
+            readyTimer: null,
         };
     },
     computed: {
@@ -78,6 +80,7 @@ export default {
             return {
                 role: this.role,
                 server: this.server,
+                mode: this.isLandscape ? "landscape" : "portrait",
             };
         },
         roleInfo() {
@@ -97,12 +100,36 @@ export default {
         },
     },
     beforeUnmount() {
+        this.loadRequestId += 1;
+        if (this.readyTimer) clearTimeout(this.readyTimer);
         window.removeEventListener("resize", this.handleScreenWidthChange);
         window.removeEventListener("load", this.handleScreenWidthChange);
     },
     methods: {
-        setDataNotReady() {
-            resetQQBotReady({ dataReady: false });
+        start(requestId) {
+            if (requestId !== this.loadRequestId) return;
+            if (this.readyTimer) clearTimeout(this.readyTimer);
+            this.addClass = true;
+            this.reelAddClass = "start";
+            this.readyTimer = setTimeout(() => {
+                if (requestId !== this.loadRequestId) return;
+                this.isOver = true;
+                this.addClass = false;
+                this.reelAddClass = "";
+                this.readyTimer = null;
+                markQQBotReady({ root: this.$refs.capture || this.$el || "#app" });
+            }, 500);
+            window.addEventListener("resize", this.handleScreenWidthChange);
+            window.addEventListener("load", this.handleScreenWidthChange);
+            this.handleScreenWidthChange();
+        },
+        finishWithoutContent(requestId) {
+            if (requestId !== this.loadRequestId) return;
+            setQQBotDataReady(true);
+            this.$nextTick(() => {
+                if (requestId !== this.loadRequestId) return;
+                markQQBotReady({ root: this.$el || "#app" });
+            });
         },
         splitArrayIntoChunks(array, chunkSize) {
             const chunks = [];
@@ -130,63 +157,67 @@ export default {
                 this.handleLandscapeScreenWidthChange();
             }
         },
-        start() {
-            this.addClass = true;
-            this.reelAddClass = "start";
-            setTimeout(() => {
-                this.isOver = true;
-                this.addClass = false;
-                this.reelAddClass = "";
-                markQQBotReady({ root: this.$refs.capture || "#capture" });
-            }, 500);
-            window.addEventListener("resize", this.handleScreenWidthChange);
-            window.addEventListener("load", this.handleScreenWidthChange);
-            this.handleScreenWidthChange();
-        },
-        async buildTreasureData(userJx3Id) {
+        async buildTreasureData(userJx3Id, requestId) {
             const res = await getTreasureData(userJx3Id);
+            if (requestId !== this.loadRequestId) return;
             const data = res.data || {};
             this.treasureLayout = res.layout || null;
-            setQQBotDataReady(true);
             if (this.isLandscape) {
-                data.pet = this.splitArrayIntoChunks(data.pet || [], 5);
-                data.normal = this.splitArrayIntoChunks(data.normal || [], 3);
+                data.pet = this.splitArrayIntoChunks([...(data.pet || [])], 5);
+                data.normal = this.splitArrayIntoChunks([...(data.normal || [])], 3);
             }
             this.userAchievement = data;
+            setQQBotDataReady(true);
             this.$nextTick(() => {
+                if (requestId !== this.loadRequestId) return;
                 this.addClass = false;
                 this.reelAddClass = "";
                 this.isOver = false;
-                this.start();
+                this.start(requestId);
             });
         },
-        async getRoleGameAchievements(params) {
+        async getRoleGameAchievements(params, requestId) {
             try {
-                const res = await getRoleGameAchievementsByRoleAndServer(params);
+                const res = await getRoleGameAchievementsByRoleAndServer({
+                    role: params.role,
+                    server: params.server,
+                });
+                if (requestId !== this.loadRequestId) return;
                 const data = res?.data?.data || {};
                 const userJx3Id = data.jx3id || "";
                 this.mount = data.mount || "";
                 if (!userJx3Id) {
-                    this.setDataNotReady();
                     this.$message.warning("请先在游戏中同步数据");
                     return;
                 }
-                await this.buildTreasureData(userJx3Id);
+                await this.buildTreasureData(userJx3Id, requestId);
             } catch (e) {
-                this.setDataNotReady();
-                this.$message.error("获取角色成就失败，请稍后再试");
+                if (requestId === this.loadRequestId) this.$message.error("获取角色成就失败，请稍后再试");
             }
         },
         async loadByParams(params) {
+            const requestId = ++this.loadRequestId;
+            if (this.readyTimer) clearTimeout(this.readyTimer);
             this.loading = true;
-            this.setDataNotReady();
+            this.userAchievement = false;
+            this.treasureLayout = null;
+            this.mount = "";
+            this.addClass = false;
+            this.reelAddClass = false;
+            this.isOver = false;
+            resetQQBotReady({ dataReady: false });
             try {
+                if ((params.role || params.server) && !(params.role && params.server)) {
+                    this.$message.error("角色名和服务器需要同时提供");
+                    return;
+                }
                 if (params.role && params.server) {
-                    await this.getRoleGameAchievements(params);
+                    await this.getRoleGameAchievements(params, requestId);
                     return;
                 }
 
                 const rolesRes = await getUserRoles();
+                if (requestId !== this.loadRequestId) return;
                 const roleList = (rolesRes?.data?.data?.list || []).filter((item) => !!item.player_id);
                 if (!roleList.length) {
                     this.$message.error("未获取到角色信息");
@@ -196,12 +227,14 @@ export default {
                 await this.getRoleGameAchievements({
                     role: roleList[0].name,
                     server: roleList[0].server,
-                });
+                }, requestId);
             } catch (e) {
-                this.setDataNotReady();
-                this.$message.error("加载奇遇卷轴失败，请稍后再试");
+                if (requestId === this.loadRequestId) this.$message.error("加载奇遇卷轴失败，请稍后再试");
             } finally {
-                this.loading = false;
+                if (requestId === this.loadRequestId) {
+                    this.loading = false;
+                    if (!this.userAchievement) this.finishWithoutContent(requestId);
+                }
             }
         },
     },

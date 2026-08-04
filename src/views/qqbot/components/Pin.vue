@@ -38,6 +38,7 @@ export default {
     height: 352px;
     position: fixed;
     .rb(0);
+    z-index: 3;
     .join-content {
         width: 209px;
         height: 107px;
@@ -79,6 +80,12 @@ export default {
     .join-img {
         width: 224px;
         height: 224px;
+    }
+}
+
+@media screen and (max-width: 1680px) {
+    .m-join {
+        display: none;
     }
 }
 </style>

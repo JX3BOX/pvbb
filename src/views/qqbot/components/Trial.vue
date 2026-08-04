@@ -7,14 +7,20 @@
         <template v-if="isLogin">
             <div class="m-trial-content">
                 <div class="m-trial-input-wrapper">
-                    <el-input v-model="command" placeholder="输入指令" class="m-trial-input" @keyup.enter="handleSend">
+                    <el-input
+                        v-model="command"
+                        placeholder="输入指令"
+                        class="m-trial-input"
+                        :disabled="loading"
+                        @keyup.enter="handleSend"
+                    >
                         <template #suffix>
                             <span class="send-button" @click="handleSend">发送</span>
                         </template>
                     </el-input>
                 </div>
 
-                <pre class="m-trial-response" v-html="text" v-if="response"></pre>
+                <pre class="m-trial-response" v-if="response">{{ text }}</pre>
             </div>
         </template>
         <template v-else>
@@ -43,15 +49,14 @@ export default {
             command: "",
             text: "",
             response: "",
-            index: 1,
+            index: 0,
+            timer: null,
+            loading: false,
         };
     },
     computed: {
         isLogin() {
             return User.isLogin();
-        },
-        responseText() {
-            return this.response.slice(0, this.index);
         },
     },
     watch: {
@@ -59,34 +64,48 @@ export default {
             this.handleText(newVal);
         },
     },
+    beforeUnmount() {
+        this.clearTextTimer();
+    },
     methods: {
         async handleSend() {
-            if (!this.command.trim()) {
-                return;
-            }
+            if (this.loading || !this.command.trim()) return;
+            this.loading = true;
             try {
                 const res = await postCommandTrial({
                     command: this.command.trim(),
                     scope: "c2c",
                 });
-                this.response = res.data.data.content;
+                this.response = String(res.data?.data?.content || "");
             } catch (error) {
                 this.$message.error("发送失败，请稍后再试");
+            } finally {
+                this.loading = false;
             }
         },
         toLogin() {
             User.toLogin();
         },
-        handleText() {
-            this.text = this.response.slice(0, this.index);
-            setTimeout(() => {
-                if (this.index < this.response.length + 2) {
-                    this.index++;
-                    this.handleText();
-                } else {
-                    this.index = 1;
+        clearTextTimer() {
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = null;
+        },
+        handleText(value = "") {
+            this.clearTextTimer();
+            const response = String(value || "");
+            this.index = 0;
+            this.text = "";
+
+            const renderNextCharacter = () => {
+                if (this.index >= response.length) {
+                    this.timer = null;
+                    return;
                 }
-            }, 20);
+                this.index += 1;
+                this.text = response.slice(0, this.index);
+                this.timer = setTimeout(renderNextCharacter, 20);
+            };
+            renderNextCharacter();
         },
     },
 };

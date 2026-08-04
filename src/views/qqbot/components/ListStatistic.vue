@@ -18,7 +18,7 @@
                 <div class="count">{{ otherCount || 0 }}</div>
                 <div class="role-name">待定</div>
             </div>
-            <div class="clear-button" @click="$emit('clear')">清空</div>
+            <div v-if="clearable" class="clear-button" @click="$emit('clear')">清空</div>
         </div>
     </div>
 </template>
@@ -39,6 +39,10 @@ export default {
         count: {
             type: Number,
             default: 0,
+        },
+        clearable: {
+            type: Boolean,
+            default: true,
         },
     },
     computed: {
@@ -125,6 +129,52 @@ export default {
             }
             .role-name {
                 height: 16px;
+            }
+        }
+    }
+}
+
+.member-statistics {
+    height: 28px;
+
+    .member-statistics-left {
+        font-size: 15px;
+        line-height: 28px;
+    }
+    .member-statistics-right {
+        gap: 10px;
+
+        .clear-button {
+            width: auto;
+            height: 24px;
+            padding: 0 8px;
+            border-color: rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            line-height: 22px;
+            color: rgba(255, 255, 255, 0.38);
+        }
+        .member-statistics-right-item {
+            align-items: center;
+            color: rgba(255, 255, 255, 0.58);
+
+            .count {
+                border-radius: 5px;
+                background: rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.72);
+                line-height: 16px;
+
+                &.T {
+                    background: rgba(140, 91, 63, 0.28);
+                    color: #e2aa86;
+                }
+                &.HPS {
+                    background: rgba(68, 130, 93, 0.28);
+                    color: #81d9a5;
+                }
+                &.DPS {
+                    background: rgba(60, 98, 140, 0.3);
+                    color: #83b8ed;
+                }
             }
         }
     }

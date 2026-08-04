@@ -44,9 +44,16 @@ export default {
 <style lang="less">
 .m-qqbot-nav {
     width: 200px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(8, 12, 20, 0.58);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(12px);
     .u-title {
-        margin: 24px 0;
-        font-size: 36px;
+        margin: 8px 0 18px;
+        font-size: 30px;
         font-weight: 400;
         letter-spacing: 0px;
         line-height: 43.2px;
@@ -57,12 +64,12 @@ export default {
     .optin {
         border-radius: 12px;
         cursor: pointer;
-        width: 200px;
-        height: 83px;
+        width: 176px;
+        height: 68px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 24px;
+        font-size: 21px;
         font-weight: 400;
         letter-spacing: 0px;
         color: rgba(255, 255, 255, 1);
@@ -80,6 +87,55 @@ export default {
     }
     .bind-option.active {
         background: linear-gradient(270deg, rgba(255, 64, 134, 0) 0%, rgba(255, 64, 134, 1) 100%);
+    }
+}
+
+@media screen and (max-width: 1279px) {
+    .m-qqbot-nav {
+        width: 176px;
+
+        .u-title {
+            font-size: 30px;
+        }
+
+        .optin {
+            width: 152px;
+        }
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .m-qqbot-nav {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        padding: 12px 0 16px;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+
+        .u-title {
+            grid-column: 1 / -1;
+            margin: 0 0 8px;
+            font-size: 28px;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .optin {
+            width: 100%;
+            height: 56px;
+            border-radius: 10px;
+            font-size: 17px;
+
+            .icon {
+                width: 20px;
+                height: 20px;
+                margin-left: 6px;
+            }
+        }
     }
 }
 </style>

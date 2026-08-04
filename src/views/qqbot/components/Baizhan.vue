@@ -85,19 +85,22 @@ export default {
             bosses: [],
 
             imagesLoaded: false,
+            loadRequestId: 0,
         };
     },
     computed: {
         update_moment() {
-            return moment(this.map.updated_at);
+            return this.map.updated_at ? moment(this.map.updated_at) : null;
         },
         update_time() {
-            return this.update_moment.format("YYYY/MM/DD HH:mm:ss");
+            return this.update_moment?.isValid() ? this.update_moment.format("YYYY/MM/DD HH:mm:ss") : "-";
         },
         duration() {
+            const updatedAt = this.update_moment;
+            if (!updatedAt?.isValid()) return { start: "-", end: "-" };
             return {
-                start: this.update_moment.startOf("week").add(1, "day").format("MM/DD"),
-                end: this.update_moment.endOf("week").add(1, "day").format("MM/DD"),
+                start: updatedAt.clone().startOf("week").add(1, "day").format("MM/DD"),
+                end: updatedAt.clone().endOf("week").add(1, "day").format("MM/DD"),
             };
         },
         list() {
@@ -114,26 +117,42 @@ export default {
         },
     },
     unmounted() {
+        this.loadRequestId += 1;
         window.removeEventListener("load", this.initImageLoader);
     },
     methods: {
-        load() {
+        async load() {
+            const requestId = ++this.loadRequestId;
             resetQQBotReady();
             this.imagesLoaded = false;
-            const bossPro = this.loadBosses();
-            const effectPro = this.loadEffects();
-            Promise.allSettled([bossPro, effectPro]).then((res) => {
-                this.loadMap();
-            });
+            this.map = {};
+            this.maps = [];
+            try {
+                await Promise.allSettled([this.loadBosses(requestId), this.loadEffects(requestId)]);
+                if (requestId !== this.loadRequestId) return;
+                await this.loadMap(requestId);
+            } catch (error) {
+                if (requestId === this.loadRequestId) {
+                    this.map = {};
+                    this.maps = [];
+                }
+            } finally {
+                if (requestId === this.loadRequestId) {
+                    setQQBotDataReady(true);
+                    this.initImageLoader(requestId);
+                }
+            }
         },
-        initImageLoader() {
+        initImageLoader(requestId) {
             this.$nextTick(() => {
-                this.setGlobalReady();
+                if (requestId !== this.loadRequestId) return;
+                this.setGlobalReady(requestId);
             });
         },
 
         // 设置全局就绪状态
-        setGlobalReady() {
+        setGlobalReady(requestId) {
+            if (requestId !== this.loadRequestId) return;
             if (this.imagesLoaded) return; // 避免重复设置
 
             this.imagesLoaded = true;
@@ -148,19 +167,16 @@ export default {
             const avatar = this.bosses.find((item) => item.id === id)?.avatar || `${this.imgRoot}fbcdpanel02_51.png`;
             return avatar;
         },
-        async loadBosses() {
+        async loadBosses(requestId) {
             await getBosses().then((res) => {
+                if (requestId !== this.loadRequestId) return;
                 let list = res.data?.data || [];
                 list = list
                     .filter((item) => item.dwNpcID)
                     .map((item) => {
                         return {
                             id: item.dwNpcID,
-                            avatar: item.ImagePath
-                                ? `${__imgPath}pve/baizhan/${item.ImagePath.match(/\\([^\\]*)\./)[1].toLowerCase()}_${
-                                      item.ImageFrame
-                                  }.png`
-                                : `${__imgPath}pve/baizhan/fbcdpanel02_51.png`,
+                            avatar: this.getBossImage(item),
                             name: item.szName,
                             skills: item.szSkill,
                         };
@@ -168,8 +184,9 @@ export default {
                 this.bosses = list;
             });
         },
-        async loadEffects() {
+        async loadEffects(requestId) {
             await getEffects().then((res) => {
+                if (requestId !== this.loadRequestId) return;
                 const list = res.data?.data || [];
                 list.unshift({
                     nID: 0,
@@ -200,17 +217,18 @@ export default {
                 this.effects = effects;
             });
         },
-        async loadMap() {
+        getBossImage(item) {
+            const fileName = item.ImagePath?.match(/\\([^\\]*)\./)?.[1];
+            if (!fileName) return `${__imgPath}pve/baizhan/fbcdpanel02_51.png`;
+            return `${__imgPath}pve/baizhan/${fileName.toLowerCase()}_${item.ImageFrame}.png`;
+        },
+        async loadMap(requestId) {
             const params = {};
             if (this.id) {
                 params.id = ~~this.id;
             }
             await getMap(params).then((res) => {
-                if (res.data?.code !== 0) {
-                    setQQBotDataReady(true);
-                    this.initImageLoader();
-                    return;
-                }
+                if (requestId !== this.loadRequestId || res.data?.code !== 0) return;
                 this.map = res.data?.data || "";
                 const bosses = this.bosses;
                 const effects = this.effects;
@@ -226,8 +244,6 @@ export default {
                     };
                 });
                 this.maps = list;
-                setQQBotDataReady(true);
-                this.initImageLoader();
             });
         },
     },

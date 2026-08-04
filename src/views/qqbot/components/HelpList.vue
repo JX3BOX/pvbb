@@ -15,7 +15,7 @@
             <div
                 class="m-help-detail-item"
                 v-for="(item, index) in helpList"
-                :key="index"
+                :key="item.triggerKeyword || index"
                 @mouseenter="itemActive = item"
             >
                 <div class="u-detail-title" :class="{ active: itemActive?.triggerKeyword === item.triggerKeyword }">
@@ -50,19 +50,27 @@ export default {
                 { name: "系统", value: "system" },
             ],
             helpList: [],
+            loadRequestId: 0,
         };
     },
     mounted() {
         this.loadCommands();
     },
     methods: {
-        loadCommands() {
+        async loadCommands() {
             const type = this.active;
-            getCommandList({ category: type }).then((res) => {
-                this.helpList = res.data.data.list;
-            });
+            const requestId = ++this.loadRequestId;
+            try {
+                const res = await getCommandList({ category: type });
+                if (requestId !== this.loadRequestId || type !== this.active) return;
+                this.helpList = res.data?.data?.list || [];
+                this.itemActive = null;
+            } catch (error) {
+                if (requestId === this.loadRequestId) this.helpList = [];
+            }
         },
         onTypeChange(type) {
+            if (type === this.active) return;
             this.active = type;
             this.loadCommands();
         },

@@ -107,31 +107,36 @@ export default {
 
 <style lang="less">
 .m-help-card {
-    width: 640px;
+    width: 100%;
     padding: 24px;
     box-sizing: border-box;
     border-radius: 12px;
-    background: linear-gradient(180deg, rgba(64, 64, 64, 1) 0%, rgba(87, 87, 87, 1) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg, rgba(65, 68, 75, 0.92) 0%, rgba(42, 46, 55, 0.94) 100%);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
     font-size: 12px;
     color: rgba(166, 166, 166, 1);
 
     .u-card-title {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 700;
         color: #fff;
     }
 
     .content-container {
         margin-top: 12px;
-        width: 592px;
-        height: 50px;
+        width: 100%;
+        min-height: 50px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 1);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         display: flex;
         justify-content: space-between;
         .content {
             display: flex;
             align-items: center;
+            min-width: 0;
+            overflow: hidden;
             .zhiling {
                 font-size: 12px;
                 font-weight: 700;
@@ -141,6 +146,8 @@ export default {
             }
             .params {
                 display: flex;
+                min-width: 0;
+                flex-wrap: wrap;
                 .param {
                     border-radius: 4px;
                     background: rgba(64, 128, 255, 0.3);
@@ -154,6 +161,7 @@ export default {
         }
         .buttons {
             display: flex;
+            flex-shrink: 0;
             font-size: 12px;
             cursor: pointer;
             .button {
@@ -202,6 +210,44 @@ export default {
     .u-simple-title {
         font-size: 14px;
         color: #fff;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .m-help-card {
+        padding: 16px;
+
+        .content-container {
+            align-items: stretch;
+
+            .content {
+                padding: 8px 0;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 6px;
+
+                .zhiling {
+                    margin-left: 12px;
+                }
+
+                .params {
+                    padding-left: 8px;
+                    row-gap: 4px;
+                }
+            }
+
+            .buttons .button {
+                width: 64px;
+                height: auto;
+                min-height: 50px;
+                line-height: 50px;
+            }
+
+            .buttons .copy-all {
+                width: 68px;
+                padding-left: 8px;
+            }
+        }
     }
 }
 </style>
