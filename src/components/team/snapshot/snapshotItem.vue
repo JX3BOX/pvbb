@@ -117,7 +117,12 @@ export default {
             return _list;
         },
         autoname() {
-            return this.$t("team.snapshot.uploadedInGame", { time: showTime(this.data.created_at), name: this.data.user_data?.display_name || this.$t("team.snapshot.unknown") });
+            if (!this.data.cguid) return this.$t("team.snapshot.manualAdd");
+
+            const uploader = this.list.find((item) => String(item.jx3id) === String(this.data.jx3id));
+            return this.$t("team.snapshot.uploadedInGame", {
+                name: uploader?.name || this.$t("team.snapshot.unknown"),
+            });
         },
         groups: function () {
             return ~~Math.ceil(this.list.length / 5);

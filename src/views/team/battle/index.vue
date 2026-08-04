@@ -36,6 +36,17 @@
             <div class="m-battle-list_null" v-else>
                 <el-alert :title="$t('pages.team.battle.noActivityRecords')" type="info" show-icon></el-alert>
             </div>
+            <el-pagination
+                v-if="list.length"
+                class="m-archive-pages"
+                background
+                layout="total, prev, pager, next,jumper"
+                :page-size="per"
+                :total="total"
+                :current-page="page"
+                @current-change="changePage"
+            >
+            </el-pagination>
             <!-- 绑定界面 -->
             <Relevance
                 v-if="relevanceShow"
@@ -71,6 +82,9 @@ export default {
             list: [],
             relevanceShow: false,
             relevanceData: {},
+            per: 10,
+            page: 1,
+            total: 1,
             loading: false,
             show: [],
             filterRanking: localStorage.getItem(RANKING_FILTER_STORAGE_KEY) === "1",
@@ -81,6 +95,14 @@ export default {
             if (!this.filterRanking) return this.list;
             return this.list.filter((item) => item.boss_info?.is_rank_boss > 0 || Boolean(item.aid_info?.event_id));
         },
+        params() {
+            return {
+                pageIndex: this.page,
+                pageSize: this.per,
+                team_id: this.teamId,
+                is_leader: 1,
+            };
+        },
     },
     watch: {
         filterRanking(value) {
@@ -89,6 +111,7 @@ export default {
         teamId: {
             handler: function (val) {
                 if (!val) return;
+                this.page = 1;
                 this.getList();
             },
             immediate: true,
@@ -100,9 +123,12 @@ export default {
         },
         getList() {
             this.loading = true;
-            getMyTeamBattleList({ team_id: this.teamId })
+            getMyTeamBattleList(this.params)
                 .then(async (data) => {
-                    let list = data.data.data.list || [];
+                    const res = data.data.data;
+                    let list = res.list || [];
+                    this.total = res.page?.total ?? res.total ?? list.length;
+                    this.show = [];
                     list.forEach((team, i) => {
                         let leader_name = team.leader,
                             members = team.team_members;
@@ -138,6 +164,11 @@ export default {
         },
         showItem(i) {
             this.show[i] = !this.show[i];
+        },
+        changePage(page) {
+            this.page = page;
+            this.getList();
+            window.scrollTo(0, 0);
         },
     },
 };

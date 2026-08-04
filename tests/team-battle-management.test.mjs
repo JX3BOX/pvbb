@@ -97,6 +97,23 @@ test("team battle management exposes the same persisted activity filter", async 
     assert.match(page, /pages\.team\.battle\.teamSource/);
 });
 
+test("team battle management requests leader records for the current team with pagination", async () => {
+    const page = await read("../src/views/team/battle/index.vue");
+
+    assert.match(page, /team_id:\s*this\.teamId/);
+    assert.match(page, /is_leader:\s*1/);
+    assert.match(page, /pageIndex:\s*this\.page/);
+    assert.match(page, /pageSize:\s*this\.per/);
+    assert.match(page, /getMyTeamBattleList\(this\.params\)/);
+    assert.match(page, /<el-pagination[\s\S]*?:total="total"[\s\S]*?@current-change="changePage"/);
+    assert.doesNotMatch(page, /hide-on-single-page/);
+    assert.match(page, /res\.page\?\.total \?\? res\.total \?\? list\.length/);
+    assert.match(
+        page,
+        /changePage\(page\) \{[\s\S]*?this\.page = page;[\s\S]*?this\.getList\(\)/,
+    );
+});
+
 test("battle notices link to the report guide in a new tab", async () => {
     const [personalPage, managementPage] = await Promise.all([
         read("../src/views/team/battle/myBattle.vue"),

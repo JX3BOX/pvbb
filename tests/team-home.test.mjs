@@ -694,8 +694,8 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
     ]);
 
     assert.match(item, /v-for="group of 5"[\s\S]*?team\.snapshot\.group/);
-    assert.match(zhCn, /uploadedInGame: "\{time\}\{'@'\}\{name\} 游戏内上传"/);
-    assert.match(zhTw, /uploadedInGame: "\{time\}\{'@'\}\{name\} 遊戲內上傳"/);
+    assert.match(zhCn, /uploadedInGame: "【\{name\}】游戏内上传"/);
+    assert.match(zhTw, /uploadedInGame: "【\{name\}】遊戲內上傳"/);
     assert.match(item, /v-if="supportDkpSync && data\.dkp"[\s\S]*?el-icon-check[\s\S]*?team\.snapshot\.dkpSynced/);
     assert.match(item, /:loading="syncingDkp"[\s\S]*?:disabled="syncingDkp"/);
     assert.match(item, /if \(!Number\.isInteger\(score\)\)/);

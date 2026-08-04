@@ -57,10 +57,10 @@ GET /api/team/my-race-rank/records?pageIndex=:page&pageSize=10&team_id=:teamId
 ### 团队战绩管理
 
 ```http
-GET /api/team/my-team/race-rank/records?team_id=:teamId
+GET /api/team/my-team/race-rank/records?pageIndex=:page&pageSize=10&team_id=:teamId&is_leader=1
 ```
 
-数据语义是归属当前团队的所有团长上报记录，供团队管理者关联战斗数据并进入秘境百强榜。
+数据语义是归属当前团队的所有团长上报记录，供团队管理者关联战斗数据并进入秘境百强榜。管理页按接口分页信息展示翻页控件；`team_id` 必须是当前工作台团队，`is_leader=1` 用于限定游戏内担任队长时上报的数据。
 
 ### 首领活动配置
 

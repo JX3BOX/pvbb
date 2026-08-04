@@ -36,3 +36,15 @@ test("snapshot supplement mount selector shows mount icons", async () => {
     assert.match(dialog, /class="u-selected-xf-icon"[\s\S]*?:src="showMountIcon\(roleForm\.xf\)"/);
     assert.match(dialog, /class="m-snapshot-xf-option"[\s\S]*?:src="showMountIcon\(item\.id\)"/);
 });
+
+test("snapshot title identifies the in-game uploader by jx3id", async () => {
+    const item = await readFile(
+        new URL("../src/components/team/snapshot/snapshotItem.vue", import.meta.url),
+        "utf8"
+    );
+
+    assert.match(item, /if \(!this\.data\.cguid\) return this\.\$t\("team\.snapshot\.manualAdd"\)/);
+    assert.match(item, /this\.list\.find\(\(item\) => String\(item\.jx3id\) === String\(this\.data\.jx3id\)\)/);
+    assert.match(item, /name: uploader\?\.name \|\| this\.\$t\("team\.snapshot\.unknown"\)/);
+    assert.doesNotMatch(item, /name: this\.data\.user_data\?\.display_name/);
+});
