@@ -111,7 +111,7 @@ import { showMountIcon, showMountName } from "@/utils/filters";
 import bus from "@/utils/bus";
 export default {
     name: "RaidSub",
-    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace"],
+    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace", "header"],
     emits: ["pass"],
     components: {
         MemberSetting,

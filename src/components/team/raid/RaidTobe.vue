@@ -108,7 +108,7 @@ import { showMountIcon, showMountName } from "@/utils/filters";
 import bus from "@/utils/bus";
 export default {
     name: "RaidTobe",
-    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace"],
+    props: ["id", "teamId", "isForceMatch", "canAdd", "canReplace", "header"],
     emits: ["pass", "pending"],
     components: {
         RaidRoleDialog,
@@ -223,11 +223,13 @@ export default {
             }
         },
         // 设为替补
-        pending(member, i) {
-            covertTobe2Sub(this.raid_id, member?.id).then(() => {
-                this.$emit("pending", member);
-                this.data.splice(i, 1);
-            });
+        async pending(member) {
+            try {
+                await covertTobe2Sub(this.raid_id, member?.id);
+                this.$emit("pending");
+            } catch (e) {
+                console.error("covertTobe2Sub", e);
+            }
         },
         // 删除候选（拒绝申请）
         reject(member, i) {

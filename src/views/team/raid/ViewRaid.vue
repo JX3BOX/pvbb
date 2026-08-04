@@ -114,7 +114,7 @@
                             </div>
                         </div>
                         <div class="u-actions">
-                            <el-button icon="FullScreen" :disabled="!canJoin" @click="showMiniprogramCode">
+                            <el-button icon="FullScreen" disabled @click="showMiniprogramCode">
                                 {{ $t("team.raid.view.miniProgram") }}
                             </el-button>
                             <el-button type="primary" icon="Right" @click="handleShowDialog" :disabled="!canJoin">

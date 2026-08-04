@@ -65,6 +65,9 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.doesNotMatch(raid, /<raid-normal-v[12][\s\S]*?v-model="members"/);
     assert.match(raid, /<raid-normal-v1[\s\S]*?:data="members"/);
     assert.match(raid, /<raid-normal-v2[\s\S]*?:data="members"/);
+    for (const source of [normalV1, normalV2, sub, tobe]) {
+        assert.match(source, /props:\s*\[[^\]]*"header"/);
+    }
     assert.doesNotMatch(normalV1 + normalV2, /\bmodel:\s*\{/);
     assert.match(normalV1 + normalV2, /import RaidRoleDialog from "@\/components\/team\/raid\/RaidRoleDialog\.vue"/);
     assert.match(normalV1 + normalV2, /class="u-member-role-trigger"/);
@@ -134,6 +137,7 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(page, /editRaid:\s*function\s*\(\)\s*\{\s*this\.formVisible = true/);
     assert.doesNotMatch(page, /this\.\$router\.push\(`\/raid\/edit\/\$\{this\.id\}`\)/);
     assert.match(page, /handleRaidSaved:\s*async function[\s\S]*await this\.getRaid\(\)/);
+    assert.match(page, /<el-button icon="FullScreen" disabled @click="showMiniprogramCode">/);
     assert.match(sidebar, /this\.\$route\.name === "view_raid"/);
     assert.match(sidebar, /this\.\$store\.state\.team\?\.ID/);
     assert.match(appStyles, /\.m-title[\s\S]*\.u-op[\s\S]*min-height:\s*38px/);
@@ -148,5 +152,6 @@ test("raid detail uses the modern team shell, shared editor and accessible top a
     assert.match(raidStyles, /\.m-raid-corebox\.m-raid-normal[\s\S]*border-radius:\s*18px/);
     assert.match(normalV1 + normalV2, /--raid-columns/);
     assert.match(normalV1 + normalV2, /team\.raid\.board\.group/);
+    assert.doesNotMatch(normalV1 + normalV2, /canDrag\(\)[\s\S]*?routerName\s*!==\s*["']view_raid["']/);
     assert.doesNotMatch(normalV2, /class="m-raid-tobebox m-raid-normalbox"/);
 });
