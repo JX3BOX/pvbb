@@ -154,30 +154,36 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
 
-    > div {
-        display: flex;
+    .u-meta-item {
+        display: grid;
         min-width: 0;
         min-height: 62px;
-        justify-content: center;
-        flex-direction: column;
+        align-content: center;
         padding: 10px 12px;
         border: 1px solid @team-border-light;
         border-radius: @team-radius-small;
         background: @team-surface-muted;
+        grid-template-rows: 16px 22px;
         gap: 3px;
     }
 
-    span {
+    .u-meta-label {
         color: @team-text-muted;
         font-size: 11px;
+        line-height: 16px;
     }
 
-    strong {
+    .u-meta-value {
+        display: flex;
         overflow: hidden;
+        height: 22px;
+        align-items: center;
         color: @team-text-primary;
         font-size: 13px;
+        line-height: 22px;
         text-overflow: ellipsis;
         white-space: nowrap;
+
     }
 }
 

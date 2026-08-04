@@ -112,7 +112,7 @@
 <script>
 import { getRoles, getAllMyRoles } from "@/service/team/role.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
-import { __imgPath } from "@/utils/config";
+import { __cdn } from "@/utils/config";
 import User from "@jx3box/jx3box-common/js/user";
 import { showMountIcon } from "@/utils/filters";
 export default {
@@ -245,7 +245,7 @@ export default {
             }
         },
         showAvatar: function (mount, body_type) {
-            return __imgPath + "image/school/" + mount + ".png";
+            return __cdn + "image/school/" + mount + ".png";
         },
         resetForm: function () {
             this.form = {

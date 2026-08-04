@@ -26,7 +26,7 @@
 <script>
 import { getEvents } from "@/service/team/apply.js";
 import { showDate } from "@/utils/filters";
-import { __imgPath } from "@/utils/config";
+import { __cdn } from "@/utils/config";
 import {resolveImagePath} from '@jx3box/jx3box-common/js/utils'
 
 export default {
@@ -40,7 +40,7 @@ export default {
     },
     computed: {
         img() {
-            return __imgPath + "image/other/apply.png";
+            return __cdn + "image/other/apply.png";
         },
     },
     methods: {

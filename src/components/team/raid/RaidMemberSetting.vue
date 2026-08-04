@@ -116,7 +116,6 @@
 import { getRoles, addNormalMember, addSubMember, updateMember } from "@/service/team/raid.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import mountg from "@jx3box/jx3box-data/data/xf/mount_group.json";
-import { __imgPath } from "@/utils/config";
 import cloneDeep from "lodash/cloneDeep";
 import pick from "lodash/pick";
 import { showMountIcon, showSchoolIcon } from "@/utils/filters";

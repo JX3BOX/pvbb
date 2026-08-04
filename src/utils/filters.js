@@ -4,14 +4,13 @@ function showBodyType(val) {
 }
 
 import school_id_map from "@jx3box/jx3box-data/data/xf/schoolid.json";
-import { __imgPath } from "@/utils/config";
 function showSchoolIcon(val) {
     let id = val || 0;
-    return __imgPath + "image/school/" + id + ".png";
+    return "https://img.jx3box.com/image/school/" + id + ".png";
 }
 function showMountIcon(val) {
     let id = val || 0;
-    return __imgPath + "image/xf/" + id + ".png";
+    return "https://img.jx3box.com/image/xf/" + id + ".png";
 }
 
 import xfids from "@jx3box/jx3box-data/data/xf/xfid.json";

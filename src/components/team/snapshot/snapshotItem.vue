@@ -75,7 +75,6 @@
     </div>
 </template>
 <script>
-import { __imgPath } from "@/utils/config";
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
 import { delSnapshot } from "@/service/team/snapshot.js";
 import { syncSnapshotDkp } from "@/service/team/dkp.js";

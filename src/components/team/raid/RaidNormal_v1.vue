@@ -8,7 +8,7 @@
         </h5>
         <div
             class="m-raid-corebox m-raid-normal"
-            :class="{ qkmode: canManage }"
+            :class="{ qkmode: canDrag }"
             :style="{ '--raid-columns': col, '--raid-rows': row }"
             v-if="members && members.length"
         >
@@ -19,7 +19,8 @@
                 tag="div"
                 class="m-raid-members"
                 v-model="members"
-                v-bind="{ ...drag_options, sort: canManage, draggable: '.u-member-draggable' }"
+                v-bind="{ ...drag_options, sort: canDrag, draggable: '.u-member-draggable' }"
+                :disabled="!canDrag"
                 handle=".u-member"
                 :animation="100"
                 :class="'row-' + row"
@@ -245,6 +246,9 @@ export default {
         },
         canManage() {
             return this.$store.state.canManage;
+        },
+        canDrag() {
+            return this.canManage && this.routerName !== "view_raid";
         },
         linkVisible() {
             return this.$store.state.isTeammate;

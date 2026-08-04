@@ -142,7 +142,7 @@
 <script>
 import { getRoles, unbindRole, noteRole, deleteRole, starRole, unstarRole } from "@/service/team/role.js";
 import school_id_map from "@jx3box/jx3box-data/data/xf/schoolid.json";
-import { __imgPath, __cdn } from "@/utils/config";
+import { __cdn } from "@/utils/config";
 import xfmap from "@jx3box/jx3box-data/data/xf/xf.json";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { showTime, showSchoolIcon, showSchoolName } from "@/utils/filters";

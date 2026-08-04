@@ -3,13 +3,20 @@
         <el-divider content-position="left"> <i class="el-icon-map-location"></i> {{ $t("team.publicContent.activities") }} </el-divider>
         <template v-if="hasRight">
             <div class="m-raid-table" v-loading="loading">
-                <activity-item
-                    v-for="item in data"
-                    :key="item.id"
-                    :activity="item"
-                    :is-home-page="isHomePage"
-                ></activity-item>
-                <div class="u-tip"><i class="el-icon-warning-outline"></i> {{ $t("team.publicContent.recentOnly") }}</div>
+                <template v-if="data.length">
+                    <activity-item
+                        v-for="item in data"
+                        :key="item.id"
+                        :activity="item"
+                        :is-home-page="isHomePage"
+                    ></activity-item>
+                    <div class="u-tip"><i class="el-icon-warning-outline"></i> {{ $t("team.publicContent.recentOnly") }}</div>
+                </template>
+                <div class="m-public-raid-empty" v-else-if="!loading">
+                    <span class="u-empty-icon" aria-hidden="true"><el-icon><Calendar /></el-icon></span>
+                    <h3>{{ $t("team.publicActivityEmpty") }}</h3>
+                    <p>{{ $t("team.publicContent.recentOnly") }}</p>
+                </div>
             </div>
         </template>
         <template v-else>
@@ -22,6 +29,7 @@
 import { getRaids } from "@/service/team/raid.js";
 import { moment } from "@jx3box/jx3box-common/js/moment";
 import ActivityItem from "@/components/team/raid/ActivityItem.vue";
+import { Calendar } from "@element-plus/icons-vue";
 export default {
     name: "TeamRaid",
     props: ["v", "super", "authority", "isHomePage"],
@@ -89,6 +97,7 @@ export default {
     },
     components: {
         ActivityItem,
+        Calendar,
     },
 };
 </script>
