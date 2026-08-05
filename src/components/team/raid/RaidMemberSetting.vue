@@ -24,16 +24,31 @@
                     <span>{{ $t("team.raid.memberSetting.roleInfoHint") }}</span>
                 </header>
 
-                <el-form-item :label="$t('team.raid.memberSetting.roleName')" prop="name">
-                    <el-input
-                        v-if="!['normal', 'sub'].includes(mode)"
-                        v-model="form.name"
-                        :placeholder="$t('team.raid.memberSetting.rolePlaceholder')"
+                <el-form-item :label="$t('team.raid.memberSetting.school')">
+                    <el-select
+                        v-model="selectedSchool"
+                        :placeholder="$t('team.raid.memberSetting.schoolPlaceholder')"
                         :disabled="!canEdit"
+                        filterable
                         clearable
-                    />
+                        @change="handleSchoolChange"
+                    >
+                        <el-option
+                            v-for="school in schoolOptions"
+                            :key="school.id"
+                            :label="school.name"
+                            :value="school.id"
+                        >
+                            <div class="m-raid-member-option">
+                                <img :src="showSchoolIcon(school.id)" :alt="school.name" />
+                                <span>{{ school.name }}</span>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
 
-                    <div v-else class="m-raid-member-source">
+                <el-form-item :label="$t('team.raid.memberSetting.roleName')" prop="name">
+                    <div class="m-raid-member-source">
                         <div v-if="form.role_id" class="m-raid-selected-role">
                             <img :src="showMountIcon(form.mount)" :alt="form.name" />
                             <div>
@@ -48,12 +63,18 @@
                                 popper-class="m-raid-pop-member-select"
                                 teleported
                                 filterable
+                                allow-create
                                 clearable
-                                :placeholder="$t('team.raid.memberSetting.selectBound')"
+                                :placeholder="$t('team.raid.memberSetting.rolePlaceholder')"
                                 :disabled="!canEdit"
                                 @change="handleChange"
                             >
-                                <el-option v-for="role in roles" :key="role.ID" :label="role.name" :value="role.ID">
+                                <el-option
+                                    v-for="role in filteredRoles"
+                                    :key="role.ID"
+                                    :label="role.name"
+                                    :value="role.ID"
+                                >
                                     <div class="m-raid-member-option">
                                         <img :src="showSchoolIcon(role.mount)" :alt="role.name" />
                                         <span>{{ role.name }}</span>
@@ -61,13 +82,6 @@
                                     </div>
                                 </el-option>
                             </el-select>
-                            <div class="m-raid-member-divider"><span>{{ $t("team.raid.memberSetting.orTemporary") }}</span></div>
-                            <el-input
-                                v-model="form.name"
-                                :placeholder="$t('team.raid.memberSetting.temporaryPlaceholder')"
-                                :disabled="!canEdit"
-                                clearable
-                            />
                         </template>
                     </div>
                 </el-form-item>
@@ -113,9 +127,10 @@
 </template>
 
 <script>
-import { getRoles, addNormalMember, addSubMember, updateMember } from "@/service/team/raid.js";
+import { addNormalMember, addSubMember, updateMember } from "@/service/team/raid.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import mountg from "@jx3box/jx3box-data/data/xf/mount_group.json";
+import school_map from "@jx3box/jx3box-data/data/xf/schoolid.json";
 import cloneDeep from "lodash/cloneDeep";
 import pick from "lodash/pick";
 import { showMountIcon, showSchoolIcon } from "@/utils/filters";
@@ -147,7 +162,6 @@ export default {
         rules: {},
         roles: [],
         substitute: [],
-        loading: false,
         addLoading: false,
         selectedSchool: 0,
 
@@ -179,6 +193,13 @@ export default {
             }
             return Object.values(xf_map);
         },
+        schoolOptions() {
+            return Object.entries(school_map).map(([id, name]) => ({ id: Number(id), name }));
+        },
+        filteredRoles() {
+            if (!this.selectedSchool) return this.roles;
+            return this.roles.filter((role) => this.getSchoolByMount(role.mount) === this.selectedSchool);
+        },
         allRoles() {
             return this.$store.state.roles;
         },
@@ -203,6 +224,8 @@ export default {
                     for (const key of Object.keys(val)) {
                         this.form[key] = val[key];
                     }
+                    this.selectedSchool = this.getSchoolByMount(val.mount);
+                    this.tmpVal = val.role_id || val.name || "";
                 }
             },
         },
@@ -284,43 +307,48 @@ export default {
         },
         handleChange(val) {
             this.form.role_id = 0;
-            const [member] = this.roles ? this.roles.filter((role) => role.ID === val) : [];
+            const member = this.roles.find((role) => String(role.ID) === String(val));
 
             if (member) {
                 this.form.name = member.name;
                 this.form.role_id = member.ID;
-                this.selectedSchool = Number(member.mount) || 0;
+                this.selectedSchool = this.getSchoolByMount(member.mount);
                 this.form.mount = this.xfMaps[0]?.id || "";
+                this.tmpVal = member.ID;
+                return;
             }
+
+            this.form.name = typeof val === "string" ? val.trim() : "";
+            this.tmpVal = this.form.name;
+            this.ensureMountMatchesSchool();
         },
-        remoteMethod(query) {
-            if (query !== "") {
-                getRoles(this.teamId, query).then((res) => {
-                    this.roles = res.data.data.list;
-                    this.loading = false;
-                });
-                // 如果新的id不在角色列表则重置已选择的门派
-                if (this.roles?.some((r) => r.name === this.form.name)) {
-                    this.selectedSchool = 0;
+        getSchoolByMount(mount) {
+            const mountId = Number(mount);
+            const mountInfo = Object.values(xf_map).find((item) => Number(item.id) === mountId);
+            return Number(mountInfo?.school) || mountId || 0;
+        },
+        handleSchoolChange() {
+            if (this.form.role_id) {
+                const role = this.roles.find((item) => String(item.ID) === String(this.form.role_id));
+                if (!this.selectedSchool || this.getSchoolByMount(role?.mount) !== this.selectedSchool) {
+                    this.clearRole();
                 }
-            } else {
-                this.roles = cloneDeep(this.allRoles);
-                this.selectedSchool = 0;
             }
+            this.ensureMountMatchesSchool();
         },
-        // 清空选择
-        handleClear() {
-            this.roles = cloneDeep(this.allRoles);
-            this.selectedSchool = 0;
+        ensureMountMatchesSchool() {
+            if (!this.selectedSchool) return;
+            const hasCurrentMount = this.xfMaps.some((item) => Number(item.id) === Number(this.form.mount));
+            if (!hasCurrentMount) this.form.mount = this.xfMaps[0]?.id || "";
         },
-        handleNameInput(val) {
-            this.remoteMethod(val);
-        },
-        removeRole() {
-            this.form.role_id = "";
+        clearRole() {
+            this.form.role_id = 0;
             this.form.name = "";
             this.form.mount = "";
-            this.selectedSchool = 0;
+            this.tmpVal = "";
+        },
+        removeRole() {
+            this.clearRole();
         },
         showMountIcon,
         showSchoolIcon,
