@@ -18,6 +18,7 @@
                     type="primary"
                     icon="CirclePlusFilled"
                     @click="handleButtonAdd('add')"
+                    :disabled="isFull"
                     v-if="canManage"
                     >{{ $t("team.raid.board.add") }}</el-button
                 >
@@ -166,7 +167,7 @@
             :data="selectedMember"
             :teamId="teamId"
             :members="members"
-            :max="col * row"
+            :max="memberLimit"
             mode="normal"
             @close="handleDialogCancel"
             @updateRole="handleSave"
@@ -192,6 +193,7 @@ import mountData from "@jx3box/jx3box-data/data/xf/mount_group.json";
 const { mount_group } = mountData;
 import { ensureDragKey } from "@/utils/draggable";
 import { showMountIcon, showMountName, showSchoolIcon } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 import bus from "@/utils/bus";
 
 // components
@@ -211,7 +213,7 @@ const item_demo = {
 
 export default {
     name: "RaidNormal",
-    props: ["data", "teamId", "leader", "row", "col", "id", "header"],
+    props: ["data", "teamId", "leader", "row", "col", "capacity", "id", "header"],
     emits: ["update"],
     components: {
         MemberSetting,
@@ -286,7 +288,16 @@ export default {
             return this.$store.state.memberOrder;
         },
         count() {
-            return this.data.filter((e) => e.is_valid).length;
+            return this.data.filter((item) => Number(item?.is_valid) === 1).length;
+        },
+        memberLimit() {
+            const capacity = Number(this.capacity);
+            if (capacity > 0) return capacity;
+
+            return Number(this.row || 0) * Number(this.col || 0);
+        },
+        isFull() {
+            return this.count >= this.memberLimit;
         },
         raidMountGroup() {
             const obj = {};
@@ -317,7 +328,12 @@ export default {
         // ===============================
         // 设置
         handleSetting(member, index) {
+            if (Number(member?.is_valid) !== 1 && this.isFull) {
+                this.notifyFull();
+                return;
+            }
             this.title = this.$t("team.raid.board.roleSettings");
+            this.action = "";
             this.selectedMember = member;
             this.selectedIndex = index;
             this.visible = true;
@@ -328,7 +344,7 @@ export default {
             this.action = "";
         },
         // 删除
-        remove(member, i) {
+        async remove(member, i) {
             // 如果当前是一个虚拟节点，则只是重置所有值为默认
             if (member.is_virtual && !member?.id) {
                 this.$notify({
@@ -340,25 +356,32 @@ export default {
                 return;
             }
             // 如果当前是一个非虚拟节点，则发起删除请求并用一个虚拟节点替代
-            removeMember(this.raid_id, member?.id).then(() => {
+            try {
+                await removeMember(this.raid_id, member?.id);
                 this.$notify({
                     title: this.$t("team.raid.member.operationSuccess"),
                     message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.members.splice(i, 1, cloneDeep(item_demo)); //应同时添加一个虚拟节点
-            });
+                this.$emit("update");
+            } catch (error) {
+                this.notifyError(error);
+            }
         },
         // 设为替补
-        pending: function (member, i) {
+        pending: async function (member, i) {
             if (member.is_virtual) {
                 return;
             }
-            covertNormal2Sub(this.raid_id, member.id).then(() => {
+            try {
+                await covertNormal2Sub(this.raid_id, member.id);
                 this.members.splice(i, 1, cloneDeep(item_demo));
                 bus.emit("pending", member);
                 this.$emit("update");
-            });
+            } catch (error) {
+                this.notifyError(error);
+            }
         },
 
         // 列表
@@ -369,6 +392,10 @@ export default {
         },
         // 弹窗添加队员
         handleButtonAdd(action) {
+            if (this.isFull) {
+                this.notifyFull();
+                return;
+            }
             this.title = this.$t("team.raid.board.add");
             this.action = action;
             this.selectedMember = null;
@@ -377,11 +404,32 @@ export default {
         },
         // 排序
         async handleSort() {
-            try {
-                await sortMember(this.raid_id, this.order);
-            } catch (e) {
-                console.log(e);
+            const order = cloneDeep(this.order);
+            if (!order.length) {
+                this.$store.commit("SET_MEMBER_ORDER", []);
+                return;
             }
+            try {
+                await sortMember(this.raid_id, order);
+                this.$store.commit("SET_MEMBER_ORDER", order);
+            } catch (error) {
+                this.notifyError(error);
+                this.$emit("update");
+            }
+        },
+        notifyFull() {
+            this.$notify({
+                type: "warning",
+                title: this.$t("team.raid.common.tip"),
+                message: this.$t("team.raid.board.full"),
+            });
+        },
+        notifyError(error) {
+            this.$notify({
+                type: "error",
+                title: this.$t("team.raid.common.tip"),
+                message: getRequestErrorMessage(error, this.$t("team.raid.misc.retry")),
+            });
         },
 
         // UI表现杂项
@@ -450,15 +498,32 @@ export default {
                         {
                             label: this.$t("team.raid.member.remove"),
                             customClass: "item",
-                            onClick: () => this.remove(this.selectedMember, this.selectedIndex),
+                            onClick: () => this.confirmRemove(this.selectedMember, this.selectedIndex),
                         },
                     ],
                 });
             }
         },
+        async confirmRemove(member, index) {
+            try {
+                await this.$confirm(this.$t("team.raid.member.removeConfirm"), this.$t("team.raid.common.tip"), {
+                    confirmButtonText: this.$t("team.raid.common.confirm"),
+                    cancelButtonText: this.$t("team.raid.common.cancel"),
+                    type: "warning",
+                });
+            } catch {
+                return;
+            }
+            await this.remove(member, index);
+        },
         // 右键编辑
         setEdit() {
+            if (Number(this.selectedMember?.is_valid) !== 1 && this.isFull) {
+                this.notifyFull();
+                return;
+            }
             this.title = this.$t("team.raid.board.roleSettings");
+            this.action = "";
             this.visible = true;
         },
         // 设为阵眼
@@ -553,7 +618,7 @@ export default {
                     this.members[index] = member;
                 } else {
                     const validIndex = this.members.findIndex((item) => item.is_valid === 0);
-                    if (validIndex) {
+                    if (validIndex > -1) {
                         this.members[validIndex] = member;
                     }
                 }
@@ -562,7 +627,9 @@ export default {
                 this.members[this.selectedIndex] = member;
             }
             this.$emit("update");
+            this.action = "";
             this.selectedMember = null;
+            this.selectedIndex = undefined;
             this.visible = false;
         },
     },

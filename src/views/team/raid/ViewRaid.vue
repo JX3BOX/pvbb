@@ -140,6 +140,7 @@
                             </div>
                         </div>
                         <Raid
+                            ref="raidBoard"
                             :count="data.count"
                             :team-id="team_id"
                             :leader="data.leader"
@@ -158,6 +159,7 @@
                         v-model="joinShow"
                         :auth="data.auth"
                         :client="client"
+                        :submitting="joinSubmitting"
                         @confirm="handleConfrim"
                     />
                 </template>
@@ -192,6 +194,7 @@ import xfid from "@jx3box/jx3box-data/data/xf/xfid.json";
 import originServer from "@jx3box/jx3box-data/data/server/server_origin.json";
 import cloneDeep from "lodash/cloneDeep";
 import { showTime, showMountIcon } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 import bus from "@/utils/bus";
 export default {
     name: "ViewRaid",
@@ -212,6 +215,7 @@ export default {
                 r_raid: 0,
             },
             joinShow: false,
+            joinSubmitting: false,
             formVisible: false,
 
             formData: {},
@@ -263,10 +267,10 @@ export default {
             return !!this.data?.content;
         },
         displayRow: function () {
-            return Number(this.data?.count) === 10 ? 5 : this.data?.row;
+            return Number(this.data?.row) || 5;
         },
         displayCol: function () {
-            return Number(this.data?.count) === 10 ? 5 : this.data?.col;
+            return Number(this.data?.col) || 5;
         },
         chosenRole: function ({ formData }) {
             const data = {
@@ -399,6 +403,7 @@ export default {
             this.loadedRaidId = "";
             this.flag = false;
             this.joinShow = false;
+            this.joinSubmitting = false;
             this.formVisible = false;
             this.$store.commit("SET_TEAM", {});
             this.$store.commit("setManageStatus", false);
@@ -440,6 +445,10 @@ export default {
         // 报名逻辑
         // ==================================
         handleShowDialog: function () {
+            if (!User.isLogin()) {
+                window.location.href = `/account/login?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
             this.joinShow = true;
         },
         // 预约报名确认
@@ -447,20 +456,33 @@ export default {
             this.formData = data;
             this.Join();
         },
-        Join: function () {
+        Join: async function () {
+            if (this.joinSubmitting) return;
+
             const raidId = this.id;
             const version = this.loadVersion;
             const role = this.chosenRole;
-            // 提交到报名接口
-            addTobeMember(raidId, role).then((res) => {
+            this.joinSubmitting = true;
+            try {
+                const res = await addTobeMember(raidId, role);
                 if (!this.isCurrentRaidLoad(raidId, version)) return;
                 this.$message({
                     message: this.$t("team.raid.view.applySuccess"),
                     type: "success",
                 });
                 this.joinShow = false;
-                bus.emit("updateTobe", res.data.data);
-            });
+                const member = res?.data?.data;
+                if (member?.type === "tobe") bus.emit("updateTobe", member);
+                await this.$refs.raidBoard?.loadMembers?.();
+            } catch (error) {
+                if (!this.isCurrentRaidLoad(raidId, version)) return;
+                this.$message({
+                    message: getRequestErrorMessage(error, this.$t("team.raid.misc.retry")),
+                    type: "error",
+                });
+            } finally {
+                if (this.isCurrentRaidLoad(raidId, version)) this.joinSubmitting = false;
+            }
         },
 
         // 其它

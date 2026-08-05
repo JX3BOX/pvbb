@@ -31,6 +31,7 @@
                 :leader="leader"
                 :row="row"
                 :col="col"
+                :capacity="capacity"
                 :id="id"
                 @update="loadMembers"
                 @updateMembers="updateMembers"
@@ -78,6 +79,7 @@ import RaidNormalV2 from "@/components/team/raid/RaidNormal_v2.vue";
 import RaidSub from "@/components/team/raid/RaidSub.vue";
 import RaidTobe from "@/components/team/raid/RaidTobe.vue";
 import { getRaidMembers } from "@/service/team/raid.js";
+import { getRequestErrorMessage } from "@/utils/common";
 
 export default {
     name: "Raid",
@@ -99,7 +101,8 @@ export default {
                 handle: ".u-member-icon",
             },
             action: "",
-            loading : false,
+            loading: false,
+            memberLoadVersion: 0,
         };
     },
     watch: {
@@ -158,8 +161,17 @@ export default {
         isTeammate() {
             return this.$store.state.isTeammate;
         },
+        capacity() {
+            const configuredCount = Number(this.count);
+            if (configuredCount > 0) return configuredCount;
+
+            return Number(this.row || 0) * Number(this.col || 0);
+        },
+        normalMemberCount() {
+            return this.members.filter((item) => Number(item?.is_valid) === 1).length;
+        },
         canAdd() {
-            return this.members.length <= this.row * this.col;
+            return this.normalMemberCount < this.capacity;
         },
         canReplace() {
             return this.members.filter(item => !item.is_valid).length > 0;
@@ -193,7 +205,7 @@ export default {
                 this.notify(this.$t("team.raid.board.promoted", { name: member.name }));
             } else {
                 const _index = this.members.findIndex(m => !m.is_valid);
-                if (_index) {
+                if (_index > -1) {
                     this.members[_index] = member;
                     this.notify(this.$t("team.raid.board.promoted", { name: member.name }));
                 }
@@ -212,28 +224,46 @@ export default {
         handlePending() {
             this.loadMembers();
         },
-        loadMembers() {
+        isCurrentMemberLoad(raidId, version) {
+            return version === this.memberLoadVersion && String(raidId) === String(this.id);
+        },
+        applyMemberLists(data = []) {
+            this.members = data.filter((member) => member.type === "normal").sort((a, b) => a.order - b.order);
+            this.subMembers = data.filter((member) => member.type === "sub");
+            this.tobeMembers = data.filter((member) => member.type === "tobe");
+
+            this.$store.commit("SET_NORMAL_MEMBERS", this.members);
+            this.$store.commit(
+                "SET_MEMBER_ORDER",
+                this.members.map((member) => ({
+                    id: member.id,
+                    order: member.order,
+                })),
+            );
+            this.$store.commit("SET_SUB_MEMBERS", this.subMembers);
+            this.$store.commit("SET_TOBE_MEMBERS", this.tobeMembers);
+        },
+        async loadMembers() {
             // 兼容旧版数据
-            if (!this.content) {
-                this.loading = true
-                getRaidMembers(this.id).then((res) => {
-                    const { data = [] } = res.data;
-                    this.members = data.filter((member) => member.type === "normal").sort((a, b) => a.order - b.order);
-                    this.$store.commit("SET_NORMAL_MEMBERS", this.members)
-                    // 保存初始排序信息
-                    this.$store.commit("SET_MEMBER_ORDER", this.members.map((member) => {
-                        return {
-                            id: member.id,
-                            order: member.order,
-                        };
-                    }));
-                    this.subMembers = data.filter((member) => member.type === "sub")
-                    this.$store.commit("SET_SUB_MEMBERS", this.subMembers)
-                    this.tobeMembers = data.filter((member) => member.type === "tobe")
-                    this.$store.commit("SET_TOBE_MEMBERS", this.tobeMembers)
-                }).finally(() => {
-                    this.loading = false
+            if (this.content) return;
+
+            const raidId = this.id;
+            const version = ++this.memberLoadVersion;
+            this.loading = true;
+            try {
+                const res = await getRaidMembers(raidId);
+                if (!this.isCurrentMemberLoad(raidId, version)) return;
+                this.applyMemberLists(res?.data?.data || []);
+            } catch (error) {
+                if (!this.isCurrentMemberLoad(raidId, version)) return;
+                this.applyMemberLists([]);
+                this.$notify({
+                    type: "error",
+                    title: this.$t("team.raid.common.tip"),
+                    message: getRequestErrorMessage(error, this.$t("team.raid.view.loadFailed")),
                 });
+            } finally {
+                if (this.isCurrentMemberLoad(raidId, version)) this.loading = false;
             }
         },
     },

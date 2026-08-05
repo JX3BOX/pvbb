@@ -48,14 +48,14 @@
                                 <el-select
                                     v-else
                                     v-model="preset"
-                                    value-key="map_id"
+                                    value-key="id"
                                     filterable
                                     :placeholder="$t('team.raid.form.selectActivity')"
                                     @change="handlePresetChange"
                                 >
                                     <el-option
                                         v-for="item in presets"
-                                        :key="item.map_id || item.name"
+                                        :key="item.id"
                                         :label="item.name"
                                         :value="item"
                                     />

@@ -105,6 +105,7 @@ import ContextMenu from "@imengyu/vue3-context-menu";
 import MemberPop from "./MemberPop.vue";
 import RaidRoleDialog from "@/components/team/raid/RaidRoleDialog.vue";
 import { showMountIcon, showMountName } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 import bus from "@/utils/bus";
 export default {
     name: "RaidTobe",
@@ -219,7 +220,7 @@ export default {
                     });
                 }
             } catch (e) {
-                console.log("covertTobe2Normal", e);
+                this.notifyError(e);
             }
         },
         // 设为替补
@@ -228,19 +229,22 @@ export default {
                 await covertTobe2Sub(this.raid_id, member?.id);
                 this.$emit("pending");
             } catch (e) {
-                console.error("covertTobe2Sub", e);
+                this.notifyError(e);
             }
         },
         // 删除候选（拒绝申请）
-        reject(member, i) {
-            rejectMember(this.raid_id, member?.id).then(() => {
+        async reject(member, i) {
+            try {
+                await rejectMember(this.raid_id, member?.id);
                 this.$notify({
                     title: this.$t("team.raid.member.operationSuccess"),
                     message: this.$t("team.raid.member.rejected", { name: member?.name || "" }),
                     type: "success",
                 });
                 this.data.splice(i, 1);
-            });
+            } catch (error) {
+                this.notifyError(error);
+            }
         },
         // 复制昵称
         handleCopy(text) {
@@ -263,6 +267,13 @@ export default {
             this.$notify.error({
                 title: this.$t("team.raid.member.copyFailed"),
                 message: this.$t("team.raid.member.copyManually"),
+            });
+        },
+        notifyError(error) {
+            this.$notify({
+                type: "error",
+                title: this.$t("team.raid.common.tip"),
+                message: getRequestErrorMessage(error, this.$t("team.raid.misc.retry")),
             });
         },
 
@@ -292,11 +303,23 @@ export default {
                         {
                             label: this.$t("team.raid.member.reject"),
                             customClass: "item",
-                            onClick: () => this.reject(this.selectedMember, this.selectedIndex),
+                            onClick: () => this.confirmReject(this.selectedMember, this.selectedIndex),
                         },
                     ],
                 });
             }
+        },
+        async confirmReject(member, index) {
+            try {
+                await this.$confirm(this.$t("team.member.rejectConfirm"), this.$t("team.raid.common.tip"), {
+                    confirmButtonText: this.$t("team.raid.common.confirm"),
+                    cancelButtonText: this.$t("team.raid.common.cancel"),
+                    type: "warning",
+                });
+            } catch {
+                return;
+            }
+            await this.reject(member, index);
         },
 
         // 过滤设置

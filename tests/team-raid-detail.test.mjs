@@ -40,12 +40,34 @@ test("raid detail only shows legacy conflict-free mounts for legacy content", as
     assert.match(page, /if \(!Array\.isArray\(this\.data\?\.content\)\) return \[\]/);
 });
 
-test("raid detail renders the 10-player roster on a 5 by 5 board", async () => {
-    const page = await read("../src/views/team/raid/ViewRaid.vue");
+test("raid detail renders the configured roster dimensions and capacity", async () => {
+    const [page, raid, templateSource] = await Promise.all([
+        read("../src/views/team/raid/ViewRaid.vue"),
+        read("../src/components/team/raid/Raid.vue"),
+        read("../src/assets/data/team/team_templates.json"),
+    ]);
+    const templates = JSON.parse(templateSource);
 
     assert.match(page, /<Raid[\s\S]*:row="displayRow"[\s\S]*:col="displayCol"/);
-    assert.match(page, /displayRow:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5 : this\.data\?\.row/);
-    assert.match(page, /displayCol:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5 : this\.data\?\.col/);
+    assert.match(page, /displayRow:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.row\) \|\| 5/);
+    assert.match(page, /displayCol:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.col\) \|\| 5/);
+    assert.doesNotMatch(page, /Number\(this\.data\?\.count\) === 10/);
+    assert.match(raid, /const configuredCount = Number\(this\.count\)/);
+    assert.match(raid, /if \(configuredCount > 0\) return configuredCount/);
+    assert.match(raid, /return Number\(this\.row \|\| 0\) \* Number\(this\.col \|\| 0\)/);
+    assert.match(raid, /Number\(item\?\.is_valid\) === 1/);
+    assert.match(raid, /return this\.normalMemberCount < this\.capacity/);
+    assert.doesNotMatch(raid, /this\.members\.length <= this\.row \* this\.col/);
+    assert.match(raid, /<raid-normal-v2[\s\S]*?:capacity="capacity"/);
+    assert.deepEqual(
+        templates
+            .filter(({ key }) => ["10std", "15std"].includes(key))
+            .map(({ key, count, row, col }) => ({ key, count, row, col })),
+        [
+            { key: "10std", count: 10, row: 5, col: 2 },
+            { key: "15std", count: 15, row: 5, col: 3 },
+        ],
+    );
 });
 
 test("raid detail component chain uses Vue 3 model and mitt event contracts", async () => {
@@ -115,7 +137,77 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.match(memberSetting, /this\.selectedSchool = Number\(member\.mount\) \|\| 0/);
     assert.match(memberSetting, /this\.form\.mount = this\.xfMaps\[0\]\?\.id \|\| ""/);
     assert.doesNotMatch(memberSetting, /popper-append-to-body/);
+    assert.match(memberSetting, /Number\(member\?\.is_valid\) === 1/);
+    assert.doesNotMatch(memberSetting, /member\.remark \|\| member\.mount \|\| member\.role_id \|\| member\.name/);
+    assert.match(normalV2, /props:\s*\[[^\]]*"capacity"/);
+    assert.match(normalV2, /:disabled="isFull"/);
+    assert.match(normalV2, /:max="memberLimit"/);
+    assert.match(normalV2, /return this\.count >= this\.memberLimit/);
     assert.doesNotMatch(memberPop, /\bfilters:\s*\{/);
+});
+
+test("raid roster mutations refresh authoritative state and surface request failures", async () => {
+    const [raid, normal, sub, tobe, join, memberSetting, page, common] = await Promise.all([
+        read("../src/components/team/raid/Raid.vue"),
+        read("../src/components/team/raid/RaidNormal_v2.vue"),
+        read("../src/components/team/raid/RaidSub.vue"),
+        read("../src/components/team/raid/RaidTobe.vue"),
+        read("../src/components/team/raid/JoinPop.vue"),
+        read("../src/components/team/raid/RaidMemberSetting.vue"),
+        read("../src/views/team/raid/ViewRaid.vue"),
+        read("../src/utils/common.js"),
+    ]);
+
+    assert.match(common, /error\?\.response\?\.data\?\.msg/);
+    assert.match(common, /error\?\.data\?\.msg/);
+    assert.match(common, /error\?\.msg/);
+    assert.match(common, /error\?\.message/);
+    for (const source of [raid, normal, sub, tobe, join, memberSetting, page]) {
+        assert.match(source, /import \{ getRequestErrorMessage \} from "@\/utils\/common"/);
+        assert.match(source, /getRequestErrorMessage\(error|notifyError\(error\)/);
+    }
+
+    assert.match(raid, /const version = \+\+this\.memberLoadVersion/);
+    assert.match(raid, /if \(!this\.isCurrentMemberLoad\(raidId, version\)\) return/);
+    assert.match(raid, /this\.applyMemberLists\(res\?\.data\?\.data \|\| \[\]\)/);
+    assert.match(raid, /catch \(error\)[\s\S]*?this\.applyMemberLists\(\[\]\)/);
+    assert.match(raid, /this\.\$store\.commit\("SET_TOBE_MEMBERS", this\.tobeMembers\)/);
+
+    assert.match(normal, /await removeMember[\s\S]*?this\.\$emit\("update"\)/);
+    assert.match(normal, /await covertNormal2Sub[\s\S]*?this\.\$emit\("update"\)/);
+    assert.match(normal, /const order = cloneDeep\(this\.order\)[\s\S]*?if \(!order\.length\)[\s\S]*?SET_MEMBER_ORDER", \[\][\s\S]*?return[\s\S]*?await sortMember/);
+    assert.match(normal, /await sortMember[\s\S]*?SET_MEMBER_ORDER/);
+    assert.match(normal, /catch \(error\)[\s\S]*?this\.notifyError\(error\)[\s\S]*?this\.\$emit\("update"\)/);
+    assert.match(normal, /handleSetting\(member, index\)[\s\S]*?this\.action = ""/);
+    assert.match(normal, /handleSave\(member\)[\s\S]*?this\.action = ""/);
+    assert.match(normal, /onClick: \(\) => this\.confirmRemove\(this\.selectedMember, this\.selectedIndex\)/);
+    assert.match(normal, /async confirmRemove\(member, index\)[\s\S]*?team\.raid\.member\.removeConfirm[\s\S]*?await this\.remove\(member, index\)/);
+
+    assert.match(sub, /handleSetting\(member, index\)[\s\S]*?this\.action = ""/);
+    assert.match(sub, /handleSave\(member\)[\s\S]*?this\.action = ""/);
+    assert.match(sub, /await covertSub2Normal[\s\S]*?catch \(e\)[\s\S]*?this\.notifyError\(e\)/);
+    assert.match(sub, /onClick: \(\) => this\.confirmRemove\(this\.selectedMember, this\.selectedIndex\)/);
+    assert.match(sub, /async confirmRemove\(member, index\)[\s\S]*?team\.raid\.member\.removeConfirm[\s\S]*?await this\.remove\(member, index\)/);
+    assert.match(tobe, /await covertTobe2Normal[\s\S]*?catch \(e\)[\s\S]*?this\.notifyError\(e\)/);
+    assert.match(tobe, /await rejectMember[\s\S]*?catch \(error\)[\s\S]*?this\.notifyError\(error\)/);
+    assert.match(tobe, /onClick: \(\) => this\.confirmReject\(this\.selectedMember, this\.selectedIndex\)/);
+    assert.match(tobe, /async confirmReject\(member, index\)[\s\S]*?team\.member\.rejectConfirm[\s\S]*?await this\.reject\(member, index\)/);
+
+    assert.match(memberSetting, /async handleSave\(\)[\s\S]*?if \(this\.addLoading\) return/);
+    assert.match(memberSetting, /this\.addLoading = true[\s\S]*?finally[\s\S]*?this\.addLoading = false/);
+    assert.match(memberSetting, /this\.\$emit\("updateRole", \{[\s\S]*?\.\.\.this\.data,[\s\S]*?\.\.\.data,[\s\S]*?is_valid:/);
+    assert.match(memberSetting, /catch \(error\)[\s\S]*?getRequestErrorMessage\(error/);
+
+    assert.match(page, /<Raid[\s\S]*?ref="raidBoard"/);
+    assert.match(page, /if \(!User\.isLogin\(\)\)[\s\S]*?account\/login\?redirect=/);
+    assert.match(page, /if \(this\.joinSubmitting\) return/);
+    assert.match(page, /const member = res\?\.data\?\.data[\s\S]*?member\?\.type === "tobe"/);
+    assert.match(page, /await this\.\$refs\.raidBoard\?\.loadMembers\?\.\(\)/);
+    assert.match(join, /:loading="submitting"/);
+    assert.match(join, /:disabled="submitting \|\| loading"/);
+    assert.match(join, /if \(this\.submitting \|\| this\.loading\) return/);
+    assert.match(join, /this\.form\.mount = "0"/);
+    assert.doesNotMatch(join, /mountRequired|Number\(formData\.mount\) > 0/);
 });
 
 test("raid detail uses the modern team shell, shared editor and accessible top actions", async () => {

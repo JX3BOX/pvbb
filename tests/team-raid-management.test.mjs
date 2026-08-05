@@ -29,6 +29,9 @@ test("raid management creates and edits activities in the shared dialog", async 
     assert.match(dialog, /requestId !== this\.openRequestId/);
     assert.match(dialog, /const requestId = \+\+this\.presetRequestId/);
     assert.match(dialog, /client !== this\.currentClient/);
+    assert.match(dialog, /v-model="preset"[\s\S]*value-key="id"/);
+    assert.match(dialog, /v-for="item in presets"[\s\S]*:key="item\.id"/);
+    assert.doesNotMatch(dialog, /value-key="map_id"/);
 });
 
 test("raid activity dialog keeps the existing API contract and grouped form sections", async () => {

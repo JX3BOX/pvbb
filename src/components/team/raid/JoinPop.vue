@@ -99,8 +99,10 @@
             <div class="m-raid-joinpop-footer">
                 <span><i class="el-icon-info"></i> {{ $t("team.raid.join.statusHint") }}</span>
                 <div>
-                    <el-button @click="visible = false">{{ $t("team.raid.common.cancel") }}</el-button>
-                    <el-button type="primary" @click="confirm">{{ $t("team.raid.join.confirm") }}</el-button>
+                    <el-button :disabled="submitting" @click="visible = false">{{ $t("team.raid.common.cancel") }}</el-button>
+                    <el-button type="primary" :loading="submitting" :disabled="submitting || loading" @click="confirm">
+                        {{ $t("team.raid.join.confirm") }}
+                    </el-button>
                 </div>
             </div>
         </template>
@@ -112,9 +114,10 @@ import { getRoles, getAllMyRoles } from "@/service/team/role.js";
 import xf_map from "@jx3box/jx3box-data/data/xf/xf.json";
 import User from "@jx3box/jx3box-common/js/user";
 import { showMountIcon } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 export default {
     name: "RaidJoinPop",
-    props: ["title", "modelValue", "auth", "client"],
+    props: ["title", "modelValue", "auth", "client", "submitting"],
     emits: ["update:modelValue", "confirm"],
     data: function () {
         return {
@@ -146,11 +149,16 @@ export default {
             this.$emit("update:modelValue", newval);
             if (newval) {
                 if (this.isLogin) {
+                    this.data = [];
                     this.loading = true;
                     getAllMyRoles()
                         .then((res) => {
                             this.data = res.data.data.list || [];
                             this.custom = this.data.length ? 0 : 1;
+                        })
+                        .catch((error) => {
+                            this.data = [];
+                            this.$message.error(getRequestErrorMessage(error, this.$t("team.raid.misc.retry")));
                         })
                         .finally(() => {
                             this.loading = false;
@@ -219,6 +227,8 @@ export default {
             });
         },
         confirm: function () {
+            if (this.submitting || this.loading) return;
+
             const [current] = this.roles || [];
             const formData = {
                 role_id: current,

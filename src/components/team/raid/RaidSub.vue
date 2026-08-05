@@ -108,6 +108,7 @@ import ContextMenu from "@imengyu/vue3-context-menu";
 import { getRoles } from "@/service/team/raid.js";
 import MemberPop from "./MemberPop.vue";
 import { showMountIcon, showMountName } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 import bus from "@/utils/bus";
 export default {
     name: "RaidSub",
@@ -205,6 +206,7 @@ export default {
         // 设置
         handleSetting(member, index) {
             this.title = this.$t("team.raid.board.roleSettings");
+            this.action = "";
             this.selectedMember = member;
             this.selectedIndex = index;
             this.visible = true;
@@ -259,19 +261,22 @@ export default {
                     });
                 }
             } catch (e) {
-                console.log("covertSub2Normal", e);
+                this.notifyError(e);
             }
         },
         // 删除
-        remove(member, i) {
-            removeMember(this.raid_id, member?.id).then(() => {
+        async remove(member, i) {
+            try {
+                await removeMember(this.raid_id, member?.id);
                 this.$notify({
                     title: this.$t("team.raid.member.operationSuccess"),
                     message: this.$t("team.raid.common.deleted"),
                     type: "success",
                 });
                 this.data.splice(i, 1);
-            });
+            } catch (error) {
+                this.notifyError(error);
+            }
         },
 
         // 列表
@@ -326,15 +331,28 @@ export default {
                         {
                             label: this.$t("team.raid.member.remove"),
                             customClass: "item",
-                            onClick: () => this.remove(this.selectedMember, this.selectedIndex),
+                            onClick: () => this.confirmRemove(this.selectedMember, this.selectedIndex),
                         },
                     ],
                 });
             }
         },
+        async confirmRemove(member, index) {
+            try {
+                await this.$confirm(this.$t("team.raid.member.removeConfirm"), this.$t("team.raid.common.tip"), {
+                    confirmButtonText: this.$t("team.raid.common.confirm"),
+                    cancelButtonText: this.$t("team.raid.common.cancel"),
+                    type: "warning",
+                });
+            } catch {
+                return;
+            }
+            await this.remove(member, index);
+        },
         // 右键编辑
         setEdit() {
             this.title = this.$t("team.raid.board.roleSettings");
+            this.action = "";
             this.visible = true;
         },
         // 右键转正
@@ -409,8 +427,17 @@ export default {
             if (!action) {
                 this.members[this.selectedIndex] = member;
             }
+            this.action = "";
             this.selectedMember = null;
+            this.selectedIndex = undefined;
             this.visible = false;
+        },
+        notifyError(error) {
+            this.$notify({
+                type: "error",
+                title: this.$t("team.raid.common.tip"),
+                message: getRequestErrorMessage(error, this.$t("team.raid.misc.retry")),
+            });
         },
         showMountIcon,
         showMountName,

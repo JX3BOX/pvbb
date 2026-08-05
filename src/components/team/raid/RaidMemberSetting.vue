@@ -105,7 +105,7 @@
 
         <template #footer>
             <div class="m-raid-member-setting__footer">
-                <el-button @click="handleCancel">{{ $t("team.raid.common.cancel") }}</el-button>
+                <el-button :disabled="addLoading" @click="handleCancel">{{ $t("team.raid.common.cancel") }}</el-button>
                 <el-button type="primary" :loading="addLoading" @click="handleSave">{{ $t("team.raid.memberSetting.save") }}</el-button>
             </div>
         </template>
@@ -119,6 +119,7 @@ import mountg from "@jx3box/jx3box-data/data/xf/mount_group.json";
 import cloneDeep from "lodash/cloneDeep";
 import pick from "lodash/pick";
 import { showMountIcon, showSchoolIcon } from "@/utils/filters";
+import { getRequestErrorMessage } from "@/utils/common";
 
 const default_form = {
     role_func: "",
@@ -182,11 +183,10 @@ export default {
             return this.$store.state.roles;
         },
         isMaxCount() {
-            return (
-                this.members?.filter((member) => {
-                    return member.remark || member.mount || member.role_id || member.name;
-                }).length >= this.max
-            );
+            const max = Number(this.max);
+            if (!(max > 0)) return false;
+
+            return this.members?.filter((member) => Number(member?.is_valid) === 1).length >= max;
         },
         raidId() {
             return this.$route.params.id;
@@ -211,34 +211,46 @@ export default {
         },
     },
     methods: {
-        handleSave() {
-            // 修改
-            if (this.data) {
-                if (this.data.id) {
+        async handleSave() {
+            if (this.addLoading) return;
+
+            const isExistingValidMember = Number(this.data?.is_valid) === 1;
+            if (this.mode === "normal" && !isExistingValidMember && this.isMaxCount) {
+                this.$notify({
+                    title: this.$t("team.raid.common.tip"),
+                    message: this.$t("team.raid.board.full"),
+                    type: "warning",
+                });
+                return;
+            }
+
+            this.addLoading = true;
+            try {
+                if (this.data?.id) {
                     const data = pick(this.form, ["name", "mount", "remark"]);
                     data.role_id = this.form.role_id || null;
                     data.order = this.data.order;
-                    updateMember(this.raidId, this.data.id, data).then(() => {
-                        this.$emit("updateRole", data);
+                    await updateMember(this.raidId, this.data.id, data);
+                    this.$emit("updateRole", {
+                        ...this.data,
+                        ...data,
+                        is_valid: data.name || data.role_id ? 1 : 0,
                     });
+                    this.resetForm();
                 } else {
-                    this.add(this.data?.order);
+                    await this.add(this.data?.order);
                 }
-            } else {
-                // 新增
-                if (!this.isMaxCount) {
-                    this.addLoading = true;
-                    this.add();
-                } else {
-                    this.$notify({
-                        title: this.$t("team.raid.common.tip"),
-                        message: this.$t("team.raid.board.full"),
-                        type: "warning",
-                    });
-                }
+            } catch (error) {
+                this.$notify({
+                    title: this.$t("team.raid.common.tip"),
+                    message: getRequestErrorMessage(error, this.$t("team.raid.misc.retry")),
+                    type: "error",
+                });
+            } finally {
+                this.addLoading = false;
             }
         },
-        add(order) {
+        async add(order) {
             const fn = this.mode === "normal" ? addNormalMember : addSubMember;
 
             let data = pick(this.form, ["name", "remark"]);
@@ -255,20 +267,20 @@ export default {
             }
             data.mount = ~~this.form.mount;
 
-            fn(this.raidId, data)
-                .then((res) => {
-                    this.$emit("updateRole", res.data.data);
-                    this.form = cloneDeep(default_form);
-                    this.selectedSchool = 0;
-                })
-                .finally(() => {
-                    this.addLoading = false;
-                });
+            const res = await fn(this.raidId, data);
+            this.$emit("updateRole", res.data.data);
+            this.resetForm();
         },
         handleCancel() {
             this.roles = cloneDeep(this.allRoles);
-            this.form = cloneDeep(default_form);
+            this.resetForm();
             this.$emit("close");
+        },
+        resetForm() {
+            this.form = cloneDeep(default_form);
+            this.tmpVal = "";
+            this.selectedSchool = 0;
+            this.$refs.roleForm?.clearValidate();
         },
         handleChange(val) {
             this.form.role_id = 0;

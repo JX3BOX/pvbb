@@ -85,6 +85,7 @@ test("team creation reuses the modern workspace and grouped archive form languag
     assert.match(page, /team\.orgLegacy\.fillHint/);
     assert.doesNotMatch(page, /class="m-title"/);
     assert.match(form, /:loading="building"/);
+    assert.match(form, /<el-form-item v-if="id"[^>]*class="m-team-field is-tv">/);
     assert.match(styles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
     assert.match(styles, /\.m-team-create__workspace[\s\S]*border-radius:\s*@team-radius-panel/);
 });

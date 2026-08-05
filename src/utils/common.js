@@ -85,4 +85,17 @@ const copyText = (text) => {
     }
 };
 
-export { getAppID, getAppType, getStarSign, isPhone, copyText };
+const getRequestErrorMessage = (error, fallback = "") => {
+    const message =
+        error?.response?.data?.msg ||
+        error?.response?.data?.message ||
+        error?.data?.msg ||
+        error?.data?.message ||
+        error?.msg ||
+        error?.message ||
+        fallback;
+
+    return String(message || "");
+};
+
+export { getAppID, getAppType, getStarSign, isPhone, copyText, getRequestErrorMessage };

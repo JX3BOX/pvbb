@@ -91,7 +91,7 @@
             <el-form-item :label="$t('team.settings.qq')" class="m-team-field is-contact">
                 <el-input v-model="form.qq_group" :placeholder="$t('team.settings.qqPlaceholder')"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('team.settings.live')" class="m-team-field is-tv">
+            <el-form-item v-if="id" :label="$t('team.settings.live')" class="m-team-field is-tv">
                 <div class="m-tv-list">
                     <el-row class="m-tv-item" v-for="(item, index) in tv_list" :key="index + ''">
                         <el-col :span="6"
