@@ -1,18 +1,18 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-rank-top100-item {
-    background: linear-gradient(90deg, #3f586e 0%, #264259 50%);
+    background: linear-gradient(135deg, #f7f9fc 0%, #f1f5fb 100%);
     .pr;
-    border-left: 4px solid #ffedc6;
-    border-bottom-right-radius: 20px;
-    @padding: 40px;
-    @logosize: 88px;
-    @leftspace: 40px + @logosize + 20px;
-    @logopadding: 5px;
-    padding: @padding;
-    padding-bottom: @padding - 10px;
-    .pl(100px + @logosize + @logopadding*2);
+    min-height: 148px;
+    padding: 24px 28px 24px 152px;
+    border: 1px solid @team-border;
+    border-top: 0;
+    border-left: 1px solid @team-border;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 10px 28px rgba(31, 42, 68, 0.06);
 
     &:hover {
-        background: linear-gradient(90deg, rgba(38, 66, 89, 1) 0%, rgba(63, 88, 110, 1) 50%);
+        background: linear-gradient(135deg, #f7f9fc 0%, #eef3fb 100%);
     }
 
     .u-logo {
@@ -20,7 +20,11 @@
 
         .el-image {
             .db;
-            .size(120px);
+            .size(96px);
+            overflow: hidden;
+            border: 3px solid #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(31, 42, 68, 0.14);
             img {
                 .size(100%);
                 .db;
@@ -28,31 +32,28 @@
         }
 
         .pa;
-        .lt(38px, 80px);
+        .lt(28px, 28px);
     }
 
     .u-title {
-        .db;
+        display: flex;
+        align-items: baseline;
+        min-width: 0;
         i {
-            color: #eee;
+            color: #8b95a7;
             .mr(5px);
         }
-        .mb(6px);
+        .mb(12px);
     }
 
     .u-teamname {
         .nobreak;
         .mr(5px);
-        color: #ffedc6;
-        .fz(24px, 24px);
+        color: #172033;
+        .fz(20px, 24px);
         .bold;
 
-        &:hover {
-            // color: #f39;
-            // i {
-            //     color: #f39;
-            // }
-        }
+        &:hover { color: #615cf6; }
 
         &.u-teamname-null {
             color: #aaa;
@@ -66,8 +67,8 @@
         &:before {
             content: "@";
         }
-        color: #fff;
-        font-weight: bold;
+        color: #7d899d;
+        font-weight: 500;
         .fz(12px);
     }
 
@@ -87,63 +88,121 @@
 
     .u-time {
         .pa;
-        .rt(40px);
+        .rt(28px, 24px);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 3px;
         font-size: 12px;
         cursor: default;
 
         .u-time-finish {
-            color: rgba(255, 255, 255, 0.5);
+            color: #8b95a7;
             display: block;
         }
         .u-time-fight {
-            color: white;
+            color: #657187;
         }
     }
 
     .u-time-fight {
         .x(right);
         b {
-            color: #ffedc6;
-            .fz(20px);
+            color: #172033;
+            .fz(18px);
         }
     }
 
     .u-teammates {
-        .clearfix;
-        .mt(10px);
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px 12px;
+        margin-top: 14px;
     }
 
     .u-leader {
-        .bold;
-        .fz(14px, 24px);
-        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+        min-height: 34px;
+        padding: 4px 12px;
+        color: #172033;
+        background: #fff;
+        border: 1px solid #e2e8f2;
+        border-radius: 8px;
+        .fz(13px, 24px);
+
+        .u-leader-label {
+            flex: none;
+            color: #8b95a7;
+            font-weight: 500;
+        }
+
         .u-username {
-            .y(top);
-            white-space: visible;
-            .w(auto);
+            width: auto;
+            max-width: 220px;
+            font-weight: 600;
         }
     }
     .u-mount {
         .size(24px);
-        .y(top);
-        .mr(2px);
+        flex: none;
+        border-radius: 50%;
     }
 
     .u-member {
+        min-width: 0;
+        padding: 7px 10px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(226, 232, 242, 0.9);
+        border-radius: 8px;
         .fz(12px);
-        .mb(5px);
 
         &-content {
             .flex;
             align-items: center;
+            gap: 6px;
+            min-width: 0;
         }
     }
 
     .u-username {
         .nobreak;
-        color: #fff;
-        width: 97px;
-        display: inline-block;
+        min-width: 0;
+        color: #3d485c;
+        display: block;
         vertical-align: middle;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .m-rank-top100-item .u-teammates {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .m-rank-top100-item {
+        padding: 20px;
+
+        .u-logo {
+            position: static;
+            float: left;
+            margin-right: 14px;
+
+            .el-image { .size(72px); }
+        }
+
+        .u-time {
+            position: static;
+            align-items: flex-start;
+            clear: both;
+            padding-top: 14px;
+        }
+
+        .u-teammates {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 }

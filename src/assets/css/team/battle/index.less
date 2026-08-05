@@ -122,13 +122,32 @@
 
     .u-team-collapse {
         margin-bottom: @team-space-2;
+        border-radius: @team-radius-control;
+        transition: box-shadow @team-duration-fast @team-ease-standard;
 
         .u-team-title {
             cursor: pointer;
         }
-        .u-team-item {
-            // height: 0;
-            // transition: height 0.4s;
+
+        &.is-expanded {
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+
+            .u-battle-team {
+                border-bottom: 1px dotted @team-border;
+                border-radius: @team-radius-control @team-radius-control 0 0;
+                box-shadow: none;
+                transform: none;
+            }
+
+            .u-team-item {
+                margin-top: 0;
+            }
+
+            .m-rank-top100-item {
+                border-color: @team-border;
+                border-radius: 0 0 @team-radius-control @team-radius-control;
+                box-shadow: none;
+            }
         }
     }
 

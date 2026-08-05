@@ -5,12 +5,7 @@
                 <h2>{{ $t("team.member.joinRequests") }}</h2>
                 <p>{{ $t("team.member.reviewHint") }}</p>
             </div>
-            <el-skeleton-item
-                v-if="loading"
-                variant="text"
-                class="u-member-total-skeleton"
-                aria-hidden="true"
-            />
+            <el-skeleton-item v-if="loading" variant="text" class="u-member-total-skeleton" aria-hidden="true" />
             <span v-else class="u-member-total">{{ $t("team.member.pendingCount", { count: total }) }}</span>
         </header>
 
@@ -65,8 +60,18 @@
                         </span>
                         <div class="u-apply-meta">
                             <span>
-                                <el-icon><OfficeBuilding /></el-icon>
-                                {{ (item.team && item.team.name) || $t("team.member.unknownTeam") }}
+                                <el-icon><User /></el-icon>
+                                {{ $t("team.memberRole.owner") }}
+                                <a
+                                    v-if="ownerUid(item)"
+                                    class="u-role-owner"
+                                    :href="authorLink(ownerUid(item))"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {{ ownerName(item) }}
+                                </a>
+                                <template v-else>{{ $t("team.memberDialog.unregistered") }}</template>
                             </span>
                             <span>
                                 <el-icon><Clock /></el-icon>
@@ -118,10 +123,11 @@
 </template>
 
 <script>
+import { authorLink } from "@jx3box/jx3box-common/js/utils";
 import { getTeamPendingMembers, checkRole, deleteRole } from "@/service/team/member.js";
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
 import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
-import { Check, CircleCheckFilled, Clock, Close, Finished, OfficeBuilding } from "@element-plus/icons-vue";
+import { Check, CircleCheckFilled, Clock, Close, Finished, User } from "@element-plus/icons-vue";
 export default {
     name: "ListMemberPending",
     emits: ["pending-count-change"],
@@ -221,6 +227,21 @@ export default {
             this.total = Math.max(0, Number(total) || 0);
             this.$emit("pending-count-change", this.total);
         },
+        ownerUid: function (item) {
+            return (
+                Number(
+                    item?.user_info?.uid ||
+                        item?.user_info?.id ||
+                        item?.user_info?.ID ||
+                        item?.relation?.uid ||
+                        item?.role?.uid
+                ) || 0
+            );
+        },
+        ownerName: function (item) {
+            return item?.user_info?.display_name || `UID ${this.ownerUid(item)}`;
+        },
+        authorLink,
         showBodyType,
         showSchoolIcon,
         showSchoolName,
@@ -246,8 +267,8 @@ export default {
         Clock,
         Close,
         Finished,
-        OfficeBuilding,
         RoleAvatar,
+        User,
     },
 };
 </script>

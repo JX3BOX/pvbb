@@ -22,9 +22,20 @@
                 <el-alert :title="$t('pages.team.battle.noTeamRecords')" type="info" show-icon></el-alert>
             </div>
             <div v-else-if="displayList.length">
-                <div v-for="(item, i) in displayList" :key="item.ID || item.id || item.created" class="u-team-collapse">
+                <div
+                    v-for="(item, i) in displayList"
+                    :key="item.ID || item.id || item.created"
+                    class="u-team-collapse"
+                    :class="{ 'is-expanded': show[i] }"
+                >
                     <div @click="showItem(i)" class="u-team-title">
-                        <BattleItem :item="item" @uploadBattle="uploadBattle"></BattleItem>
+                        <BattleItem
+                            :item="item"
+                            :expanded="Boolean(show[i])"
+                            show-details-toggle
+                            @toggleDetails="showItem(i)"
+                            @uploadBattle="uploadBattle"
+                        ></BattleItem>
                     </div>
                     <collapse-transition>
                         <div class="u-team-item" v-show="show[i]">
@@ -59,7 +70,7 @@
 </template>
 
 <script>
-import { getMyTeamBattleList, getBossConfig } from "@/service/team/battle.js";
+import { getMyTeamBattleList, getBossConfig, getAchievementsByIds } from "@/service/team/battle.js";
 import { uniq } from "lodash";
 import CollapseTransition from "@/assets/js/collapse.js";
 import Relevance from "./relevance.vue";
@@ -145,13 +156,23 @@ export default {
                         list[i]["leaders"] = leader_info;
                     });
                     this.list = list;
-                    const aids = uniq(list.map((item) => item.achieve_id)).join(",");
-                    const boss_infos = (await getBossConfig({ aids, per: 100 })).data?.data?.list.reduce((acc, cur) => {
+                    const achievementIds = uniq(list.map((item) => item.achieve_id)).filter(Boolean);
+                    const aids = achievementIds.join(",");
+                    const [bossRes, achievementRes] = await Promise.all([
+                        getBossConfig({ aids, per: 100 }),
+                        getAchievementsByIds(achievementIds),
+                    ]);
+                    const boss_infos = bossRes.data?.data?.list.reduce((acc, cur) => {
                         acc[cur.aid] = cur;
+                        return acc;
+                    }, {});
+                    const achievements = (achievementRes.data?.data || []).reduce((acc, cur) => {
+                        acc[cur.ID] = cur;
                         return acc;
                     }, {});
                     this.list.forEach((item) => {
                         item["boss_info"] = boss_infos[item.achieve_id] || "";
+                        item["achievement_info"] = achievements[item.achieve_id] || null;
                     });
                 })
                 .finally(() => {

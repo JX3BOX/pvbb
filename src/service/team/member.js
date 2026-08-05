@@ -8,9 +8,10 @@ function getMyJoinedTeams() {
 function getMyPureRoles(team_id) {
     return $team().get(`/api/team/relation/my/${team_id}/roles/not-at-team`);
 }
-function joinTeam(team_id, list) {
+function joinTeam(team_id, list, options = {}) {
     return $team().post(`/api/team/relation/my/${team_id}/join`, {
         roles: list,
+        founder_direct: options.founderDirect === true,
     });
 }
 function quitTeam(team_id, role_id) {

@@ -19,9 +19,10 @@
 
 <script>
 import PendingList from "./PendingList.vue";
+import RoleList from "./RoleList.vue";
 import UserList from "./UserList.vue";
 
-const MEMBER_SUBTABS = ["user", "pending"];
+const MEMBER_SUBTABS = ["user", "role", "pending"];
 
 export default {
     props: ["id"],
@@ -34,11 +35,16 @@ export default {
         tabs() {
             return [
                 { label: this.$t("team.member.officialMembers"), value: "user" },
+                { label: this.$t("team.memberAllRoles"), value: "role" },
                 { label: this.$t("team.member.joinRequests"), value: "pending" },
             ];
         },
         activeComponent() {
-            return this.tab === "pending" ? PendingList : UserList;
+            return {
+                user: UserList,
+                role: RoleList,
+                pending: PendingList,
+            }[this.tab];
         },
         pendingCount: function () {
             const pending = this.$store.state.pendingList.find((item) => item.team_id == this.id);
@@ -84,6 +90,7 @@ export default {
     },
     components: {
         PendingList,
+        RoleList,
         UserList,
     },
 };

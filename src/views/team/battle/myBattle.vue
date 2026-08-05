@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getMyBattleList, getBossConfig } from "@/service/team/battle.js";
+import { getMyBattleList, getBossConfig, getAchievementsByIds } from "@/service/team/battle.js";
 import { uniq } from "lodash";
 import Relevance from "./relevance.vue";
 import BattleItem from "./battleItem.vue";
@@ -122,13 +122,23 @@ export default {
                     this.list = res.list || [];
                     this.total = res.page.total || 1;
 
-                    const aids = uniq(this.list.map((item) => item.achieve_id)).join(",");
-                    const boss_infos = (await getBossConfig({ aids, per: 100 })).data?.data?.list.reduce((acc, cur) => {
+                    const achievementIds = uniq(this.list.map((item) => item.achieve_id)).filter(Boolean);
+                    const aids = achievementIds.join(",");
+                    const [bossRes, achievementRes] = await Promise.all([
+                        getBossConfig({ aids, per: 100 }),
+                        getAchievementsByIds(achievementIds),
+                    ]);
+                    const boss_infos = bossRes.data?.data?.list.reduce((acc, cur) => {
                         acc[cur.aid] = cur;
+                        return acc;
+                    }, {});
+                    const achievements = (achievementRes.data?.data || []).reduce((acc, cur) => {
+                        acc[cur.ID] = cur;
                         return acc;
                     }, {});
                     this.list.forEach((item) => {
                         item["boss_info"] = boss_infos[item.achieve_id] || "";
+                        item["achievement_info"] = achievements[item.achieve_id] || null;
                     });
                 })
                 .finally(() => {

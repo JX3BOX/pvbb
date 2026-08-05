@@ -9,6 +9,7 @@
         :close-on-press-escape="false"
         :show-close="!submitting"
         append-to-body
+        @closed="handleClosed"
     >
         <template #header>
             <div class="m-team-joinpop-header">
@@ -17,7 +18,7 @@
                 </span>
                 <span class="u-header-copy">
                     <strong>{{ resolvedTitle }}</strong>
-                    <small>{{ $t("team.joinDialog.description") }}</small>
+                    <small>{{ founderGuide ? $t("team.createGuide.description") : $t("team.joinDialog.description") }}</small>
                 </span>
             </div>
         </template>
@@ -27,7 +28,7 @@
                 <div class="m-team-joinpop-toolbar">
                     <div class="u-selection-summary">
                         <strong>{{ $t("team.joinDialog.selectRoles") }}</strong>
-                        <span>{{ $t("team.joinDialog.reviewHint") }}</span>
+                        <span>{{ copy("reviewHint") }}</span>
                     </div>
                     <el-checkbox
                         :indeterminate="isIndeterminate"
@@ -44,7 +45,7 @@
                     class="u-list"
                     v-model="roles"
                     @change="checkIsAll"
-                    :aria-label="$t('team.joinDialog.aria')"
+                    :aria-label="copy('aria')"
                 >
                     <el-checkbox v-for="item in data" :value="item.ID" :key="item.ID" class="u-role-card" border>
                         <div class="u-role-card__content">
@@ -63,8 +64,8 @@
             </template>
 
             <div class="m-team-joinpop-null" v-else-if="!loading">
-                <el-empty :image-size="80" :description="$t('team.joinDialog.empty')">
-                    <span class="u-empty-tip">{{ $t("team.joinDialog.emptyHint") }}</span>
+                <el-empty :image-size="80" :description="copy('empty')">
+                    <span class="u-empty-tip">{{ copy("emptyHint") }}</span>
                 </el-empty>
             </div>
         </div>
@@ -73,17 +74,17 @@
             <div class="dialog-footer">
                 <span class="u-footer-status" aria-live="polite">
                     <template v-if="data.length">{{ $t("team.joinDialog.selected", { count: roles.length }) }}</template>
-                    <template v-else>{{ $t("team.joinDialog.selectHint") }}</template>
+                    <template v-else>{{ copy("selectHint") }}</template>
                 </span>
                 <div class="u-footer-actions">
-                    <el-button :disabled="submitting" @click="visible = false">{{ $t("team.joinDialog.cancel") }}</el-button>
+                    <el-button :disabled="submitting" @click="visible = false">{{ copy("cancel") }}</el-button>
                     <el-button
                         type="primary"
                         :loading="submitting"
                         :disabled="loading || !roles.length"
                         @click="confirm"
                     >
-                        {{ $t("team.joinDialog.submit") }}
+                        {{ copy("submit") }}
                     </el-button>
                 </div>
             </div>
@@ -110,8 +111,12 @@ export default {
             type: [Number, String],
             default: 0,
         },
+        founderGuide: {
+            type: Boolean,
+            default: false,
+        },
     },
-    emits: ["update:show"],
+    emits: ["update:show", "success", "closed"],
     data: function () {
         return {
             visible: false,
@@ -142,13 +147,29 @@ export default {
     },
     computed: {
         resolvedTitle: function () {
-            return this.title || this.$t("team.joinDialog.title");
+            return this.title || this.copy("title");
         },
         role_ids: function () {
             return this.data.map((item) => item.ID);
         },
     },
     methods: {
+        copy: function (key) {
+            const founderKeys = [
+                "title",
+                "reviewHint",
+                "aria",
+                "empty",
+                "emptyHint",
+                "selectHint",
+                "cancel",
+                "submit",
+                "success",
+                "submitFailed",
+            ];
+            const namespace = this.founderGuide && founderKeys.includes(key) ? "createGuide" : "joinDialog";
+            return this.$t(`team.${namespace}.${key}`);
+        },
         resetSelection: function () {
             this.roles = [];
             this.checkAll = false;
@@ -164,6 +185,10 @@ export default {
                 .then((res) => {
                     if (version !== this.loadVersion || !this.visible) return;
                     this.data = res.data.data || [];
+                    if (this.founderGuide) {
+                        this.roles = [...this.role_ids];
+                        this.checkAll = this.role_ids.length > 0;
+                    }
                 })
                 .catch((err) => {
                     if (version !== this.loadVersion || !this.visible) return;
@@ -180,17 +205,18 @@ export default {
             if (!this.roles.length || this.submitting) return;
 
             this.submitting = true;
-            joinTeam(this.team_id, this.roles)
+            joinTeam(this.team_id, this.roles, { founderDirect: this.founderGuide })
                 .then(() => {
                     this.$message({
-                        message: this.$t("team.joinDialog.success"),
+                        message: this.copy("success"),
                         type: "success",
                     });
+                    this.$emit("success", [...this.roles]);
                     this.visible = false;
                 })
                 .catch((err) => {
                     console.error("Failed to submit team application:", err);
-                    this.$message.error(this.$t("team.joinDialog.submitFailed"));
+                    this.$message.error(this.copy("submitFailed"));
                 })
                 .finally(() => {
                     this.submitting = false;
@@ -207,6 +233,9 @@ export default {
         },
         showAvatar: function (mount) {
             return "https://img.jx3box.com/image/school/" + mount + ".png";
+        },
+        handleClosed: function () {
+            this.$emit("closed");
         },
     },
     beforeUnmount: function () {

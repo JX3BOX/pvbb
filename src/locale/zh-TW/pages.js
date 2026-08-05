@@ -349,6 +349,7 @@ export default {
         battle: {
             unknown: "未知",
             boss: "首領",
+            achievementLabel: "成就",
             nonEvent: "非賽事",
             eventEdition: "第 {number} 屆",
             qualifier: "預選賽",
@@ -366,6 +367,7 @@ export default {
             linked: "已綁定",
             unlinked: "未綁定",
             view: "查看",
+            viewDetails: "查看詳情",
             linkBattle: "關聯戰鬥",
             myNotice: "本資料可能會顯示於天梯榜，請勿關聯不正確的資料",
             mySource: "資料來源：由你上報的所有資料",

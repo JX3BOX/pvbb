@@ -1,4 +1,4 @@
-import { $team, $cms } from "@jx3box/jx3box-common/js/api";
+import { $team, $cms, $node } from "@jx3box/jx3box-common/js/api";
 
 function getBattleOrJcl(params) {
     return $team().get(`/api/team/battle/my-list`, { params });
@@ -24,6 +24,22 @@ function getMyBattleList(params) {
 // 获取成就对应的首领配置
 export function getBossConfig(params) {
     return $cms().get(`/api/cms/team/boss_aid`, { params });
+}
+
+// 批量获取战绩对应的成就名称和图标
+export function getAchievementsByIds(ids) {
+    const achievementIds = uniqIds(ids);
+    if (!achievementIds.length) return Promise.resolve({ data: { data: [] } });
+
+    return $node().post(`/api/node/achievement/list`, {
+        ids: achievementIds.join(","),
+        attributes: "ID,Name,IconID",
+        __hidden: 1,
+    });
+}
+
+function uniqIds(ids) {
+    return [...new Set(ids)].filter(Boolean);
 }
 
 export { getBattleOrJcl, setBattleJcL, getMyTeamBattleList, getMyBattleList };

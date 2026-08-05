@@ -5,9 +5,13 @@
 
             <div class="u-team-info">
                 <div class="u-battle-title">
-                    <span class="u-battle-kicker">{{ $t("pages.team.battle.boss") }}</span>
+                    <span class="u-battle-kicker">{{
+                        hasAidInfo ? $t("pages.team.battle.boss") : $t("pages.team.battle.achievementLabel")
+                    }}</span>
                     <strong>{{
-                        item.boss_info?.name || item.aid_info?.name || $t("pages.team.battle.unknown")
+                        hasAidInfo
+                            ? item.boss_info?.name || item.aid_info.name || $t("pages.team.battle.unknown")
+                            : item.achievement_info?.Name || item.achieve_id || $t("pages.team.battle.unknown")
                     }}</strong>
                 </div>
 
@@ -38,16 +42,6 @@
                     </span>
                 </div>
 
-                <dl class="u-battle-meta">
-                    <div>
-                        <dt>{{ $t("pages.team.battle.leader") }}</dt>
-                        <dd>{{ item.leader || $t("pages.team.battle.unknown") }}</dd>
-                    </div>
-                    <div>
-                        <dt>{{ $t("pages.team.battle.reportedAt") }}</dt>
-                        <dd>{{ showTime(item.created) }}</dd>
-                    </div>
-                </dl>
             </div>
         </div>
 
@@ -55,6 +49,10 @@
             <section class="u-team-setting" :aria-label="$t('pages.team.battle.combatInfo')">
                 <h3>{{ $t("pages.team.battle.combatInfo") }}</h3>
                 <dl class="u-battle-fields">
+                    <div>
+                        <dt>{{ $t("pages.team.battle.reportedAt") }}</dt>
+                        <dd>{{ showTime(item.created) }}</dd>
+                    </div>
                     <div>
                         <dt>{{ $t("pages.team.battle.role") }}</dt>
                         <dd>
@@ -65,10 +63,6 @@
                     <div>
                         <dt>{{ $t("pages.team.battle.server") }}</dt>
                         <dd>{{ item.team_info?.server || $t("pages.team.battle.unknown") }}</dd>
-                    </div>
-                    <div>
-                        <dt>{{ $t("pages.team.battle.team") }}</dt>
-                        <dd>{{ item.team_info?.name || $t("pages.team.battle.unknown") }}</dd>
                     </div>
                 </dl>
             </section>
@@ -116,17 +110,29 @@
         </div>
 
         <div class="u-team-op">
-            <el-button type="primary" @click.stop="uploadBattle(item)"
-                >{{ $t("pages.team.battle.linkBattle") }}<i class="el-icon-upload el-icon--right"></i
-            ></el-button>
+            <el-button
+                v-if="showDetailsToggle"
+                plain
+                :icon="View"
+                class="u-detail-toggle"
+                :class="{ 'is-expanded': expanded }"
+                :aria-expanded="expanded"
+                @click.stop="$emit('toggleDetails')"
+            >
+                {{ $t("pages.team.battle.viewDetails") }}
+            </el-button>
+            <el-button class="u-bind-battle" type="primary" :icon="Connection" @click.stop="uploadBattle(item)">
+                {{ $t("pages.team.battle.linkBattle") }}
+            </el-button>
         </div>
     </article>
 </template>
 
 <script>
 import { __imgPath } from "@/utils/config";
-import { getThumbnail, getLink } from "@jx3box/jx3box-common/js/utils";
+import { getThumbnail, getLink, iconLink } from "@jx3box/jx3box-common/js/utils";
 import { showTime } from "@jx3box/jx3box-common/js/moment";
+import { Connection, View } from "@element-plus/icons-vue";
 export default {
     components: {},
     props: {
@@ -138,15 +144,33 @@ export default {
             type: Boolean,
             default: false,
         },
+        expanded: {
+            type: Boolean,
+            default: false,
+        },
+        showDetailsToggle: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    data() {
+        return { Connection, View };
     },
     computed: {
         showIcon() {
+            if (!this.hasAidInfo && this.item.achievement_info?.IconID) {
+                return iconLink(this.item.achievement_info.IconID);
+            }
             if (this.item.boss_info?.img && Number.isInteger(Number(this.item.boss_info?.img))) {
                 return this.bossIcon(Number(this.item.boss_info?.img));
             } else if (this.item.boss_info?.img) {
                 return this.item.boss_info?.img;
             }
             return this.bossIcon(this.item.aid_info?.achievement_id);
+        },
+        hasAidInfo() {
+            const aidInfo = this.item.aid_info;
+            return Boolean(aidInfo?.achievement_id || aidInfo?.event_id || aidInfo?.name);
         },
         RankLink() {
             const boss_info = this.item.boss_info;

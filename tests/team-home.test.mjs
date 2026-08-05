@@ -125,7 +125,10 @@ test("team workspace uses a shared mobile navigation trigger and side drawer", a
     assert.match(shell, /m-team-modern-shell__sidebar[\s\S]*?order:\s*1/);
     assert.match(shell, /m-team-modern-shell__sidebar[\s\S]*?position:\s*absolute[\s\S]*?width:\s*0/);
     assert.match(shell, /m-team-modern-shell__content[\s\S]*?order:\s*2/);
-    assert.match(styles, /@media screen and \(max-width:\s*820px\)[\s\S]*?\.u-team-mobile-navigation-trigger[\s\S]*?position:\s*fixed/);
+    assert.match(
+        styles,
+        /@media screen and \(max-width:\s*820px\)[\s\S]*?\.u-team-mobile-navigation-trigger[\s\S]*?position:\s*fixed/
+    );
     assert.match(styles, /\.u-team-mobile-navigation-trigger[\s\S]*?border-radius:\s*0 12px 12px 0/);
     assert.match(styles, /&\.is-mobile-drawer-open\s*\{\s*z-index:\s*1001/);
     assert.match(styles, /left:\s*0/);
@@ -217,11 +220,23 @@ test("team public homepage shares the modern shell and keeps public modules inta
         assert.match(page, new RegExp(`team\\.public\\.${tab}`));
     }
     assert.doesNotMatch(page, /DKP记录|ViewDkp|name="dkp"/);
-    for (const component of ["team-intro", "team-recruit", "team-medals", "team-trophy", "ViewMember", "TeamRaid", "ViewVideo", "ViewComment"]) {
+    for (const component of [
+        "team-intro",
+        "team-recruit",
+        "team-medals",
+        "team-trophy",
+        "ViewMember",
+        "TeamRaid",
+        "ViewVideo",
+        "ViewComment",
+    ]) {
         assert.match(page, new RegExp(`<${component}\\b`));
     }
     assert.match(page, /const PUBLIC_TABS = \["overview", "member", "raid", "video", "comment"\]/);
-    assert.match(page, /:label="\$t\('team\.public\.activities'\)" name="raid"[\s\S]*?:v="data\.v_activity"[\s\S]*?:authority="authority"/);
+    assert.match(
+        page,
+        /:label="\$t\('team\.public\.activities'\)" name="raid"[\s\S]*?:v="data\.v_activity"[\s\S]*?:authority="authority"/
+    );
     assert.match(page, /const query = \{ \.\.\.this\.\$route\.query \}/);
     assert.match(page, /Promise\.all\(\[this\.loadTeamInfo\(id\), this\.loadAuthority\(id\)\]\)/);
     assert.match(page, /version !== this\.loadVersion \|\| id !== this\.id/);
@@ -237,7 +252,10 @@ test("team public homepage shares the modern shell and keeps public modules inta
     assert.match(pageStyles, /max-width:\s*700px[\s\S]*fade\(#fff, 94%\)[\s\S]*transparent 72%/);
     assert.match(pageStyles, /max-width:\s*520px[\s\S]*&::before,[\s\S]*display:\s*none !important/);
     assert.match(pageStyles, /max-width:\s*520px[\s\S]*> \.u-logo[\s\S]*grid-row:\s*1/);
-    assert.match(pageStyles, /max-width:\s*520px[\s\S]*\.u-title[\s\S]*align-self:\s*center[\s\S]*grid-row:\s*1[\s\S]*flex-direction:\s*row/);
+    assert.match(
+        pageStyles,
+        /max-width:\s*520px[\s\S]*\.u-title[\s\S]*align-self:\s*center[\s\S]*grid-row:\s*1[\s\S]*flex-direction:\s*row/
+    );
     assert.match(pageStyles, /max-width:\s*520px[\s\S]*\.u-meta[\s\S]*background:\s*transparent/);
     assert.match(pageStyles, /\.m-team-info[\s\S]*grid-template-columns:\s*76px minmax\(0, 1fr\) auto/);
     assert.match(pageStyles, /\.m-public-org__overview[\s\S]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
@@ -268,13 +286,10 @@ test("team join dialog uses an isolated responsive role picker without changing 
     assert.match(styles, /\.m-team-member-join-dialog\.el-dialog\s*\{[\s\S]*?border-radius:\s*18px/);
     assert.match(styles, /\.u-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
     assert.match(styles, /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?&\.is-checked/);
+    assert.match(styles, /\.el-checkbox__input\.is-checked \.el-checkbox__inner::after[\s\S]*?translate\(-50%, -58%\)/);
     assert.match(
         styles,
-        /\.el-checkbox__input\.is-checked \.el-checkbox__inner::after[\s\S]*?translate\(-50%, -58%\)/,
-    );
-    assert.match(
-        styles,
-        /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?\.el-checkbox__label[\s\S]*?background:\s*transparent/,
+        /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?\.el-checkbox__label[\s\S]*?background:\s*transparent/
     );
     assert.match(styles, /\.dialog-footer[\s\S]*?justify-content:\s*space-between/);
     assert.match(styles, /@media screen and \(max-width: 520px\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
@@ -349,7 +364,7 @@ test("member account removal lives in the role dialog footer", async () => {
     assert.doesNotMatch(memberCardStyles, /\.u-remove-account/);
     assert.match(
         member,
-        /<template #footer>[\s\S]*?class="m-member-role-dialog-footer"[\s\S]*?class="u-remove-account"[\s\S]*?class="u-dialog-done"/,
+        /<template #footer>[\s\S]*?class="m-member-role-dialog-footer"[\s\S]*?class="u-remove-account"[\s\S]*?class="u-dialog-done"/
     );
     assert.match(member, /this\.\$confirm\(this\.\$t\("team\.memberDialog\.accountConfirm"\)/);
     assert.match(member, /removeTeamRoleAll\(this\.team_id, this\.item\.uid\)/);
@@ -378,7 +393,10 @@ test("team DKP records use a segmented switch", async () => {
     ]);
 
     assert.match(dkp, /<el-segmented v-model="tab" :options="tabs" class="m-dkp-segmented">/);
-    assert.match(dkp, /\{ label: this\.\$t\("team\.raid\.misc\.currentScore"\), value: "list", icon: "el-icon-tickets" \}/);
+    assert.match(
+        dkp,
+        /\{ label: this\.\$t\("team\.raid\.misc\.currentScore"\), value: "list", icon: "el-icon-tickets" \}/
+    );
     assert.match(dkp, /\{ label: this\.\$t\("team\.raid\.misc\.history"\), value: "logs", icon: "el-icon-time" \}/);
     assert.match(dkp, /<dkp-list v-if="tab === 'list' && data\.length > 0"/);
     assert.match(dkp, /<dkp-logs v-if="tab === 'logs'"/);
@@ -395,8 +413,14 @@ test("r_video administrators receive the complete video management workspace", a
     ]);
 
     assert.match(workspace, /canManageVideo:[\s\S]*?this\.isSuper \|\| Number\(this\.permissions\.r_video\) === 1/);
-    assert.match(workspace, /<el-tab-pane :label="\$t\('team\.workspace\.videoManagement'\)"[^>]*v-if="canManageVideo"/);
-    assert.match(workspace, /<ManageVideo[\s\S]*?:key="`manage-video-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-manage="canManageVideo"/);
+    assert.match(
+        workspace,
+        /<el-tab-pane :label="\$t\('team\.workspace\.videoManagement'\)"[^>]*v-if="canManageVideo"/
+    );
+    assert.match(
+        workspace,
+        /<ManageVideo[\s\S]*?:key="`manage-video-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-manage="canManageVideo"/
+    );
     assert.match(workspace, /if \(this\.canManageVideo\) tabs\.push\("video"\)/);
 
     assert.match(manager, /teamId:[\s\S]*?canManage:/);
@@ -405,7 +429,10 @@ test("r_video administrators receive the complete video management workspace", a
     assert.match(manager, /:isMine="canManage"/);
     assert.match(manager, /isMaster:\s*this\.canManage/);
     assert.match(manager, /this\.canManage \? getVideosMaster\(this\.id, params\) : getVideos\(this\.id, params\)/);
-    assert.match(manager, /return request[\s\S]*?\.catch\(\(\) => \{[\s\S]*?this\.videos_list = \[\];[\s\S]*?this\.total = 0/);
+    assert.match(
+        manager,
+        /return request[\s\S]*?\.catch\(\(\) => \{[\s\S]*?this\.videos_list = \[\];[\s\S]*?this\.total = 0/
+    );
     assert.match(manager, /return getTeamsList\(\)[\s\S]*?\.catch\(\(\) => \{[\s\S]*?this\.eventsList = \[\]/);
     assert.match(manager, /deleteVideo\(id\)[\s\S]*?\.catch\(\(\) => \{/);
     assert.match(manager, /const request = isEditing[\s\S]*?\.catch\(\(\) => \{[\s\S]*?\.finally\(\(\) => \{/);
@@ -444,7 +471,10 @@ test("team header actions follow management, member, and public route modes", as
     assert.match(info, /v-if="\(showPublicActions \|\| showHomeAction\) && \(!isRaid \|\| !isTeamSuper\)"/);
     assert.match(info, /:show-home-action="showHomeAction"/);
     assert.match(info, /:always-show-join-action="alwaysShowJoinAction"/);
-    assert.match(panel, /v-if="showHomeAction"[\s\S]*?:to="`\/org\/\$\{team_id\}`"[\s\S]*?team\.publicActions\.homepage/);
+    assert.match(
+        panel,
+        /v-if="showHomeAction"[\s\S]*?:to="`\/org\/\$\{team_id\}`"[\s\S]*?team\.publicActions\.homepage/
+    );
     assert.match(panel, /v-if="showPublicActions && !isRaid"/);
     assert.match(panel, /v-if="showPublicActions && showJoinAction"/);
     assert.match(panel, /return this\.alwaysShowJoinAction \|\| \(!this\.isMine && !this\.isLeader\)/);
@@ -480,7 +510,10 @@ test("team workspace separates management tools from the member view", async () 
         "team.workspace.comments",
     ]);
     assert.doesNotMatch(managementTemplate, /team\.workspace\.(myRoles|myBattles|teamDkp|teamActivities)/);
-    assert.doesNotMatch(memberTemplate, /team\.workspace\.(memberManagement|battleManagement|videoManagement|snapshotManagement|dkpManagement|activityManagement|teamSettings)/);
+    assert.doesNotMatch(
+        memberTemplate,
+        /team\.workspace\.(memberManagement|battleManagement|videoManagement|snapshotManagement|dkpManagement|activityManagement|teamSettings)/
+    );
     assert.match(managementTemplate, /<Setting \/>[\s\S]*?team\.workspace\.teamSettings/);
     assert.match(workspace, /class="p-team-my-org p-team-public"/);
     assert.match(workspace, /class="m-public-org__hero"/);
@@ -510,10 +543,13 @@ test("team workspace separates management tools from the member view", async () 
     assert.match(myRaid, /:can-quit="item\.joined"/);
     assert.match(memberTemplate, /name="comment"[\s\S]*?<ViewComment/);
     assert.match(memberTemplate, /name="video"[\s\S]*?<ViewVideo/);
-    assert.match(workspace, /if \(!mode\) mode = routeMode \|\| \(MANAGEMENT_TAB_NAMES\.includes\(tab\) \? "manage" : "member"\)/);
     assert.match(
         workspace,
-        /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/,
+        /if \(!mode\) mode = routeMode \|\| \(MANAGEMENT_TAB_NAMES\.includes\(tab\) \? "manage" : "member"\)/
+    );
+    assert.match(
+        workspace,
+        /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/
     );
     assert.match(workspace, /:v="data\.v_comment"[\s\S]*?:authority="authority"/);
 });
@@ -577,7 +613,10 @@ test("team archive certification and permission management match the compact arc
     assert.match(permissionStyles, /cursor:\s*not-allowed/);
     assert.match(permission, /:variant="variant"/);
     assert.match(permission, /team\.permissions\.remove/);
-    assert.match(permission, /this\.\$confirm\([\s\S]*?team\.permissions\.confirmRemove[\s\S]*?team\.permissions\.cancel/);
+    assert.match(
+        permission,
+        /this\.\$confirm\([\s\S]*?team\.permissions\.confirmRemove[\s\S]*?team\.permissions\.cancel/
+    );
     assert.doesNotMatch(permission, />删除<\/el-button|确认删除|删除管理员/);
     const founderPermissions = permission.slice(
         permission.indexOf('<template v-if="item.level == 99">'),
@@ -679,19 +718,20 @@ test("DKP tables follow the archive certification table language", async () => {
 });
 
 test("DKP snapshot association reuses the five-team roster styling", async () => {
-    const [item, itemStyles, bodyStyles, list, listStyles, stat, statStyles, chart, chartData, zhCn, zhTw] = await Promise.all([
-        read("../src/components/team/snapshot/snapshotItem.vue"),
-        read("../src/assets/css/team/snapshot/item.less"),
-        read("../src/assets/css/team/snapshot/body.less"),
-        read("../src/components/team/snapshot/snapshotList.vue"),
-        read("../src/assets/css/team/snapshot/list.less"),
-        read("../src/components/team/snapshot/snapshotStat.vue"),
-        read("../src/assets/css/team/snapshot/stat.less"),
-        read("../src/components/team/snapshot/snapshotChart.vue"),
-        read("../src/assets/data/team/snapshot_chart.json"),
-        read("../src/locale/zh-CN/team.js"),
-        read("../src/locale/zh-TW/team.js"),
-    ]);
+    const [item, itemStyles, bodyStyles, list, listStyles, stat, statStyles, chart, chartData, zhCn, zhTw] =
+        await Promise.all([
+            read("../src/components/team/snapshot/snapshotItem.vue"),
+            read("../src/assets/css/team/snapshot/item.less"),
+            read("../src/assets/css/team/snapshot/body.less"),
+            read("../src/components/team/snapshot/snapshotList.vue"),
+            read("../src/assets/css/team/snapshot/list.less"),
+            read("../src/components/team/snapshot/snapshotStat.vue"),
+            read("../src/assets/css/team/snapshot/stat.less"),
+            read("../src/components/team/snapshot/snapshotChart.vue"),
+            read("../src/assets/data/team/snapshot_chart.json"),
+            read("../src/locale/zh-CN/team.js"),
+            read("../src/locale/zh-TW/team.js"),
+        ]);
 
     assert.match(item, /v-for="group of 5"[\s\S]*?team\.snapshot\.group/);
     assert.match(zhCn, /uploadedInGame: "【\{name\}】游戏内上传"/);
@@ -723,10 +763,7 @@ test("DKP snapshot association reuses the five-team roster styling", async () =>
     assert.match(stat, /team\.snapshot\.count/);
     assert.match(statStyles, /\.m-snapshot-toolbar[\s\S]*background:\s*@team-surface-muted/);
     assert.match(statStyles, /\.m-snapshot-search[\s\S]*width:\s*320px/);
-    assert.match(
-        statStyles,
-        /\.m-snapshot-date\s*\{[\s\S]*--el-date-editor-width:\s*250px[\s\S]*flex:\s*0 0 250px/
-    );
+    assert.match(statStyles, /\.m-snapshot-date\s*\{[\s\S]*--el-date-editor-width:\s*250px[\s\S]*flex:\s*0 0 250px/);
     assert.match(statStyles, /--el-table-row-hover-bg-color:\s*fade\(@team-primary, 3%\)/);
     assert.match(statStyles, /\.u-view-snapshot[\s\S]*background:\s*@team-primary-soft/);
     assert.match(chart, /m-snapshot-chart-period[\s\S]*m-snapshot-chart-date/);
@@ -774,7 +811,7 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(workspace, /archiveSection === 'feature'[\s\S]*?config-section="feature"/);
     assert.match(
         workspace,
-        /archiveSection === 'other'[\s\S]*?class="m-archive-other"[\s\S]*?<EditNamespace variant="archive"[\s\S]*?config-section="other"/,
+        /archiveSection === 'other'[\s\S]*?class="m-archive-other"[\s\S]*?<EditNamespace variant="archive"[\s\S]*?config-section="other"/
     );
     assert.match(workspace, /class="m-archive-advanced"[\s\S]*?<team-advanced-setting/);
     assert.doesNotMatch(workspace, /config-section="advanced"/);
@@ -814,7 +851,10 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(banner, /object-position:\s*right center/);
     assert.match(banner, /\.u-tip[\s\S]*display:\s*none/);
     assert.match(banner, /updateTeamInfo\(this\.id,\s*\{\s*banner:\s*this\.banner/);
-    assert.match(teamService, /function updateTeamInfo\(team_id, data\)[\s\S]*?\.patch\(`\/api\/team\/my-team\/\$\{team_id\}`/);
+    assert.match(
+        teamService,
+        /function updateTeamInfo\(team_id, data\)[\s\S]*?\.patch\(`\/api\/team\/my-team\/\$\{team_id\}`/
+    );
     assert.match(dkpRule, /team\.settingSections\.dkpRule/);
     assert.match(dkpRule, /class="m-dkp-rule__footer"/);
     assert.match(advanced, /team\.advanced\.actions/);
@@ -825,12 +865,21 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(advanced, /:confirm-text="\$t\('team\.advanced\.confirmTransfer'\)"/);
     assert.match(advanced, /class="u-transform" type="warning" @click="transformTeam"/);
     assert.match(advanced, /class="u-delete" type="danger" @click="deleteTeam"/);
-    assert.match(advanced, /class="u-transform"[\s\S]*?<el-icon><Switch \/><\/el-icon>[\s\S]*?team\.advanced\.startTransfer/);
+    assert.match(
+        advanced,
+        /class="u-transform"[\s\S]*?<el-icon><Switch \/><\/el-icon>[\s\S]*?team\.advanced\.startTransfer/
+    );
     assert.match(advanced, /class="u-delete"[\s\S]*?<el-icon><Delete \/><\/el-icon>[\s\S]*?team\.advanced\.deleteTeam/);
     assert.match(advanced, /import \{ Delete, Switch \} from "@element-plus\/icons-vue"/);
     assert.doesNotMatch(advanced, /type="(?:warning|danger)" plain/);
-    assert.match(advanced, /confirmTransform:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.transferTitle[\s\S]*?transformTeam\(this\.id, this\.to_uid\)/);
-    assert.match(advanced, /deleteTeam:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.deleteTitle[\s\S]*?this\.removeTeam\(\)/);
+    assert.match(
+        advanced,
+        /confirmTransform:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.transferTitle[\s\S]*?transformTeam\(this\.id, this\.to_uid\)/
+    );
+    assert.match(
+        advanced,
+        /deleteTeam:[\s\S]*?this\.\$confirm\([\s\S]*?team\.advanced\.deleteTitle[\s\S]*?this\.removeTeam\(\)/
+    );
     assert.doesNotMatch(advanced, /<EditNamespace :variant="variant"/);
     assert.match(namespace, /team\.namespace\.title/);
     assert.match(namespace, /v-if="variant !== 'archive'" class="u-desc"/);
@@ -841,7 +890,7 @@ test("team feature, other and advanced settings keep their business sections sep
     assert.match(userpop, /confirmText \|\| \(isArchive \? \$t\("team\.raid\.misc\.addUser"\)/);
     assert.match(
         workspaceStyles,
-        /\.m-archive-feature,[\s\S]*\.m-archive-other,[\s\S]*\.m-archive-advanced[\s\S]*\.m-team-form-section[\s\S]*&::before/,
+        /\.m-archive-feature,[\s\S]*\.m-archive-other,[\s\S]*\.m-archive-advanced[\s\S]*\.m-team-form-section[\s\S]*&::before/
     );
     assert.match(workspaceStyles, /\.m-archive-other > \.v-team-config\.is-archive\s*\{\s*margin-top:\s*@team-space-4/);
     assert.doesNotMatch(workspaceStyles, /\.m-archive-advanced\s*\{[\s\S]{0,160}border:/);
@@ -873,7 +922,10 @@ test("snapshot subtabs stay synchronized with the subtab query", async () => {
     assert.match(snapshot, /@click="switchTab\('password'\)"/);
     assert.match(snapshot, /v-if="canConfigurePassword"[^>]*@click="switchTab\('password'\)"/);
     assert.match(snapshot, /return this\.canConfigurePassword \? MANAGE_SNAPSHOT_TABS : MEMBER_SNAPSHOT_TABS/);
-    assert.match(snapshot, /canConfigurePassword:\s*function \(\)[\s\S]*?this\.tab = this\.allowedTabs\.includes\(subtab\) \? subtab : "list"/);
+    assert.match(
+        snapshot,
+        /canConfigurePassword:\s*function \(\)[\s\S]*?this\.tab = this\.allowedTabs\.includes\(subtab\) \? subtab : "list"/
+    );
     assert.match(snapshot, /query:\s*\{[\s\S]*?\.\.\.this\.\$route\.query,[\s\S]*?subtab:\s*tab/);
     assert.match(snapshot, /class="u-snapshot-help" href="\/tool\/23783" target="_blank" rel="noopener noreferrer"/);
     assert.match(snapshot, /\.u-snapshot-help\s*\{[\s\S]*?margin-left:\s*auto/);
@@ -888,24 +940,41 @@ test("member workspace exposes team snapshots as a read-only tab before videos",
         read("../src/views/team/snapshot/ListSnapshot.vue"),
     ]);
 
-    assert.match(workspace, /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/);
     assert.match(
         workspace,
-        /:label="\$t\('team\.workspace\.teamSnapshots'\)" name="snapshot"[\s\S]*?<SnapshotList :key="`member-snapshots-\$\{id\}`" :team-id="id" read-only \/>[\s\S]*?:label="\$t\('team\.workspace\.teamDkp'\)" name="my-dkp"[\s\S]*?<MyDkp :key="`member-dkp-\$\{id\}`" :team-id="id" \/>[\s\S]*?:label="\$t\('team\.workspace\.videos'\)" name="video"/,
+        /const MEMBER_TABS = \["overview", "battle", "my-raid", "snapshot", "my-dkp", "video", "comment"\]/
     );
-    assert.match(workspace, /<SnapshotList[\s\S]*?:key="`snapshot-management-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-configure-password="isSuper"/);
+    assert.match(
+        workspace,
+        /:label="\$t\('team\.workspace\.teamSnapshots'\)" name="snapshot"[\s\S]*?<SnapshotList :key="`member-snapshots-\$\{id\}`" :team-id="id" read-only \/>[\s\S]*?:label="\$t\('team\.workspace\.teamDkp'\)" name="my-dkp"[\s\S]*?<MyDkp :key="`member-dkp-\$\{id\}`" :team-id="id" \/>[\s\S]*?:label="\$t\('team\.workspace\.videos'\)" name="video"/
+    );
+    assert.match(
+        workspace,
+        /<SnapshotList[\s\S]*?:key="`snapshot-management-\$\{id\}`"[\s\S]*?:team-id="id"[\s\S]*?:can-configure-password="isSuper"/
+    );
     assert.match(snapshot, /:read-only="readOnly"/);
     assert.match(snapshot, /:support-dkp-sync="false"/);
 });
 
 test("member management subtabs stay synchronized with the subtab query", async () => {
-    const members = await read("../src/views/team/member/ListMember.vue");
+    const [members, pending] = await Promise.all([
+        read("../src/views/team/member/ListMember.vue"),
+        read("../src/views/team/member/PendingList.vue"),
+    ]);
 
-    assert.match(members, /const MEMBER_SUBTABS = \["user", "pending"\]/);
+    assert.match(members, /const MEMBER_SUBTABS = \["user", "role", "pending"\]/);
+    assert.match(members, /team\.memberAllRoles/);
+    assert.match(members, /role:\s*RoleList/);
     assert.match(members, /"\$route\.query\.subtab":\s*\{[\s\S]*?immediate:\s*true/);
     assert.match(members, /this\.tab = MEMBER_SUBTABS\.includes\(subtab\) \? subtab : "user"/);
     assert.match(members, /@click="switchTab\(item\.value\)"/);
     assert.match(members, /query:\s*\{[\s\S]*?\.\.\.this\.\$route\.query,[\s\S]*?subtab:\s*tab/);
+    assert.match(pending, /team\.memberRole\.owner/);
+    assert.match(pending, /v-if="ownerUid\(item\)"/);
+    assert.match(pending, /:href="authorLink\(ownerUid\(item\)\)"/);
+    assert.match(pending, /item\?\.user_info\?\.uid/);
+    assert.match(pending, /item\?\.user_info\?\.display_name \|\| `UID /);
+    assert.doesNotMatch(pending, /item\.team && item\.team\.name/);
 });
 
 test("team discovery keeps two-column cards and exposes real totals in the hero", async () => {
@@ -931,7 +1000,7 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
     assert.match(
         styles,
-        /@media screen and \(max-width: 820px\)[\s\S]*?> \.u-meta:not\(\.u-recruit\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-meta-item[\s\S]*?display:\s*flex[\s\S]*?width:\s*100%/,
+        /@media screen and \(max-width: 820px\)[\s\S]*?> \.u-meta:not\(\.u-recruit\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-meta-item[\s\S]*?display:\s*flex[\s\S]*?width:\s*100%/
     );
     assert.match(styles, /> \.u-super\s*\{[\s\S]*?min-width:\s*0[\s\S]*?white-space:\s*nowrap/);
     assert.match(styles, /\.m-team-list-pages[\s\S]*?overflow:\s*hidden[\s\S]*?min-width:\s*32px/);

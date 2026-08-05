@@ -374,6 +374,7 @@ export default {
         battle: {
             unknown: "Unknown",
             boss: "Boss",
+            achievementLabel: "Achievement",
             nonEvent: "Non-event",
             eventEdition: "Season {number}",
             qualifier: "Qualifier",
@@ -391,6 +392,7 @@ export default {
             linked: "Linked",
             unlinked: "Not linked",
             view: "View",
+            viewDetails: "View details",
             linkBattle: "Link Battle",
             myNotice: "This data may appear on the leaderboard. Please only link the correct battle.",
             mySource: "Data source: all data submitted by you",

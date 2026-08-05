@@ -349,6 +349,7 @@ export default {
         battle: {
             unknown: "Không rõ",
             boss: "Thủ lĩnh",
+            achievementLabel: "Thành tựu",
             nonEvent: "Không thi đấu",
             eventEdition: "Mùa {number}",
             qualifier: "Vòng loại",
@@ -366,6 +367,7 @@ export default {
             linked: "Đã liên kết",
             unlinked: "Chưa liên kết",
             view: "Xem",
+            viewDetails: "Xem chi tiết",
             linkBattle: "Liên kết trận đấu",
             myNotice: "Dữ liệu này có thể xuất hiện trên bảng xếp hạng. Chỉ liên kết trận đấu chính xác.",
             mySource: "Nguồn dữ liệu: toàn bộ dữ liệu do bạn gửi lên",

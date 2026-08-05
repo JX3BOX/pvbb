@@ -54,12 +54,20 @@
                 <button class="u-team-create-secondary" type="button" @click="goBack">{{ $t("team.orgLegacy.backPlaza") }}</button>
             </div>
         </section>
+
+        <joinpop
+            v-model:show="joinGuideVisible"
+            :team_id="createdTeamId"
+            founder-guide
+            @closed="finishCreation"
+        />
     </div>
 </template>
 
 <script>
 import { createTeam, getMyTeams } from "@/service/team/team.js";
 import teamform from "@/components/team/org/teamform.vue";
+import joinpop from "@/components/team/member/joinpop.vue";
 import User from "@jx3box/jx3box-common/js/user.js";
 import { __cdn } from "@/utils/config";
 import { ArrowLeft, Lock, ShoppingCart } from "@element-plus/icons-vue";
@@ -92,6 +100,8 @@ export default {
             total: 0,
             processing: false,
             checkingLimit: true,
+            createdTeamId: 0,
+            joinGuideVisible: false,
         };
     },
     methods: {
@@ -105,10 +115,8 @@ export default {
                     });
                     const teamId = res.data?.data?.ID || res.data?.data?.id;
                     if (teamId) {
-                        this.$router.push({
-                            name: "manage_my_org",
-                            params: { id: teamId },
-                        });
+                        this.createdTeamId = teamId;
+                        this.joinGuideVisible = true;
                     } else {
                         this.$router.push("/");
                     }
@@ -116,6 +124,15 @@ export default {
                 .finally(() => {
                     this.processing = false;
                 });
+        },
+        finishCreation: function () {
+            if (!this.createdTeamId) return;
+            const teamId = this.createdTeamId;
+            this.createdTeamId = 0;
+            this.$router.push({
+                name: "manage_my_org",
+                params: { id: teamId },
+            });
         },
         goBack: function () {
             this.$router.push("/");
@@ -144,6 +161,7 @@ export default {
         Lock,
         ShoppingCart,
         teamform,
+        joinpop,
     },
 };
 </script>

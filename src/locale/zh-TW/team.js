@@ -1,4 +1,10 @@
 export default {
+    memberAllRoles: "全部角色",
+    memberRoleNote: "備註",
+    memberRoleMore: "更多",
+    memberRoleCount: "{count} 個角色",
+    memberNoRoles: "暫無團隊角色",
+    memberNoRolesHint: "正式加入團隊的角色會顯示在這裡。",
     publicActivityEmpty: "暫無近期團隊活動",
     publicIntroEmpty: "該團隊暫未填寫團隊介紹",
     publicRecruitEmpty: "該團隊暫未發佈招募資訊",
@@ -64,6 +70,7 @@ export default {
     homeFilters: { selectServer: "選擇伺服器", searchTeams: "查找團隊", allServers: "全部伺服器", createTeam: "建立團隊", verifiedOnly: "只看認證", clear: "清除", more: "查看更多", loading: "團隊列表載入中", viewTeam: "查看團隊：{name}", verified: "已認證", server: "伺服器", leader: "團長", typePending: "類型待補充", recruitment: "招募公告", noRecruitment: "暫未發布招募公告", empty: "沒有找到相關條目" },
     teamTags: { teachable: "可教學", fixed: "固定團", achievement: "成就團", student: "學生黨", worker: "上班族", hardcore: "爆肝帝", timezone: "時差黨" },
     joinDialog: { title: "加入團隊", description: "選擇需要加入該團隊的角色，可同時提交多個角色", selectRoles: "選擇角色", reviewHint: "申請提交後，需要等待團隊管理員審核", selectAll: "全選", aria: "選擇申請加入團隊的角色", roleFallback: "角色", mountAlt: "{name}門派圖示", unknownServer: "未知伺服器", empty: "暫無可申請加入該團隊的角色", emptyHint: "已加入團隊或尚未綁定的角色不會顯示在這裡", selected: "已選擇 {count} 個角色", selectHint: "請選擇可用角色後提交申請", cancel: "取消", submit: "提交申請", missingTeam: "團隊ID缺失", loadFailed: "取得角色列表失敗，請稍後重試", success: "申請成功，請等待團隊管理審核", submitFailed: "申請提交失敗，請稍後重試" },
+    createGuide: { title: "把我的角色加入團隊", description: "團隊建立成功，推薦將自己的全部角色一起加入團隊", reviewHint: "已為你全選目前可用角色，可按需取消", aria: "選擇要直接加入新團隊的角色", empty: "暫無可加入的角色", emptyHint: "可以先進入團隊，綁定角色後再從團隊首頁加入", selectHint: "目前沒有可加入角色，可直接進入團隊", cancel: "暫時跳過", submit: "加入團隊", success: "所選角色已加入團隊", submitFailed: "角色加入失敗，請稍後重試" },
     action: { back: "返回" },
     role: { bind: "綁定角色", back: "返回列表", pluginBind: "插件綁定", retailOnly: "僅正式服可用", token: "綁定權杖", tokenHint: "10 分鐘內有效，逾時請重新整理頁面", clickCopy: "點擊複製", steps: "綁定步驟", step1: "開啟【茗伊插件集】-【團隊】-【團隊平台】", step2: "點擊綁定並填入上方密鑰，將角色綁定至魔盒帳號", step3: "可以將多個角色綁定至同一個魔盒帳號", customCreate: "自訂建立", create: "建立", copied: "複製成功", copyFailed: "複製失敗", copyManually: "請手動複製", updated: "更新成功", myRoles: "我的角色", customRole: "自訂角色", namePlaceholder: "請輸入角色名稱", find: "查找", all: "全部", verified: "已認證", note: "設定備註", unpin: "取消置頂", pin: "置頂", server: "伺服器", school: "門派", bodyType: "體型", boundAt: "綁定時間：{time}", unbind: "解除綁定角色", edit: "編輯", delete: "刪除", empty: "找不到相關條目", contentPlaceholder: "請輸入內容", cancel: "取消", confirm: "確定", unbindHint: "在網站解除綁定後，需要在遊戲內重新登入角色方可生效", confirmUnbind: "確定解除綁定", unbound: "解除綁定成功", unboundMessage: "角色解除綁定成功", success: "成功", noteSaved: "備註設定成功", deleteConfirm: "確定刪除該角色嗎？", deleted: "刪除成功", deletedMessage: "角色刪除成功", unpinned: "取消星標成功", unpinnedMessage: "角色取消星標成功", pinned: "星標成功", pinnedMessage: "角色星標成功", add: "建立角色", noPermission: "沒有操作權限", boundReadonly: "綁定角色不允許竄改", info: "角色資訊", joinTeam: "加入團隊", teamsPrivate: "加入的團隊僅自己可見", noTeam: "目前角色沒有加入任何團隊", missing: "角色不存在或沒有權限", myTeams: "我的團隊", visitHomepage: "前往 [{name}] 首頁", findTeam: "尋找團隊", roleName: "角色名", joinedAt: "加入時間", public: "是否公開", operation: "操作", quit: "退出", noRoles: "目前團隊沒有任何角色", noJoinedTeams: "目前沒有加入任何團隊", viewTeam: "查看團隊", settingSuccess: "設定成功", settingUpdated: "更新設定成功", quitSuccess: "退出成功", quitMessage: "角色成功退出隊伍", selectServer: "請選擇伺服器", selectBodyType: "請選擇體型", remark: "備註", remarkPlaceholder: "請輸入備註資訊", nameRequired: "角色名不能為空", reminder: "提醒" },
     roleCommon: { visit: "前往" },

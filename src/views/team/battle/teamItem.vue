@@ -33,16 +33,16 @@
             </span>
         </div>
         <!-- 队员 -->
-        <el-row class="u-teammates" :gutter="10">
-            <el-col class="u-member" :span="4" v-for="(member, j) in item.members" :key="j">
+        <div class="u-teammates">
+            <div class="u-member" v-for="(member, j) in item.members" :key="j">
                 <div class="u-member-content">
                     <img loading="lazy" class="u-mount" :src="showMount(member.XFId)" />
                     <span class="u-username" :title="member.Name">{{
                         member.Name || $t("pages.team.battle.unknown")
                     }}</span>
                 </div>
-            </el-col>
-        </el-row>
+            </div>
+        </div>
     </div>
 </template>
 

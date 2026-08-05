@@ -1,124 +1,177 @@
 <template>
-    <div class="m-member-roles" v-loading="loading">
-        <el-input class="m-member-role-search" :placeholder="$t('team.memberRole.searchPlaceholder')" v-model="search">
-            <template #prepend><i class="el-icon-search"></i> {{ $t("team.memberRole.search") }}</template>
-            <template #append><el-button icon="Position"></el-button></template>
-        </el-input>
-        <div class="m-member-list-roles m-team-rolelist" v-if="data && data.length">
-            <ul class="u-list">
-                <li class="u-item" v-for="(item, i) in data" :key="i">
-                    <span class="u-pic">
+    <div class="m-member-roles">
+        <header class="m-member-panel-header">
+            <div>
+                <h2>{{ $t("team.memberAllRoles") }}</h2>
+            </div>
+            <el-skeleton-item v-if="loading" variant="text" class="u-member-total-skeleton" aria-hidden="true" />
+            <span v-else class="u-member-total">{{ $t("team.memberRoleCount", { count: total }) }}</span>
+        </header>
+
+        <el-input
+            v-model="search"
+            clearable
+            class="m-member-role-search"
+            :placeholder="$t('team.memberRole.searchPlaceholder')"
+            :prefix-icon="Search"
+        />
+
+        <div v-if="loading" class="m-role-card-grid m-pending-skeleton-grid" aria-hidden="true">
+            <el-skeleton v-for="index in per" :key="index" animated class="m-pending-skeleton-card">
+                <template #template>
+                    <div class="u-pending-skeleton">
+                        <el-skeleton-item variant="image" class="u-skeleton-avatar" />
+                        <div class="u-skeleton-main">
+                            <div class="u-skeleton-title">
+                                <el-skeleton-item variant="text" class="u-skeleton-name" />
+                                <el-skeleton-item variant="text" class="u-skeleton-verified" />
+                            </div>
+                            <div class="u-skeleton-tags">
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                                <el-skeleton-item variant="text" />
+                            </div>
+                            <el-skeleton-item variant="text" class="u-skeleton-meta" />
+                        </div>
+                        <div class="u-skeleton-actions">
+                            <el-skeleton-item variant="button" />
+                            <el-skeleton-item variant="button" />
+                        </div>
+                    </div>
+                </template>
+            </el-skeleton>
+        </div>
+
+        <div v-else-if="data.length" class="m-member-list-roles">
+            <ul class="m-role-card-grid">
+                <li v-for="(item, i) in data" :key="item.relation.role_id || i" class="u-item m-pending-card m-role-card">
+                    <span class="u-pic u-pending-avatar">
                         <RoleAvatar :mount="item.role.mount" :body_type="item.role.body_type" />
                     </span>
-                    <span class="u-title">
-                        <router-link class="u-rolename" :to="'/role/' + item.role.ID" target="_blank">{{
-                            item.role.name
-                        }}</router-link>
-                        <i class="u-status" v-if="!item.role.custom" :title="$t('team.role.verified')">
-                            <img svg-inline src="@/assets/img/team/verify.svg" />
-                        </i>
-                        <span class="u-note" v-if="item.relation.role_remark">({{ item.relation.role_remark }})</span>
-                        <span class="u-addnote" @click="noteRole(item)">
-                            <el-tooltip class="item" effect="dark" :content="$t('team.role.note')" placement="top">
-                                <i class="el-icon-edit-outline"></i>
-                            </el-tooltip>
+                    <div class="u-pending-main">
+                        <span class="u-title">
+                            <router-link class="u-rolename" :to="'/role/' + item.role.ID" target="_blank">
+                                {{ item.role.name }}
+                            </router-link>
+                            <span v-if="!item.role.custom" class="u-verified">
+                                <el-icon><CircleCheckFilled /></el-icon>
+                                {{ $t("team.member.verified") }}
+                            </span>
+                            <span v-if="item.relation.role_remark" class="u-role-remark">
+                                {{ item.relation.role_remark }}
+                            </span>
                         </span>
-                        <el-rate
-                            class="u-star"
-                            v-model.number="item.relation.star"
-                            @change="starRole(item.relation.team_id, item.relation.role_id, item.relation.star)"
-                        ></el-rate>
-                    </span>
-                    <span class="u-meta">
-                        <span class="u-server">
-                            <em>{{ $t("team.role.server") }}</em>
-                            {{ item.role.server }}
+                        <span class="u-meta u-role-meta">
+                            <span>{{ item.role.server || $t("team.member.unknownServer") }}</span>
+                            <span class="u-mount">
+                                <img class="u-icon" :src="showSchoolIcon(item.role.mount)" />
+                                {{ showSchoolName(item.role.mount) }}
+                            </span>
+                            <span>{{ showBodyType(item.role.body_type) }}</span>
                         </span>
-                        <span class="u-mount">
-                            <em>{{ $t("team.role.school") }}</em>
-                            <img class="u-icon" :src="showSchoolIcon(item.role.mount)" />
-                            {{ showSchoolName(item.role.mount) }}
-                        </span>
-                        <span class="u-body">
-                            <em>{{ $t("team.role.bodyType") }}</em>
-                            {{ showBodyType(item.role.body_type) }}
-                        </span>
-                    </span>
-                    <div class="u-meta u-misc">
-                        <span class="u-team">
-                            <i class="el-icon-user"></i>
-                            {{ $t("team.memberRole.owner") }}
-                            <a class="u-user-name" target="_blank" :href="authorLink(item.relation.uid)">{{
-                                item.user.display_name
-                            }}</a>
-                        </span>
-                        <span class="u-time">
-                            <i class="el-icon-time"></i>
-                            {{ $t("team.memberRole.joinedAt") }}
-                            {{ showTime(item.relation.created_at) }}
-                        </span>
+                        <div class="u-apply-meta">
+                            <span>
+                                <el-icon><User /></el-icon>
+                                {{ $t("team.memberRole.owner") }}
+                                <a
+                                    class="u-role-owner"
+                                    :href="showAuthorLink(item.relation.uid)"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {{ item.user.display_name }}
+                                </a>
+                            </span>
+                            <span>
+                                <el-icon><Clock /></el-icon>
+                                {{ showTime(item.relation.created_at) }}
+                            </span>
+                        </div>
                     </div>
-                    <div class="u-op">
-                        <el-button
-                            class="u-btn u-reject"
-                            type="info"
-                            size="small"
-                            plain
-                            @click="removeRole(item.relation.team_id, item.relation.role_id, i)"
-                            icon="Delete"
-                            >{{ $t("team.memberRole.remove") }}</el-button
-                        >
+                    <div class="u-role-footer">
+                        <el-rate
+                            v-model.number="item.relation.star"
+                            class="u-star"
+                            @change="updateStar(item.relation.team_id, item.relation.role_id, item.relation.star)"
+                        />
+                        <div class="u-role-actions">
+                            <button class="u-btn u-note" type="button" @click="noteRole(item)">
+                                <el-icon><EditPen /></el-icon>
+                                {{ $t("team.memberRoleNote") }}
+                            </button>
+                            <el-dropdown trigger="click" @command="handleRoleCommand($event, item, i)">
+                                <button
+                                    class="u-btn u-more"
+                                    type="button"
+                                    :aria-label="$t('team.memberRoleMore')"
+                                    :title="$t('team.memberRoleMore')"
+                                >
+                                    <el-icon><MoreFilled /></el-icon>
+                                </button>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="remove" class="u-role-remove-command">
+                                            <el-icon><Delete /></el-icon>
+                                            {{ $t("team.memberRole.remove") }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
                     </div>
                 </li>
             </ul>
             <el-pagination
+                v-model:current-page="page"
                 class="m-archive-pages"
                 background
-                layout="total, prev, pager, next,jumper"
+                layout="total, prev, pager, next, jumper"
                 :hide-on-single-page="true"
                 :page-size="per"
                 :total="total"
-                v-model:current-page="page"
                 @current-change="changePage"
-            ></el-pagination>
+            />
         </div>
-        <el-alert v-else class="m-archive-null" :title="$t('team.role.empty')" type="info" center show-icon></el-alert>
-        <el-dialog :title="$t('team.role.note')" v-model="noteVisible" width="30%" class="m-team-note-dialog">
-            <div>
-                <el-input v-model="note" :placeholder="$t('team.role.contentPlaceholder')" :maxlength="20" :show-word-limit="true"></el-input>
-            </div>
+
+        <div v-else class="m-member-empty">
+            <span class="u-empty-icon" aria-hidden="true"><el-icon><User /></el-icon></span>
+            <h3>{{ $t("team.memberNoRoles") }}</h3>
+            <p>{{ $t("team.memberNoRolesHint") }}</p>
+        </div>
+
+        <el-dialog v-model="noteVisible" :title="$t('team.role.note')" width="min(420px, 90vw)" class="m-team-note-dialog">
+            <el-input v-model="note" :placeholder="$t('team.role.contentPlaceholder')" :maxlength="20" show-word-limit />
             <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="noteVisible = false">{{ $t("team.role.cancel") }}</el-button>
-                    <el-button type="primary" @click="confirmNote">{{ $t("team.role.confirm") }}</el-button>
-                </div>
+                <el-button @click="noteVisible = false">{{ $t("team.role.cancel") }}</el-button>
+                <el-button type="primary" @click="confirmNote">{{ $t("team.role.confirm") }}</el-button>
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { authorLink } from "@jx3box/jx3box-common/js/utils";
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
 import { getMyTeamRoles, deleteRole, remarkRole, starRole } from "@/service/team/member.js";
 import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
+import { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, Search, User } from "@element-plus/icons-vue";
+import { authorLink as getAuthorLink } from "@jx3box/jx3box-common/js/utils";
+
 export default {
     name: "RoleList",
     props: ["id"],
-    components: {},
+    components: { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, RoleAvatar, User },
     data: function () {
         return {
             data: [],
-            per: 10,
+            per: 12,
             page: 1,
-            total: 1,
+            total: 0,
             loading: false,
             search: "",
-
-            // 备注
             noteVisible: false,
-            currentItem: "",
+            currentItem: null,
             note: "",
+            Search,
         };
     },
     computed: {
@@ -126,11 +179,7 @@ export default {
             return this.id;
         },
         params: function () {
-            return {
-                pageIndex: this.page,
-                pageSize: this.per,
-                search: this.search,
-            };
+            return { pageIndex: this.page, pageSize: this.per, search: this.search };
         },
     },
     methods: {
@@ -139,63 +188,53 @@ export default {
             getMyTeamRoles(this.team_id, this.params)
                 .then((res) => {
                     this.data = res.data.data.list || [];
-                    this.total = res.data.data.page.total;
+                    this.total = Number(res.data.data.page.total) || 0;
                 })
                 .finally(() => {
                     this.loading = false;
                 });
         },
-        removeRole: function (team_id, role_id, i) {
-            // 移除角色
-            this.$alert(this.$t("team.memberRole.removeConfirm"), this.$t("team.raid.item.message"), {
+        removeRole: function (item, index) {
+            this.$confirm(this.$t("team.memberRole.removeConfirm"), this.$t("team.raid.item.message"), {
                 confirmButtonText: this.$t("team.role.confirm"),
-                callback: (action) => {
-                    if (action == "confirm") {
-                        deleteRole(team_id, role_id).then((res) => {
-                            this.$notify({
-                                title: this.$t("team.memberRole.deleted"),
-                                message: this.$t("team.memberRole.deletedMessage"),
-                                type: "success",
-                            });
-                            this.data.splice(i, 1);
-                        });
-                    }
-                },
-            });
+                cancelButtonText: this.$t("team.role.cancel"),
+                type: "warning",
+            })
+                .then(() => deleteRole(item.relation.team_id, item.relation.role_id))
+                .then(() => {
+                    this.data.splice(index, 1);
+                    this.total = Math.max(0, this.total - 1);
+                    this.$notify({ title: this.$t("team.memberRole.deleted"), message: this.$t("team.memberRole.deletedMessage"), type: "success" });
+                })
+                .catch(() => {});
+        },
+        handleRoleCommand: function (command, item, index) {
+            if (command === "remove") this.removeRole(item, index);
         },
         noteRole: function (item) {
-            // 给角色添加备注
-            this.noteVisible = true;
             this.currentItem = item;
+            this.note = item.relation.role_remark || "";
+            this.noteVisible = true;
         },
         confirmNote: function () {
+            if (!this.currentItem) return;
             remarkRole(this.currentItem.relation.team_id, this.currentItem.relation.role_id, this.note).then(() => {
-                this.noteVisible = false;
                 this.currentItem.relation.role_remark = this.note;
-                this.note = "";
-                this.$notify({
-                    title: this.$t("team.memberRole.noteSuccess"),
-                    message: this.$t("team.memberRole.noteMessage"),
-                    type: "success",
-                });
+                this.noteVisible = false;
+                this.$notify({ title: this.$t("team.memberRole.noteSuccess"), message: this.$t("team.memberRole.noteMessage"), type: "success" });
             });
         },
-        starRole: function (team_id, role_id, star) {
-            starRole(team_id, role_id, star).then((res) => {
-                this.$notify({
-                    title: this.$t("team.memberRole.starSuccess"),
-                    message: this.$t("team.memberRole.starMessage"),
-                    type: "success",
-                });
+        updateStar: function (team_id, role_id, star) {
+            starRole(team_id, role_id, star).then(() => {
+                this.$notify({ title: this.$t("team.memberRole.starSuccess"), message: this.$t("team.memberRole.starMessage"), type: "success" });
             });
         },
         changePage: function () {
             window.scrollTo(0, 0);
         },
-        init: function () {
-            this.loadData();
+        showAuthorLink: function (uid) {
+            return getAuthorLink(uid);
         },
-        authorLink,
         showBodyType,
         showSchoolIcon,
         showSchoolName,
@@ -203,6 +242,7 @@ export default {
     },
     watch: {
         team_id: function () {
+            this.page = 1;
             this.loadData();
         },
         params: {
@@ -213,11 +253,7 @@ export default {
         },
     },
     created: function () {
-        this.init();
-    },
-    mounted: function () {},
-    components: {
-        RoleAvatar,
+        this.loadData();
     },
 };
 </script>

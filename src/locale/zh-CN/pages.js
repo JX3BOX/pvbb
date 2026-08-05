@@ -461,6 +461,7 @@ export default {
         battle: {
             unknown: "未知",
             boss: "首领",
+            achievementLabel: "成就",
             nonEvent: "非赛事",
             eventEdition: "第 {number} 届",
             qualifier: "预选赛",
@@ -478,6 +479,7 @@ export default {
             linked: "已绑定",
             unlinked: "未绑定",
             view: "查看",
+            viewDetails: "查看详情",
             linkBattle: "关联战斗",
             myNotice: "绑定战斗数据，用于展示在门派天梯榜。",
             mySource: "数据源：由你上报的所有数据",

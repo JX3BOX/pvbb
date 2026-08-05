@@ -18,23 +18,94 @@ test("battle cards keep combat and linked data columns aligned when ranking data
     assert.match(item, /hasRanking\(\)/);
     assert.match(
         styles,
-        /grid-template-columns:\s*minmax\(320px,\s*1fr\)\s*minmax\(280px,\s*0\.8fr\)/,
+        /\.u-battle-content[\s\S]*?grid-template-columns:\s*minmax\(0,\s*720px\)\s*minmax\(0,\s*660px\)/,
     );
     assert.match(styles, /\.u-battle-links[\s\S]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-    assert.match(styles, /\.u-battle-link[\s\S]*background:\s*@team-surface/);
-    assert.match(styles, /\.u-battle-fields[\s\S]*?dt \{[\s\S]*?font-weight:\s*500/);
+    assert.match(styles, /\.u-battle-link[\s\S]*background:\s*@team-surface-muted/);
+    assert.match(styles, /\.u-battle-fields[\s\S]*?dt \{[\s\S]*?font-weight:\s*400/);
     assert.match(styles, /\.u-battle-fields[\s\S]*?dd \{[\s\S]*?font-weight:\s*500/);
     assert.match(styles, /\.u-battle-link[\s\S]*?> span \{[\s\S]*?font-size:\s*12px/);
-    assert.match(styles, /\.u-battle-link[\s\S]*?> span \{[\s\S]*?font-weight:\s*500/);
-    assert.match(styles, /\.u-battle-link[\s\S]*?em,[\s\S]*?\.u-link \{[\s\S]*?font-size:\s*13px/);
+    assert.match(styles, /\.u-battle-link[\s\S]*?> span \{[\s\S]*?font-weight:\s*400/);
+    assert.match(styles, /\.u-battle-link[\s\S]*?em,[\s\S]*?\.u-link \{[\s\S]*?font-size:\s*12px/);
     assert.match(styles, /\.u-battle-link[\s\S]*?em,[\s\S]*?\.u-link \{[\s\S]*?font-weight:\s*500/);
-    assert.match(styles, /\.u-battle-fields[\s\S]*?> div \{[\s\S]*?height:\s*50px/);
-    assert.match(styles, /\.u-battle-link[\s\S]*?height:\s*50px/);
-    assert.match(styles, /\.u-team-op \{[\s\S]*?align-items:\s*center;[\s\S]*?padding-top:\s*12px/);
-    assert.match(styles, /@media screen and \(max-width: 1240px\)[\s\S]*?\.u-team-op \{[\s\S]*?padding-top:\s*0/);
+    assert.match(styles, /\.u-battle-fields[\s\S]*?grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    assert.match(styles, /\.u-battle-fields[\s\S]*?> div \{[\s\S]*?height:\s*54px/);
+    assert.match(styles, /\.u-battle-fields[\s\S]*?> div \{[\s\S]*?border:\s*1px solid @team-border-light/);
+    assert.match(styles, /\.u-battle-link[\s\S]*?height:\s*54px/);
+    assert.match(styles, /grid-template-areas:\s*"summary action"\s*"content content"/);
     assert.doesNotMatch(styles, /\.u-battle-data\s*\{[\s\S]*?min-width:\s*max-content/);
-    assert.match(styles, /\.u-battle-meta[\s\S]*?dd \{[\s\S]*?font-weight:\s*400/);
-    assert.match(styles, /\.u-battle-meta[\s\S]*?dd \{[\s\S]*?color:\s*@team-text-secondary/);
+    assert.doesNotMatch(item, /class="u-battle-meta"/);
+    assert.doesNotMatch(item, /pages\.team\.battle\.team/);
+    assert.doesNotMatch(item, /pages\.team\.battle\.leader/);
+});
+
+test("battle cards show achievement metadata instead of an unknown boss when aid info is absent", async () => {
+    const [item, service, managementPage, personalPage] = await Promise.all([
+        read("../src/views/team/battle/battleItem.vue"),
+        read("../src/service/team/battle.js"),
+        read("../src/views/team/battle/index.vue"),
+        read("../src/views/team/battle/myBattle.vue"),
+    ]);
+
+    assert.match(item, /hasAidInfo \? \$t\("pages\.team\.battle\.boss"\) : \$t\("pages\.team\.battle\.achievementLabel"\)/);
+    assert.match(item, /return Boolean\(aidInfo\?\.achievement_id \|\| aidInfo\?\.event_id \|\| aidInfo\?\.name\)/);
+    assert.match(item, /item\.achievement_info\?\.Name/);
+    assert.match(item, /item\.achievement_info\?\.Name \|\| item\.achieve_id \|\| \$t\("pages\.team\.battle\.unknown"\)/);
+    assert.match(item, /iconLink\(this\.item\.achievement_info\.IconID\)/);
+    assert.match(service, /post\(`\/api\/node\/achievement\/list`/);
+    assert.match(service, /attributes: "ID,Name,IconID"/);
+    for (const page of [managementPage, personalPage]) {
+        assert.match(page, /getAchievementsByIds\(achievementIds\)/);
+        assert.match(page, /item\["achievement_info"\] = achievements\[item\.achieve_id\] \|\| null/);
+    }
+});
+
+test("expanded team details keep the leader on one line and use a responsive member grid", async () => {
+    const [item, styles] = await Promise.all([
+        read("../src/views/team/battle/teamItem.vue"),
+        read("../src/assets/css/team/battle/item.less"),
+    ]);
+
+    assert.match(item, /<div class="u-teammates">/);
+    assert.match(styles, /\.u-leader[\s\S]*?display:\s*inline-flex/);
+    assert.match(styles, /\.u-leader[\s\S]*?\.u-username \{[\s\S]*?width:\s*auto/);
+    assert.match(styles, /\.u-teammates \{[\s\S]*?grid-template-columns:\s*repeat\(6, minmax\(0, 1fr\)\)/);
+    assert.doesNotMatch(styles, /white-space:\s*visible/);
+});
+
+test("battle title provides a dedicated details toggle using the card expand action", async () => {
+    const [item, page, styles] = await Promise.all([
+        read("../src/views/team/battle/battleItem.vue"),
+        read("../src/views/team/battle/index.vue"),
+        read("../src/assets/css/team/battle/battle-item.less"),
+    ]);
+
+    assert.match(item, /<el-button[\s\S]*?v-if="showDetailsToggle"[\s\S]*?plain[\s\S]*?class="u-detail-toggle"[\s\S]*?@click\.stop="\$emit\('toggleDetails'\)"/);
+    assert.doesNotMatch(item, /v-if="showDetailsToggle"\s*type="primary"/);
+    assert.match(page, /:class="\{ 'is-expanded': show\[i\] \}"/);
+    assert.match(page, /:expanded="Boolean\(show\[i\]\)"/);
+    assert.match(page, /show-details-toggle/);
+    assert.match(page, /@toggleDetails="showItem\(i\)"/);
+    assert.match(item, /<div class="u-team-op">[\s\S]*?class="u-detail-toggle"[\s\S]*?class="u-bind-battle"/);
+    assert.match(item, /plain[\s\S]*?:icon="View"[\s\S]*?pages\.team\.battle\.viewDetails/);
+    assert.match(item, /class="u-bind-battle" type="primary" :icon="Connection"/);
+    assert.match(item, /return \{ Connection, View \}/);
+    assert.match(styles, /\.u-team-op[\s\S]*?\.el-button \{[\s\S]*?min-height:\s*38px/);
+    assert.doesNotMatch(styles, /\.el-icon \+ span \{[\s\S]*?margin-left:\s*0/);
+});
+
+test("expanded battle and team detail cards share one continuous container", async () => {
+    const [pageStyles, detailStyles] = await Promise.all([
+        read("../src/assets/css/team/battle/index.less"),
+        read("../src/assets/css/team/battle/item.less"),
+    ]);
+
+    assert.match(pageStyles, /&\.is-expanded \{[\s\S]*?\.u-battle-team \{[\s\S]*?border-radius:\s*@team-radius-control @team-radius-control 0 0/);
+    assert.match(pageStyles, /\.u-battle-team \{[\s\S]*?border-bottom:\s*1px dotted @team-border/);
+    assert.match(pageStyles, /\.u-team-item \{[\s\S]*?margin-top:\s*0/);
+    assert.match(pageStyles, /\.m-rank-top100-item \{[\s\S]*?border-color:\s*@team-border[\s\S]*?border-radius:\s*0 0 @team-radius-control @team-radius-control/);
+    assert.match(detailStyles, /border-left:\s*1px solid @team-border/);
+    assert.doesNotMatch(detailStyles, /border-left:\s*4px solid #615cf6/);
 });
 
 test("battle relevance dialog uses guided empty states and the team dialog design", async () => {
