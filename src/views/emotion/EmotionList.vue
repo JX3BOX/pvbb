@@ -83,7 +83,7 @@
                             :loading="loading"
                             :disabled="!hasNextPage"
                             :icon="hasNextPage ? 'ArrowDown' : ''"
-                            size="large"
+                            :size="isMobilePagination ? 'default' : 'large'"
                             @click="loadMore"
                         >
                             {{ hasNextPage ? $t("pages.emotion.loadMore") : $t("pages.emotion.noMore") }}
@@ -94,7 +94,8 @@
                             background
                             :page-size="per"
                             :hide-on-single-page="true"
-                            layout="total, prev, pager, next, jumper,sizes"
+                            :layout="isMobilePagination ? 'prev, pager, next' : 'total, prev, pager, next, jumper, sizes'"
+                            :pager-count="isMobilePagination ? 5 : 7"
                             :total="total"
                             :page-sizes="[10, 30, 50, 70, 90]"
                             @current-change="handleCurrentChange"
@@ -119,9 +120,11 @@ import { postStat } from "@jx3box/jx3box-common/js/stat";
 import User from "@jx3box/jx3box-common/js/user";
 import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 import { getPaginationFromQuery, isSameRouteQuery, shouldReplacePaginationQuery } from "@/utils/listQuery";
+import responsivePagination from "@/mixins/responsive-pagination";
 
 export default {
     name: "EmotionList",
+    mixins: [responsivePagination],
     components: {
         ContentListShell,
         ContentSearchBar,

@@ -15,7 +15,7 @@
         </template>
         <Info />
         <template #op-append>
-            <publish-gate />
+            <publish-gate v-if="$route.name !== 'joke'" />
         </template>
     </Breadcrumb>
     <LeftSidebar>

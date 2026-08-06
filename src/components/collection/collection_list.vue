@@ -87,7 +87,8 @@
             :page-size="per"
             :hide-on-single-page="true"
             v-model:current-page="page"
-            layout="total, prev, pager, next, jumper"
+            :layout="isMobilePagination ? 'prev, pager, next' : 'total, prev, pager, next, jumper'"
+            :pager-count="isMobilePagination ? 5 : 7"
             :total="total"
             @current-change="skipTop"
         ></el-pagination>
@@ -100,8 +101,10 @@ import collection_item_v2 from "./collection_item_v2.vue";
 import { getCollections } from "@/service/collection.js";
 import Banner from "@/components/bbs/banner.vue";
 import { isPhone } from "@/utils/common";
+import responsivePagination from "@/mixins/responsive-pagination";
 export default {
     name: "CollectionList",
+    mixins: [responsivePagination],
     props: [],
     components: {
         "collection-item": collection_item_v2,
@@ -429,6 +432,22 @@ export default {
             .u-desc, .u-page { display: none; }
         }
         .m-collection-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+        .m-collection-pagination {
+            width: 100%;
+            max-width: 320px;
+            min-width: 0;
+            margin-right: auto;
+            margin-left: auto;
+            justify-content: center;
+            overflow: hidden;
+
+            .btn-prev,
+            .btn-next,
+            .el-pager li {
+                min-width: 32px;
+                margin: 0 2px;
+            }
+        }
         .m-collection-skeleton {
             .u-skeleton-desc,
             .u-skeleton-page { display: none; }

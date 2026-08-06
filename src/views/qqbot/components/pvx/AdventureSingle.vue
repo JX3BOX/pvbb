@@ -232,6 +232,11 @@ export default {
 
 <style lang="less">
 .m-qqbot-pvx-adventure {
+    .u-reward [style*="background"],
+    .u-content [style*="background"] {
+        background: transparent !important;
+    }
+
     .m-robot__adventure-header {
         .flex;
         justify-content: space-between;

@@ -338,10 +338,4 @@ export default {
         }
     }
 }
-
-@media screen and (max-width: @phone) {
-    .wechat-miniprogram .m-emotion-publish {
-        display: none;
-    }
-}
 </style>

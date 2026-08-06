@@ -364,8 +364,33 @@
         width: 100%;
     }
     .m-community-pages {
-        overflow: auto;
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
         justify-content: center;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .m-topic-pagination {
+        width: calc(100% - 20px);
+        max-width: 320px;
+        margin: 0 auto;
+
+        .m-topic-pages {
+            height: 32px;
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .m-community-pages {
+            .btn-prev,
+            .btn-next,
+            .el-pager li {
+                min-width: 32px;
+                margin: 0 2px;
+            }
+        }
     }
 }
 .scrollbar {

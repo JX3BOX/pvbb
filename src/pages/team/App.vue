@@ -140,5 +140,4 @@ export default {
 <style lang="less">
 @import "@/assets/css/team/app.less";
 @import "@/assets/css/team/modules/home-theme.less";
-@import "@/assets/css/team/miniprogram.less";
 </style>

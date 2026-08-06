@@ -5,18 +5,13 @@
  * @Description:
  */
 import { createRouter, createWebHistory } from "vue-router";
-import { isMiniProgram, isApp } from "@jx3box/jx3box-common/js/utils";
 
 const Namespace = () => import("../views/Namespace.vue");
-const NamespaceMobile = () => import("../views/Namespace-mobile.vue");
 const Joke = () => import("../views/Joke/Joke.vue");
-const JokeMobile = () => import("../views/Joke/Joke-mobile.vue");
 
 const Emotion = () => import("../views/emotion/Emotion.vue");
-const EmotionMobile = () => import("../views/emotion/Emotion-mobile.vue");
 const Collection = () => import("../views/Collection.vue");
 const CollectionSingle = () => import("@/components/collection/collection_single.vue");
-const CollectionMiniSingle = () => import("@/components/collection/collection_mini_single.vue");
 
 const routes = [
     { name: "index", path: "/", redirect: { name: "community" } },
@@ -75,7 +70,7 @@ const routes = [
     {
         name: "namespace",
         path: "/namespace",
-        component: isMiniProgram() || isApp() ? NamespaceMobile : Namespace,
+        component: Namespace,
         meta: {
             i18n: {
                 title: "pages.namespace.title",
@@ -101,7 +96,7 @@ const routes = [
     {
         name: "joke",
         path: "/joke/:id?",
-        component: isMiniProgram() || isApp() ? JokeMobile : Joke,
+        component: Joke,
         meta: {
             i18n: {
                 title: "pages.joke.title",
@@ -115,7 +110,7 @@ const routes = [
     {
         name: "emotion",
         path: "/emotion/:id?",
-        component: isMiniProgram() || isApp() ? EmotionMobile : Emotion,
+        component: Emotion,
         meta: {
             i18n: {
                 title: "pages.emotion.title",
@@ -141,7 +136,7 @@ const routes = [
     {
         name: "collection-single",
         path: "/collection/:id",
-        component: isMiniProgram() || isApp() ? CollectionMiniSingle : CollectionSingle,
+        component: CollectionSingle,
         meta: {
             i18n: {
                 title: "pages.collection.title",

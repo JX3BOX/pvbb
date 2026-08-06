@@ -59,7 +59,7 @@
                     :loading="loadingMore"
                     :disabled="!hasNextPage"
                     :icon="hasNextPage ? 'ArrowDown' : ''"
-                    size="large"
+                    :size="isMobilePagination ? 'default' : 'large'"
                     @click="appendPage"
                 >
                     {{ hasNextPage ? $t("pages.joke.loadMore") : $t("pages.joke.noMore") }}
@@ -70,7 +70,8 @@
                     background
                     :page-size="per"
                     :hide-on-single-page="true"
-                    layout="total, prev, pager, next, jumper,sizes"
+                    :layout="isMobilePagination ? 'prev, pager, next' : 'total, prev, pager, next, jumper, sizes'"
+                    :pager-count="isMobilePagination ? 5 : 7"
                     :total="total"
                     :page-sizes="[10, 30, 50, 70, 90]"
                     @current-change="handleCurrentChange"
@@ -105,9 +106,11 @@ import { getLikes } from "@/service/next";
 import User from "@jx3box/jx3box-common/js/user";
 import { toggleStarWithAutoAppraise } from "@/utils/starAutoAppraise";
 import { getPaginationFromQuery, isSameRouteQuery, shouldReplacePaginationQuery } from "@/utils/listQuery";
+import responsivePagination from "@/mixins/responsive-pagination";
 
 export default {
     name: "JokeList",
+    mixins: [responsivePagination],
     components: {
         ContentListShell,
         ContentSearchBar,

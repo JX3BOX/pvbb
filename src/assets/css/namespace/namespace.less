@@ -253,8 +253,9 @@
 }
 .m-namespace-pages {
     margin-top:20px;
-    overflow-x: auto;
-    .x;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
     justify-content: center;
 }
 .m-namespace-null {
@@ -353,6 +354,19 @@
 }
 
 @media screen and (max-width: @phone) {
+    .m-namespace-pages {
+        max-width: 320px;
+        margin-right: auto;
+        margin-left: auto;
+
+        .btn-prev,
+        .btn-next,
+        .el-pager li {
+            min-width: 32px;
+            margin: 0 2px;
+        }
+    }
+
     .m-namespace-hero {
         align-items: flex-start;
         flex-direction: column;

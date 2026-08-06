@@ -75,3 +75,17 @@ VUE_APP_QQBOT_READY_LOG=false
 - 最后的渲染帧稳定
 
 默认最长等待 8 秒，避免单个资源异常导致截图服务永久挂起。
+
+## 奇遇详情富文本
+
+`/qqbot/pvx?type=adventure` 的前置条件、触发方式、流程和奖励来自百科富文本，并通过 `v-html` 注入 `AdventureSingle.vue` 的深色机器人卡片。
+
+富文本可能携带编辑器写入的浅色内联背景，例如 `background-color: #fafbfc`。奇遇组件同时会将正文文字统一为白色，因此必须在 `.m-qqbot-pvx-adventure` 范围内清除这些富文本节点的内联背景，避免截图出现白底白字。
+
+约束如下：
+
+- 背景清理只能限定在 `.m-qqbot-pvx-adventure`。
+- 只清理奖励区和正文区中带 `background` 内联样式的节点。
+- 不修改接口返回或百科原始 HTML。
+- 不使用全局 `p`、`div`、`.c-article` 等宽泛选择器。
+- 其他 QQBot 类型必须保留各自的富文本展示规则。

@@ -2,21 +2,22 @@
     <div class="m-topic-pagination">
         <el-button
             class="m-topic-pages"
-            :style="{ fontSize: hasNextPage ? '14px' : '12px' }"
+            :style="{ fontSize: isMobilePagination ? '13px' : hasNextPage ? '14px' : '12px' }"
             :type="hasNextPage ? 'primary' : 'info'"
             :link="!hasNextPage"
             @click="appendPage"
             :loading="loading"
             :disabled="!hasNextPage"
             :icon="hasNextPage ? 'ArrowDown' : ''"
-            size="large"
+            :size="isMobilePagination ? 'default' : 'large'"
         >
             {{ hasNextPage ? $t("pages.community.list.loadMore") : $t("pages.community.list.noMore") }}
         </el-button>
         <el-pagination
             class="m-community-pages"
             background
-            layout="total, prev, pager, next, jumper"
+            :layout="isMobilePagination ? 'prev, pager, next' : 'total, prev, pager, next, jumper'"
+            :pager-count="isMobilePagination ? 5 : 7"
             :hide-on-single-page="true"
             :page-size="per"
             :total="total"
@@ -27,8 +28,11 @@
 </template>
 
 <script>
+import responsivePagination from "@/mixins/responsive-pagination";
+
 export default {
     name: "PaginationComponent",
+    mixins: [responsivePagination],
     props: {
         per: {
             type: Number,

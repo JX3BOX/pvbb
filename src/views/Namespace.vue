@@ -98,7 +98,8 @@
                     v-if="!loading"
                     class="m-namespace-pages"
                     background
-                    layout="total, prev, pager, next,jumper"
+                    :layout="isMobilePagination ? 'prev, pager, next' : 'total, prev, pager, next, jumper'"
+                    :pager-count="isMobilePagination ? 5 : 7"
                     :hide-on-single-page="true"
                     :page-size="per"
                     :total="total"
@@ -114,9 +115,11 @@ import namespaceItem from "@/components/namespace/namespace_item";
 import { getNamespaceList } from "@/service/namespace.js";
 import { publishLink } from "@jx3box/jx3box-common/js/utils.js";
 import ListLayout from "@/layouts/ListLayout.vue";
+import responsivePagination from "@/mixins/responsive-pagination";
 
 export default {
     name: "Namespace",
+    mixins: [responsivePagination],
     props: [],
     data: function () {
         return {
