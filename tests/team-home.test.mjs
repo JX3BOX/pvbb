@@ -655,10 +655,11 @@ test("team role table follows the archive certification table language", async (
 });
 
 test("DKP tables follow the archive certification table language", async () => {
-    const [manager, managerStyles, list, logs, listStyles, logStyles, characterStyles, dialog, dialogStyles] =
+    const [manager, managerStyles, myDkp, list, logs, listStyles, logStyles, characterStyles, dialog, dialogStyles] =
         await Promise.all([
             read("../src/views/team/dkp/ManageDkp.vue"),
             read("../src/assets/css/team/dkp/list_dkp.less"),
+            read("../src/views/team/dkp/MyDkp.vue"),
             read("../src/components/team/dkp/dkp_list.vue"),
             read("../src/components/team/dkp/dkp_logs.vue"),
             read("../src/assets/css/team/dkp/dkp_list.less"),
@@ -685,6 +686,8 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(managerStyles, /\.m-dkp-manage-nav[\s\S]*button[\s\S]*&\.is-active/);
     assert.match(managerStyles, /\.u-dkp-help\s*\{[\s\S]*?margin-left:\s*auto/);
     assert.match(managerStyles, /\.m-dkp-danger-card\s*\{[\s\S]*?fade\(#ef4444, 24%\)/);
+    assert.match(myDkp, /this\.rank = this\.overview\.rank \|\| ""/);
+    assert.doesNotMatch(myDkp, /getTeamDkpList/);
     assert.doesNotMatch(list, /<el-table[\s\S]*?\sborder(?:\s|>)/);
     assert.match(list, /type="selection" width="52" align="center"/);
     assert.match(list, /:label="\$t\('team\.dkp\.operation'\)" width="120" v-if="!readOnly"/);
@@ -694,6 +697,7 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.match(logStyles, /\.m-dkp-logs-container[\s\S]*border-radius:\s*12px/);
     assert.match(logStyles, /--el-table-border-color:\s*@team-border-light/);
     assert.match(logs, /class="u-user" :href="authorLink\(scope\.row\.user_id\)"/);
+    assert.match(logs, /\.catch\(\(\) => \{[\s\S]*?this\.logs = \[\][\s\S]*?this\.pagination\.total = 0/);
     assert.match(logStyles, /\.u-user\s*\{[\s\S]*display:\s*inline-flex[\s\S]*align-items:\s*center/);
     assert.doesNotMatch(listStyles, /content:\s*"全选"/);
     assert.match(list, /popper-class="m-dkp-role-popover"/);

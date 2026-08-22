@@ -89,7 +89,7 @@
 <script>
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import { getMyJoinedTeams, getMyTeamUsersNoPager } from "@/service/team/member.js";
-import { getTeamMyDkp, getTeamDkpList } from "@/service/team/dkp.js";
+import { getTeamMyDkp } from "@/service/team/dkp.js";
 import User from "@jx3box/jx3box-common/js/user";
 import dkp_logs from "@/components/team/dkp/dkp_logs.vue";
 import dkp_list from "@/components/team/dkp/dkp_list.vue";
@@ -143,21 +143,18 @@ export default {
                         score: 0,
                         total: 0,
                     };
+                    this.rank = this.overview.rank || "";
+                })
+                .catch(() => {
+                    this.overview = {
+                        score: 0,
+                        total: 0,
+                    };
+                    this.rank = "";
                 })
                 .finally(() => {
                     this.overview_loading = false;
                 });
-            getTeamDkpList(this.org).then((res) => {
-                let list = res.data.data;
-                list.sort((a, b) => {
-                    return b.score - a.score;
-                });
-                list.forEach((item, i) => {
-                    if (item.user_id == User.getInfo().uid) {
-                        this.rank = i + 1;
-                    }
-                });
-            });
         },
         loadDkpLogs: function () {},
         showAllTeamScores: function () {
