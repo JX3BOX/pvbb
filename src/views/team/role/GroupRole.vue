@@ -31,8 +31,9 @@
                                 <thead>
                                     <tr>
                                         <th>{{ $t("team.role.roleName") }}</th>
-                                        <th>{{ $t("team.raid.roleDialog.mount") }}</th>
+                                        <th>{{ $t("team.role.school") }}</th>
                                         <th>{{ $t("team.role.bodyType") }}</th>
+                                        <th>{{ $t("team.mountPreference.label") }}</th>
                                         <th>{{ $t("team.role.joinedAt") }}</th>
                                         <th>{{ $t("team.role.public") }}</th>
                                         <th>{{ $t("team.role.operation") }}</th>
@@ -46,6 +47,21 @@
                                             {{ showSchoolName(role.info.mount) }}
                                         </td>
                                         <td>{{ showBodyType(role.info.body_type) }}</td>
+                                        <td class="u-role-mount-preference-cell">
+                                            <RoleMountPreferenceSelect
+                                                v-model="role.info.mounts"
+                                                :role-mount="role.info.mount"
+                                            />
+                                            <el-button
+                                                type="primary"
+                                                size="small"
+                                                :loading="savingKey === preferenceKey(item.team_info.ID, role.info.ID)"
+                                                :disabled="!role.info.mounts || !role.info.mounts.length"
+                                                @click="saveMounts(item.team_info.ID, role.info)"
+                                            >
+                                                {{ $t("team.mountPreference.save") }}
+                                            </el-button>
+                                        </td>
                                         <td>{{ showTime(role.relation.created_at) }}</td>
                                         <td>
                                             <el-switch
@@ -86,6 +102,13 @@
 
 <script>
 import { getMyJoinedTeams, changeRolePublic, quitTeam } from "@/service/team/member.js";
+import {
+    deleteRoleMountPreference,
+    getRoleMountPreferences,
+    saveRoleMountPreferences,
+} from "@/service/team/role_mount_preference";
+import RoleMountPreferenceSelect from "@/components/team/member/RoleMountPreferenceSelect.vue";
+import { mergeRoleMountPreferences } from "@/utils/team-role-mounts";
 import { getThumbnail } from "@jx3box/jx3box-common/js/utils";
 import User from "@jx3box/jx3box-common/js/user";
 import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
@@ -101,6 +124,7 @@ export default {
 
             uid: User.getInfo().uid,
             loading: false,
+            savingKey: "",
 
             org: "",
             team_link: {
@@ -113,9 +137,28 @@ export default {
         loadData: function () {
             this.loading = true;
             getMyJoinedTeams()
-                .then((res) => {
+                .then(async (res) => {
                     this.data = res.data.data || [];
-                    this.org = String(this.data[0]["team_info"]["ID"]);
+                    await Promise.all(
+                        this.data.map(async (team) => {
+                            const roles = (team.roles || []).map((role) => ({ ...role.info }));
+                            try {
+                                const preferenceResponse = await getRoleMountPreferences(team.team_info.ID);
+                                const mergedRoles = mergeRoleMountPreferences(
+                                    roles,
+                                    preferenceResponse.data.data || []
+                                );
+                                team.roles.forEach((role, index) => {
+                                    role.info.mounts = mergedRoles[index].mounts || [];
+                                });
+                            } catch {
+                                team.roles.forEach((role) => {
+                                    role.info.mounts = Array.isArray(role.info.mounts) ? role.info.mounts : [];
+                                });
+                            }
+                        })
+                    );
+                    this.org = this.data.length ? String(this.data[0]["team_info"]["ID"]) : "";
                 })
                 .finally(() => {
                     this.loading = false;
@@ -130,8 +173,27 @@ export default {
                 });
             });
         },
+        preferenceKey: function (teamId, roleId) {
+            return `${teamId}:${roleId}`;
+        },
+        saveMounts: function (teamId, role) {
+            if (!role.mounts?.length) return;
+            this.savingKey = this.preferenceKey(teamId, role.ID);
+            saveRoleMountPreferences(teamId, [{ role_id: role.ID, mounts: role.mounts }])
+                .then(() => {
+                    this.$notify({
+                        title: this.$t("team.mountPreference.saved"),
+                        message: this.$t("team.mountPreference.savedHint"),
+                        type: "success",
+                    });
+                })
+                .finally(() => {
+                    this.savingKey = "";
+                });
+        },
         quitTeam: function (team_id, role_id, list, i) {
             quitTeam(team_id, role_id).then((res) => {
+                deleteRoleMountPreference(team_id, role_id).catch(() => {});
                 this.$notify({
                     title: this.$t("team.role.quitSuccess"),
                     message: this.$t("team.role.quitMessage"),
@@ -166,6 +228,9 @@ export default {
                 }
             },
         },
+    },
+    components: {
+        RoleMountPreferenceSelect,
     },
 };
 </script>

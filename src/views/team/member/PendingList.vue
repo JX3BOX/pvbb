@@ -58,6 +58,21 @@
                             </span>
                             <span>{{ showBodyType(item.role.body_type) }}</span>
                         </span>
+                        <div class="u-declared-mounts">
+                            <span class="u-declared-label">
+                                <el-icon><MagicStick /></el-icon>
+                                {{ $t("team.mountPreference.label") }}
+                            </span>
+                            <div class="u-declared-mount-list">
+                                <template v-if="item.role.mounts && item.role.mounts.length">
+                                    <span v-for="mount in item.role.mounts" :key="mount" class="u-declared-mount">
+                                        <img :src="showMountIcon(mount)" :alt="showMountName(mount)" />
+                                        {{ showMountName(mount) }}
+                                    </span>
+                                </template>
+                                <em v-else>{{ $t("team.mountPreference.unconfigured") }}</em>
+                            </div>
+                        </div>
                         <div class="u-apply-meta">
                             <span>
                                 <el-icon><User /></el-icon>
@@ -125,9 +140,11 @@
 <script>
 import { authorLink } from "@jx3box/jx3box-common/js/utils";
 import { getTeamPendingMembers, checkRole, deleteRole } from "@/service/team/member.js";
+import { getRoleMountPreferences } from "@/service/team/role_mount_preference";
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
-import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
-import { Check, CircleCheckFilled, Clock, Close, Finished, User } from "@element-plus/icons-vue";
+import { showBodyType, showMountIcon, showMountName, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
+import { mergeRoleMountPreferences } from "@/utils/team-role-mounts";
+import { Check, CircleCheckFilled, Clock, Close, Finished, MagicStick, User } from "@element-plus/icons-vue";
 export default {
     name: "ListMemberPending",
     emits: ["pending-count-change"],
@@ -157,8 +174,18 @@ export default {
         loadData: function () {
             this.loading = true;
             getTeamPendingMembers(this.team_id, this.params)
-                .then((res) => {
-                    this.data = res.data.data.list || [];
+                .then(async (res) => {
+                    const list = res.data.data.list || [];
+                    try {
+                        const preferenceResponse = await getRoleMountPreferences(this.team_id);
+                        const roles = mergeRoleMountPreferences(
+                            list.map((item) => ({ ...item.role, ID: item.relation.role_id })),
+                            preferenceResponse.data.data || []
+                        );
+                        this.data = list.map((item, index) => ({ ...item, role: roles[index] }));
+                    } catch {
+                        this.data = list;
+                    }
                     this.updateTotal(res.data.data.page.total);
                 })
                 .finally(() => {
@@ -243,6 +270,8 @@ export default {
         },
         authorLink,
         showBodyType,
+        showMountIcon,
+        showMountName,
         showSchoolIcon,
         showSchoolName,
         showTime,
@@ -267,6 +296,7 @@ export default {
         Clock,
         Close,
         Finished,
+        MagicStick,
         RoleAvatar,
         User,
     },

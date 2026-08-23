@@ -274,18 +274,22 @@ test("team join dialog uses an isolated responsive role picker without changing 
     assert.match(dialog, /width="820px"[\s\S]*?align-center/);
     assert.match(dialog, /class="m-team-joinpop-header"/);
     assert.match(dialog, /class="m-team-joinpop-toolbar"/);
-    assert.match(dialog, /class="u-role-card" border/);
+    assert.match(dialog, /class="u-role-card"\s+border/);
+    assert.match(dialog, /class="m-team-joinpop-preferences"/);
+    assert.match(dialog, /v-for="item in selectedRoles"/);
     assert.match(dialog, /class="u-footer-actions"/);
-    assert.match(dialog, /:disabled="loading \|\| !roles\.length"/);
+    assert.match(dialog, /:disabled="loading \|\| !allPreferencesReady"/);
     assert.match(dialog, /:loading="submitting"/);
     assert.match(dialog, /v-loading="loading"/);
     assert.match(dialog, /this\.isIndeterminate = value\.length > 0 && value\.length < total/);
-    assert.match(dialog, /if \(!this\.roles\.length \|\| this\.submitting\) return/);
+    assert.match(dialog, /if \(!this\.allPreferencesReady \|\| this\.submitting\)/);
     assert.match(dialog, /version !== this\.loadVersion \|\| !this\.visible/);
     assert.match(service, /get\(`\/api\/team\/relation\/my\/\$\{team_id\}\/roles\/not-at-team`\)/);
     assert.match(service, /post\(`\/api\/team\/relation\/my\/\$\{team_id\}\/join`,\s*\{[\s\S]*?roles:\s*list/);
     assert.match(styles, /\.m-team-member-join-dialog\.el-dialog\s*\{[\s\S]*?border-radius:\s*18px/);
     assert.match(styles, /\.u-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
+    assert.match(styles, /\.u-preferences-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+    assert.doesNotMatch(styles, /is-with-preference/);
     assert.match(styles, /\.el-checkbox\.is-bordered\.u-role-card[\s\S]*?&\.is-checked/);
     assert.match(styles, /\.el-checkbox__input\.is-checked \.el-checkbox__inner::after[\s\S]*?translate\(-50%, -58%\)/);
     assert.match(

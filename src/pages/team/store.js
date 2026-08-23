@@ -1,6 +1,8 @@
 import { createStore } from "vuex";
 
 import { getRoles } from "@/service/team/raid.js";
+import { getRoleMountPreferences } from "@/service/team/role_mount_preference";
+import { mergeRoleMountPreferences } from "@/utils/team-role-mounts";
 
 let store = {
     state: {
@@ -62,10 +64,16 @@ let store = {
     },
     getters: {},
     actions: {
-        loadAllRoles({ commit }, { teamId }) {
-            getRoles(teamId, "").then((res) => {
-                commit("SET_ROLES", res.data.data.list);
-            });
+        async loadAllRoles({ commit }, { teamId }) {
+            const res = await getRoles(teamId, "");
+            const roles = res.data.data.list || [];
+            try {
+                const preferenceResponse = await getRoleMountPreferences(teamId);
+                commit("SET_ROLES", mergeRoleMountPreferences(roles, preferenceResponse.data.data || []));
+            } catch {
+                // 偏好接口不可用时保留旧门派推导逻辑，不阻断排表加载。
+                commit("SET_ROLES", roles);
+            }
         },
     },
     modules: {},

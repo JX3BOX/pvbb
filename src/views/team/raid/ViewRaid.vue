@@ -267,10 +267,10 @@ export default {
             return !!this.data?.content;
         },
         displayRow: function () {
-            return Number(this.data?.row) || 5;
+            return Number(this.data?.count) === 10 ? 5 : Number(this.data?.row) || 5;
         },
         displayCol: function () {
-            return Number(this.data?.col) || 5;
+            return Number(this.data?.count) === 10 ? 5 : Number(this.data?.col) || 5;
         },
         chosenRole: function ({ formData }) {
             const data = {

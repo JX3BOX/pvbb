@@ -73,6 +73,15 @@ test("member management uses the current workspace tabs and compact account card
     assert.match(listStyles, /\.u-member-skeleton[\s\S]*height:\s*100%/);
     assert.match(listStyles, /\.u-skeleton-avatar\.el-skeleton__item[\s\S]*width:\s*46px/);
     assert.match(listStyles, /\.u-pending-skeleton[\s\S]*grid-template-columns:\s*60px minmax\(0,\s*1fr\)/);
+    assert.match(listStyles, /\.m-pending-card[\s\S]*\.u-declared-mounts\s*\{[\s\S]*margin:\s*10px 0 12px/);
+    assert.match(pendingList, /class="u-declared-label"[\s\S]*<MagicStick/);
+    assert.match(pendingList, /class="u-declared-mount-list"/);
+    assert.match(listStyles, /\.u-declared-label\s*\{[\s\S]*font-size:\s*11px/);
+    assert.match(listStyles, /\.u-declared-mount-list\s*\{[\s\S]*overflow-x:\s*auto/);
+    assert.match(listStyles, /\.m-pending-card[\s\S]*\.u-apply-meta[\s\S]*gap:\s*7px 12px/);
+    assert.match(listStyles, /\.m-pending-card\s*\{[\s\S]*align-self:\s*start/);
+    assert.match(listStyles, /\.u-declared-mount[\s\S]*padding:\s*1px 6px[\s\S]*font-size:\s*11px/);
+    assert.match(listStyles, /\.u-btn\s*\{[\s\S]*height:\s*38px/);
     assert.match(listStyles, /\.u-skeleton-actions[\s\S]*grid-column:\s*1 \/ -1/);
     assert.match(listStyles, /@media screen and \(max-width:\s*620px\)[\s\S]*grid-auto-rows:\s*72px/);
     assert.doesNotMatch(listStyles, /grid-auto-rows:\s*(?:360|400)px/);

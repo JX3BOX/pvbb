@@ -353,6 +353,117 @@
         gap: 10px;
     }
 
+    .m-team-joinpop-preferences {
+        margin-top: @team-space-4;
+        padding-top: @team-space-3;
+        border-top: 1px solid @team-border-light;
+    }
+
+    .u-preferences-heading {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: @team-space-2;
+        gap: @team-space-2;
+
+        strong {
+            color: @team-text-primary;
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        span {
+            color: @team-text-secondary;
+            font-size: 12px;
+            line-height: 18px;
+        }
+    }
+
+    .u-preferences-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: @team-space-2;
+    }
+
+    .u-preference-card {
+        display: grid;
+        min-width: 0;
+        padding: @team-space-2;
+        border: 1px solid @team-border;
+        border-radius: 12px;
+        background: @team-surface-muted;
+        grid-template-columns: 128px minmax(0, 1fr);
+        gap: @team-space-2;
+    }
+
+    .u-preference-role {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .u-preference-avatar {
+        width: 34px;
+        height: 34px;
+        flex: none;
+        padding: 3px;
+        border-radius: 9px;
+        background: @team-surface;
+        object-fit: contain;
+    }
+
+    .u-preference-role__copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 2px;
+
+        strong,
+        small {
+            display: block;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        strong {
+            color: @team-text-primary;
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        small {
+            color: @team-text-secondary;
+            font-size: 11px;
+            line-height: 16px;
+        }
+    }
+
+    .u-role-mount-preference {
+        position: relative;
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .u-preference-label {
+        display: flex;
+        align-items: center;
+        color: @team-text-regular;
+        font-size: 12px;
+        line-height: 18px;
+        gap: 5px;
+
+        b {
+            color: #f56c6c;
+            font-size: 11px;
+            font-weight: 500;
+        }
+    }
+
     .u-item-avatar {
         display: block;
         width: 42px;
@@ -464,6 +575,10 @@
         .u-list {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
+        .u-preferences-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
     }
 }
 
@@ -508,6 +623,14 @@
         }
 
         .u-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .u-preferences-heading span {
+            display: none;
+        }
+
+        .u-preference-card {
             grid-template-columns: minmax(0, 1fr);
         }
 
