@@ -48,6 +48,11 @@ test("activity center restores the public raid list inside the modern team shell
     assert.match(styles, /\.u-center-operation/);
     assert.match(styles, /\.u-center-type/);
     assert.match(styles, /\.u-center-title/);
+    assert.match(styles, /\.m-activity-center-actions\s*\{[\s\S]*width: 100%;[\s\S]*justify-content: stretch;[\s\S]*grid-area: actions;/);
+    assert.match(styles, /\.u-create-activity\s*\{[\s\S]*width: 100%;[\s\S]*min-height: 44px;/);
+    assert.match(styles, /grid-template-areas:[\s\S]*"icon eyebrow"[\s\S]*"description description"[\s\S]*"actions actions"/);
+    assert.match(styles, /\.m-activity-center-heading\s*\{[\s\S]*display: contents;/);
+    assert.match(styles, /grid-area: description/);
 });
 
 test("activity center weekdays follow the active i18n locale", async () => {

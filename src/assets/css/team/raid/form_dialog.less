@@ -271,11 +271,31 @@
 }
 
 @media screen and (max-width: 620px) {
-    .m-raid-form-dialog {
-        .el-dialog__header,
+    .m-raid-form-dialog.el-dialog {
+        width: 100% !important;
+        max-width: none;
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+
+        .el-dialog__header {
+            padding: max(@team-space-4, env(safe-area-inset-top)) @team-space-3 @team-space-3;
+        }
+
+        .el-dialog__headerbtn {
+            width: 52px;
+            height: 52px;
+        }
+
+        .el-dialog__body {
+            overscroll-behavior: contain;
+        }
+
         .el-dialog__footer {
-            padding-right: @team-space-3;
-            padding-left: @team-space-3;
+            padding: @team-space-3 @team-space-3 max(@team-space-3, env(safe-area-inset-bottom));
         }
     }
 
@@ -291,8 +311,40 @@
         }
     }
 
-    .u-auth-options .el-radio-group {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .u-auth-options {
+        .el-radio-group {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: @team-space-2;
+        }
+
+        .el-radio-button__inner {
+            display: flex;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid @team-border !important;
+            border-radius: 10px !important;
+            background: @team-surface-muted;
+            box-shadow: none !important;
+            color: @team-text-secondary;
+            font-weight: 600;
+            transition: color @team-duration-fast @team-ease-standard,
+                border-color @team-duration-fast @team-ease-standard,
+                background-color @team-duration-fast @team-ease-standard;
+        }
+
+        .el-radio-button:not(.is-active) .el-radio-button__inner:hover {
+            border-color: @team-border-focus !important;
+            background: @team-primary-soft;
+            color: @team-primary;
+        }
+
+        .el-radio-button.is-active .el-radio-button__inner {
+            border-color: @team-primary !important;
+            background: @team-primary;
+            box-shadow: 0 6px 14px fade(@team-primary, 18%) !important;
+            color: @team-text-inverse;
+        }
     }
 
     .m-raid-size-row {
@@ -305,6 +357,16 @@
 
         .u-capacity {
             margin-left: 0;
+        }
+    }
+
+    .m-raid-dialog-footer {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        .el-button {
+            width: 100%;
+            min-height: 42px;
         }
     }
 }

@@ -6,6 +6,20 @@ async function read(path) {
     return readFile(new URL(path, import.meta.url), "utf8");
 }
 
+test("the deprecated standalone team battle page redirects home and has no navigation entry", async () => {
+    const [router, legacyNav, workspace] = await Promise.all([
+        read("../src/pages/team/router.js"),
+        read("../src/components/team/widget/Nav.vue"),
+        read("../src/views/team/org/ViewMyOrg.vue"),
+    ]);
+
+    assert.doesNotMatch(router, /const Battle\s*=\s*\(\)\s*=>/);
+    assert.match(router, /path:\s*["']\/battle["'][\s\S]*?redirect:\s*["']\/["']/);
+    assert.doesNotMatch(router, /name:\s*["']Battle["']/);
+    assert.doesNotMatch(legacyNav, /to=["']\/battle["']/);
+    assert.match(workspace, /<ManageBattle[^>]*:team-id="id"/);
+});
+
 test("battle cards keep combat and linked data columns aligned when ranking data is absent", async () => {
     const [item, styles] = await Promise.all([
         read("../src/views/team/battle/battleItem.vue"),
@@ -142,7 +156,7 @@ test("personal battle ranking links target the DPS ladder for the record mount",
 test("personal battle records can hide non-ranking records without removing pagination", async () => {
     const page = await read("../src/views/team/battle/myBattle.vue");
 
-    assert.match(page, /v-model="filterRanking" :active-text="\$t\('pages\.team\.battle\.activityOnly'\)"/);
+    assert.match(page, /class="u-notice-filter"[\s\S]*?pages\.team\.battle\.activityOnly[\s\S]*?v-model="filterRanking"/);
     assert.match(page, /m-battle-notice--filter"[^>]*:closable="false"/);
     assert.match(page, /v-for="item in displayList"/);
     assert.match(
@@ -159,7 +173,7 @@ test("personal battle records can hide non-ranking records without removing pagi
 test("team battle management exposes the same persisted activity filter", async () => {
     const page = await read("../src/views/team/battle/index.vue");
 
-    assert.match(page, /v-model="filterRanking" :active-text="\$t\('pages\.team\.battle\.activityOnly'\)"/);
+    assert.match(page, /class="u-notice-filter"[\s\S]*?pages\.team\.battle\.activityOnly[\s\S]*?v-model="filterRanking"/);
     assert.match(page, /m-battle-notice--filter"[^>]*:closable="false"/);
     assert.match(page, /v-for="\(item, i\) in displayList"/);
     assert.match(page, /item\.boss_info\?\.is_rank_boss > 0 \|\| Boolean\(item\.aid_info\?\.event_id\)/);
@@ -203,7 +217,8 @@ test("battle notice keeps its copy and activity filter in a compact responsive t
 
     assert.match(styles, /\.m-battle-notice__content[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
     assert.match(styles, /\.u-notice-meta[\s\S]*?display:\s*flex[\s\S]*?flex-wrap:\s*wrap/);
-    assert.match(styles, /max-width:\s*480px[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+    assert.match(styles, /\.u-notice-filter\s*\{[\s\S]*?justify-content:\s*space-between[\s\S]*?background:\s*fade\(#fff, 62%\)/);
+    assert.match(styles, /max-width:\s*@phone[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-notice-filter\s*\{[\s\S]*?width:\s*100%/);
     assert.doesNotMatch(styles, /\.m-battle-notice__content\s*\{[\s\S]{0,120}flex-direction:\s*column/);
 });
 

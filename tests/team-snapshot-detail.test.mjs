@@ -37,6 +37,19 @@ test("snapshot supplement mount selector shows mount icons", async () => {
     assert.match(dialog, /class="m-snapshot-xf-option"[\s\S]*?:src="showMountIcon\(item\.id\)"/);
 });
 
+test("snapshot supplement dialog becomes a scrollable full-screen mobile editor", async () => {
+    const dialog = await readFile(
+        new URL("../src/components/team/snapshot/EditSnapshotDialog.vue", import.meta.url),
+        "utf8"
+    );
+
+    assert.match(dialog, /@media screen and \(max-width: 620px\)[\s\S]*?\.m-snapshot-edit-dialog\.el-dialog/);
+    assert.match(dialog, /\.m-snapshot-edit-dialog\.el-dialog\s*\{[\s\S]*?width:\s*100% !important;[\s\S]*?height:\s*100dvh;[\s\S]*?margin:\s*0 !important;[\s\S]*?border-radius:\s*0/);
+    assert.match(dialog, /\.el-dialog__body\s*\{[\s\S]*?flex:\s*1;[\s\S]*?overflow-y:\s*auto;[\s\S]*?overscroll-behavior:\s*contain/);
+    assert.match(dialog, /\.el-dialog__footer\s*\{[\s\S]*?env\(safe-area-inset-bottom\)[\s\S]*?background:\s*@team-surface/);
+    assert.match(dialog, /\.m-snapshot-edit__footer\s*\{[\s\S]*?\.el-button\s*\{[\s\S]*?flex:\s*1/);
+});
+
 test("snapshot title identifies the in-game uploader by jx3id", async () => {
     const item = await readFile(
         new URL("../src/components/team/snapshot/snapshotItem.vue", import.meta.url),

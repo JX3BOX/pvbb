@@ -131,7 +131,12 @@
                                 class="u-user-avatar"
                                 :src="showAvatar(item.super_user_info && item.super_user_info.avatar)"
                             />
-                            {{ item.super_user_info && item.super_user_info.display_name }}
+                            <span
+                                class="u-super-name"
+                                :title="item.super_user_info && item.super_user_info.display_name"
+                            >
+                                {{ item.super_user_info && item.super_user_info.display_name }}
+                            </span>
                         </a>
                     </span>
                 </span>

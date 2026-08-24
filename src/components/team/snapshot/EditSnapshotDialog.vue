@@ -764,8 +764,73 @@ export default {
 }
 
 @media screen and (max-width: 620px) {
-    .m-snapshot-edit-dialog {
-        width: calc(100% - 24px) !important;
+    .m-snapshot-edit-dialog.el-dialog {
+        display: flex;
+        width: 100% !important;
+        max-width: none;
+        height: 100vh;
+        height: 100dvh;
+        flex-direction: column;
+        margin: 0 !important;
+        overflow: hidden;
+        border-radius: 0;
+
+        .el-dialog__header {
+            flex: none;
+            padding: 16px 18px 14px;
+        }
+
+        .el-dialog__title {
+            font-size: 18px;
+            line-height: 26px;
+        }
+
+        .el-dialog__body {
+            min-height: 0;
+            flex: 1;
+            padding: 16px 18px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .el-dialog__footer {
+            flex: none;
+            padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+            background: @team-surface;
+        }
+    }
+
+    .m-snapshot-edit {
+        min-height: 0;
+    }
+
+    .m-snapshot-edit__segmented {
+        margin-bottom: 16px;
+    }
+
+    .m-snapshot-edit__form {
+        .el-form-item {
+            margin-bottom: 16px;
+        }
+
+        .el-form-item__label {
+            padding-bottom: 5px;
+        }
+
+        .el-textarea__inner {
+            min-height: 108px !important;
+            resize: none;
+        }
+    }
+
+    .m-snapshot-edit__footer {
+        width: 100%;
+
+        .el-button {
+            min-height: 42px;
+            min-width: 0;
+            flex: 1;
+        }
     }
 
     .m-snapshot-edit__member-list {

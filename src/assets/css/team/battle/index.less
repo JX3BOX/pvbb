@@ -68,14 +68,29 @@
                 }
             }
 
-            .el-switch {
-                flex: none;
+            .u-notice-filter {
+                display: flex;
+                min-width: 0;
+                min-height: 36px;
+                align-items: center;
+                justify-content: space-between;
+                padding: 6px 10px;
+                border: 1px solid fade(#f59e0b, 18%);
+                border-radius: 10px;
+                background: fade(#fff, 62%);
+                gap: @team-space-3;
             }
 
-            .el-switch__label {
+            .u-notice-filter-label {
                 color: @team-text-secondary;
                 font-size: 12px;
                 font-weight: 600;
+                line-height: 18px;
+                white-space: nowrap;
+            }
+
+            .el-switch {
+                flex: none;
             }
         }
     }
@@ -86,27 +101,14 @@
     .m-team-view {
         .m-battle-notice {
             padding: 12px;
-        }
 
-        .m-battle-notice__content {
-            gap: @team-space-2;
+            .m-battle-notice__content {
+                grid-template-columns: minmax(0, 1fr);
+                gap: @team-space-2;
 
-            .el-switch {
-                justify-self: end;
-            }
-        }
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .v-battle,
-    .m-team-view {
-        .m-battle-notice__content {
-            align-items: start;
-            grid-template-columns: minmax(0, 1fr);
-
-            .el-switch {
-                justify-self: start;
+                .u-notice-filter {
+                    width: 100%;
+                }
             }
         }
     }

@@ -61,6 +61,20 @@ test("team home uses a personal workbench beside the discovery workspace", async
     assert.match(shell, /grid-template-columns:\s*280px minmax\(0, 1fr\)/);
 });
 
+test("team plaza mobile hero keeps its summary visually connected", async () => {
+    const styles = await read("../src/assets/css/team/modules/home-theme.less");
+
+    assert.match(styles, /@media screen and \(max-width: 560px\)[\s\S]*?\.m-team-home__summary\s*\{[\s\S]*?display:\s*flex;[\s\S]*?padding:\s*0 0 0 56px;[\s\S]*?border-top:\s*0;[\s\S]*?> span\s*\{\s*display:\s*none;/);
+    assert.match(styles, /@media screen and \(max-width: 560px\)[\s\S]*?\.m-team-home__actions\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+});
+
+test("team plaza mobile search controls use separate full-width rows", async () => {
+    const styles = await read("../src/assets/css/team/modules/home-theme.less");
+
+    assert.match(styles, /@media screen and \(max-width: 560px\)[\s\S]*?\.m-team-list-header\s*\{[\s\S]*?\.m-filter\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+    assert.match(styles, /\.u-home-server,[\s\S]*?\.u-name\s*\{[\s\S]*?width:\s*100%;/);
+});
+
 test("team creation reuses the modern workspace and grouped archive form language", async () => {
     const [app, page, form, styles] = await Promise.all([
         read("../src/pages/team/App.vue"),
@@ -965,10 +979,31 @@ test("member workspace exposes team snapshots as a read-only tab before videos",
     assert.match(snapshot, /:support-dkp-sync="false"/);
 });
 
+test("team management hero uses a compact mobile identity and full-width home action", async () => {
+    const [styles, teamInfo] = await Promise.all([
+        read("../src/assets/css/team/org/view_my_org.less"),
+        read("../src/components/team/org/team_info.vue"),
+    ]);
+
+    assert.match(styles, /@media screen and \(max-width: 520px\)[\s\S]*?\.p-team-my-org/);
+    assert.match(styles, /\.m-public-org__hero\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?padding:\s*@team-space-3/);
+    assert.match(styles, /\.m-team-info\s*\{[\s\S]*?grid-template-columns:\s*52px minmax\(0, 1fr\)/);
+    assert.match(styles, /\.u-title\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+    assert.match(styles, /> \.u-meta\s*\{[\s\S]*?grid-auto-columns:\s*minmax\(0, 1fr\);[\s\S]*?grid-auto-flow:\s*column/);
+    assert.match(styles, /> \.u-meta\s*\{[\s\S]*?border:\s*1px solid @team-border-light;[\s\S]*?background:\s*@team-surface-muted/);
+    assert.match(styles, /&:first-of-type\s*\{[\s\S]*?grid-template-columns:\s*1fr 0\.78fr 1\.22fr/);
+    assert.match(styles, /\.u-meta-item\s*\{[\s\S]*?align-items:\s*center;[\s\S]*?flex-direction:\s*row;[\s\S]*?white-space:\s*nowrap/);
+    assert.match(styles, /& \+ \.u-meta-item\s*\{[\s\S]*?border-left:\s*1px solid @team-border-light/);
+    assert.match(styles, /a\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1;[\s\S]*?text-overflow:\s*ellipsis/);
+    assert.match(styles, /\.m-team-admin\s*\{[\s\S]*?\.u-team-home-link,[\s\S]*?\.el-button\s*\{[\s\S]*?width:\s*100%/);
+    assert.match(teamInfo, /class="u-leader-link"[\s\S]*?:title="leaderName"[\s\S]*?\{\{ leaderName \}\}/);
+});
+
 test("member management subtabs stay synchronized with the subtab query", async () => {
-    const [members, pending] = await Promise.all([
+    const [members, pending, styles] = await Promise.all([
         read("../src/views/team/member/ListMember.vue"),
         read("../src/views/team/member/PendingList.vue"),
+        read("../src/assets/css/team/member/list_member.less"),
     ]);
 
     assert.match(members, /const MEMBER_SUBTABS = \["user", "role", "pending"\]/);
@@ -984,6 +1019,9 @@ test("member management subtabs stay synchronized with the subtab query", async 
     assert.match(pending, /item\?\.user_info\?\.uid/);
     assert.match(pending, /item\?\.user_info\?\.display_name \|\| `UID /);
     assert.doesNotMatch(pending, /item\.team && item\.team\.name/);
+    assert.match(styles, /@media screen and \(max-width: 620px\)[\s\S]*?\.m-member-subnav\s*\{[\s\S]*?width:\s*100%;[\s\S]*?border-radius:\s*12px/);
+    assert.match(styles, /\.m-member-subnav\s*\{[\s\S]*?button\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1/);
+    assert.match(styles, /&\.is-active\s*\{[\s\S]*?background:\s*@team-primary-soft;[\s\S]*?box-shadow:\s*none/);
 });
 
 test("team discovery keeps two-column cards and exposes real totals in the hero", async () => {
@@ -1014,4 +1052,16 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     assert.match(styles, /> \.u-super\s*\{[\s\S]*?min-width:\s*0[\s\S]*?white-space:\s*nowrap/);
     assert.match(styles, /\.m-team-list-pages[\s\S]*?overflow:\s*hidden[\s\S]*?min-width:\s*32px/);
     assert.match(styles, /@media screen and \(max-width: 360px\)[\s\S]*?min-width:\s*28px/);
+});
+
+test("team discovery cards use a compact mobile information hierarchy", async () => {
+    const [list, styles] = await Promise.all([
+        read("../src/components/team/org/team_list.vue"),
+        read("../src/assets/css/team/modules/home-theme.less"),
+    ]);
+
+    assert.match(list, /class="u-super-name"[\s\S]*?:title="item\.super_user_info && item\.super_user_info\.display_name"/);
+    assert.match(styles, /@media screen and \(max-width: 560px\)[\s\S]*?\.m-team-list \.u-item\s*\{[\s\S]*?grid-template-areas:[\s\S]*?"pic name"[\s\S]*?"tags tags"[\s\S]*?"recruit recruit"/);
+    assert.match(styles, /> \.u-tag-list\s*\{[\s\S]*?height:\s*auto;[\s\S]*?flex-wrap:\s*wrap;[\s\S]*?grid-area:\s*tags/);
+    assert.match(styles, /\.u-super-name\s*\{[\s\S]*?text-overflow:\s*ellipsis;[\s\S]*?white-space:\s*nowrap/);
 });

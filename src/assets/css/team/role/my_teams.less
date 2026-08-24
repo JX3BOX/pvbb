@@ -109,3 +109,80 @@
         }
     }
 }
+
+@media screen and (max-width: 620px) {
+    .m-group-role {
+        .m-group-role-tabs .el-tabs__nav-wrap {
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .m-group-role-box {
+            overflow: visible;
+            border: 0;
+        }
+
+        .m-group-role-table {
+            min-width: 0;
+            background: transparent;
+
+            thead {
+                display: none;
+            }
+
+            tbody,
+            tr,
+            td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            tr {
+                margin-bottom: @team-space-2;
+                overflow: hidden;
+                border: 1px solid @team-border-light;
+                border-radius: 12px;
+                background: @team-surface;
+                box-shadow: @team-shadow-xs;
+            }
+
+            td {
+                display: grid;
+                min-height: 42px;
+                align-items: center;
+                padding: 9px @team-space-2;
+                border-bottom: 1px solid @team-border-light;
+                grid-template-columns: 76px minmax(0, 1fr);
+                gap: @team-space-2;
+
+                &::before {
+                    content: attr(data-label);
+                    color: @team-text-muted;
+                    font-size: 12px;
+                    font-weight: 600;
+                }
+            }
+
+            td:last-child {
+                border-bottom: 0;
+            }
+
+            .u-role-mount-preference-cell {
+                min-width: 0;
+
+                .m-team-role-mount-select {
+                    width: 100%;
+                    min-width: 0;
+                    margin: 0 0 8px;
+                }
+
+                .el-button {
+                    width: 100%;
+                    margin: 0;
+                    grid-column: 2;
+                }
+            }
+        }
+    }
+}

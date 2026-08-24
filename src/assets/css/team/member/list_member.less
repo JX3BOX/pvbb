@@ -928,13 +928,29 @@
 
 @media screen and (max-width: 620px) {
     .m-member-subnav {
-        margin-right: -@team-space-3;
-        margin-left: -@team-space-3;
-        padding-right: @team-space-3;
-        padding-left: @team-space-3;
-        border-right: 0;
-        border-left: 0;
-        border-radius: 0;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: @team-space-3;
+        margin-left: 0;
+        padding: 4px;
+        overflow: hidden;
+        border: 1px solid @team-border-light;
+        border-radius: 12px;
+        gap: 3px;
+
+        button {
+            min-width: 0;
+            min-height: 38px;
+            flex: 1;
+            padding: 0 8px;
+            border-radius: 9px;
+            font-size: 12px;
+
+            &.is-active {
+                background: @team-primary-soft;
+                box-shadow: none;
+            }
+        }
     }
 
     .m-member-panel-header {

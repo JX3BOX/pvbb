@@ -38,6 +38,7 @@
         </div>
         <div class="m-apply-logs" v-if="logs.length">
             <h4>{{ $t("team.apply.records") }}</h4>
+            <div class="m-apply-logs-table">
             <el-table :data="logs" style="width: 100%">
                 <el-table-column :label="$t('team.apply.date')" width="180">
                     <template #default="scope">
@@ -60,6 +61,7 @@
                     </template>
                 </el-table-column>
             </el-table>
+            </div>
         </div>
     </div>
 </template>

@@ -58,10 +58,6 @@
                 <i class="u-count" v-if="pendingMememberCount">{{ pendingMememberCount }}</i>
             </router-link>
 
-            <router-link to="/battle">
-                <i class="u-icon el-icon-document-copy"></i>
-                <span class="u-txt">{{ $t("team.legacyNav.resultManagement") }}</span>
-            </router-link>
             <router-link to="/snapshot/list">
                 <i class="u-icon el-icon-camera"></i>
                 <span class="u-txt">{{ $t("team.workspace.snapshotManagement") }}</span>

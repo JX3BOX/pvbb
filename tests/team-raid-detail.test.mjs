@@ -16,6 +16,12 @@ test("public raid detail restores the roster for signed-out visitors", async () 
     assert.match(page, /<Raid[\s\S]*:is-public="data\.is_public"/);
 });
 
+test("embedded raid create action spans the mobile toolbar", async () => {
+    const styles = await read("../src/assets/css/team/raid/manage_raid.less");
+
+    assert.match(styles, /@media screen and \(max-width: 720px\)[\s\S]*?\.m-raid-toolbar\s*\{[\s\S]*?\.u-create\s*\{[\s\S]*?width:\s*100%;[\s\S]*?justify-content:\s*center;/);
+});
+
 test("snapshot editor ignores stale record responses", async () => {
     const dialog = await read("../src/components/team/snapshot/EditSnapshotDialog.vue");
 

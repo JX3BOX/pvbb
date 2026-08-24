@@ -12,7 +12,13 @@
                             </a>
                         </span>
                     </span>
-                    <el-switch v-model="filterRanking" :active-text="$t('pages.team.battle.activityOnly')" />
+                    <div class="u-notice-filter">
+                        <span class="u-notice-filter-label">{{ $t("pages.team.battle.activityOnly") }}</span>
+                        <el-switch
+                            v-model="filterRanking"
+                            :aria-label="$t('pages.team.battle.activityOnly')"
+                        />
+                    </div>
                 </div>
             </template>
         </el-alert>

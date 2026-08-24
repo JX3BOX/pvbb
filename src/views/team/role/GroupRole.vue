@@ -41,13 +41,16 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(role, i) in item.roles" :key="role + i">
-                                        <td>{{ role.info.name }}</td>
-                                        <td>
+                                        <td :data-label="$t('team.role.roleName')">{{ role.info.name }}</td>
+                                        <td :data-label="$t('team.role.school')">
                                             <img :src="showSchoolIcon(role.info.mount)" />
                                             {{ showSchoolName(role.info.mount) }}
                                         </td>
-                                        <td>{{ showBodyType(role.info.body_type) }}</td>
-                                        <td class="u-role-mount-preference-cell">
+                                        <td :data-label="$t('team.role.bodyType')">{{ showBodyType(role.info.body_type) }}</td>
+                                        <td
+                                            class="u-role-mount-preference-cell"
+                                            :data-label="$t('team.mountPreference.label')"
+                                        >
                                             <RoleMountPreferenceSelect
                                                 v-model="role.info.mounts"
                                                 :role-mount="role.info.mount"
@@ -62,8 +65,8 @@
                                                 {{ $t("team.mountPreference.save") }}
                                             </el-button>
                                         </td>
-                                        <td>{{ showTime(role.relation.created_at) }}</td>
-                                        <td>
+                                        <td :data-label="$t('team.role.joinedAt')">{{ showTime(role.relation.created_at) }}</td>
+                                        <td :data-label="$t('team.role.public')">
                                             <el-switch
                                                 v-model="role.relation.public"
                                                 active-color="#13ce66"
@@ -74,7 +77,7 @@
                                                 "
                                             ></el-switch>
                                         </td>
-                                        <td>
+                                        <td :data-label="$t('team.role.operation')">
                                             <el-button
                                                 type="info"
                                                 size="small"

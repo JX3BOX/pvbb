@@ -40,3 +40,57 @@
         color:#999;
     }
 }
+
+@media screen and (max-width: 620px) {
+    .m-user-list {
+        margin: 0 -4px;
+
+        .u-user {
+            width: 50%;
+            padding: 4px;
+        }
+
+        .u-user-inner {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .m-snapshot-form {
+        :deep(.el-form-item) {
+            display: block;
+        }
+
+        :deep(.el-form-item__label) {
+            width: 100% !important;
+            height: auto;
+            justify-content: flex-start;
+            padding-bottom: 6px;
+            line-height: 20px;
+        }
+
+        :deep(.el-form-item__content) {
+            margin-left: 0 !important;
+        }
+
+        :deep(.el-select),
+        .u-submit {
+            width: 100%;
+        }
+
+        :deep(.demo-form-inline) {
+            display: grid;
+            width: 100%;
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :deep(.demo-form-inline .el-form-item),
+        :deep(.demo-form-inline .el-input),
+        :deep(.demo-form-inline .el-select),
+        :deep(.demo-form-inline .el-button) {
+            width: 100%;
+            margin-right: 0;
+        }
+    }
+}
