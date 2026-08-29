@@ -24,7 +24,7 @@
                         <small>{{ $t("team.home.teamCount") }}</small>
                     </div>
                     <nav class="m-team-home__actions" :aria-label="$t('team.home.quickActions')">
-                        <a class="u-team-home-action" href="/tool/21789" target="_blank" rel="noopener noreferrer">
+                        <a class="u-team-home-action" href="/collection/44" target="_blank" rel="noopener noreferrer">
                             <el-icon><QuestionFilled /></el-icon>
                             <span>{{ $t("team.home.guide") }}</span>
                         </a>

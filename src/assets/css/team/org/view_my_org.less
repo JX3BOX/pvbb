@@ -192,12 +192,14 @@
 
             .el-tabs__item {
                 height: 48px;
+                flex: none;
                 padding: 0 @team-space-3;
                 border: 0;
                 color: @team-text-secondary;
                 font-size: 14px;
                 font-weight: 600;
                 gap: 6px;
+                white-space: nowrap;
 
                 &:hover,
                 &.is-active {
@@ -260,6 +262,7 @@
         }
 
         button {
+            flex: none;
             min-width: max-content;
             min-height: 34px;
             padding: 0 @team-space-3;
@@ -271,6 +274,7 @@
             font: inherit;
             font-size: 13px;
             font-weight: 600;
+            white-space: nowrap;
             transition: color @team-duration-fast @team-ease-standard,
                 background-color @team-duration-fast @team-ease-standard,
                 box-shadow @team-duration-fast @team-ease-standard;
@@ -495,7 +499,7 @@
     }
 }
 
-@media screen and (max-width: 620px) {
+@media screen and (max-width: @phone) {
     .p-team-my-org {
         .m-my-org__hero,
         .m-my-org__workspace {
@@ -531,6 +535,17 @@
 
                 .el-tabs__nav-wrap {
                     padding-right: @team-space-3;
+                }
+
+                .el-tabs__nav-scroll {
+                    overflow-x: auto;
+                    overscroll-behavior-x: contain;
+                    scrollbar-width: none;
+                    -webkit-overflow-scrolling: touch;
+
+                    &::-webkit-scrollbar {
+                        display: none;
+                    }
                 }
 
                 .el-tabs__item {

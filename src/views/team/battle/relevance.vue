@@ -481,17 +481,33 @@ export default {
     }
 }
 
-@media screen and (max-width: 560px) {
+@media screen and (max-width: @phone) {
     .m-rank-relevance-dialog.el-dialog {
+        display: flex;
+        width: 100vw !important;
+        min-width: 100vw;
+        max-width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        max-height: 100vh;
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+
         .el-dialog__header {
+            flex: none;
             padding: @team-space-3 52px @team-space-3 @team-space-3;
         }
 
         .el-dialog__body {
+            min-height: 0;
+            flex: 1;
+            overflow-y: auto;
             padding: @team-space-3;
         }
 
         .el-dialog__footer {
+            flex: none;
             padding: @team-space-3;
         }
 

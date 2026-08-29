@@ -389,6 +389,11 @@ test("member account removal lives in the role dialog footer", async () => {
     assert.match(member, /removeTeamRoleAll\(this\.team_id, this\.item\.uid\)/);
     assert.match(styles, /\.m-member-role-dialog-footer[\s\S]*?\.u-remove-account[\s\S]*?color:\s*#dc2626/);
     assert.match(styles, /\.u-dialog-done[\s\S]*?margin-left:\s*auto/);
+    assert.match(
+        styles,
+        /@media screen and \(max-width: @phone\)[\s\S]*?\.m-member-role-dialog\.el-dialog\s*\{[\s\S]*?width:\s*100vw !important;[\s\S]*?height:\s*100vh;[\s\S]*?max-height:\s*100vh;[\s\S]*?margin:\s*0;/
+    );
+    assert.match(styles, /\.m-member-role-dialog\.el-dialog[\s\S]*?\.el-dialog__body\s*\{[\s\S]*?flex:\s*1;[\s\S]*?overflow-y:\s*auto/);
     assert.match(service, /function removeTeamRoleAll\(team_id, user_id\)/);
 });
 
@@ -1019,8 +1024,9 @@ test("member management subtabs stay synchronized with the subtab query", async 
     assert.match(pending, /item\?\.user_info\?\.uid/);
     assert.match(pending, /item\?\.user_info\?\.display_name \|\| `UID /);
     assert.doesNotMatch(pending, /item\.team && item\.team\.name/);
-    assert.match(styles, /@media screen and \(max-width: 620px\)[\s\S]*?\.m-member-subnav\s*\{[\s\S]*?width:\s*100%;[\s\S]*?border-radius:\s*12px/);
-    assert.match(styles, /\.m-member-subnav\s*\{[\s\S]*?button\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1/);
+    assert.match(styles, /\.m-pending-card[\s\S]*?\.u-btn\s*\{[\s\S]*?min-width:\s*max-content;[\s\S]*?white-space:\s*nowrap/);
+    assert.match(styles, /@media screen and \(max-width: @phone\)[\s\S]*?\.m-member-subnav\s*\{[\s\S]*?width:\s*100%;[\s\S]*?overflow-x:\s*auto;[\s\S]*?border-radius:\s*12px/);
+    assert.match(styles, /\.m-member-subnav\s*\{[\s\S]*?button\s*\{[\s\S]*?flex:\s*none;[\s\S]*?min-width:\s*max-content;[\s\S]*?white-space:\s*nowrap/);
     assert.match(styles, /&\.is-active\s*\{[\s\S]*?background:\s*@team-primary-soft;[\s\S]*?box-shadow:\s*none/);
 });
 
@@ -1032,7 +1038,8 @@ test("team discovery keeps two-column cards and exposes real totals in the hero"
     ]);
 
     assert.match(page, /@total-change="updateTeamTotal"/);
-    assert.match(list, /this\.\$emit\("total-change", this\.total\)/);
+    assert.match(list, /const isUnfiltered = !this\.server && !this\.searchName && !this\.isVerified && !this\.tag\.length/);
+    assert.match(list, /if \(isUnfiltered\) \{\s*this\.\$emit\("total-change", this\.total\);\s*\}/);
     assert.match(list, /const TEAM_NAME_LIMIT = 12/);
     assert.match(list, /\{\{ formatTeamName\(item\.name\) \}\}/);
     assert.match(list, /characters\.slice\(0, TEAM_NAME_LIMIT\)\.join\(""\) \+ "…"/);

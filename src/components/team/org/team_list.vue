@@ -286,12 +286,15 @@ export default {
         },
         loadData: function () {
             this.loading = true;
+            const isUnfiltered = !this.server && !this.searchName && !this.isVerified && !this.tag.length;
             getTeams(this.params)
                 .then((res) => {
                     this.total = res.data.data.page.total;
                     this.pages = res.data.data.page.pageTotal;
                     this.data = res.data.data.list || [];
-                    this.$emit("total-change", this.total);
+                    if (isUnfiltered) {
+                        this.$emit("total-change", this.total);
+                    }
                 })
                 .finally(() => {
                     this.loading = false;

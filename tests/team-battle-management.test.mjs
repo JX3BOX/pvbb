@@ -134,6 +134,11 @@ test("battle relevance dialog uses guided empty states and the team dialog desig
     assert.match(dialog, /:loading="submitting"/);
     assert.match(dialog, /\.m-rank-relevance-dialog\.el-dialog/);
     assert.match(dialog, /@import \(reference\) "@\/assets\/css\/team\/design-system\/_tokens\.less"/);
+    assert.match(
+        dialog,
+        /@media screen and \(max-width: @phone\)[\s\S]*?\.m-rank-relevance-dialog\.el-dialog\s*\{[\s\S]*?width:\s*100vw !important;[\s\S]*?height:\s*100vh;[\s\S]*?max-height:\s*100vh;[\s\S]*?margin:\s*0;/
+    );
+    assert.match(dialog, /\.el-dialog__body\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?flex:\s*1;[\s\S]*?overflow-y:\s*auto/);
 });
 
 test("personal battle records include both leaders and regular members", async () => {

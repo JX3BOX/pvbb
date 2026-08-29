@@ -28,6 +28,7 @@
 
     button {
         display: inline-flex;
+        flex: none;
         min-width: max-content;
         min-height: 34px;
         align-items: center;
@@ -41,6 +42,7 @@
         font: inherit;
         font-size: 13px;
         font-weight: 600;
+        white-space: nowrap;
         transition: color @team-duration-fast @team-ease-standard,
             background-color @team-duration-fast @team-ease-standard,
             box-shadow @team-duration-fast @team-ease-standard;
@@ -965,6 +967,7 @@
     .u-btn {
         display: inline-flex;
         height: 38px;
+        min-width: max-content;
         min-height: 38px;
         align-items: center;
         justify-content: center;
@@ -976,9 +979,14 @@
         font: inherit;
         font-size: 13px;
         font-weight: 600;
+        white-space: nowrap;
         transition: border-color @team-duration-fast @team-ease-standard,
             background-color @team-duration-fast @team-ease-standard,
             color @team-duration-fast @team-ease-standard;
+
+        .el-icon {
+            flex: none;
+        }
 
         &:focus-visible {
             outline: none;
@@ -1092,22 +1100,22 @@
     }
 }
 
-@media screen and (max-width: 620px) {
+@media screen and (max-width: @phone) {
     .m-member-subnav {
         width: 100%;
         margin-right: 0;
         margin-bottom: @team-space-3;
         margin-left: 0;
         padding: 4px;
-        overflow: hidden;
+        overflow-x: auto;
         border: 1px solid @team-border-light;
         border-radius: 12px;
         gap: 3px;
 
         button {
-            min-width: 0;
+            min-width: max-content;
             min-height: 38px;
-            flex: 1;
+            flex: none;
             padding: 0 8px;
             border-radius: 9px;
             font-size: 12px;
