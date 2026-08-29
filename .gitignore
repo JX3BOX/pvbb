@@ -8,6 +8,7 @@ node_modules
 /tmp
 /src/mock
 .gitkeep
+build
 
 package-lock.json
 yarn.lock
