@@ -51,10 +51,13 @@ const MyTeamRaid = () => import("@/views/team/raid/MyTeamRaid.vue");
 
 const ApplyList = () => import("@/views/team/apply/ApplyList.vue");
 const ApplySingle = () => import("@/views/team/apply/ApplySingle.vue");
-const Battle = () => import("@/views/team/battle/index.vue");
 const myBattle = () => import("@/views/team/battle/myBattle.vue");
 
 const routes = [
+    {
+        path: "/battle",
+        redirect: "/",
+    },
     {
         name: "index",
         path: "/",
@@ -495,19 +498,6 @@ const routes = [
         component: ApplySingle,
     },
 
-    {
-        name: "Battle",
-        path: "/battle",
-        meta: {
-            isPublic: false,
-            i18n: {
-                title: "pages.team.title",
-                keywords: "pages.team.keywords",
-                description: "pages.team.description",
-            },
-        },
-        component: Battle,
-    },
     {
         name: "myBattle",
         path: "/myBattle",

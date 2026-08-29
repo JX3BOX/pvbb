@@ -39,7 +39,7 @@
 
             <!-- 替补队员 -->
             <raid-sub
-                v-if="id && !content"
+                v-if="isLogin && id && !content"
                 ref="subRaid"
                 class="m-raid-sub"
                 :header="$t('team.raid.board.substitute')"
@@ -54,7 +54,7 @@
 
             <!-- 候选名单 -->
             <raid-tobe
-                v-if="id && !content"
+                v-if="isLogin && id && !content"
                 class="m-raid-tobe"
                 :header="$t('team.raid.board.candidates')"
                 mode="tobe"
@@ -83,7 +83,7 @@ import { getRequestErrorMessage } from "@/utils/common";
 
 export default {
     name: "Raid",
-    props: ["preset", "count", "teamId", "leader", "templateId", "content", "row", "col", "isPublic", "isForceMatch"],
+    props: ["preset", "count", "teamId", "leader", "templateId", "content", "row", "col", "isPublic", "isForceMatch", "isLogin"],
     emits: ["updateMembers"],
     components: {
         "raid-normal-v1": RaidNormalV1,
@@ -228,9 +228,10 @@ export default {
             return version === this.memberLoadVersion && String(raidId) === String(this.id);
         },
         applyMemberLists(data = []) {
-            this.members = data.filter((member) => member.type === "normal").sort((a, b) => a.order - b.order);
-            this.subMembers = data.filter((member) => member.type === "sub");
-            this.tobeMembers = data.filter((member) => member.type === "tobe");
+            const visibleData = this.isLogin ? data : data.filter((member) => member.type === "normal");
+            this.members = visibleData.filter((member) => member.type === "normal").sort((a, b) => a.order - b.order);
+            this.subMembers = visibleData.filter((member) => member.type === "sub");
+            this.tobeMembers = visibleData.filter((member) => member.type === "tobe");
 
             this.$store.commit("SET_NORMAL_MEMBERS", this.members);
             this.$store.commit(

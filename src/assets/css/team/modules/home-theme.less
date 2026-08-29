@@ -1124,12 +1124,22 @@
         }
 
         .u-super {
+            display: inline-flex;
             min-width: 0;
+            align-items: center;
             color: @team-text-regular;
+            gap: 5px;
 
             &:hover {
                 color: @team-primary;
             }
+        }
+
+        .u-super-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .u-user-avatar {
@@ -1717,13 +1727,20 @@
         }
 
         .m-team-home__summary {
+            display: flex;
             width: 100%;
             min-width: 0;
-            padding: @team-space-2 0 0;
-            border-top: 1px solid @team-border-light;
+            align-items: baseline;
+            padding: 0 0 0 56px;
+            flex-wrap: wrap;
+            border-top: 0;
             border-right: 0;
             border-left: 0;
-            grid-template-columns: auto 1fr;
+            gap: 2px 7px;
+
+            > span {
+                display: none;
+            }
 
             strong {
                 font-size: 22px;
@@ -1733,6 +1750,7 @@
 
         .m-team-home__actions {
             display: grid;
+            margin-top: 2px;
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
@@ -1745,7 +1763,7 @@
 
             .m-filter {
                 display: grid;
-                grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr);
+                grid-template-columns: minmax(0, 1fr);
                 align-items: stretch;
 
                 > .el-button {
@@ -1785,25 +1803,70 @@
         }
 
         .m-team-list .u-item {
-            min-height: 168px;
-            padding: @team-space-3 @team-space-3 @team-space-3 84px;
+            min-height: 0;
+            padding: @team-space-3;
+            grid-template-areas:
+                "pic name"
+                "pic meta"
+                "tags tags"
+                "recruit recruit";
+            grid-template-columns: 56px minmax(0, 1fr);
+            column-gap: @team-space-2;
 
             .u-pic {
+                position: static;
                 width: 56px;
                 height: 56px;
                 border-radius: 14px;
+                grid-area: pic;
             }
 
             .u-name {
+                align-self: end;
                 font-size: 15px;
+                grid-area: name;
             }
 
-            .u-meta {
-                gap: 4px @team-space-1;
+            > .u-meta:not(.u-recruit) {
+                margin-top: 2px;
+                grid-area: meta;
+                gap: 2px;
+
+                .u-meta-item {
+                    min-height: 20px;
+                    line-height: 20px;
+
+                    > em {
+                        min-width: 36px;
+                        margin-right: 6px;
+                        padding: 0;
+                        background: transparent;
+                        color: @team-text-muted;
+                        font-size: 11px;
+                        line-height: 20px;
+                    }
+                }
             }
 
-            .u-tag {
-                display: flex !important;
+            > .u-tag-list {
+                height: auto;
+                max-height: 52px;
+                margin-top: @team-space-2;
+                flex-wrap: wrap;
+                grid-area: tags;
+            }
+
+            .u-recruit {
+                margin-top: @team-space-2;
+                padding-top: @team-space-2;
+                grid-area: recruit;
+
+                .u-meta-item > em {
+                    padding: 0;
+                    background: transparent;
+                    color: @team-text-muted;
+                    font-size: 11px;
+                }
             }
         }
 

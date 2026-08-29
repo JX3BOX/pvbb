@@ -47,7 +47,12 @@
             </span>
             <span class="u-meta-item">
                 <em>{{ $t("team.header.leader") }}</em>
-                <a :href="authorLink(data.super)" target="_blank">
+                <a
+                    class="u-leader-link"
+                    :href="authorLink(data.super)"
+                    :title="leaderName"
+                    target="_blank"
+                >
                     {{ leaderName }}
                 </a>
             </span>

@@ -19,3 +19,26 @@
         .mb(10px);
     }
 }
+
+@media screen and (max-width: 620px) {
+    .m-role-form {
+        .el-select,
+        .u-btn {
+            width: 100%;
+        }
+
+        .el-radio-group {
+            display: grid;
+            width: 100%;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .el-radio {
+            width: 100%;
+            min-width: 0;
+            margin: 0 !important;
+            padding: 7px 6px;
+        }
+    }
+}

@@ -191,6 +191,20 @@
     flex-direction: column;
 }
 
+.m-raid-member-filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+
+    .el-form-item + .el-form-item {
+        margin-top: 0;
+    }
+
+    + .el-form-item {
+        margin-top: 16px;
+    }
+}
+
 .m-raid-selected-role {
     display: flex;
     min-height: 62px;
@@ -279,6 +293,18 @@
         color: @team-text-muted;
         font-size: 11px;
     }
+
+    .u-role-mounts {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        gap: 3px;
+
+        img {
+            width: 22px;
+            height: 22px;
+        }
+    }
 }
 
 @media screen and (max-width: 640px) {
@@ -308,6 +334,14 @@
             align-items: flex-start;
             flex-direction: column;
             gap: 3px;
+        }
+    }
+
+    .m-raid-member-filter-row {
+        grid-template-columns: 1fr;
+
+        .el-form-item + .el-form-item {
+            margin-top: 14px;
         }
     }
 

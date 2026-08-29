@@ -250,6 +250,10 @@ export default {
                         log.roles = member?.roles;
                     });
                 })
+                .catch(() => {
+                    this.logs = [];
+                    this.pagination.total = 0;
+                })
                 .finally(() => {
                     this.loading = false;
                 });

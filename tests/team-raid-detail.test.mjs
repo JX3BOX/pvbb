@@ -4,8 +4,11 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("public raid detail restores the roster for signed-out visitors", async () => {
-    const page = await read("../src/views/team/raid/ViewRaid.vue");
+test("public raid detail only exposes the formal roster to signed-out visitors", async () => {
+    const [page, raid] = await Promise.all([
+        read("../src/views/team/raid/ViewRaid.vue"),
+        read("../src/components/team/raid/Raid.vue"),
+    ]);
 
     assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\{ authority: 0, r_raid: 0 \}\)/);
     assert.match(page, /await Promise\.allSettled\(\[[\s\S]*?this\.getTeam\(teamId\),[\s\S]*?this\.getAuthority\(teamId\)/);
@@ -14,6 +17,15 @@ test("public raid detail restores the roster for signed-out visitors", async () 
     assert.match(page, /this\.flag = true/);
     assert.match(page, /class="m-raid-view-section m-raid-view-board"/);
     assert.match(page, /<Raid[\s\S]*:is-public="data\.is_public"/);
+    assert.match(page, /<Raid[\s\S]*:is-login="isLogin"/);
+    assert.match(raid, /v-if="isLogin && id && !content"/);
+    assert.match(raid, /const visibleData = this\.isLogin \? data : data\.filter\(\(member\) => member\.type === "normal"\)/);
+});
+
+test("embedded raid create action spans the mobile toolbar", async () => {
+    const styles = await read("../src/assets/css/team/raid/manage_raid.less");
+
+    assert.match(styles, /@media screen and \(max-width: 720px\)[\s\S]*?\.m-raid-toolbar\s*\{[\s\S]*?\.u-create\s*\{[\s\S]*?width:\s*100%;[\s\S]*?justify-content:\s*center;/);
 });
 
 test("snapshot editor ignores stale record responses", async () => {
@@ -49,9 +61,8 @@ test("raid detail renders the configured roster dimensions and capacity", async 
     const templates = JSON.parse(templateSource);
 
     assert.match(page, /<Raid[\s\S]*:row="displayRow"[\s\S]*:col="displayCol"/);
-    assert.match(page, /displayRow:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.row\) \|\| 5/);
-    assert.match(page, /displayCol:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.col\) \|\| 5/);
-    assert.doesNotMatch(page, /Number\(this\.data\?\.count\) === 10/);
+    assert.match(page, /displayRow:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5/);
+    assert.match(page, /displayCol:\s*function\s*\(\)\s*\{\s*return Number\(this\.data\?\.count\) === 10 \? 5/);
     assert.match(raid, /const configuredCount = Number\(this\.count\)/);
     assert.match(raid, /if \(configuredCount > 0\) return configuredCount/);
     assert.match(raid, /return Number\(this\.row \|\| 0\) \* Number\(this\.col \|\| 0\)/);
@@ -137,16 +148,27 @@ test("raid detail component chain uses Vue 3 model and mitt event contracts", as
     assert.match(memberSetting, /v-for="role in filteredRoles"/);
     assert.doesNotMatch(memberSetting, /memberSetting\.orTemporary|memberSetting\.temporaryPlaceholder/);
     assert.doesNotMatch(memberSetting, /\bgetRoles\b/);
-    assert.match(memberSetting, /:src="showSchoolIcon\(role\.mount\)"/);
+    assert.match(memberSetting, /class="m-raid-member-filter-row"[\s\S]*?v-model="selectedSchool"[\s\S]*?v-model="form\.mount"/);
+    assert.match(memberSetting, /v-for="mount in getRoleMounts\(role\)"[\s\S]*?:src="showMountIcon\(mount\)"/);
+    assert.doesNotMatch(memberSetting, /:src="showSchoolIcon\(role\.mount\)"/);
     assert.match(memberSetting, /handler\(val\)[\s\S]*?this\.selectedSchool = this\.getSchoolByMount\(val\.mount\)/);
     assert.match(memberSetting, /this\.tmpVal = val\.role_id \|\| val\.name \|\| ""/);
-    assert.match(memberSetting, /const mountInfo = Object\.values\(xf_map\)\.find\(\(item\) => Number\(item\.id\) === mountId\)/);
+    assert.match(memberSetting, /Number\(id\) === 0 \? this\.\$t\("team\.raid\.memberSetting\.allSchools"\) : name/);
+    assert.match(memberSetting, /getMountInfo\(mount\)[\s\S]*?Object\.values\(xf_map\)\.find\(\(item\) => Number\(item\.id\) === mountId\)/);
     assert.match(memberSetting, /return Number\(mountInfo\?\.school\) \|\| mountId \|\| 0/);
-    assert.match(memberSetting, /this\.selectedSchool = this\.getSchoolByMount\(member\.mount\)/);
     assert.match(memberSetting, /this\.form\.name = typeof val === "string" \? val\.trim\(\) : ""/);
-    assert.match(memberSetting, /filteredRoles\(\)[\s\S]*?this\.getSchoolByMount\(role\.mount\) === this\.selectedSchool/);
-    assert.match(memberSetting, /handleSchoolChange\(\)[\s\S]*?this\.clearRole\(\)[\s\S]*?this\.ensureMountMatchesSchool\(\)/);
-    assert.match(memberSetting, /this\.form\.mount = this\.xfMaps\[0\]\?\.id \|\| ""/);
+    assert.match(memberSetting, /const roles = Array\.isArray\(this\.roles\) \? this\.roles : \[\]/);
+    assert.match(memberSetting, /return Array\.isArray\(this\.\$store\.state\.roles\) \? this\.\$store\.state\.roles : \[\]/);
+    assert.match(memberSetting, /allRoles:\s*\{[\s\S]*?if \(this\.visible\) this\.roles = cloneDeep\(val\)/);
+    assert.match(memberSetting, /filteredRoles\(\)[\s\S]*?this\.usedRoleIds\.has\(String\(role\.ID\)\)[\s\S]*?this\.isRoleCompatibleWithMount\(role, this\.form\.mount\)/);
+    assert.match(memberSetting, /roleMounts\.some\(\(mount\) => this\.getSchoolByMount\(mount\) === Number\(this\.selectedSchool\)\)/);
+    assert.match(memberSetting, /usedRoleIds\(\)[\s\S]*?state\.normalMembers[\s\S]*?state\.subMembers[\s\S]*?state\.tobeMembers/);
+    assert.match(memberSetting, /getRoleMounts\(role\)[\s\S]*?normalizeMounts\(role\?\.mounts\)[\s\S]*?Number\(item\.school\) === mountId/);
+    assert.match(memberSetting, /isRoleCompatibleWithMount\(role, mount\)[\s\S]*?roleMount === this\.getSchoolByMount\(mountId\)/);
+    assert.match(memberSetting, /handleMountChange\(\)[\s\S]*?this\.selectedSchool = this\.getSchoolByMount\(this\.form\.mount\)/);
+    assert.match(memberSetting, /handleSchoolChange\(\)[\s\S]*?if \(!this\.selectedSchool\) \{\s*this\.form\.mount = "";\s*return;/);
+    assert.match(memberSetting, /syncMountSelection\(\)[\s\S]*?this\.form\.mount = options\.length === 1 \? options\[0\]\.id : ""/);
+    assert.doesNotMatch(memberSetting, /this\.form\.mount = this\.xfMaps\[0\]\?\.id \|\| ""/);
     assert.doesNotMatch(memberSetting, /popper-append-to-body/);
     assert.match(memberSetting, /Number\(member\?\.is_valid\) === 1/);
     assert.doesNotMatch(memberSetting, /member\.remark \|\| member\.mount \|\| member\.role_id \|\| member\.name/);

@@ -475,26 +475,60 @@
 @media screen and (max-width: @phone) {
     .p-team-activity-center {
         .m-activity-center-hero {
-            padding: 22px 20px;
-            grid-template-columns: 48px minmax(0, 1fr);
-            gap: @team-space-2;
+            min-height: auto;
+            padding: 18px;
+            grid-template-areas:
+                "icon eyebrow"
+                "icon title"
+                "description description"
+                "actions actions";
+            grid-template-columns: 44px minmax(0, 1fr);
+            column-gap: @team-space-2;
+            row-gap: 0;
         }
 
         .u-activity-center-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 15px;
-            font-size: 21px;
+            width: 44px;
+            height: 44px;
+            align-self: center;
+            border-radius: 14px;
+            font-size: 20px;
+            grid-area: icon;
+        }
+
+        .m-activity-center-heading {
+            display: contents;
+
+            > span {
+                align-self: end;
+                grid-area: eyebrow;
+            }
+
+            p {
+                margin-top: 8px;
+                font-size: 13px;
+                line-height: 20px;
+                grid-area: description;
+            }
         }
 
         .m-activity-center-heading h1 {
-            font-size: 22px;
-            line-height: 30px;
+            align-self: start;
+            font-size: 21px;
+            line-height: 28px;
+            grid-area: title;
         }
 
         .m-activity-center-actions {
-            grid-column: 1 / -1;
-            justify-content: flex-end;
+            width: 100%;
+            margin-top: 14px;
+            justify-content: stretch;
+            grid-area: actions;
+        }
+
+        .u-create-activity {
+            width: 100%;
+            min-height: 44px;
         }
 
         .m-raid-filter {

@@ -69,6 +69,16 @@
                             </span>
                             <span>{{ showBodyType(item.role.body_type) }}</span>
                         </span>
+                        <div class="u-declared-mounts">
+                            <span>{{ $t("team.mountPreference.label") }}</span>
+                            <template v-if="item.role.mounts && item.role.mounts.length">
+                                <span v-for="mount in item.role.mounts" :key="mount" class="u-declared-mount">
+                                    <img :src="showMountIcon(mount)" :alt="showMountName(mount)" />
+                                    {{ showMountName(mount) }}
+                                </span>
+                            </template>
+                            <em v-else>{{ $t("team.mountPreference.unconfigured") }}</em>
+                        </div>
                         <div class="u-apply-meta">
                             <span>
                                 <el-icon><User /></el-icon>
@@ -110,6 +120,10 @@
                                 </button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
+                                        <el-dropdown-item command="mounts">
+                                            <el-icon><Setting /></el-icon>
+                                            {{ $t("team.mountPreference.edit") }}
+                                        </el-dropdown-item>
                                         <el-dropdown-item command="remove" class="u-role-remove-command">
                                             <el-icon><Delete /></el-icon>
                                             {{ $t("team.memberRole.remove") }}
@@ -146,20 +160,60 @@
                 <el-button type="primary" @click="confirmNote">{{ $t("team.role.confirm") }}</el-button>
             </template>
         </el-dialog>
+
+        <el-dialog
+            v-model="mountVisible"
+            width="520px"
+            class="m-team-role-mount-dialog"
+            append-to-body
+            destroy-on-close
+        >
+            <template #header>
+                <div class="m-team-role-mount-dialog-header">
+                    <span class="u-dialog-icon" aria-hidden="true">
+                        <el-icon><Setting /></el-icon>
+                    </span>
+                    <span class="u-dialog-copy">
+                        <b>{{ $t("team.mountPreference.adminTitle") }}</b>
+                        <small>{{ $t("team.mountPreference.adminHint") }}</small>
+                    </span>
+                </div>
+            </template>
+
+            <div class="m-team-role-mount-dialog-body">
+                <label>{{ $t("team.mountPreference.label") }}</label>
+                <RoleMountPreferenceSelect
+                    v-if="preferenceItem"
+                    v-model="preferenceMounts"
+                    :role-mount="preferenceItem.role.mount"
+                />
+            </div>
+            <template #footer>
+                <div class="m-team-role-mount-dialog-footer">
+                    <el-button @click="mountVisible = false">{{ $t("team.role.cancel") }}</el-button>
+                    <el-button type="primary" :loading="mountSaving" :disabled="!preferenceMounts.length" @click="saveMounts">
+                        {{ $t("team.mountPreference.save") }}
+                    </el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import RoleAvatar from "@/components/team/widget/RoleAvatar.vue";
+import RoleMountPreferenceSelect from "@/components/team/member/RoleMountPreferenceSelect.vue";
 import { getMyTeamRoles, deleteRole, remarkRole, starRole } from "@/service/team/member.js";
-import { showBodyType, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
-import { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, Search, User } from "@element-plus/icons-vue";
+import { getRoleMountPreferences, saveRoleMountPreferences } from "@/service/team/role_mount_preference";
+import { showBodyType, showMountIcon, showMountName, showSchoolIcon, showSchoolName, showTime } from "@/utils/filters";
+import { mergeRoleMountPreferences } from "@/utils/team-role-mounts";
+import { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, Search, Setting, User } from "@element-plus/icons-vue";
 import { authorLink as getAuthorLink } from "@jx3box/jx3box-common/js/utils";
 
 export default {
     name: "RoleList",
     props: ["id"],
-    components: { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, RoleAvatar, User },
+    components: { CircleCheckFilled, Clock, Delete, EditPen, MoreFilled, RoleAvatar, RoleMountPreferenceSelect, Setting, User },
     data: function () {
         return {
             data: [],
@@ -171,6 +225,10 @@ export default {
             noteVisible: false,
             currentItem: null,
             note: "",
+            mountVisible: false,
+            mountSaving: false,
+            preferenceItem: null,
+            preferenceMounts: [],
             Search,
         };
     },
@@ -186,8 +244,18 @@ export default {
         loadData: function () {
             this.loading = true;
             getMyTeamRoles(this.team_id, this.params)
-                .then((res) => {
-                    this.data = res.data.data.list || [];
+                .then(async (res) => {
+                    const list = res.data.data.list || [];
+                    try {
+                        const preferenceResponse = await getRoleMountPreferences(this.team_id);
+                        const roles = mergeRoleMountPreferences(
+                            list.map((item) => ({ ...item.role, ID: item.relation.role_id })),
+                            preferenceResponse.data.data || []
+                        );
+                        this.data = list.map((item, index) => ({ ...item, role: roles[index] }));
+                    } catch {
+                        this.data = list;
+                    }
                     this.total = Number(res.data.data.page.total) || 0;
                 })
                 .finally(() => {
@@ -209,6 +277,7 @@ export default {
                 .catch(() => {});
         },
         handleRoleCommand: function (command, item, index) {
+            if (command === "mounts") this.editMounts(item);
             if (command === "remove") this.removeRole(item, index);
         },
         noteRole: function (item) {
@@ -224,6 +293,29 @@ export default {
                 this.$notify({ title: this.$t("team.memberRole.noteSuccess"), message: this.$t("team.memberRole.noteMessage"), type: "success" });
             });
         },
+        editMounts: function (item) {
+            this.preferenceItem = item;
+            this.preferenceMounts = Array.isArray(item.role.mounts) ? [...item.role.mounts] : [];
+            this.mountVisible = true;
+        },
+        saveMounts: function () {
+            if (!this.preferenceItem || !this.preferenceMounts.length || this.mountSaving) return;
+            this.mountSaving = true;
+            const roleId = this.preferenceItem.relation.role_id;
+            saveRoleMountPreferences(this.team_id, [{ role_id: roleId, mounts: this.preferenceMounts }])
+                .then(() => {
+                    this.preferenceItem.role.mounts = [...this.preferenceMounts];
+                    this.mountVisible = false;
+                    this.$notify({
+                        title: this.$t("team.mountPreference.saved"),
+                        message: this.$t("team.mountPreference.savedHint"),
+                        type: "success",
+                    });
+                })
+                .finally(() => {
+                    this.mountSaving = false;
+                });
+        },
         updateStar: function (team_id, role_id, star) {
             starRole(team_id, role_id, star).then(() => {
                 this.$notify({ title: this.$t("team.memberRole.starSuccess"), message: this.$t("team.memberRole.starMessage"), type: "success" });
@@ -236,6 +328,8 @@ export default {
             return getAuthorLink(uid);
         },
         showBodyType,
+        showMountIcon,
+        showMountName,
         showSchoolIcon,
         showSchoolName,
         showTime,

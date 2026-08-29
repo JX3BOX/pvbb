@@ -196,7 +196,9 @@
 @media screen and (max-width: @phone) {
     .m-team-note-dialog {
         .el-dialog {
-            .w(100%) !important;
+            width: calc(100% - 24px) !important;
+            min-width: 0;
+            margin: 12px auto !important;
         }
     }
 }

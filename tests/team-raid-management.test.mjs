@@ -49,6 +49,13 @@ test("raid activity dialog keeps the existing API contract and grouped form sect
     assert.match(styles, /max-height: calc\(100vh - 24px\)/);
     assert.match(styles, /margin: auto/);
     assert.match(styles, /flex: 1 1 auto/);
+    assert.match(styles, /@media screen and \(max-width: 620px\)/);
+    assert.match(styles, /\.m-raid-form-dialog\.el-dialog\s*\{[\s\S]*width: 100% !important;[\s\S]*height: 100dvh;[\s\S]*margin: 0;[\s\S]*border-radius: 0;/);
+    assert.match(styles, /safe-area-inset-bottom/);
+    assert.match(styles, /\.m-raid-dialog-footer\s*\{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+    assert.match(styles, /\.u-auth-options\s*\{[\s\S]*\.el-radio-group\s*\{[\s\S]*gap: @team-space-2;/);
+    assert.match(styles, /\.el-radio-button__inner\s*\{[\s\S]*min-height: 44px;[\s\S]*border-radius: 10px !important;/);
+    assert.match(styles, /\.el-radio-button\.is-active \.el-radio-button__inner\s*\{[\s\S]*background: @team-primary;/);
     assert.doesNotMatch(dialog, /m-raid-form-intro/);
     for (const field of [
         "team_id",
