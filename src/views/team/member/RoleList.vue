@@ -105,10 +105,6 @@
                             @change="updateStar(item.relation.team_id, item.relation.role_id, item.relation.star)"
                         />
                         <div class="u-role-actions">
-                            <button class="u-btn u-note" type="button" @click="editMounts(item)">
-                                <el-icon><Setting /></el-icon>
-                                {{ $t("team.mountPreference.edit") }}
-                            </button>
                             <button class="u-btn u-note" type="button" @click="noteRole(item)">
                                 <el-icon><EditPen /></el-icon>
                                 {{ $t("team.memberRoleNote") }}
@@ -124,6 +120,10 @@
                                 </button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
+                                        <el-dropdown-item command="mounts">
+                                            <el-icon><Setting /></el-icon>
+                                            {{ $t("team.mountPreference.edit") }}
+                                        </el-dropdown-item>
                                         <el-dropdown-item command="remove" class="u-role-remove-command">
                                             <el-icon><Delete /></el-icon>
                                             {{ $t("team.memberRole.remove") }}
@@ -163,21 +163,38 @@
 
         <el-dialog
             v-model="mountVisible"
-            :title="$t('team.mountPreference.adminTitle')"
-            width="min(520px, 90vw)"
-            class="m-team-note-dialog"
+            width="520px"
+            class="m-team-role-mount-dialog"
+            append-to-body
+            destroy-on-close
         >
-            <p class="u-mount-dialog-hint">{{ $t("team.mountPreference.adminHint") }}</p>
-            <RoleMountPreferenceSelect
-                v-if="preferenceItem"
-                v-model="preferenceMounts"
-                :role-mount="preferenceItem.role.mount"
-            />
+            <template #header>
+                <div class="m-team-role-mount-dialog-header">
+                    <span class="u-dialog-icon" aria-hidden="true">
+                        <el-icon><Setting /></el-icon>
+                    </span>
+                    <span class="u-dialog-copy">
+                        <b>{{ $t("team.mountPreference.adminTitle") }}</b>
+                        <small>{{ $t("team.mountPreference.adminHint") }}</small>
+                    </span>
+                </div>
+            </template>
+
+            <div class="m-team-role-mount-dialog-body">
+                <label>{{ $t("team.mountPreference.label") }}</label>
+                <RoleMountPreferenceSelect
+                    v-if="preferenceItem"
+                    v-model="preferenceMounts"
+                    :role-mount="preferenceItem.role.mount"
+                />
+            </div>
             <template #footer>
-                <el-button @click="mountVisible = false">{{ $t("team.role.cancel") }}</el-button>
-                <el-button type="primary" :loading="mountSaving" :disabled="!preferenceMounts.length" @click="saveMounts">
-                    {{ $t("team.mountPreference.save") }}
-                </el-button>
+                <div class="m-team-role-mount-dialog-footer">
+                    <el-button @click="mountVisible = false">{{ $t("team.role.cancel") }}</el-button>
+                    <el-button type="primary" :loading="mountSaving" :disabled="!preferenceMounts.length" @click="saveMounts">
+                        {{ $t("team.mountPreference.save") }}
+                    </el-button>
+                </div>
             </template>
         </el-dialog>
     </div>
@@ -260,6 +277,7 @@ export default {
                 .catch(() => {});
         },
         handleRoleCommand: function (command, item, index) {
+            if (command === "mounts") this.editMounts(item);
             if (command === "remove") this.removeRole(item, index);
         },
         noteRole: function (item) {

@@ -4,8 +4,11 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("public raid detail restores the roster for signed-out visitors", async () => {
-    const page = await read("../src/views/team/raid/ViewRaid.vue");
+test("public raid detail only exposes the formal roster to signed-out visitors", async () => {
+    const [page, raid] = await Promise.all([
+        read("../src/views/team/raid/ViewRaid.vue"),
+        read("../src/components/team/raid/Raid.vue"),
+    ]);
 
     assert.match(page, /if \(!User\.isLogin\(\)\) return Promise\.resolve\(\{ authority: 0, r_raid: 0 \}\)/);
     assert.match(page, /await Promise\.allSettled\(\[[\s\S]*?this\.getTeam\(teamId\),[\s\S]*?this\.getAuthority\(teamId\)/);
@@ -14,6 +17,9 @@ test("public raid detail restores the roster for signed-out visitors", async () 
     assert.match(page, /this\.flag = true/);
     assert.match(page, /class="m-raid-view-section m-raid-view-board"/);
     assert.match(page, /<Raid[\s\S]*:is-public="data\.is_public"/);
+    assert.match(page, /<Raid[\s\S]*:is-login="isLogin"/);
+    assert.match(raid, /v-if="isLogin && id && !content"/);
+    assert.match(raid, /const visibleData = this\.isLogin \? data : data\.filter\(\(member\) => member\.type === "normal"\)/);
 });
 
 test("embedded raid create action spans the mobile toolbar", async () => {

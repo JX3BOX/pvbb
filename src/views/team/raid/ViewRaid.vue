@@ -148,6 +148,7 @@
                             :row="displayRow"
                             :col="displayCol"
                             :is-public="data.is_public"
+                            :is-login="isLogin"
                             :isForceMatch="data.force_match"
                             @updateMembers="handleUpdate"
                         />
@@ -259,6 +260,9 @@ export default {
         },
         canManage: function () {
             return this.$store.state.canManage;
+        },
+        isLogin: function () {
+            return User.isLogin();
         },
         editTeams: function () {
             return this.info ? [this.info] : [];

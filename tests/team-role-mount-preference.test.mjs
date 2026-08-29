@@ -40,6 +40,11 @@ test("team role preferences feed member review, self-service, admin editing, and
 
     assert.match(pending, /getRoleMountPreferences[\s\S]*?mergeRoleMountPreferences/);
     assert.match(pending, /team\.mountPreference\.unconfigured/);
+    assert.match(adminRoles, /<el-dropdown-item command="mounts">[\s\S]*?team\.mountPreference\.edit/);
+    assert.doesNotMatch(adminRoles, /<button[^>]*@click="editMounts\(item\)"/);
+    assert.match(adminRoles, /command === "mounts"[\s\S]*?this\.editMounts\(item\)/);
+    assert.match(adminRoles, /class="m-team-role-mount-dialog"[\s\S]*?<template #header>/);
+    assert.match(adminRoles, /m-team-role-mount-dialog-body[\s\S]*?team\.mountPreference\.label/);
     assert.match(adminRoles, /editMounts\(item\)[\s\S]*?saveRoleMountPreferences/);
     assert.match(myTeams, /<RoleMountPreferenceSelect[\s\S]*?saveMounts\(item\.team_info\.ID, role\.info\)/);
     assert.match(store, /getRoleMountPreferences[\s\S]*?mergeRoleMountPreferences[\s\S]*?SET_ROLES/);
