@@ -743,6 +743,10 @@ test("DKP tables follow the archive certification table language", async () => {
     assert.doesNotMatch(list, /const _score = action/);
     assert.match(dialogStyles, /\.m-dkp-dialog-modify\.el-dialog/);
     assert.match(dialogStyles, /\.m-dkp-dialog-form__row[\s\S]*grid-template-columns:\s*repeat\(2/);
+    assert.match(
+        dialogStyles,
+        /@media screen and \(max-width: @phone\)[\s\S]*?\.m-dkp-dialog-modify\.el-dialog\s*\{[\s\S]*?width:\s*100vw !important;[\s\S]*?height:\s*100vh !important;[\s\S]*?margin:\s*0 !important;/
+    );
 });
 
 test("DKP snapshot association reuses the five-team roster styling", async () => {

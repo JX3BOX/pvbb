@@ -246,6 +246,14 @@ test("season video management uses the modern workspace, cards, empty state and 
     assert.match(videos, /rel="noopener noreferrer"/);
     assert.match(pageStyles, /@import \(reference\) "\.\.\/design-system\/_tokens\.less"/);
     assert.match(pageStyles, /\.m-rank-video-dialog\.el-dialog/);
+    assert.match(
+        pageStyles,
+        /@media screen and \(max-width: @phone\)[\s\S]*?\.m-rank-video-dialog\.el-dialog\s*\{[\s\S]*?width:\s*100vw !important;[\s\S]*?height:\s*100vh;[\s\S]*?max-height:\s*100vh;[\s\S]*?margin:\s*0;/
+    );
+    assert.match(
+        pageStyles,
+        /\.m-rank-video-dialog\.el-dialog\s*\{[\s\S]*?\.el-dialog__body\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?flex:\s*1;[\s\S]*?overflow-y:\s*auto;/
+    );
     assert.match(videoStyles, /grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(260px,\s*1fr\)\)/);
     assert.match(videoStyles, /\.m-team-videos-empty/);
 });
