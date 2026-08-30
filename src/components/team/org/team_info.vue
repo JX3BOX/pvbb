@@ -43,7 +43,7 @@
         <div class="u-meta">
             <span class="u-meta-item">
                 <em>{{ $t("team.header.server") }}</em>
-                {{ data.server }}
+                <span class="u-meta-value">{{ data.server }}</span>
             </span>
             <span class="u-meta-item">
                 <em>{{ $t("team.header.leader") }}</em>
@@ -74,11 +74,11 @@
             </span>
             <span class="u-meta-item u-meta-yy" @click="handleCopy(data.yy_channel)" v-if="data.yy_channel">
                 <em><i class="el-icon-document-copy"></i> {{ $t("team.header.yy") }}</em>
-                {{ data.yy_channel }}
+                <span class="u-meta-value">{{ data.yy_channel }}</span>
             </span>
             <span class="u-meta-item u-meta-qq" @click="handleCopy(data.qq_group)" v-if="data.qq_group">
                 <em><i class="el-icon-document-copy"></i> {{ $t("team.header.qq") }}</em>
-                {{ data.qq_group }}
+                <span class="u-meta-value">{{ data.qq_group }}</span>
             </span>
         </div>
 

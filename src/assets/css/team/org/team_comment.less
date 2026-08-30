@@ -1,5 +1,88 @@
+@import (reference) "../design-system/_tokens.less";
+
 .m-team-comment{
     .u-tip{
         .fz(12px);
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .m-team-comment {
+        .c-comment-cmt .u-toolbar {
+            &.u-toolbar--primary {
+                margin-top: 8px;
+            }
+
+            .u-toolbar-left,
+            .u-toolbar-right {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .u-toolbar-right {
+                display: none;
+            }
+
+            .u-toolbar-left > .el-button:nth-of-type(n + 3) {
+                display: none;
+            }
+
+            .el-button.is-link {
+                min-height: 26px;
+                margin: 0;
+                padding: 4px 7px;
+                border: 1px solid @team-border;
+                border-radius: 8px;
+                background: @team-surface-muted;
+                color: @team-text-secondary;
+                font-size: 11px;
+                line-height: 16px;
+
+                > span {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .el-icon {
+                    margin: 0;
+                    font-size: 14px;
+                }
+
+                &.el-button--primary {
+                    border-color: #dfe3ff;
+                    background: @team-primary-soft;
+                    color: @team-primary;
+                }
+
+                &.el-button--danger {
+                    border-color: #fee2e2;
+                    background: #fef2f2;
+                    color: #dc2626;
+                }
+            }
+
+            .el-button + .el-button {
+                margin-left: 0;
+            }
+
+            .u-up {
+                width: 14px;
+                height: 14px;
+                margin-right: 0;
+            }
+
+            .u-date {
+                width: 100%;
+                flex-basis: 100%;
+                justify-content: flex-end;
+                margin: 0;
+                padding-top: 2px;
+                font-size: 11px;
+                line-height: 16px;
+            }
+        }
     }
 }
