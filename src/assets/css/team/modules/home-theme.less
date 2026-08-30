@@ -1071,9 +1071,21 @@
         }
 
         .u-medals {
+            display: flex;
+            width: 100%;
             min-width: 0;
-            overflow: hidden;
+            margin-top: 4px;
+            overflow-x: auto;
+            overflow-y: hidden;
             gap: 3px;
+            overscroll-behavior-inline: contain;
+            scrollbar-width: none;
+            touch-action: pan-x;
+            -webkit-overflow-scrolling: touch;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
         }
 
         .u-medal-icon {
@@ -1807,6 +1819,7 @@
             padding: @team-space-3;
             grid-template-areas:
                 "pic name"
+                "pic medals"
                 "pic meta"
                 "tags tags"
                 "recruit recruit";
@@ -1825,6 +1838,12 @@
                 align-self: end;
                 font-size: 15px;
                 grid-area: name;
+            }
+
+            .u-medals {
+                align-self: center;
+                margin-top: 0;
+                grid-area: medals;
             }
 
             > .u-meta:not(.u-recruit) {

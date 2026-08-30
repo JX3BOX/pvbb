@@ -109,15 +109,15 @@
                     <i class="u-status" v-if="item.status == 1" :title="$t('team.homeFilters.verified')">
                         <img svg-inline src="@/assets/img/team/verify.svg" />
                     </i>
-                    <span class="u-medals">
-                        <img
-                            class="u-medal-icon"
-                            :src="showTeamMedal(medal.icon)"
-                            v-for="(medal, x) in item.medals"
-                            :key="x"
-                            :title="medal.name"
-                        />
-                    </span>
+                </span>
+                <span class="u-medals" v-if="item.medals && item.medals.length">
+                    <img
+                        class="u-medal-icon"
+                        :src="showTeamMedal(medal.icon)"
+                        v-for="(medal, x) in item.medals"
+                        :key="x"
+                        :title="medal.name"
+                    />
                 </span>
                 <span class="u-meta">
                     <span class="u-meta-item u-server">

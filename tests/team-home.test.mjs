@@ -75,6 +75,18 @@ test("team plaza mobile search controls use separate full-width rows", async () 
     assert.match(styles, /\.u-home-server,[\s\S]*?\.u-name\s*\{[\s\S]*?width:\s*100%;/);
 });
 
+test("team cards keep medals on a separate horizontally scrollable row", async () => {
+    const [list, styles] = await Promise.all([
+        read("../src/components/team/org/team_list.vue"),
+        read("../src/assets/css/team/modules/home-theme.less"),
+    ]);
+
+    assert.match(list, /<\/span>\s*<span class="u-medals" v-if="item\.medals && item\.medals\.length">/);
+    assert.match(styles, /\.u-medals\s*\{[\s\S]*?width:\s*100%;[\s\S]*?overflow-x:\s*auto;[\s\S]*?touch-action:\s*pan-x/);
+    assert.match(styles, /grid-template-areas:[\s\S]*?"pic name"[\s\S]*?"pic medals"[\s\S]*?"pic meta"/);
+    assert.match(styles, /\.u-medals\s*\{[\s\S]*?grid-area:\s*medals/);
+});
+
 test("team creation reuses the modern workspace and grouped archive form language", async () => {
     const [app, page, form, styles] = await Promise.all([
         read("../src/pages/team/App.vue"),
@@ -998,14 +1010,17 @@ test("team management hero uses a compact mobile identity and full-width home ac
     assert.match(styles, /\.m-public-org__hero\s*\{[\s\S]*?min-height:\s*0;[\s\S]*?padding:\s*@team-space-3/);
     assert.match(styles, /\.m-team-info\s*\{[\s\S]*?grid-template-columns:\s*52px minmax\(0, 1fr\)/);
     assert.match(styles, /\.u-title\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
-    assert.match(styles, /> \.u-meta\s*\{[\s\S]*?grid-auto-columns:\s*minmax\(0, 1fr\);[\s\S]*?grid-auto-flow:\s*column/);
+    assert.match(styles, /> \.u-meta\s*\{[\s\S]*?display:\s*flex;[\s\S]*?flex-direction:\s*column/);
     assert.match(styles, /> \.u-meta\s*\{[\s\S]*?border:\s*1px solid @team-border-light;[\s\S]*?background:\s*@team-surface-muted/);
-    assert.match(styles, /&:first-of-type\s*\{[\s\S]*?grid-template-columns:\s*1fr 0\.78fr 1\.22fr/);
-    assert.match(styles, /\.u-meta-item\s*\{[\s\S]*?align-items:\s*center;[\s\S]*?flex-direction:\s*row;[\s\S]*?white-space:\s*nowrap/);
-    assert.match(styles, /& \+ \.u-meta-item\s*\{[\s\S]*?border-left:\s*1px solid @team-border-light/);
-    assert.match(styles, /a\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1;[\s\S]*?text-overflow:\s*ellipsis/);
+    assert.match(styles, /\.u-meta-item\s*\{[\s\S]*?width:\s*100%;[\s\S]*?justify-content:\s*flex-start;[\s\S]*?white-space:\s*nowrap/);
+    assert.match(styles, /& \+ \.u-meta-item\s*\{[\s\S]*?border-top:\s*1px solid @team-border-light/);
+    assert.match(styles, /em\s*\{[\s\S]*?justify-content:\s*flex-start;[\s\S]*?text-align:\s*left/);
+    assert.match(styles, /a,[\s\S]*?\.u-meta-value\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1;[\s\S]*?text-overflow:\s*ellipsis/);
     assert.match(styles, /\.m-team-admin\s*\{[\s\S]*?\.u-team-home-link,[\s\S]*?\.el-button\s*\{[\s\S]*?width:\s*100%/);
     assert.match(teamInfo, /class="u-leader-link"[\s\S]*?:title="leaderName"[\s\S]*?\{\{ leaderName \}\}/);
+    assert.match(teamInfo, /class="u-meta-value">\{\{ data\.server \}\}<\/span>/);
+    assert.match(teamInfo, /class="u-meta-value">\{\{ data\.yy_channel \}\}<\/span>/);
+    assert.match(teamInfo, /class="u-meta-value">\{\{ data\.qq_group \}\}<\/span>/);
 });
 
 test("member management subtabs stay synchronized with the subtab query", async () => {
