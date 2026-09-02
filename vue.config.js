@@ -6,6 +6,22 @@ const commonDomains = require("@jx3box/jx3box-common/data/jx3box.json");
 const postcssConfig = path.resolve(__dirname, "./postcss.config.js");
 const tailwindEntry = path.resolve(__dirname, "./src/assets/css/tailwind.css");
 
+// 部分共享包会在异步 chunk 中生成 __webpack_require__.t 调用。某些生产构建环境
+// 无法正确把这项间接依赖回传给入口 runtime，最终导致路由加载时报 “.t is not a function”。
+// 显式保留该 runtime helper，避免入口与懒加载 chunk 的运行时能力不一致。
+class EnsureCreateFakeNamespaceObjectRuntimePlugin {
+    apply(compiler) {
+        compiler.hooks.thisCompilation.tap("EnsureCreateFakeNamespaceObjectRuntimePlugin", (compilation) => {
+            compilation.hooks.additionalChunkRuntimeRequirements.tap(
+                "EnsureCreateFakeNamespaceObjectRuntimePlugin",
+                (chunk, runtimeRequirements) => {
+                    runtimeRequirements.add(compiler.webpack.RuntimeGlobals.createFakeNamespaceObject);
+                }
+            );
+        });
+    }
+}
+
 const pages = {
     index: {
         entry: "./src/main.js",
@@ -169,6 +185,7 @@ module.exports = {
             warningsFilter: [/node_modules[\\\\/]+@jx3box[\\\\/]+jx3box-common[\\\\/]+/],
         },
         plugins: [
+            new EnsureCreateFakeNamespaceObjectRuntimePlugin(),
             new webpack.DefinePlugin({
                 // 全局注入，用于 JS 或其他代码中
                 __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
