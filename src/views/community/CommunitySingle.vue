@@ -174,6 +174,7 @@ import {
     getTopicDetails,
     getTopicDetailsFromAdmin,
     getTopicReplyList,
+    getTopicReplyListFromAdmin,
     replyTopic,
 } from "@/service/community";
 import { getStat, postStat, postHistory } from "@jx3box/jx3box-common/js/stat";
@@ -253,7 +254,6 @@ export default {
             replyDraftMentions: [],
             onlyAuthor: false,
             number_queries: ["per", "page"],
-            mode: null,
 
             // 打赏相关 start
             showHomeWork: false,
@@ -350,7 +350,7 @@ export default {
             return window.innerWidth < 768;
         },
         isAdminMode() {
-            return this.isSuper && (this.mode === "admin" || this.$route.query.from === "admin");
+            return this.$route.query.mode === "admin" || (this.isSuper && this.$route.query.from === "admin");
         },
         isLogin() {
             return User.isLogin();
@@ -442,6 +442,9 @@ export default {
         this.footerEditorObserver = null;
     },
     watch: {
+        isAdminMode() {
+            if (this.routeReady) this.loadTopic();
+        },
         "$route.params.id": function (nextId, previousId) {
             if (!this.routeReady || String(nextId || "") === String(previousId || "")) return;
             this.loadTopic();
@@ -717,7 +720,8 @@ export default {
             const requestVersion = ++this.replyRequestVersion;
             this.loading = true;
             this.currentReplyRequestKey = requestKey;
-            const request = getTopicReplyList(requestTopicId, params)
+            const fetchReplyList = this.isAdminMode ? getTopicReplyListFromAdmin : getTopicReplyList;
+            const request = fetchReplyList(requestTopicId, params)
                 .then(async (res) => {
                     if (
                         requestVersion !== this.replyRequestVersion ||

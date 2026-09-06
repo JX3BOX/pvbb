@@ -30,6 +30,13 @@ function getTopicReplyList(id, params) {
     });
 }
 
+// 管理员-获取帖子回复列表
+function getTopicReplyListFromAdmin(id, params) {
+    return $next().get(`${API_PREFIX}/community/discussion/manage/reply/list`, {
+        params: { ...params, topic_id: id },
+    });
+}
+
 // 回复主贴
 function replyTopic(id, data, params) {
     return $next().post(`${API_PREFIX}/community/discussion/topic/item/${id}/reply`, data, { params });
@@ -114,6 +121,7 @@ export {
     getTopicBucket,
     getTopicDetails,
     getTopicReplyList,
+    getTopicReplyListFromAdmin,
     replyTopic,
     delReplyToMyTopic,
     delCommentToMyReply,
