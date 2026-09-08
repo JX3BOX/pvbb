@@ -18,10 +18,8 @@
                         target="_blank"
                     >
                         <span class="u-name">{{ data.title || $t("team.raid.item.noTitle") }}</span>
-                        <span v-if="data.is_public" class="u-public"><i class="el-icon-position"></i> {{ $t("team.raid.item.lobby") }}</span>
+                        <span v-if="data.is_public" class="u-public"><el-icon><View /></el-icon> {{ $t("team.raid.item.public") }}</span>
                     </router-link>
-                </div>
-                <div class="u-activity-row">
                     <el-tag class="u-activity-tag" size="small" effect="plain" round>{{ data.name }}</el-tag>
                 </div>
                 <div class="u-meta">

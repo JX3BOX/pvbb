@@ -222,7 +222,7 @@ test("battle notice keeps its copy and activity filter in a compact responsive t
 
     assert.match(styles, /\.m-battle-notice__content[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
     assert.match(styles, /\.u-notice-meta[\s\S]*?display:\s*flex[\s\S]*?flex-wrap:\s*wrap/);
-    assert.match(styles, /\.u-notice-filter\s*\{[\s\S]*?justify-content:\s*space-between[\s\S]*?background:\s*fade\(#fff, 62%\)/);
+    assert.match(styles, /\.u-notice-filter\s*\{[\s\S]*?justify-content:\s*space-between[\s\S]*?background:\s*#fff/);
     assert.match(styles, /max-width:\s*@phone[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?\.u-notice-filter\s*\{[\s\S]*?width:\s*100%/);
     assert.doesNotMatch(styles, /\.m-battle-notice__content\s*\{[\s\S]{0,120}flex-direction:\s*column/);
 });

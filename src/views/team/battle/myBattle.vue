@@ -28,13 +28,28 @@
                 <el-alert :title="$t('pages.team.battle.noRecords')" type="info" show-icon></el-alert>
             </div>
             <div class="m-mybattle-list" v-else-if="displayList.length">
-                <BattleItem
+                <div
                     v-for="item in displayList"
                     :key="item.ID || item.id || item.created"
-                    :item="item"
-                    personal-ranking
-                    @uploadBattle="uploadBattle"
-                ></BattleItem>
+                    class="u-team-collapse"
+                    :class="{ 'is-expanded': expandedItems.includes(item) }"
+                >
+                    <div @click="toggleDetails(item)" class="u-team-title">
+                        <BattleItem
+                            :item="item"
+                            personal-ranking
+                            :expanded="expandedItems.includes(item)"
+                            show-details-toggle
+                            @toggleDetails="toggleDetails(item)"
+                            @uploadBattle="uploadBattle"
+                        ></BattleItem>
+                    </div>
+                    <collapse-transition>
+                        <div class="u-team-item" v-show="expandedItems.includes(item)">
+                            <TeamItem :item="item" />
+                        </div>
+                    </collapse-transition>
+                </div>
             </div>
             <div class="m-battle-list_null" v-else>
                 <el-alert :title="$t('pages.team.battle.noActivityRecordsOnPage')" type="info" show-icon></el-alert>
@@ -67,13 +82,15 @@
 <script>
 import { getMyBattleList, getBossConfig, getAchievementsByIds } from "@/service/team/battle.js";
 import { uniq } from "lodash";
+import CollapseTransition from "@/assets/js/collapse.js";
 import Relevance from "./relevance.vue";
 import BattleItem from "./battleItem.vue";
+import TeamItem from "./teamItem.vue";
 
 const RANKING_FILTER_STORAGE_KEY = "team:my-battle:ranking-only";
 
 export default {
-    components: { BattleItem, Relevance },
+    components: { BattleItem, Relevance, TeamItem, "collapse-transition": CollapseTransition },
     props: {
         teamId: {
             type: [Number, String],
@@ -83,6 +100,7 @@ export default {
     data() {
         return {
             list: [],
+            expandedItems: [],
             relevanceShow: false,
             relevanceData: {},
             per: 10,
@@ -125,7 +143,13 @@ export default {
             getMyBattleList(this.params)
                 .then(async (data) => {
                     let res = data.data.data;
-                    this.list = res.list || [];
+                    this.expandedItems = [];
+                    this.list = (res.list || []).map((item) => ({
+                        ...item,
+                        team_info: item.team_info || {},
+                        leaders: (item.team_members || []).find((member) => member.Name === item.leader),
+                        members: (item.team_members || []).filter((member) => member.Name !== item.leader),
+                    }));
                     this.total = res.page.total || 1;
 
                     const achievementIds = uniq(this.list.map((item) => item.achieve_id)).filter(Boolean);
@@ -154,6 +178,13 @@ export default {
         uploadBattle(item) {
             this.relevanceData = item;
             this.relevanceShow = true;
+        },
+        toggleDetails(item) {
+            if (this.expandedItems.includes(item)) {
+                this.expandedItems = this.expandedItems.filter((expanded) => expanded !== item);
+            } else {
+                this.expandedItems.push(item);
+            }
         },
 
         changePage: function (page) {
