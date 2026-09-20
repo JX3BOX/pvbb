@@ -1,29 +1,31 @@
 <template>
-    <div class="m-events">
-        <h3><i class="el-icon-present"></i>{{ $t("team.apply.available") }}</h3>
+    <div class="m-events p-team-home p-team-welfare">
+        <ApplyHeader />
         <div class="m-events-box" v-if="list && list.length">
-            <div @click="gotoApply(item)" class="u-item" v-for="(item, index) in list" :key="index">
+            <router-link :to="{ name: 'apply_single', params: { id: item.id } }" class="u-item" v-for="item in list" :key="item.id">
                 <img :src="resolveImagePath(item.banner) || img" :alt="item.name" />
                 <div class="u-info">
                     <div class="u-txt">
                         <span class="u-title">{{ item.name }}</span>
-                        <span class="u-time"><i class="el-icon-date"></i> {{ $t("team.apply.time", { time: showTime(item.start_at || item.created_at) }) }} ~
+                        <span class="u-time"><el-icon><Calendar /></el-icon> {{ $t("team.apply.time", { time: showTime(item.start_at || item.created_at) }) }} ~
                             {{ showTime(item.end_at || item.created_at) }}</span>
                         <span class="u-desc" v-html="item.desc"></span>
                     </div>
                     <div class="u-status">
-                        <el-button :disabled="!item.status" size="small" :type="item.status ? 'success' : 'info'">{{ $t(item.status ? "team.apply.ongoing" : "team.apply.ended") }}<i class="el-icon-arrow-right" v-if="item.status"></i></el-button>
+                        <el-tag :type="item.status ? 'success' : 'info'" round>{{ $t(item.status ? "team.apply.ongoing" : "team.apply.ended") }}</el-tag>
                     </div>
                 </div>
-            </div>
+            </router-link>
         </div>
 
         <div class="m-events-null" v-else>
-            <el-alert :title="$t('team.apply.empty')" type="info" show-icon> </el-alert>
+            <el-empty :description="$t('team.apply.empty')" />
         </div>
     </div>
 </template>
 <script>
+import { Calendar } from "@element-plus/icons-vue";
+import ApplyHeader from "@/components/team/apply/ApplyHeader.vue";
 import { getEvents } from "@/service/team/apply.js";
 import { showDate } from "@/utils/filters";
 import { __imgPath } from "@/utils/config";
@@ -31,6 +33,7 @@ import {resolveImagePath} from '@jx3box/jx3box-common/js/utils'
 
 export default {
     name: "eventsList",
+    components: { ApplyHeader, Calendar },
     data: function () {
         return {
             list: [],
@@ -45,12 +48,7 @@ export default {
     },
     methods: {
         showTime: showDate,
-        gotoApply({ id }) {
-            this.$router.push({
-                name: "apply_single",
-                params: { id },
-            });
-        },resolveImagePath
+        resolveImagePath,
     },
     created() {
         getEvents().then((res) => {

@@ -1,7 +1,6 @@
 <template>
-    <div class="m-apply-event" v-loading="loading">
-        <el-button class="u-goback" icon="ArrowLeft" @click="goBack">{{ $t("team.apply.back") }}</el-button>
-        <h3><i class="el-icon-present"></i>{{ data.name }}</h3>
+    <div class="m-apply-event p-team-home p-team-welfare" v-loading="loading">
+        <ApplyHeader :title="data.name" back />
         <div class="m-apply-info">
             <h4>{{ $t("team.apply.conditions") }}</h4>
             <div v-html="data.desc"></div>
@@ -66,6 +65,7 @@
     </div>
 </template>
 <script>
+import ApplyHeader from "@/components/team/apply/ApplyHeader.vue";
 import { getMyManageTeams } from "@/service/team/team.js";
 import { getApply, getApplyRecord, postApplyRecord, checkApply } from "@/service/team/apply.js";
 import { showTime } from "@/utils/filters";
@@ -92,7 +92,7 @@ export default {
             extend: "",
         };
     },
-    components: { author, express, extend, tifu },
+    components: { ApplyHeader, author, express, extend, tifu },
     computed: {
         event_id() {
             return ~~this.$route.params.id;

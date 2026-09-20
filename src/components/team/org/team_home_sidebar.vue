@@ -250,6 +250,22 @@
                 <el-icon class="u-sidebar-nav-arrow"><TopRight /></el-icon>
             </a>
         </section>
+        <section class="m-team-home-sidebar__panel">
+            <router-link
+                class="u-sidebar-workspace-link u-sidebar-welfare-link"
+                :class="{ 'is-active': ['apply_list', 'apply_single'].includes($route.name) }"
+                :to="{ name: 'apply_list' }"
+                @click="closeMobileDrawer"
+            >
+                <span class="u-sidebar-group-icon is-welfare" aria-hidden="true">
+                    <el-icon><Present /></el-icon>
+                </span>
+                <span class="u-sidebar-group-copy">
+                    <strong>{{ $t("team.legacyNav.welfareApplications") }}</strong>
+                </span>
+                <el-icon class="u-sidebar-nav-arrow"><ArrowRight /></el-icon>
+            </router-link>
+        </section>
         </div>
     </aside>
 </template>
@@ -267,6 +283,7 @@ import {
     Close,
     Lock,
     OfficeBuilding,
+    Present,
     Search,
     School,
     Setting,
@@ -284,6 +301,7 @@ export default {
         Close,
         Lock,
         OfficeBuilding,
+        Present,
         Search,
         School,
         Setting,

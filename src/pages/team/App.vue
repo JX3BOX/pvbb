@@ -114,6 +114,8 @@ export default {
                 "manage_my_org",
                 "add_org",
                 "view_role",
+                "apply_list",
+                "apply_single",
             ].includes(this.$route.name);
         },
         loginUrl: function () {

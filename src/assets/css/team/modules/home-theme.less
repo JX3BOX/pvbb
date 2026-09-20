@@ -374,6 +374,34 @@
         }
     }
 
+    .u-sidebar-welfare-link {
+        border-top: 0;
+        background: #fff7fa;
+
+        .u-sidebar-group-icon.is-welfare {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .u-sidebar-group-copy strong,
+        .u-sidebar-nav-arrow {
+            color: #be185d;
+        }
+
+        &.is-active,
+        &:hover {
+            background: #fdf2f8;
+            .u-sidebar-group-copy strong,
+            .u-sidebar-nav-arrow {
+                color: #be185d;
+            }
+        }
+
+        &:focus-visible {
+            box-shadow: inset 0 0 0 3px rgba(219, 39, 119, 0.16);
+        }
+    }
+
     .u-sidebar-group-count {
         min-width: 20px;
         height: 20px;
