@@ -226,7 +226,9 @@ export default {
         },
         getBanner: function (val, subtype) {
             if (val) {
-                return showBanner(resolveImagePath(val));
+                const banner = resolveImagePath(val);
+                // WebP 预览图直接使用原图，避免 OSS 样式处理导致加载失败。
+                return /\.webp(?:[?#]|$)/i.test(banner) ? banner : showBanner(banner);
             } else {
                 return __cdn + `design/random_cover/${getRandomCoverIndex(this.item)}.jpg`;
             }

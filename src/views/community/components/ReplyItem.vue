@@ -90,7 +90,7 @@
                         </template>
                     </div>
 
-                    <div v-if="!isMaster" v-html="renderContent" />
+                    <ReplyContent v-if="!isMaster" :content="renderContent" />
 
                     <div v-if="extraImages && extraImages.length && isMaster && isFromPhone" class="m-image-box">
                         <a class="u-item" v-for="(item, index) in extraImages" :key="index">
@@ -275,6 +275,7 @@ import Thx from "@jx3box/jx3box-ui/src/single/Thx.vue";
 import CommentUser from "./CommentUser.vue";
 import ReplyForReply from "./ReplyForReply.vue";
 import CommentItem from "./CommentItem.vue";
+import ReplyContent from "./ReplyContent.vue";
 import Article from "@jx3box/jx3box-editor/src/Article.vue";
 import { renderEmotionHTML } from "@/utils/jx3Emo";
 import sanitizeRichText from "@jx3box/jx3box-editor/src/assets/js/xss";
@@ -293,6 +294,7 @@ export default {
         CommentUser,
         ReplyForReply,
         CommentItem,
+        ReplyContent,
         Article,
         // AddBlackHoleButton,
     },

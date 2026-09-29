@@ -47,7 +47,7 @@
                 <p class="u-answer-user">{{
                     $t("pages.community.reply.replyTo", { name: replyTargetName })
                 }}</p>
-                <p class="u-content" v-html="renderContent"></p>
+                <ReplyContent class="u-content" :content="renderContent" />
                 <div class="u-comment-toolbar">
                     <div class="u-comment-actions">
                         <el-button link size="small" type="primary" @click="addLike" class="">
@@ -112,6 +112,7 @@ import { __cdn } from "@/utils/config";
 import { enableLazyImages } from "@/utils/community";
 
 import ReplyForReply from "./ReplyForReply.vue";
+import ReplyContent from "./ReplyContent.vue";
 import AddBlockButton from "./AddBlockButton.vue";
 import ComplaintButton from "./ComplaintButton.vue";
 import DeleteButton from "./DeleteButton.vue";
@@ -123,6 +124,7 @@ export default {
     inject: ["getTopicData", "getTopicPassword", "getReplyData", "getCommentList"],
     components: {
         ReplyForReply,
+        ReplyContent,
         AddBlockButton,
         // AddBlackHoleButton,
         ComplaintButton,
