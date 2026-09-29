@@ -11,9 +11,6 @@ node_modules
 .gitkeep
 build
 
-package-lock.json
-yarn.lock
-
 # local env files
 .env.local
 .env.*.local
