@@ -2,7 +2,7 @@
     <el-dialog
         custom-class="m-design-task"
         :width="isPhone ? '95%' : '600px'"
-        :visible="modelValue"
+        :model-value="modelValue"
         @close="close"
         :title="$t('pages.collection.admin.quickPush')"
         append-to-body
@@ -18,7 +18,7 @@
             </el-form-item>
             <el-form-item :label="$t('pages.collection.admin.version')">
                 <el-radio-group v-model="form.version">
-                    <el-radio-button v-for="(label, key) in versions" :key="key" :label="key">{{
+                    <el-radio-button v-for="(label, key) in versions" :key="key" :value="key">{{
                         label
                     }}</el-radio-button>
                 </el-radio-group>
@@ -72,10 +72,6 @@ export default {
             type: Object,
             default: () => {},
         },
-    },
-    model: {
-        prop: "modelValue",
-        event: "update:modelValue",
     },
     emits: ["update:modelValue"],
     data() {

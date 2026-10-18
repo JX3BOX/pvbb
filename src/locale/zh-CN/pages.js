@@ -516,6 +516,9 @@ export default {
     },
 
     common: {
+        confirm: "确定",
+        cancel: "取消",
+        submit: "提交",
         appendTitle: "- 剑网3魔盒（JX3BOX）",
     },
 };

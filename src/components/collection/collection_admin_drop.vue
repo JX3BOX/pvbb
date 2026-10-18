@@ -31,7 +31,6 @@
 <script>
 import User from "@jx3box/jx3box-common/js/user";
 import { sendMessage } from "@/service/collection";
-import { editLink } from "@jx3box/jx3box-common/js/utils";
 import CollectionAdmin from "@/components/collection/collection_admin.vue";
 import DesignTask from "@/components/collection/collection_design_task.vue";
 export default {

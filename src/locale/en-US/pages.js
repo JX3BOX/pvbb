@@ -429,6 +429,9 @@ export default {
     },
 
     common: {
+        confirm: "Confirm",
+        cancel: "Cancel",
+        submit: "Submit",
         appendTitle: "- JX3BOX",
     },
 };

@@ -2,16 +2,16 @@
     <el-drawer
         class="c-admin"
         :title="$t('pages.collection.admin.panelTitle')"
-        :visible="modelValue"
+        :model-value="modelValue"
         :before-close="close"
         :append-to-body="true"
         :modal="false"
-        :withHeader="false"
+        :with-header="false"
     >
         <div class="c-admin-wrapper">
             <el-divider content-position="left">{{ $t("pages.collection.admin.visibility") }}</el-divider>
             <el-radio-group v-model="visible" size="small" class="c-admin-status">
-                <el-radio-button v-for="(option, key) in visible_options" :label="key" :key="key">{{
+                <el-radio-button v-for="(option, key) in visible_options" :value="Number(key)" :key="key">{{
                     option
                 }}</el-radio-button>
             </el-radio-group>
@@ -80,10 +80,6 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    model: {
-        prop: "modelValue",
-        event: "update:modelValue",
     },
     data() {
         return {

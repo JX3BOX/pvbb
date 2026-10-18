@@ -404,6 +404,9 @@ export default {
     },
 
     common: {
+        confirm: "Xác nhận",
+        cancel: "Hủy",
+        submit: "Gửi",
         appendTitle: "- JX3BOX",
     },
 };

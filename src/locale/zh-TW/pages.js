@@ -404,6 +404,9 @@ export default {
     },
 
     common: {
+        confirm: "確定",
+        cancel: "取消",
+        submit: "提交",
         appendTitle: "- 劍網3魔盒（JX3BOX）",
     },
 };
