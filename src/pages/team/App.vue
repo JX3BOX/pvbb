@@ -9,7 +9,8 @@
             :adminEnable="false"
             :feedbackEnable="true"
             :crumbEnable="true"
-            v-if="!isCreateTeam && !isModernWorkspace"
+            :withoutLeft="isModernWorkspace"
+            v-if="!isCreateTeam"
         >
             <template #logo>
                 <img :src="logo" />
@@ -21,7 +22,6 @@
         <Main
             :withoutRight="true"
             :withoutLeft="isModernWorkspace"
-            :withoutBread="isModernWorkspace"
             :class="{ 'is-team-modern-main': isModernWorkspace }"
             v-if="!isCreateTeam"
         >

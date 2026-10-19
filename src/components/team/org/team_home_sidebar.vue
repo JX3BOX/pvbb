@@ -40,15 +40,6 @@
             </header>
 
         <section class="m-team-home-sidebar__panel is-navigation is-discovery">
-            <div class="m-team-home-sidebar__brand">
-                <span class="u-sidebar-brand-icon" aria-hidden="true">
-                    <img :src="teamLogo" alt="" />
-                </span>
-                <div>
-                    <strong>{{ $t("team.common.platform") }}</strong>
-                </div>
-            </div>
-
             <nav class="m-team-home-sidebar__nav" :aria-label="$t('team.sidebar.navigation')">
                 <router-link
                     class="u-sidebar-nav-item"
