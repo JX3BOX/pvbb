@@ -1,4 +1,4 @@
-import treasurePerfect from "@jx3box/jx3box-common/data/treasure_perfect.json";
+import treasurePerfect from "@jx3box/jx3box-data/data/serendipity/treasure_perfect.json";
 
 const STYLE_LENGTH_KEYS = new Set(["top", "right", "bottom", "left", "width", "height", "fontSize", "lineHeight"]);
 

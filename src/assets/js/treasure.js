@@ -1,11 +1,11 @@
 import axios from "axios";
-import treasurePerfect from "@jx3box/jx3box-common/data/treasure_perfect.json";
+import treasurePerfect from "@jx3box/jx3box-data/data/serendipity/treasure_perfect.json";
 import { getRoleGameAchievements, getAdventures, getAchievements } from "@/service/qqbot-pvx";
 import { getPerfectItems } from "@/assets/js/treasure-layout";
 
 const REMOTE_LAYOUT_URL =
     process.env.VUE_APP_ADVENTURE_TREASURE_LAYOUT_URL ||
-    "https://cdn.jsdelivr.net/npm/@jx3box/jx3box-common/data/treasure_perfect.json";
+    "https://data.jx3box.com/data/serendipity/treasure_perfect.json";
 
 let layoutPromise;
 

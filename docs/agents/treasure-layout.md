@@ -2,11 +2,10 @@
 
 ## 背景
 
-QQBot 奇遇珍卷的绝世奇遇布局来自 `@jx3box/jx3box-common/data/treasure_perfect.json`，运行时默认会请求：
+QQBot 奇遇珍卷的绝世奇遇布局来自 `@jx3box/jx3box-data/data/serendipity/treasure_perfect.json`，运行时默认会请求：
 
-`https://cdn.jsdelivr.net/npm/@jx3box/jx3box-common/data/treasure_perfect.json`
+`https://data.jx3box.com/data/serendipity/treasure_perfect.json`
 
-这个无版本 jsDelivr URL 可能因为 CDN 或浏览器缓存短时间指向旧 npm 版本，导致本地包已包含的新绝世奇遇在远程布局里暂时缺失。
 
 ## 当前规则
 
@@ -21,8 +20,6 @@ QQBot 奇遇珍卷的绝世奇遇布局来自 `@jx3box/jx3box-common/data/treasu
 
 ## 维护建议
 
-- 发布 `@jx3box/jx3box-common` 新版本后，建议 purge 相关 jsDelivr URL：
-  - `https://purge.jsdelivr.net/npm/@jx3box/jx3box-common/data/treasure_perfect.json`
-  - `https://purge.jsdelivr.net/npm/@jx3box/jx3box-common@latest/data/treasure_perfect.json`
-- 如果对实时性要求更高，可通过 `VUE_APP_ADVENTURE_TREASURE_LAYOUT_URL` 指向固定版本 URL 或自有数据地址。
+布局源文件位于 `jx3box-data/data/serendipity/treasure_perfect.json`，随数据仓库同步至线上。
+
 - 后续调整奇遇珍卷逻辑时，请先阅读本文件和项目根目录的 `AGENTS.md`（如果存在）。
